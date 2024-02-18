@@ -1,0 +1,38 @@
+{
+	"requestbid_id": 1,
+	"request_id": 1,
+        "supplierid": 1,
+        "suppliercontactid": 1,
+        "quantity": 1.00,
+        "comments": "",
+        "deliverydate": {"$date":"2023-07-15T08:00:00Z"},
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-20T08:00:00Z"},
+        "comment": ""
+}
+
+{
+	"requestbid_id": 2,
+	"request_id": 1,
+        "supplierid": 2,
+        "suppliercontactid": 1,
+        "quantity": 1.00,
+        "comments": "",
+        "deliverydate": {"$date":"2023-07-15T08:00:00Z"},
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-20T08:00:00Z"},
+        "comment": ""
+}
+
+{
+	"requestbid_id": 3,
+	"request_id": 1,
+        "supplierid": 3,
+        "suppliercontactid": 1,
+        "quantity": 1.00,
+        "comments": "",
+        "deliverydate": {"$date":"2023-07-15T08:00:00Z"},
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-20T08:00:00Z"},
+        "comment": ""
+}

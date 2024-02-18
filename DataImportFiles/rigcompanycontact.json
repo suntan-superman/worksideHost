@@ -1,0 +1,48 @@
+{
+        "contact_id": 1,
+        "accesslevel": "STANDARD",
+        "username": "bbroussard55",
+        "userpassword": "workside",
+        "firstname": "Brian",
+        "lastname": "Broussard",
+        "nickname": "BB",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "bbroussard@workside.com",
+        "secondaryemail": "sales@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+         "comment": ""
+}
+{
+        "contact_id": 2,
+        "accesslevel": "STANDARD",
+        "username": "ddoucet55",
+        "userpassword": "workside",
+        "firstname": "Doug",
+        "lastname": "Doucet",
+        "nickname": "Doug",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "ddoucet@workside.com",
+        "secondaryemail": "sales@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+        "comment": ""
+}
+{
+        "contact_id": 3,
+        "accesslevel": "STANDARD",
+        "username": "cmelancon55",
+        "userpassword": "workside",
+        "firstname": "Christine",
+        "lastname": "Melancon",
+        "nickname": "Christy",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "cmelancon@workside.com",
+        "secondaryemail": "sales@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+        "comment": ""
+}

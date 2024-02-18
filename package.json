@@ -1,0 +1,80 @@
+{
+  "proxy": "http://localhost:4000",
+  "name": "worksidehost",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@emotion/core": "^11.0.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@googlemaps/react-wrapper": "^1.1.35",
+    "@material-ui/core": "^4.12.4",
+    "@mui/icons-material": "^5.14.16",
+    "@react-google-maps/api": "^2.19.2",
+    "@syncfusion/ej2": "^23.1.40",
+    "@syncfusion/ej2-base": "^23.1.40",
+    "@syncfusion/ej2-data": "^23.1.36",
+    "@syncfusion/ej2-inputs": "^23.1.43",
+    "@syncfusion/ej2-react-calendars": "^23.1.40",
+    "@syncfusion/ej2-react-charts": "^23.1.40",
+    "@syncfusion/ej2-react-dropdowns": "^23.1.40",
+    "@syncfusion/ej2-react-grids": "^23.1.40",
+    "@syncfusion/ej2-react-inputs": "^23.1.40",
+    "@syncfusion/ej2-react-kanban": "^23.1.36",
+    "@syncfusion/ej2-react-navigations": "^23.1.41",
+    "@syncfusion/ej2-react-popups": "^23.1.43",
+    "@syncfusion/ej2-react-richtexteditor": "^23.1.40",
+    "@syncfusion/ej2-react-schedule": "^23.1.40",
+    "@syncfusion/ej2-treegrid": "^23.1.43",
+    "@ubilabs/google-maps-react-hooks": "^2.0.2",
+    "axios": "^1.5.1",
+    "date-fns": "^2.30.0",
+    "dotenv": "^16.3.1",
+    "google-map-react": "^2.2.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.10.1",
+    "react-loading-skeleton": "^3.3.1",
+    "react-router-dom": "^6.2.1",
+    "react-scripts": "^5.0.1",
+    "react-usestateref": "^1.0.8"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.2",
+    "eslint": "^8.9.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "postcss": "^8.4.6",
+    "tailwindcss": "^3.0.19"
+  },
+  "author": "Workside",
+  "license": "ISC"
+}

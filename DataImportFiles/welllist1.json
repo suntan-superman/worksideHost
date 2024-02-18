@@ -1,0 +1,20 @@
+{
+	"Latitude":"37.69652",
+	"Longitude":"-121.588699",
+	"LeaseName":"Altamont",
+	"WellNumber":"1",
+	"OpName":"Irex Corp.",
+	"County":"Alameda",
+	"API":"120053",
+	"FieldName":"Any Field",
+	"OpWellID":"'Altamont' 1",
+	"AreaName":"Any Area"
+}
+{"Latitude":"37.642521","Longitude":"-121.721163","LeaseName":"Antonini", "WellNumber":"1","OpName":"Biglo Co.","County":"Alameda","API":"120027","FieldName":"Any Field","OpWellID":"'Antonini' 1", "AreaName":"Any Area"}
+{"Latitude":"37.68489","Longitude":"-121.696372","LeaseName":"B & G", "WellNumber":"1","OpName":"N. D. Bradford & J. F. Guardino","County":"Alameda","API":"100036","FieldName":"Livermore","OpWellID":"'B & G' 1", "AreaName":"Any Area"}
+{"Latitude":"37.754518","Longitude":"-122.013812","LeaseName":"Buttes Freitas", "WellNumber":"1","OpName":"Venoco, LLC","County":"Alameda","API":"100005","FieldName":"Any Field","OpWellID":"'Buttes Freitas' 1", "AreaName":"Any Area"}
+{"Latitude":"37.755409","Longitude":"-121.59227","LeaseName":"Castello", "WellNumber":"44939","OpName":"Mobil Oil Exploration & Production North America, Inc.","County":"Alameda","API":"100018","FieldName":"Any Field","OpWellID":"'Castello' 1-13", "AreaName":"Any Area"}
+{"Latitude":"37.660941","Longitude":"-121.684082","LeaseName":"Castle-Wisner Unit", "WellNumber":"44927","OpName":"Castle Minerals","County":"Alameda","API":"120043","FieldName":"Any Field","OpWellID":"'Castle-Wisner Unit' 1-1", "AreaName":"Any Area"}
+{"Latitude":"37.729739","Longitude":"-121.734724","LeaseName":"City of Livermore", "WellNumber":"1","OpName":"Venoco, LLC","County":"Alameda","API":"120019","FieldName":"Any Field","OpWellID":"'City of Livermore' 1", "AreaName":"Any Area"}
+{"Latitude":"37.648931","Longitude":"-121.593629","LeaseName":"Clay Canyon Minerals", "WellNumber":"1","OpName":"Trico Industries, Inc.","County":"Alameda","API":"120029","FieldName":"Any Field","OpWellID":"'Clay Canyon Minerals' 1", "AreaName":"Any Area"}
+{"Latitude":"37.7045","Longitude":"-121.686012","LeaseName":"Corwin-Bettencourt", "WellNumber":"1","OpName":"Humiston Investment Co.","County":"Alameda","API":"120007","FieldName":"Livermore","OpWellID":"'Corwin-Bettencourt' 1", "AreaName":"Any Area"}

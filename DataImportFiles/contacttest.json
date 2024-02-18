@@ -1,0 +1,16 @@
+{
+        "contact_id": 1,
+        "accesslevel": "STANDARD",
+        "username": "ssmith55",
+        "userpassword": "workside",
+        "firstname": "Steven",
+        "lastname": "Smith",
+        "nickname": "Steve",
+        "primaryphone": "",
+        "secondaryphone": "",
+        "primaryemail": "ssmith@workside.com",
+        "secondaryemail": "sales@workside.com",
+        "status": "ACTIVE",
+        "statusdate": "06/15/2023",
+        "comment": ""
+}

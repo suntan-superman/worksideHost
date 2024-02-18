@@ -1,0 +1,80 @@
+{
+        "contact_id": 1,
+        "accesslevel": "STANDARD",
+        "username": "magnew5",
+        "userpassword": "workside",
+        "firstname": "Michael",
+        "lastname": "Agnew",
+        "nickname": "Mike",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "magnew@workside.com",
+        "secondaryemail": "purchasing@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+        "comment": ""
+}
+{
+        "contact_id": 2,
+        "accesslevel": "STANDARD",
+        "username": "csmith55",
+        "userpassword": "workside",
+        "firstname": "Charles",
+        "lastname": "Smith",
+        "nickname": "Chuck",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "csmith@workside.com",
+        "secondaryemail": "purchasing@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+         "comment": ""
+}
+{
+        "contact_id": 3,
+        "accesslevel": "STANDARD",
+        "username": "srodriguez55",
+        "userpassword": "workside",
+        "firstname": "Samuel",
+        "lastname": "Rodriguez",
+        "nickname": "Sam",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "srodriguez@workside.com",
+        "secondaryemail": "purchasing@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+        "comment": ""
+}
+{
+        "contact_id": 4,
+        "accesslevel": "STANDARD",
+        "username": "gcostanza55",
+        "userpassword": "workside",
+        "firstname": "George",
+        "lastname": "Costanza",
+        "nickname": "George",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "gconstanza@workside.com",
+        "secondaryemail": "purchasing@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+         "comment": ""
+}
+{
+        "contact_id": 5,
+        "accesslevel": "STANDARD",
+        "username": "jmanziel55",
+        "userpassword": "workside",
+        "firstname": "Johnny",
+        "lastname": "Manziel",
+        "nickname": "JT",
+        "primaryphone": "661-333-1111",
+        "secondaryphone": "661-300-1111",
+        "primaryemail": "jmanziel@workside.com",
+        "secondaryemail": "purchasing@workside.com",
+        "status": "ACTIVE",
+        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
+         "comment": ""
+}

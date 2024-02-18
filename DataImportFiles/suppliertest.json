@@ -1,0 +1,18 @@
+{
+        "supplier_id": 9,
+        "name": "Welltec",
+        "address1": "",
+        "address2": "",
+        "city": "Bakersfield",
+        "state": "CA",
+        "zipCode": "",
+        "mailingaddress1": "",
+        "mailingaddress2": "",
+        "mailingcity": "",
+        "mailingstate": "",
+        "mailingzipcode": "",
+        "status": "ACTIVE",
+        "statusdate": "06/15/2023",
+	"comment": "",
+        "products": [4,5,6]
+}
