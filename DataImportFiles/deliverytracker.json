@@ -1,8 +1,0 @@
-{
-        "tracker_id": 1,
-	"request_id": 1,
-        "status": "ACTIVE",
-        "statusdate": {"$date":"2023-06-15T08:00:00Z"},
-         "comment": "",
-	"coordinates": [-119.043732, 35.393528]
-}
