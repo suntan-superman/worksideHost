@@ -1,17 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { GridComponent, ColumnsDirective, ColumnDirective, Selection, Edit, Filter, Inject, Page, Toolbar, Resize, Freeze } from '@syncfusion/ej2-react-grids';
+import React, { useEffect, useState } from "react";
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Selection,
+  Edit,
+  Filter,
+  Inject,
+  Page,
+  Toolbar,
+  Resize,
+  Freeze,
+} from "@syncfusion/ej2-react-grids";
 // import { TreeGridComponent } from '@syncfusion/ej2-react-treegrid';
-import { TabComponent } from '@syncfusion/ej2-react-navigations';
-import { MaskedTextBox } from '@syncfusion/ej2-inputs';
-import { DataManager, Query } from '@syncfusion/ej2-data';
-import { useContactContext } from '../hooks/useContactContext';
-import { useFirmContext } from '../hooks/useFirmContext';
-import { useRigContext } from '../hooks/useRigContext';
-import { useProductContext } from '../hooks/useProductContext';
-import { useSupplierProductContext } from '../hooks/useSupplierProductContext';
-import { Header } from '../components';
-import '../index.css';
-import '../App.css';
+import { TabComponent } from "@syncfusion/ej2-react-navigations";
+import { MaskedTextBox } from "@syncfusion/ej2-inputs";
+import { DataManager, Query } from "@syncfusion/ej2-data";
+import { useContactContext } from "../hooks/useContactContext";
+import { useFirmContext } from "../hooks/useFirmContext";
+import { useRigContext } from "../hooks/useRigContext";
+import { useProductContext } from "../hooks/useProductContext";
+import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
+import { Header } from "../components";
+import "../index.css";
+import "../App.css";
+import { toast } from "react-toastify";
 
 const gridPageSize = 8;
 
@@ -23,16 +36,22 @@ const Admin = () => {
   const [productList, setProductList] = useState(null);
   const [supplierProductList, setSupplierProductList] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
-  const editOptions = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog' };
-  const toolbarOptions = ['Add', 'Edit', 'Delete'];
+  const editOptions = {
+    allowEditing: true,
+    allowAdding: true,
+    allowDeleting: true,
+    mode: "Dialog",
+  };
+  const toolbarOptions = ["Add", "Edit", "Delete"];
   const { contactsData, dispatch: contactDispatch } = useContactContext();
   const { firmData, dispatch: firmDispatch } = useFirmContext();
   const { rigData, dispatch: rigDispatch } = useRigContext();
   const { productData, dispatch: productDispatch } = useProductContext();
-  const { supplierProductData, dispatch: supplierProductDispatch } = useSupplierProductContext();
+  const { supplierProductData, dispatch: supplierProductDispatch } =
+    useSupplierProductContext();
 
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const settings = { mode: 'Row' };
+  const settings = { mode: "Row" };
   let firmsGrid = null;
   let rigsGrid = null;
   let contactsGrid = null;
@@ -41,34 +60,36 @@ const Admin = () => {
 
   // Set Firm Type Selection Options
   const firmOptions = [
-    { firmType: 'CUSTOMER', firmId: '1' },
-    { firmType: 'RIGCOMPANY', firmId: '2' },
-    { firmType: 'SUPPLIER', firmId: '3' }];
+    { firmType: "CUSTOMER", firmId: "1" },
+    { firmType: "RIGCOMPANY", firmId: "2" },
+    { firmType: "SUPPLIER", firmId: "3" },
+  ];
 
   const firmSelections = {
     params: {
       actionComplete: () => false,
       allowFiltering: true,
       dataSource: new DataManager(firmOptions),
-      fields: { text: 'firmType', value: 'firmType' },
+      fields: { text: "firmType", value: "firmType" },
       query: new Query(),
     },
   };
 
   // Set Location Type Selection Options
   const locationOptions = [
-    { location: 'WESTCOAST', locationId: '1' },
-    { location: 'GULFCOAST', locationId: '2' },
-    { location: 'PERMIAN', locationId: '3' },
-    { location: 'EASTCOAST', locationId: '4' },
-    { location: 'MIDCONTINENT', locationId: '5' }];
+    { location: "WESTCOAST", locationId: "1" },
+    { location: "GULFCOAST", locationId: "2" },
+    { location: "PERMIAN", locationId: "3" },
+    { location: "EASTCOAST", locationId: "4" },
+    { location: "MIDCONTINENT", locationId: "5" },
+  ];
 
   const locationSelections = {
     params: {
       actionComplete: () => false,
       allowFiltering: true,
       dataSource: new DataManager(locationOptions),
-      fields: { text: 'location', value: 'location' },
+      fields: { text: "location", value: "location" },
       query: new Query(),
     },
   };
@@ -76,16 +97,16 @@ const Admin = () => {
   useEffect(() => {
     const fetchFirms = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/firm');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/firm");
       const json = await response.json();
       setFirmList(json);
 
       if (response.ok) {
-        firmDispatch({ type: 'GET_FIRM', payload: json });
+        firmDispatch({ type: "GET_FIRM", payload: json });
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchFirms();
   }, [firmDispatch]);
@@ -93,17 +114,17 @@ const Admin = () => {
   useEffect(() => {
     const fetchRigs = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/rig');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/rig");
       const json = await response.json();
 
       setRigList(json);
 
       if (response.ok) {
-        rigDispatch({ type: 'GET_RIG', payload: json });
+        rigDispatch({ type: "GET_RIG", payload: json });
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchRigs();
   }, [rigDispatch]);
@@ -111,17 +132,17 @@ const Admin = () => {
   useEffect(() => {
     const fetchContacts = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/contact');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/contact");
       const json = await response.json();
 
       setContactList(json);
 
       if (response.ok) {
-        contactDispatch({ type: 'GET_CONTACTS', payload: json });
+        contactDispatch({ type: "GET_CONTACTS", payload: json });
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchContacts();
   }, [contactDispatch]);
@@ -129,17 +150,17 @@ const Admin = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/product');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/product");
       const json = await response.json();
 
       setProductList(json);
 
       if (response.ok) {
-        productDispatch({ type: 'GET_PRODUCTS', payload: json });
+        productDispatch({ type: "GET_PRODUCTS", payload: json });
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchProducts();
   }, [productDispatch]);
@@ -147,37 +168,35 @@ const Admin = () => {
   useEffect(() => {
     const fetchSupplierProducts = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/supplierproduct');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/supplierproduct");
       const json = await response.json();
 
       setSupplierProductList(json);
 
       if (response.ok) {
-        supplierProductDispatch({ type: 'GET_SUPPLIERPRODUCTS', payload: json });
+        supplierProductDispatch({
+          type: "GET_SUPPLIERPRODUCTS",
+          payload: json,
+        });
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchSupplierProducts();
   }, [supplierProductDispatch]);
 
   const handleFirmDelete = async () => {
-    const fetchString = (`/api/firm/${selectedRecord}`);
-    // const fetchString = ('/api/firm/' + selectedRecord);
-    // alert(fetchString);
+    const fetchString = `/api/firm/${selectedRecord}`;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
-    // if (!response.ok) {
-    //   setError(json.error);
-    // }
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
+      toast.success("Record Successfully Deleted...");
       // dispatch({ type: 'DELETE_PRODUCT', payload: json });
     }
     // setDeleteFlag(false);
@@ -185,10 +204,9 @@ const Admin = () => {
   };
 
   const handleContactDelete = async () => {
-    const fetchString = (`/api/contact/${selectedRecord}`);
-    alert(fetchString);
+    const fetchString = `/api/contact/${selectedRecord}`;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
@@ -198,7 +216,7 @@ const Admin = () => {
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
+      toast.success("Record Successfully Deleted...");
       // dispatch({ type: 'DELETE_PRODUCT', payload: json });
     }
     // setDeleteFlag(false);
@@ -206,79 +224,68 @@ const Admin = () => {
   };
 
   const handleRigDelete = async () => {
-    const fetchString = (`/api/rig/${selectedRecord}`);
-    // const fetchString = ('/api/rig/' + selectedRecord);
-    alert(fetchString);
+    const fetchString = `/api/rig/${selectedRecord}`;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
-    // if (!response.ok) {
-    //   setError(json.error);
-    // }
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
-      // dispatch({ type: 'DELETE_PRODUCT', payload: json });
+      toast.success("Record Successfully Deleted...");
     }
     // setDeleteFlag(false);
     // setEmptyFields([]);
   };
 
   const handleProductDelete = async () => {
-    const fetchString = (`/api/product/${selectedRecord}`);
-    // const fetchString = ('/api/product/' + selectedRecord);
-    alert(fetchString);
+    const fetchString = `/api/product/${selectedRecord}`;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
-    // if (!response.ok) {
-    //   setError(json.error);
-    // }
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
+      toast.success("Record Successfully Deleted...");
       // dispatch({ type: 'DELETE_PRODUCT', payload: json });
     }
-    // setDeleteFlag(false);
-    // setEmptyFields([]);
   };
 
   const firmsActionComplete = async (args) => {
     if (!firmsGrid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Firms';
+        dialog.header = "Workside Firms";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/firm/', {
-            method: 'POST',
+          const response = await fetch("/api/firm/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -294,7 +301,7 @@ const Admin = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleFirmDelete();
         setInsertFlag(false);
@@ -305,33 +312,35 @@ const Admin = () => {
   const contactsActionComplete = async (args) => {
     if (!contactsGrid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Contacts';
+        dialog.header = "Workside Contacts";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/contact/', {
-            method: 'POST',
+          const response = await fetch("/api/contact/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -347,7 +356,7 @@ const Admin = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleContactDelete();
         setInsertFlag(false);
@@ -358,33 +367,35 @@ const Admin = () => {
   const rigsActionComplete = async (args) => {
     if (!rigsGrid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Rigs';
+        dialog.header = "Workside Rigs";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/rig/', {
-            method: 'POST',
+          const response = await fetch("/api/rig/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -400,7 +411,7 @@ const Admin = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleRigDelete();
         setInsertFlag(false);
@@ -411,33 +422,35 @@ const Admin = () => {
   const productsActionComplete = async (args) => {
     if (!productsGrid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Products/Services';
+        dialog.header = "Workside Products/Services";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/product/', {
-            method: 'POST',
+          const response = await fetch("/api/product/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -453,7 +466,7 @@ const Admin = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleProductDelete();
         setInsertFlag(false);
@@ -520,7 +533,7 @@ const Admin = () => {
   };
 
   const FilterOptions = {
-    type: 'Menu',
+    type: "Menu",
   };
 
   // *******************************************************
@@ -529,7 +542,7 @@ const Admin = () => {
   let phElem;
   let phObject;
   const createcusphonemaskinputn = () => {
-    phElem = document.createElement('input');
+    phElem = document.createElement("input");
     return phElem;
   };
   const destroycusphonemaskinputFn = () => {
@@ -539,9 +552,9 @@ const Admin = () => {
   const writecusphonemaskinputFn = (args) => {
     phObject = new MaskedTextBox({
       value: args.rowData[args.column.field].toString(),
-      mask: '000-000-0000',
-      placeholder: 'Phone',
-      floatLabelType: 'Always',
+      mask: "000-000-0000",
+      placeholder: "Phone",
+      floatLabelType: "Always",
     });
     phObject.appendTo(phElem);
   };
@@ -558,7 +571,7 @@ const Admin = () => {
   // End of custom code
   // *******************************************************
   const onFirmLoad = () => {
-    const gridElement = document.getElementById('firmGridElement');
+    const gridElement = document.getElementById("firmGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       /** height of the each row */
@@ -577,7 +590,7 @@ const Admin = () => {
   };
 
   const onRigLoad = () => {
-    const gridElement = document.getElementById('rigGridElement');
+    const gridElement = document.getElementById("rigGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       gridInstance.pageSettings.pageSize = gridPageSize;
@@ -587,7 +600,7 @@ const Admin = () => {
   };
 
   const onContactLoad = () => {
-    const gridElement = document.getElementById('contactGridElement');
+    const gridElement = document.getElementById("contactGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       gridInstance.pageSettings.pageSize = gridPageSize;
@@ -597,7 +610,7 @@ const Admin = () => {
   };
 
   const onProductLoad = () => {
-    const gridElement = document.getElementById('productGridElement');
+    const gridElement = document.getElementById("productGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       gridInstance.pageSettings.pageSize = gridPageSize;
@@ -607,7 +620,7 @@ const Admin = () => {
   };
 
   const onSupplierProductLoad = () => {
-    const gridElement = document.getElementById('supplierProductGridElement');
+    const gridElement = document.getElementById("supplierProductGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       // gridInstance.pageSettings.pageSize = gridPageSize;
@@ -649,26 +662,116 @@ const Admin = () => {
               frozenColumns={2}
               load={onFirmLoad}
               width="1000px"
-              // width="auto"
+              // width='auto'
               // eslint-disable-next-line no-return-assign, no-const-assign
-              ref={(g) => firmsGrid = g}
+              ref={(g) => (firmsGrid = g)}
             >
               <ColumnsDirective>
-                <ColumnDirective field="_id" headerText="Id" textAlign="Left" width="10" isPrimaryKey allowEditing={false} visible={false} />
-                <ColumnDirective field="firm_id" headerText="Id" textAlign="Left" width="10" allowEditing={false} visible={false} />
-                <ColumnDirective field="name" headerText="Name" textAlign="Left" width="125" freeze="left" />
-                <ColumnDirective field="type" headerText="Type" editType="dropdownedit" edit={firmSelections} textAlign="Left" width="125" />
-                <ColumnDirective field="area" headerText="Area" editType="dropdownedit" edit={locationSelections} textAlign="Left" width="100" />
-                <ColumnDirective field="address1" headerText="Address 1" textAlign="Left" width="25" />
-                <ColumnDirective field="address2" headerText="Address 2" textAlign="Left" width="100" />
-                <ColumnDirective field="city" headerText="City" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="state" headerText="State" textAlign="Left" width="100" />
-                <ColumnDirective field="zipcode" headerText="Zip" textAlign="Left" width="100" />
-                <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-                <ColumnDirective field="comment" headerText="Comment" textAlign="Left" width="200" />
+                <ColumnDirective
+                  field="_id"
+                  headerText="Id"
+                  textAlign="Left"
+                  width="10"
+                  isPrimaryKey
+                  allowEditing={false}
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="firm_id"
+                  headerText="Id"
+                  textAlign="Left"
+                  width="10"
+                  allowEditing={false}
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="name"
+                  headerText="Name"
+                  textAlign="Left"
+                  width="125"
+                  freeze="left"
+                />
+                <ColumnDirective
+                  field="type"
+                  headerText="Type"
+                  editType="dropdownedit"
+                  edit={firmSelections}
+                  textAlign="Left"
+                  width="125"
+                />
+                <ColumnDirective
+                  field="area"
+                  headerText="Area"
+                  editType="dropdownedit"
+                  edit={locationSelections}
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="address1"
+                  headerText="Address 1"
+                  textAlign="Left"
+                  width="25"
+                />
+                <ColumnDirective
+                  field="address2"
+                  headerText="Address 2"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="city"
+                  headerText="City"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="state"
+                  headerText="State"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="zipcode"
+                  headerText="Zip"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="status"
+                  headerText="Status"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="statusdate"
+                  headerText="Date"
+                  type="date"
+                  editType="datepickeredit"
+                  format="MM/dd/yyy"
+                  textAlign="Right"
+                  width="140"
+                />
+                <ColumnDirective
+                  field="comment"
+                  headerText="Comment"
+                  textAlign="Left"
+                  width="200"
+                />
               </ColumnsDirective>
-              <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+              <Inject
+                services={[
+                  Selection,
+                  Edit,
+                  Filter,
+                  Page,
+                  Toolbar,
+                  Resize,
+                  Freeze,
+                ]}
+              />
             </GridComponent>
           </div>
           {/* End of Companies Tab */}
@@ -693,19 +796,76 @@ const Admin = () => {
               load={onRigLoad}
               width="1000px"
               // eslint-disable-next-line no-return-assign
-              ref={(g) => rigsGrid = g}
+              ref={(g) => (rigsGrid = g)}
             >
               <ColumnsDirective>
-                <ColumnDirective field="_id" headerText="Id" textAlign="Left" width="50" isPrimaryKey allowEditing={false} visible={false} />
-                <ColumnDirective field="rigname" headerText="Name" textAlign="Left" width="100" />
-                <ColumnDirective field="rignumber" headerText="Number" textAlign="Left" width="75" />
-                <ColumnDirective field="rigclassification" headerText="Class" textAlign="Left" width="100" />
-                <ColumnDirective field="description" headerText="Description" textAlign="Left" width="75" />
-                <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-                <ColumnDirective field="comment" headerText="Comment" textAlign="Left" width="200" />
+                <ColumnDirective
+                  field="_id"
+                  headerText="Id"
+                  textAlign="Left"
+                  width="50"
+                  isPrimaryKey
+                  allowEditing={false}
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="rigname"
+                  headerText="Name"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="rignumber"
+                  headerText="Number"
+                  textAlign="Left"
+                  width="75"
+                />
+                <ColumnDirective
+                  field="rigclassification"
+                  headerText="Class"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="description"
+                  headerText="Description"
+                  textAlign="Left"
+                  width="75"
+                />
+                <ColumnDirective
+                  field="status"
+                  headerText="Status"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="statusdate"
+                  headerText="Date"
+                  type="date"
+                  editType="datepickeredit"
+                  format="MM/dd/yyy"
+                  textAlign="Right"
+                  width="140"
+                />
+                <ColumnDirective
+                  field="comment"
+                  headerText="Comment"
+                  textAlign="Left"
+                  width="200"
+                />
               </ColumnsDirective>
-              <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+              <Inject
+                services={[
+                  Selection,
+                  Edit,
+                  Filter,
+                  Page,
+                  Toolbar,
+                  Resize,
+                  Freeze,
+                ]}
+              />
             </GridComponent>
           </div>
           {/* End of Rigs */}
@@ -729,31 +889,134 @@ const Admin = () => {
               // frozenColumns={2}
               load={onContactLoad}
               width="1000px"
-              // width="auto"
+              // width='auto'
               // eslint-disable-next-line no-return-assign, no-const-assign
-              ref={(g) => contactsGrid = g}
+              ref={(g) => (contactsGrid = g)}
             >
               <ColumnsDirective>
-                <ColumnDirective field="_id" headerText="Id" textAlign="Left" width="50" isPrimaryKey allowEditing={false} visible={false} />
-                <ColumnDirective field="contact_id" headerText="ID" textAlign="Left" width="25" allowEditing={false} visible={false} />
-                <ColumnDirective field="firstname" headerText="First" textAlign="Left" width="125" />
-                <ColumnDirective field="lastname" headerText="Last" textAlign="Left" width="125" />
-                <ColumnDirective field="nickname" headerText="Nickname" textAlign="Left" width="100" />
-                <ColumnDirective field="contactclass" headerText="Class" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="accesslevel" headerText="Access" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="username" headerText="User Name" textAlign="Left" width="100" />
-                <ColumnDirective field="userpassword" headerText="Password" textAlign="Left" width="100" />
-                <ColumnDirective field="primaryphone" headerText="Phone 1" textAlign="Left" width="100" edit={custphonemaskinput} />
-                <ColumnDirective field="secondaryphone" headerText="Phone 2" textAlign="Left" width="100" edit={custphonemaskinput} />
-                {/* <ColumnDirective field="primaryemail" headerText="Email 1" textAlign="Left" width="150" validationRules={mailidRules} />
-                <ColumnDirective field="secondaryemail" headerText="Email 2" textAlign="Left" width="150" validationRules={mailidRules} /> */}
-                <ColumnDirective field="primaryemail" headerText="Email 1" textAlign="Left" width="150" />
-                <ColumnDirective field="secondaryemail" headerText="Email 2" textAlign="Left" width="150" />
-                <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-                <ColumnDirective field="comment" headerText="Comment" textAlign="Left" width="200" />
+                <ColumnDirective
+                  field="_id"
+                  headerText="Id"
+                  textAlign="Left"
+                  width="50"
+                  isPrimaryKey
+                  allowEditing={false}
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="contact_id"
+                  headerText="ID"
+                  textAlign="Left"
+                  width="25"
+                  allowEditing={false}
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="firstname"
+                  headerText="First"
+                  textAlign="Left"
+                  width="125"
+                />
+                <ColumnDirective
+                  field="lastname"
+                  headerText="Last"
+                  textAlign="Left"
+                  width="125"
+                />
+                <ColumnDirective
+                  field="nickname"
+                  headerText="Nickname"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="contactclass"
+                  headerText="Class"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="accesslevel"
+                  headerText="Access"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="username"
+                  headerText="User Name"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="userpassword"
+                  headerText="Password"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="primaryphone"
+                  headerText="Phone 1"
+                  textAlign="Left"
+                  width="100"
+                  edit={custphonemaskinput}
+                />
+                <ColumnDirective
+                  field="secondaryphone"
+                  headerText="Phone 2"
+                  textAlign="Left"
+                  width="100"
+                  edit={custphonemaskinput}
+                />
+                {/* <ColumnDirective field='primaryemail' headerText='Email 1' textAlign='Left' width='150' validationRules={mailidRules} />
+                <ColumnDirective field='secondaryemail' headerText='Email 2' textAlign='Left' width='150' validationRules={mailidRules} /> */}
+                <ColumnDirective
+                  field="primaryemail"
+                  headerText="Email 1"
+                  textAlign="Left"
+                  width="150"
+                />
+                <ColumnDirective
+                  field="secondaryemail"
+                  headerText="Email 2"
+                  textAlign="Left"
+                  width="150"
+                />
+                <ColumnDirective
+                  field="status"
+                  headerText="Status"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="statusdate"
+                  headerText="Date"
+                  type="date"
+                  editType="datepickeredit"
+                  format="MM/dd/yyy"
+                  textAlign="Right"
+                  width="140"
+                />
+                <ColumnDirective
+                  field="comment"
+                  headerText="Comment"
+                  textAlign="Left"
+                  width="200"
+                />
               </ColumnsDirective>
-              <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+              <Inject
+                services={[
+                  Selection,
+                  Edit,
+                  Filter,
+                  Page,
+                  Toolbar,
+                  Resize,
+                  Freeze,
+                ]}
+              />
             </GridComponent>
           </div>
           {/* End of Contacts Tab */}
@@ -778,17 +1041,65 @@ const Admin = () => {
               load={onProductLoad}
               width="1000px"
               // eslint-disable-next-line no-return-assign
-              ref={(g) => productsGrid = g}
+              ref={(g) => (productsGrid = g)}
             >
               <ColumnsDirective>
-                <ColumnDirective field="projectId" headerText="Id" textAlign="Left" width="50" isPrimaryKey="true" allowEditing="false" visible={false} />
-                <ColumnDirective field="categoryname" headerText="Category" editType="dropdownedit" textAlign="Left" width="200" />
-                <ColumnDirective field="productname" headerText="Service/Projects" textAlign="Left" width="100" />
-                <ColumnDirective field="description" headerText="Description" textAlign="Left" width="100" />
-                <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
+                <ColumnDirective
+                  field="projectId"
+                  headerText="Id"
+                  textAlign="Left"
+                  width="50"
+                  isPrimaryKey="true"
+                  allowEditing="false"
+                  visible={false}
+                />
+                <ColumnDirective
+                  field="categoryname"
+                  headerText="Category"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="200"
+                />
+                <ColumnDirective
+                  field="productname"
+                  headerText="Service/Projects"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="description"
+                  headerText="Description"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="status"
+                  headerText="Status"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="statusdate"
+                  headerText="Date"
+                  type="date"
+                  editType="datepickeredit"
+                  format="MM/dd/yyy"
+                  textAlign="Right"
+                  width="140"
+                />
               </ColumnsDirective>
-              <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+              <Inject
+                services={[
+                  Selection,
+                  Edit,
+                  Filter,
+                  Page,
+                  Toolbar,
+                  Resize,
+                  Freeze,
+                ]}
+              />
             </GridComponent>
           </div>
           {/* End of Products/Services Tab */}
@@ -813,17 +1124,57 @@ const Admin = () => {
               load={onSupplierProductLoad}
               width="1000px"
               // eslint-disable-next-line no-return-assign
-              ref={(g) => supplierProductsGrid = g}
+              ref={(g) => (supplierProductsGrid = g)}
             >
               <ColumnsDirective>
-                {/* <ColumnDirective field="_id" headerText="Id" textAlign="Left" width="50" isPrimaryKey="true" allowEditing="false" visible={false} /> */}
-                <ColumnDirective field="supplier" headerText="Supplier" editType="dropdownedit" textAlign="Left" width="200" />
-                <ColumnDirective field="category" headerText="Category" textAlign="Left" width="100" />
-                <ColumnDirective field="product" headerText="Product" textAlign="Left" width="100" />
-                <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="100" />
-                <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
+                {/* <ColumnDirective field='_id' headerText='Id' textAlign='Left' width='50' isPrimaryKey='true' allowEditing='false' visible={false} /> */}
+                <ColumnDirective
+                  field="supplier"
+                  headerText="Supplier"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="200"
+                />
+                <ColumnDirective
+                  field="category"
+                  headerText="Category"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="product"
+                  headerText="Product"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="status"
+                  headerText="Status"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="statusdate"
+                  headerText="Date"
+                  type="date"
+                  editType="datepickeredit"
+                  format="MM/dd/yyy"
+                  textAlign="Right"
+                  width="140"
+                />
               </ColumnsDirective>
-              <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+              <Inject
+                services={[
+                  Selection,
+                  Edit,
+                  Filter,
+                  Page,
+                  Toolbar,
+                  Resize,
+                  Freeze,
+                ]}
+              />
             </GridComponent>
           </div>
           {/* End of Supplier-Products Tab */}

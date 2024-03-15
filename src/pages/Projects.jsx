@@ -1,10 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { DataManager, Query } from '@syncfusion/ej2-data';
-import { GridComponent, ColumnsDirective, ColumnDirective, Selection, Edit, Filter, Inject, Page, Toolbar, Resize, Freeze } from '@syncfusion/ej2-react-grids';
-import { useProjectContext } from '../hooks/useProjectContext';
-import { projects, contextMenuItems } from '../data/dummy';
-import { Header } from '../components';
-import '../index.css';
+import React, { useEffect, useState } from "react";
+import { DataManager, Query } from "@syncfusion/ej2-data";
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Selection,
+  Edit,
+  Filter,
+  Inject,
+  Page,
+  Toolbar,
+  Resize,
+  Freeze,
+} from "@syncfusion/ej2-react-grids";
+import { useProjectContext } from "../hooks/useProjectContext";
+import { projects, contextMenuItems } from "../data/dummy";
+import { Header } from "../components";
+import "../index.css";
+import { toast } from "react-toastify";
 
 const gridPageSize = 8;
 
@@ -13,29 +26,32 @@ const Projects = () => {
   const [filteredProjects, setFilteredProjects] = useState(null);
   const [firmList, setFirmList] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
-  const editOptions = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog' };
-  const toolbarOptions = ['Add', 'Edit', 'Delete'];
+  const editOptions = {
+    allowEditing: true,
+    allowAdding: true,
+    allowDeleting: true,
+    mode: "Dialog",
+  };
+  const toolbarOptions = ["Add", "Edit", "Delete"];
   const { projectsData, dispatch } = useProjectContext();
 
   const [selectedRecord, setSelectedRecord] = useState(null);
-  // const [error, setError] = useState(null);
-  // const [emptyFields, setEmptyFields] = useState([]);
-  const settings = { mode: 'Row' };
+  const settings = { mode: "Row" };
   let projectsGrid = null;
 
   useEffect(() => {
     const fetchProjects = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/project');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/project");
       const json = await response.json();
 
       if (response.ok) {
-        dispatch({ type: 'GET_PROJECTS', payload: json });
+        dispatch({ type: "GET_PROJECTS", payload: json });
         setFilteredProjects(json);
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchProjects();
   }, [dispatch]);
@@ -43,51 +59,41 @@ const Projects = () => {
   useEffect(() => {
     const fetchFirms = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/firm');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/firm");
       const jsonResults = await response.json();
       // Filter The entire List to include companies only
-      // console.log(jsonResults);
-      const result = jsonResults.filter((jsonResult) => jsonResult.type === 'CUSTOMER');
-      // console.log(result);
+      const result = jsonResults.filter(
+        (jsonResult) => jsonResult.type === "CUSTOMER"
+      );
       setFirmList(result);
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchFirms();
   }, []);
 
   // Set Location Type Selection Options
   const companyOptions = [
-    { name: 'Aera Energy', nameId: '1' },
-    { name: 'Chevron', nameId: '2' },
-    { name: 'CRC', nameId: '3' }];
+    { name: "Aera Energy", nameId: "1" },
+    { name: "Chevron", nameId: "2" },
+    { name: "CRC", nameId: "3" },
+  ];
 
   const companySelections = {
     params: {
       actionComplete: () => false,
       allowFiltering: true,
       dataSource: new DataManager(companyOptions),
-      fields: { text: 'name', value: 'name' },
+      fields: { text: "name", value: "name" },
       query: new Query(),
     },
   };
 
-  // const companySelections = {
-  //   params: {
-  //     actionComplete: () => false,
-  //     allowFiltering: true,
-  //     dataSource: new DataManager(firmList),
-  //     fields: { text: 'name', value: 'name' },
-  //     query: new Query(),
-  //   },
-  // };
-
   const handleDelete = async () => {
-    const fetchString = ('/api/project/' + selectedRecord);
-    alert(fetchString);
+    const fetchString = "/api/project/" + selectedRecord;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
@@ -97,8 +103,7 @@ const Projects = () => {
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
-      // dispatch({ type: 'DELETE_PRODUCT', payload: json });
+      toast.success("Record Successfully Deleted...");
     }
     // setDeleteFlag(false);
     // setEmptyFields([]);
@@ -107,33 +112,35 @@ const Projects = () => {
   const actionComplete = async (args) => {
     if (!projectsGrid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Projects';
+        dialog.header = "Workside Projects";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/project/', {
-            method: 'POST',
+          const response = await fetch("/api/project/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -149,7 +156,7 @@ const Projects = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleDelete();
         setInsertFlag(false);
@@ -169,11 +176,11 @@ const Projects = () => {
   };
 
   const FilterOptions = {
-    type: 'Menu',
+    type: "Menu",
   };
 
   const onProjectLoad = () => {
-    const gridElement = document.getElementById('projectGridElement');
+    const gridElement = document.getElementById("projectGridElement");
     if (gridElement && gridElement.ej2_instances[0]) {
       const gridInstance = gridElement.ej2_instances[0];
       gridInstance.pageSettings.pageSize = gridPageSize;
@@ -206,27 +213,119 @@ const Projects = () => {
           // width="auto"
           width="1000px"
           // eslint-disable-next-line no-return-assign
-          ref={(g) => projectsGrid = g}
+          ref={(g) => (projectsGrid = g)}
         >
           <ColumnsDirective>
-            <ColumnDirective field="_id" headerText="Id" textAlign="Left" width="50" isPrimaryKey="true" allowEditing="false" visible={false} />
-            <ColumnDirective field="Area" headerText="Area" editType="dropdownedit" textAlign="Left" width="100" />
+            <ColumnDirective
+              field="_id"
+              headerText="Id"
+              textAlign="Left"
+              width="50"
+              isPrimaryKey="true"
+              allowEditing="false"
+              visible={false}
+            />
+            <ColumnDirective
+              field="Area"
+              headerText="Area"
+              editType="dropdownedit"
+              textAlign="Left"
+              width="100"
+            />
             {/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
-            <ColumnDirective field="customer" headerText="Customer" editType="dropdownedit" textAlign="Left" width="100" edit={companySelections} />
-            <ColumnDirective field="projectname" headerText="Name" textAlign="Left" width="200" />
-            <ColumnDirective field="description" headerText="Description" textAlign="Left" width="200" />
-            <ColumnDirective field="customercontact" headerText="Cust Contact" textAlign="Left" width="50" />
-            <ColumnDirective field="rigcompany" headerText="Rig Company" textAlign="left" width="50" />
-            <ColumnDirective field="status" headerText="Status" editType="dropdownedit" width="100" />
-            <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-            <ColumnDirective field="projectedstartdate" headerText="Proj Start" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-            <ColumnDirective field="actualstartdate" headerText="Act Start" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
-            <ColumnDirective field="expectedduration" headerText="Proj Dur" textAlign="Right" width="50" />
-            <ColumnDirective field="actualduration" headerText="Act Dur" textAlign="Right" width="50" />
-            <ColumnDirective field="latdec" headerText="Latitude" textAlign="Right" width="100" />
-            <ColumnDirective field="longdec" headerText="Longitude" textAlign="Right" width="100" />
+            <ColumnDirective
+              field="customer"
+              headerText="Customer"
+              editType="dropdownedit"
+              textAlign="Left"
+              width="100"
+              edit={companySelections}
+            />
+            <ColumnDirective
+              field="projectname"
+              headerText="Name"
+              textAlign="Left"
+              width="200"
+            />
+            <ColumnDirective
+              field="description"
+              headerText="Description"
+              textAlign="Left"
+              width="200"
+            />
+            <ColumnDirective
+              field="customercontact"
+              headerText="Cust Contact"
+              textAlign="Left"
+              width="50"
+            />
+            <ColumnDirective
+              field="rigcompany"
+              headerText="Rig Company"
+              textAlign="left"
+              width="50"
+            />
+            <ColumnDirective
+              field="status"
+              headerText="Status"
+              editType="dropdownedit"
+              width="100"
+            />
+            <ColumnDirective
+              field="statusdate"
+              headerText="Date"
+              type="date"
+              editType="datepickeredit"
+              format="MM/dd/yyy"
+              textAlign="Right"
+              width="140"
+            />
+            <ColumnDirective
+              field="projectedstartdate"
+              headerText="Proj Start"
+              type="date"
+              editType="datepickeredit"
+              format="MM/dd/yyy"
+              textAlign="Right"
+              width="140"
+            />
+            <ColumnDirective
+              field="actualstartdate"
+              headerText="Act Start"
+              type="date"
+              editType="datepickeredit"
+              format="MM/dd/yyy"
+              textAlign="Right"
+              width="140"
+            />
+            <ColumnDirective
+              field="expectedduration"
+              headerText="Proj Dur"
+              textAlign="Right"
+              width="50"
+            />
+            <ColumnDirective
+              field="actualduration"
+              headerText="Act Dur"
+              textAlign="Right"
+              width="50"
+            />
+            <ColumnDirective
+              field="latdec"
+              headerText="Latitude"
+              textAlign="Right"
+              width="100"
+            />
+            <ColumnDirective
+              field="longdec"
+              headerText="Longitude"
+              textAlign="Right"
+              width="100"
+            />
           </ColumnsDirective>
-          <Inject services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]} />
+          <Inject
+            services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+          />
         </GridComponent>
       </div>
     </div>

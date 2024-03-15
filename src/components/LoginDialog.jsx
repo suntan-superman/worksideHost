@@ -33,9 +33,7 @@ const LoginDialog = () => {
       document.getElementById("root").style.cursor = "wait";
       // eslint-disable-next-line prefer-template
       const fetchString = "/api/user/" + userName + "?password=" + password;
-      // alert('Before Axios FetchString ' + fetchString);
       const { loginData: res } = await axios.get(fetchString);
-      // alert(res.message);
 
       const response = await fetch(fetchString, {
         method: "GET",
@@ -45,13 +43,11 @@ const LoginDialog = () => {
           "Content-Type": "application/json",
         },
       });
-      // alert('After fetch');
       if (response.ok) {
         // Need to validate password
         const json = await response.json();
         setIsLoggedIn(true);
         localStorage.setItem("logInFlag", "true");
-        // dispatch({ type: 'GET_USER', payload: json });
         localStorage.setItem("token", json.userToken);
         setGlobalUserName(JSON.stringify(json.user));
         localStorage.setItem("userName", JSON.stringify(json.user));
@@ -81,11 +77,6 @@ const LoginDialog = () => {
     // const user = localStorage.getItem('token');
     // Set Default Cursor
     document.getElementById("root").style.cursor = "default";
-    // if (user) {
-    //   setIsLoggedIn(true);
-    //   onSaveUserName();
-    //   window.location = '/dashboard';
-    // }
     window.location = "/dashboard";
   };
 
@@ -96,11 +87,7 @@ const LoginDialog = () => {
   useEffect(() => {
     const getUserName = () => {
       const user = localStorage.getItem("loginName");
-      // setUserName(JSON.parse(localStorage.getItem('userName')));
       setUserName(user);
-      // eslint-disable-next-line no-alert
-      // alert('Get User Name:' + userName);
-      // alert('Get User:' + user);
     };
     getUserName();
   }, []);
@@ -188,15 +175,11 @@ const LoginDialog = () => {
             <p className="mb-10 text-xl text-center">
               Please sign up and and begin the journey with us.
             </p>
-            {/* <button type="button" className="border-2 border-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-white hover:text-green-500">Sign Up</button> */}
             <div className="justify-center items-center content-center flex-col">
               <Link to="/signup">
                 <h2 className="border-2 border-white rounded-full px-12 py-2 font-semibold mb-2 text-center hover:bg-white hover:text-green-500">
                   Sign Up
                 </h2>
-                {/* <button type="button" className="border-2 border-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-white hover:text-green-500">
-                Sign Up
-              </button> */}
               </Link>
             </div>
           </div>

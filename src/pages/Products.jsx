@@ -1,9 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 // import useState from 'react-usestateref';
-import { GridComponent, ColumnsDirective, ColumnDirective, Selection, Edit, Filter, Inject, Page, Toolbar } from '@syncfusion/ej2-react-grids';
-import { Header } from '../components';
-import { useProductContext } from '../hooks/useProductContext';
-import '../index.css';
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Selection,
+  Edit,
+  Filter,
+  Inject,
+  Page,
+  Toolbar,
+} from "@syncfusion/ej2-react-grids";
+import { Header } from "../components";
+import { useProductContext } from "../hooks/useProductContext";
+import "../index.css";
 
 const gridPageSize = 12;
 
@@ -11,38 +21,42 @@ const Products = () => {
   // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
   const [filteredProducts, setFilteredProducts] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
-  const editOptions = { allowEditing: true, allowAdding: true, allowDeleting: true, mode: 'Dialog' };
-  const toolbarOptions = ['Add', 'Edit', 'Delete'];
+  const editOptions = {
+    allowEditing: true,
+    allowAdding: true,
+    allowDeleting: true,
+    mode: "Dialog",
+  };
+  const toolbarOptions = ["Add", "Edit", "Delete"];
   const { productsData, dispatch } = useProductContext();
 
   const [selectedRecord, setSelectedRecord] = useState(null);
   // const [error, setError] = useState(null);
   // const [emptyFields, setEmptyFields] = useState([]);
-  const settings = { mode: 'Row' };
+  const settings = { mode: "Row" };
   let grid = null;
 
   useEffect(() => {
     const fetchProducts = async () => {
       // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch('/api/product');
+      document.getElementById("root").style.cursor = "wait";
+      const response = await fetch("/api/product");
       const json = await response.json();
 
       if (response.ok) {
-        dispatch({ type: 'GET_PRODUCTS', payload: json });
+        dispatch({ type: "GET_PRODUCTS", payload: json });
         setFilteredProducts(json);
       }
       // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      document.getElementById("root").style.cursor = "default";
     };
     fetchProducts();
   }, [dispatch]);
 
   const handleDelete = async () => {
-    const fetchString = ('/api/product/' + selectedRecord);
-    alert(fetchString);
+    const fetchString = "/api/product/" + selectedRecord;
     const response = await fetch(fetchString, {
-      method: 'DELETE',
+      method: "DELETE",
     });
     const json = await response.json();
 
@@ -52,8 +66,7 @@ const Products = () => {
     if (response.ok) {
       // Clear form useStates
       // ResetUseStates();
-      alert('Record Successfully Deleted ');
-      // dispatch({ type: 'DELETE_PRODUCT', payload: json });
+      toast.success("Record Successfully Deleted...");
     }
     // setDeleteFlag(false);
     // setEmptyFields([]);
@@ -62,33 +75,35 @@ const Products = () => {
   const actionComplete = async (args) => {
     if (!grid) return;
 
-    if ((args.requestType === 'beginEdit'
-     || args.requestType === 'add'
-     || args.requestType === 'update'
-     || args.requestType === 'save'
-     || args.requestType === 'delete')) {
-      if ((args.requestType === 'beginEdit' || args.requestType === 'add')) {
+    if (
+      args.requestType === "beginEdit" ||
+      args.requestType === "add" ||
+      args.requestType === "update" ||
+      args.requestType === "save" ||
+      args.requestType === "delete"
+    ) {
+      if (args.requestType === "beginEdit" || args.requestType === "add") {
         const { dialog } = args;
-        dialog.header = 'Workside Product/Services';
+        dialog.header = "Workside Product/Services";
       }
-      if (args.requestType === 'add') {
+      if (args.requestType === "add") {
         // set insert flag
         setInsertFlag(true);
       }
-      if (args.requestType === 'update') {
+      if (args.requestType === "update") {
         // set insert flag
         setInsertFlag(false);
       }
-      if (args.requestType === 'save') {
+      if (args.requestType === "save") {
         // Save or Update Data
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch('/api/product/', {
-            method: 'POST',
+          const response = await fetch("/api/product/", {
+            method: "POST",
             body: JSON.stringify(data),
             headers: {
-              'Content-Type': 'application/json',
+              "Content-Type": "application/json",
             },
           });
 
@@ -104,7 +119,7 @@ const Products = () => {
         }
         setInsertFlag(false);
       }
-      if (args.requestType === 'delete') {
+      if (args.requestType === "delete") {
         // Delete Data
         handleDelete();
         setInsertFlag(false);
@@ -124,7 +139,7 @@ const Products = () => {
   };
 
   const FilterOptions = {
-    type: 'Menu',
+    type: "Menu",
   };
 
   return (
@@ -144,15 +159,53 @@ const Products = () => {
           editSettings={editOptions}
           width="auto"
           // eslint-disable-next-line no-return-assign
-          ref={(g) => grid = g}
+          ref={(g) => (grid = g)}
         >
           <ColumnsDirective>
-            <ColumnDirective field="projectId" headerText="Id" textAlign="Left" width="50" isPrimaryKey="true" allowEditing="false" visible={false} />
-            <ColumnDirective field="categoryname" headerText="Category" editType="dropdownedit" textAlign="Left" width="200" />
-            <ColumnDirective field="productname" headerText="Service/Projects" textAlign="Left" width="200" />
-            <ColumnDirective field="description" headerText="Description" textAlign="Left" width="200" />
-            <ColumnDirective field="status" headerText="Status" editType="dropdownedit" textAlign="Left" width="120" />
-            <ColumnDirective field="statusdate" headerText="Date" type="date" editType="datepickeredit" format="MM/dd/yyy" textAlign="Right" width="140" />
+            <ColumnDirective
+              field="projectId"
+              headerText="Id"
+              textAlign="Left"
+              width="50"
+              isPrimaryKey="true"
+              allowEditing="false"
+              visible={false}
+            />
+            <ColumnDirective
+              field="categoryname"
+              headerText="Category"
+              editType="dropdownedit"
+              textAlign="Left"
+              width="200"
+            />
+            <ColumnDirective
+              field="productname"
+              headerText="Service/Projects"
+              textAlign="Left"
+              width="200"
+            />
+            <ColumnDirective
+              field="description"
+              headerText="Description"
+              textAlign="Left"
+              width="200"
+            />
+            <ColumnDirective
+              field="status"
+              headerText="Status"
+              editType="dropdownedit"
+              textAlign="Left"
+              width="120"
+            />
+            <ColumnDirective
+              field="statusdate"
+              headerText="Date"
+              type="date"
+              editType="datepickeredit"
+              format="MM/dd/yyy"
+              textAlign="Right"
+              width="140"
+            />
           </ColumnsDirective>
           <Inject services={[Selection, Edit, Filter, Page, Toolbar]} />
         </GridComponent>
