@@ -5,7 +5,6 @@ const ModalDialog = ({ textMsg, open, onOK, onClose }) => {
   if (!open) return null;
 
   return (
-    // <div onClick={onClose} className="overlay">
     <div
       onClick={onClose}
       className='fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm'
@@ -48,30 +47,3 @@ const ModalDialog = ({ textMsg, open, onOK, onClose }) => {
 };
 
 export default ModalDialog;
-// return (
-//   <div onClick={onClose} className="overlay">
-//     <div
-//       onClick={(e) => {
-//         e.stopPropagation();
-//       }}
-//       className="modalContainer"
-//     >
-//       <img src={Workside} alt="/" className="img" />
-//       <div className="modalRight">
-//         <div className="content">
-//           {/* <p>Important:</p> */}
-//           <h1>{message}</h1>
-//         </div>
-//         <div className="btnContainer">
-//           <button className="btnPrimary" type="button" onClick={onOK}>
-//             <span className="bold">YES</span>
-//           </button>
-//           <button className="btnOutline" type="button" onClick={onClose}>
-//             <span className="bold">NO</span>
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   </div>
-// );
-// };

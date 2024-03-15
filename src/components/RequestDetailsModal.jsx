@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
-import { format } from "date-fns";
-import { Box } from "@material-ui/core";
-import Skeleton, { SkeletonText } from "react-loading-skeleton";
+import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { format } from 'date-fns';
+import Skeleton, { SkeletonText } from 'react-loading-skeleton';
 // import GoogleMapReact from 'google-map-react';
 import {
   useJsApiLoader,
@@ -9,10 +8,10 @@ import {
   useLoadScript,
   LoadScript,
   Marker,
-} from "@react-google-maps/api";
+} from '@react-google-maps/api';
 // import { Wrapper } from '@googlemaps/react-wrapper';
 // import { GoogleMapsProvider, useGoogleMap } from '@ubilabs/google-maps-react-hooks';
-import Map from "./Map";
+import Map from './Map';
 
 const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
   if (!open || !recordID) return null;
@@ -27,8 +26,8 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
   const containerStyle = {
-    width: "300px",
-    height: "300px",
+    width: '300px',
+    height: '300px',
   };
 
   // const center = {
@@ -58,7 +57,7 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
 
     return (
       <>
-        <div ref={ref} id="map" />
+        <div ref={ref} id='map' />
         {map}
       </>
     );
@@ -75,36 +74,36 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
     const fetchRequest = async () => {
       const fetchString = `/api/request/${recordID}`;
       // Set Wait Cursor
-      document.getElementById("root").style.cursor = "wait";
+      document.getElementById('root').style.cursor = 'wait';
       const response = await fetch(fetchString);
       const json = await response.json();
       // Set the Customer Name and remove double quotes at beginning and end
       setCustomerName(
-        JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1")
+        JSON.stringify(json.customername).replace(/^"(.*)"$/, '$1')
       );
-      setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
+      setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, '$1'));
       setRequestName(
-        JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1")
+        JSON.stringify(json.requestname).replace(/^"(.*)"$/, '$1')
       );
       setRequestCategory(
-        JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, "$1")
+        JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, '$1')
       );
       const formattedDate = format(
         new Date(json.datetimerequested),
-        "MMMM do yyyy, h:mm"
+        'MMMM do yyyy, h:mm'
       );
       setDateTimeRequested(formattedDate);
       // setDateTimeRequested(JSON.stringify(json.datetimerequested));
       // Set Default Cursor
-      document.getElementById("root").style.cursor = "default";
+      document.getElementById('root').style.cursor = 'default';
     };
     fetchRequest();
   }, []);
 
   return (
     <div
-      id="requestFrame"
-      className="relative bg-gainsboro-100 w-full h-full overflow-hidden text-center text-lg text-black font-paragraph-button-text"
+      id='requestFrame'
+      className='relative bg-gainsboro-100 w-full h-full overflow-hidden text-center text-lg text-black font-paragraph-button-text'
     >
       <div>
         <p>Customer: {customername}</p>
@@ -112,7 +111,7 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
         <p>Request: {requestname}</p>
         <p>Date Time Requested: {datetimerequested}</p>
       </div>
-      <div className="map_box">
+      <div className='map_box'>
         {/* <Box position="absolute" left="0" top="0" height="100%" width="100%"> */}
         {/* <GoogleMapsProvider
             googleMapsAPIKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
@@ -132,11 +131,11 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
           )} */}
         {/* </Box> */}
         <LoadScript
-          id="script-loader"
+          id='script-loader'
           googleMapsApiKey={apiKey}
-          language="en"
-          region="EN"
-          version="weekly"
+          language='en'
+          region='EN'
+          version='weekly'
         >
           <Map reqLocation={reqLocation} delLocation={delLocation} />
         </LoadScript>

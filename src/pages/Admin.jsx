@@ -12,7 +12,7 @@ import {
   Resize,
   Freeze,
 } from "@syncfusion/ej2-react-grids";
-// import { TreeGridComponent } from '@syncfusion/ej2-react-treegrid';
+import { toast } from "react-toastify";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
@@ -24,7 +24,6 @@ import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
 import { Header } from "../components";
 import "../index.css";
 import "../App.css";
-import { toast } from "react-toastify";
 
 const gridPageSize = 8;
 

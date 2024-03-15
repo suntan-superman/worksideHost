@@ -14,7 +14,6 @@ import {
   Toolbar,
   Resize,
   Freeze,
-  CommandColumn,
 } from "@syncfusion/ej2-react-grids";
 import { useStateContext } from "../contexts/ContextProvider";
 import RequestDetailsModal from "../components/RequestDetailsModal";
@@ -36,10 +35,9 @@ const Requests = () => {
   };
   const toolbarOptions = ["Add", "Edit", "Delete"];
   const [selectedRecord, setSelectedRecord] = useState(null);
-  const [selectedID, setSelectedID] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
-  const defaultDialogInstance = null;
-  const PositioningInstance = null;
+  // const defaultDialogInstance = null;
+  // const PositioningInstance = null;
   const settings = { mode: "Row" };
   const position = { X: "left", Y: "top" };
   const dialogAnimationSettings = {
@@ -128,34 +126,17 @@ const Requests = () => {
     </div>
   );
 
-  function selectionDetails() {
-    <>
-      <text> Customer Name </text>
-      <text> Rig Company </text>
-      <text> Request Name </text>
-      <text> Date/Time Requested </text>
-    </>;
-  }
-
   const recordClick = (args) => {
     if (args.target.classList.contains("requestData")) {
       const rowObj = requestGrid.getRowObjectFromUID(
         closest(args.target, ".e-row").getAttribute("data-uid")
       );
 
-      const selectedrowindex = requestGrid.getSelectedRowIndexes();
+      // const selectedrowindex = requestGrid.getSelectedRowIndexes();
       setSelectedRecord(rowObj._id);
       setShowDialog(true);
     }
   };
-
-  // const dialogHeader = () => {
-  //   <span id="template">Workside</span>;
-  // };
-  // const requestCommands = [{ type: 'Edit', buttonOption: { iconCss: ' e-icons e-edit', cssClass: 'e-flat' } },
-  //   { type: 'Delete', buttonOption: { iconCss: 'e-icons e-delete', cssClass: 'e-flat' } },
-  //   { type: 'Save', buttonOption: { iconCss: 'e-icons e-update', cssClass: 'e-flat' } },
-  //   { type: 'Cancel', buttonOption: { iconCss: 'e-icons e-cancel-icon', cssClass: 'e-flat' } }];
 
   return (
     <div className="App">
@@ -163,12 +144,10 @@ const Requests = () => {
         id="requestFrame"
         className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text"
       >
-        {/* <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl"> */}
         <Header category="Workside" title="Requests" />
         <GridComponent
           id="requestGridElement"
           dataSource={requestList}
-          // actionBegin={actionBegin}
           allowSelection
           allowFiltering
           allowPaging

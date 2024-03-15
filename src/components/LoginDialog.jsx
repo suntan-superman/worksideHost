@@ -4,8 +4,11 @@ import { FaRegEnvelope } from "react-icons/fa";
 import { MdLockOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { confirmAlert } from "react-confirm-alert";
 import { useStateContext } from "../contexts/ContextProvider";
-import { useUserContext } from "../hooks/useUserContext";
+// import { useUserContext } from "../hooks/useUserContext";
+// import { Alert, Button } from '@material-tailwind/react';
 import "../index.css";
 
 // eslint-disable-next-line consistent-return
@@ -16,6 +19,7 @@ const LoginDialog = () => {
   // const [company, setCompany] = useState('');
   const [saveUserChecked, setSaveUserChecked] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  // const [alertFlag, setAlertFlag] = useState(false);
   // const { usersData, dispatch } = useUserContext();
 
   const onSaveUserName = (user) => {
@@ -24,16 +28,47 @@ const LoginDialog = () => {
 
   const onSignIn = async (e) => {
     e.preventDefault();
+    toast.info("Logging In...");
+    confirmAlert({
+      title: "Workside Software",
+      message: `Before Fetch...`,
+      buttons: [
+        {
+          label: "Cancel",
+        },
+        {
+          label: "Ok",
+          onClick: () => {
+            toast.success(`Success`);
+          },
+        },
+      ],
+    });
 
+    // setAlertFlag(true);
+    // <Alert
+    //   variant='gradient'
+    //   open={alertFlag}
+    //   action={
+    //     <Button
+    //       variant='text'
+    //       color='white'
+    //       size='sm'
+    //       className='!absolute top-3 right-3'
+    //       onClick={() => setAlertFlag(false)}
+    //     />
+    //   }
+    // >
+    //   Ready to Fetch
+    // </Alert>;
     localStorage.removeItem("logInFlag");
     setErrorMsg("");
-
     try {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
       // eslint-disable-next-line prefer-template
       const fetchString = "/api/user/" + userName + "?password=" + password;
-      const { loginData: res } = await axios.get(fetchString);
+      // const { loginData: res } = await axios.get(fetchString);
 
       const response = await fetch(fetchString, {
         method: "GET",
@@ -43,14 +78,16 @@ const LoginDialog = () => {
           "Content-Type": "application/json",
         },
       });
+      console.log("response", JSON.stringify(response));
       if (response.ok) {
         // Need to validate password
         const json = await response.json();
         setIsLoggedIn(true);
         localStorage.setItem("logInFlag", "true");
-        localStorage.setItem("token", json.userToken);
-        setGlobalUserName(JSON.stringify(json.user));
-        localStorage.setItem("userName", JSON.stringify(json.user));
+        localStorage.setItem("token", json.user.userToken);
+        setGlobalUserName(JSON.stringify(json.user.user));
+        localStorage.setItem("userName", JSON.stringify(json.user.user));
+        localStorage.setItem("userID", JSON.stringify(json.user.userId));
         onSaveUserName(userName);
         // Set Default Cursor
         document.getElementById("root").style.cursor = "default";
