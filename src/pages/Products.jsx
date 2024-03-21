@@ -11,6 +11,7 @@ import {
   Page,
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
+import { toast } from "react-toastify";
 import { Header } from "../components";
 import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
@@ -58,7 +59,7 @@ const Products = () => {
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
-    const json = await response.json();
+    // const json = await response.json();
 
     // if (!response.ok) {
     //   setError(json.error);
