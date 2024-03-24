@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { FiSettings } from 'react-icons/fi';
-import { BsFillLockFill } from 'react-icons/bs';
-import { registerLicense } from '@syncfusion/ej2-base';
-import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { FiSettings } from "react-icons/fi";
+import { BsFillLockFill } from "react-icons/bs";
+import { registerLicense } from "@syncfusion/ej2-base";
+import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 
 import {
   Navbar,
@@ -14,7 +14,7 @@ import {
   ThemeSettings,
   LoginDialog,
   SignupDialog,
-} from './components';
+} from "./components";
 import {
   Dashboard,
   Projects,
@@ -23,9 +23,9 @@ import {
   Admin,
   Settings,
   Scheduler,
-} from './pages';
-import './App.css';
-import PrivateRoutes from './utils/PrivateRoutes';
+} from "./pages";
+import "./App.css";
+import PrivateRoutes from "./utils/PrivateRoutes";
 
 import {
   useStateContext,
@@ -36,7 +36,7 @@ import {
   RequestContextProvider,
   ProjectContextProvider,
   SupplierProductContextProvider,
-} from './contexts/ContextProvider';
+} from "./contexts/ContextProvider";
 
 const App = () => {
   const {
@@ -52,13 +52,13 @@ const App = () => {
     setGlobalUserName,
   } = useStateContext();
   registerLicense(
-    'Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfdXVWQ2ZfV0V3WUc='
+    "Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfdXVWQ2ZfV0V3WUc="
   );
   // Make sure token exists
   const [user, setUser] = useState(null);
 
   const onLogOut = () => {
-    toast.success('Logging Out...');
+    toast.success("Logging Out...");
     // toast.success(message, {
     //   position: toast.POSITION.TOP_CENTER,
     //   autoClose: 3000, //3 seconds
@@ -69,77 +69,76 @@ const App = () => {
     //   transition: Slide
     // });
     setIsLoggedIn(false);
-    setGlobalUserName('');
-    localStorage.removeItem('token');
-    localStorage.removeItem('userName');
-    localStorage.setItem('logInFlag', 'false');
-    window.location = '/login';
+    setGlobalUserName("");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.setItem("logInFlag", "false");
+    window.location = "/login";
   };
 
   useEffect(() => {
     // eslint-disable-next-line no-const-assign
     // setUser(JSON.parse(localStorage.getItem('token')));
-    setUser(localStorage.getItem('userName'));
+    setUser(localStorage.getItem("userName"));
     // const loggedInFLag = localStorage.getItem('logInFlag');
     // setIsLoggedIn(!!loggedInFLag);
 
-    const currentThemeColor = localStorage.getItem('colorMode');
-    const currentThemeMode = localStorage.getItem('themeMode');
+    const currentThemeColor = localStorage.getItem("colorMode");
+    const currentThemeMode = localStorage.getItem("themeMode");
     if (currentThemeColor && currentThemeMode) {
       setCurrentColor(currentThemeColor);
       setCurrentMode(currentThemeMode);
     }
-    console.log('Lets go from here');
   }, []);
 
   return (
-    <div className={currentMode === 'Dark' ? 'dark' : ''}>
+    <div className={currentMode === "Dark" ? "dark" : ""}>
       <BrowserRouter>
-        <div className='flex relative dark:bg-main-dark-bg'>
+        <div className="flex relative dark:bg-main-dark-bg">
           {/* Settings Button */}
-          <div className='fixed right-4 bottom-4' style={{ zIndex: '1000' }}>
-            <TooltipComponent content='Settings' position='Top'>
+          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
+            <TooltipComponent content="Settings" position="Top">
               <button
-                type='button'
+                type="button"
                 onClick={() => setThemeSettings(true)}
-                style={{ background: currentColor, borderRadius: '50%' }}
-                className='text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray'
+                style={{ background: currentColor, borderRadius: "50%" }}
+                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
               >
                 <FiSettings />
               </button>
             </TooltipComponent>
           </div>
           {/* Log Out Button */}
-          <div className='fixed left-4 bottom-4' style={{ zIndex: '1000' }}>
-            <TooltipComponent content='Log Out' position='Top'>
+          <div className="fixed left-4 bottom-4" style={{ zIndex: "1000" }}>
+            <TooltipComponent content="Log Out" position="Top">
               <button
-                type='button'
+                type="button"
                 onClick={onLogOut}
-                style={{ background: currentColor, borderRadius: '50%' }}
-                className='text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray'
+                style={{ background: currentColor, borderRadius: "50%" }}
+                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
               >
                 <BsFillLockFill />
               </button>
             </TooltipComponent>
           </div>
           {activeMenu ? (
-            <div className='w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white '>
+            <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
               <Sidebar />
             </div>
           ) : (
-            <div className='w-0 dark:bg-secondary-dark-bg'>
+            <div className="w-0 dark:bg-secondary-dark-bg">
               <Sidebar />
             </div>
           )}
           <div
             className={
               activeMenu
-                ? 'dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  '
-                : 'bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 '
+                ? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  "
+                : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
             }
           >
             {/* Open Login Dialog Initially */}
-            <div className='fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full '>
+            <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
               <Navbar />
             </div>
             <div>
@@ -159,7 +158,7 @@ const App = () => {
                       <SupplierProductContextProvider>
                         <Routes>
                           <Route element={<PrivateRoutes />}>
-                            <Route path='/admin' exact element={<Admin />} />
+                            <Route path="/admin" exact element={<Admin />} />
                           </Route>
                         </Routes>
                       </SupplierProductContextProvider>
@@ -171,7 +170,7 @@ const App = () => {
               <RequestContextProvider>
                 <Routes>
                   <Route element={<PrivateRoutes />}>
-                    <Route path='/requests' exact element={<Requests />} />
+                    <Route path="/requests" exact element={<Requests />} />
                   </Route>
                 </Routes>
               </RequestContextProvider>
@@ -179,31 +178,31 @@ const App = () => {
               <ProjectContextProvider>
                 <Routes>
                   <Route element={<PrivateRoutes />}>
-                    <Route path='/projects' exact element={<Projects />} />
+                    <Route path="/projects" exact element={<Projects />} />
                   </Route>
                 </Routes>
               </ProjectContextProvider>
 
               <Routes>
                 {!isLoggedIn && (
-                  <Route path='/signup' element={<SignupDialog />} />
+                  <Route path="/signup" element={<SignupDialog />} />
                 )}
                 {!isLoggedIn && (
-                  <Route path='/login' element={<LoginDialog />} />
+                  <Route path="/login" element={<LoginDialog />} />
                 )}
-                <Route path='/' element={<Navigate replace to='/login' />} />
+                <Route path="/" element={<Navigate replace to="/login" />} />
                 <Route element={<PrivateRoutes />}>
-                  <Route path='/dashboard' exact element={<Dashboard />} />
+                  <Route path="/dashboard" exact element={<Dashboard />} />
                   <Route
-                    path='/notifications'
+                    path="/notifications"
                     exact
                     element={<Notifications />}
                   />
                   {/* <Route path='/rigs' exact element={<RigCompanies />} />
                   <Route path='/suppliers' exact element={<Suppliers />} /> */}
-                  <Route path='/settings' exact element={<Settings />} />
-                  <Route path='/scheduler' exact element={<Scheduler />} />
-                  <Route path='/' element={<Navigate replace to='/login' />} />
+                  <Route path="/settings" exact element={<Settings />} />
+                  <Route path="/scheduler" exact element={<Scheduler />} />
+                  <Route path="/" element={<Navigate replace to="/login" />} />
                 </Route>
               </Routes>
             </div>

@@ -21,6 +21,9 @@ import { useFirmContext } from "../hooks/useFirmContext";
 import { useRigContext } from "../hooks/useRigContext";
 import { useProductContext } from "../hooks/useProductContext";
 import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
+import { useStateContext } from "../contexts/ContextProvider";
+import axios from "axios";
+
 import { Header } from "../components";
 import "../index.css";
 import "../App.css";
@@ -28,7 +31,7 @@ import "../App.css";
 const gridPageSize = 8;
 
 const Admin = () => {
-  // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
+  const { apiURL } = useStateContext();
   const [firmList, setFirmList] = useState(null);
   const [rigList, setRigList] = useState(null);
   const [contactList, setContactList] = useState(null);
@@ -62,6 +65,7 @@ const Admin = () => {
     { firmType: "CUSTOMER", firmId: "1" },
     { firmType: "RIGCOMPANY", firmId: "2" },
     { firmType: "SUPPLIER", firmId: "3" },
+    { firmType: "DELIVERYASSOC", firmId: "4" },
   ];
 
   const firmSelections = {
@@ -132,14 +136,21 @@ const Admin = () => {
     const fetchContacts = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
+      // const strAPI = `${apiURL}/api/contact`;
+      // console.log("strAPI: ", strAPI);
+      // const response = await axios.get(strAPI);
+      // console.log("response data: ", response.data);
+      // setContactList(response.data);
+
+      // toast.success(strAPI);
+      // const response = await fetch(strAPI);
       const response = await fetch("/api/contact");
       const json = await response.json();
-
       setContactList(json);
 
-      if (response.ok) {
-        contactDispatch({ type: "GET_CONTACTS", payload: json });
-      }
+      // if (response.ok) {
+      //   contactDispatch({ type: "GET_CONTACTS", payload: json });
+      // }
       // Set Default Cursor
       document.getElementById("root").style.cursor = "default";
     };
@@ -310,7 +321,6 @@ const Admin = () => {
 
   const contactsActionComplete = async (args) => {
     if (!contactsGrid) return;
-
     if (
       args.requestType === "beginEdit" ||
       args.requestType === "add" ||
@@ -550,7 +560,8 @@ const Admin = () => {
   const readcusphonemaskinputFn = () => phObject.value;
   const writecusphonemaskinputFn = (args) => {
     phObject = new MaskedTextBox({
-      value: args.rowData[args.column.field].toString(),
+      // value: args.rowData[args.column.field].toString(),
+      value: args.rowData[args.column.field],
       mask: "000-000-0000",
       placeholder: "Phone",
       floatLabelType: "Always",
@@ -931,6 +942,13 @@ const Admin = () => {
                 <ColumnDirective
                   field="contactclass"
                   headerText="Class"
+                  editType="dropdownedit"
+                  textAlign="Left"
+                  width="100"
+                />
+                <ColumnDirective
+                  field="firm"
+                  headerText="Firm"
                   editType="dropdownedit"
                   textAlign="Left"
                   width="100"

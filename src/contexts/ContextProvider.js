@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useReducer } from 'react';
+import React, { createContext, useContext, useState, useReducer } from "react";
 
 const StateContext = createContext();
 
@@ -11,30 +11,60 @@ const initialState = {
 
 export const ContextProvider = ({ children }) => {
   const [screenSize, setScreenSize] = useState(undefined);
-  const [currentColor, setCurrentColor] = useState('#7E7574');
-  const [currentMode, setCurrentMode] = useState('Light');
+  const [currentColor, setCurrentColor] = useState("#7E7574");
+  const [currentMode, setCurrentMode] = useState("Light");
   const [themeSettings, setThemeSettings] = useState(false);
   const [activeMenu, setActiveMenu] = useState(true);
   const [isClicked, setIsClicked] = useState(initialState);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [globalUserName, setGlobalUserName] = useState('');
+  const [globalUserName, setGlobalUserName] = useState("");
   const [deleteFlag, setDeleteFlag] = useState(false);
+  const [apiURL, setApiURL] = useState(
+    "https://keen-squid-lately.ngrok-free.app"
+  );
 
   const setMode = (e) => {
     setCurrentMode(e.target.value);
-    localStorage.setItem('themeMode', e.target.value);
+    localStorage.setItem("themeMode", e.target.value);
   };
 
   const setColor = (color) => {
     setCurrentColor(color);
-    localStorage.setItem('colorMode', color);
+    localStorage.setItem("colorMode", color);
   };
 
-  const handleClick = (clicked) => setIsClicked({ ...initialState, [clicked]: true });
+  const handleClick = (clicked) =>
+    setIsClicked({ ...initialState, [clicked]: true });
 
   return (
     // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <StateContext.Provider value={{ currentColor, currentMode, activeMenu, screenSize, setScreenSize, handleClick, isClicked, initialState, setIsClicked, setActiveMenu, setCurrentColor, setCurrentMode, setMode, setColor, themeSettings, setThemeSettings, deleteFlag, setDeleteFlag, isLoggedIn, setIsLoggedIn, globalUserName, setGlobalUserName }}>
+    <StateContext.Provider
+      value={{
+        currentColor,
+        currentMode,
+        activeMenu,
+        screenSize,
+        setScreenSize,
+        handleClick,
+        isClicked,
+        initialState,
+        setIsClicked,
+        setActiveMenu,
+        setCurrentColor,
+        setCurrentMode,
+        setMode,
+        setColor,
+        themeSettings,
+        setThemeSettings,
+        deleteFlag,
+        setDeleteFlag,
+        isLoggedIn,
+        setIsLoggedIn,
+        globalUserName,
+        setGlobalUserName,
+        apiURL,
+      }}
+    >
       {children}
     </StateContext.Provider>
   );
@@ -48,17 +78,19 @@ export const CustomerContext = createContext();
 
 export const customerReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_CUSTOMER':
+    case "GET_CUSTOMER":
       return {
         customersData: action.payload,
       };
-    case 'CREATE_CUSTOMER':
+    case "CREATE_CUSTOMER":
       return {
         customersData: [action.payload, ...state.customersData],
       };
-    case 'DELETE_CUSTOMER':
+    case "DELETE_CUSTOMER":
       return {
-        customersData: state.customersData.filter((c) => c._id !== action.payload._id),
+        customersData: state.customersData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -73,7 +105,7 @@ export const CustomerContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <CustomerContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </CustomerContext.Provider>
   );
 };
@@ -84,17 +116,19 @@ export const ContactContext = createContext();
 
 export const contactReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_CONTACT':
+    case "GET_CONTACT":
       return {
         contactsData: action.payload,
       };
-    case 'CREATE_CONTACT':
+    case "CREATE_CONTACT":
       return {
         contactsData: [action.payload, ...state.contactsData],
       };
-    case 'DELETE_CONTACT':
+    case "DELETE_CONTACT":
       return {
-        contactsData: state.contactsData.filter((c) => c._id !== action.payload._id),
+        contactsData: state.contactsData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -109,7 +143,7 @@ export const ContactContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <ContactContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </ContactContext.Provider>
   );
 };
@@ -120,15 +154,15 @@ export const FirmContext = createContext();
 
 export const firmReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_FIRM':
+    case "GET_FIRM":
       return {
         firmData: action.payload,
       };
-    case 'CREATE_FIRM':
+    case "CREATE_FIRM":
       return {
         firmData: [action.payload, ...state.firmData],
       };
-    case 'DELETE_FIRM':
+    case "DELETE_FIRM":
       return {
         firmData: state.firmData.filter((c) => c._id !== action.payload._id),
       };
@@ -145,7 +179,7 @@ export const FirmContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <FirmContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </FirmContext.Provider>
   );
 };
@@ -156,15 +190,15 @@ export const RigContext = createContext();
 
 export const rigReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_RIG':
+    case "GET_RIG":
       return {
         rigData: action.payload,
       };
-    case 'CREATE_RIG':
+    case "CREATE_RIG":
       return {
         rigData: [action.payload, ...state.rigData],
       };
-    case 'DELETE_RIG':
+    case "DELETE_RIG":
       return {
         rigData: state.rigData.filter((c) => c._id !== action.payload._id),
       };
@@ -181,7 +215,7 @@ export const RigContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <RigContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </RigContext.Provider>
   );
 };
@@ -192,17 +226,19 @@ export const ProductContext = createContext();
 
 export const productReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_PRODUCT':
+    case "GET_PRODUCT":
       return {
         productsData: action.payload,
       };
-    case 'CREATE_PRODUCT':
+    case "CREATE_PRODUCT":
       return {
         productsData: [action.payload, ...state.productsData],
       };
-    case 'DELETE_PRODUCT':
+    case "DELETE_PRODUCT":
       return {
-        productsData: state.productsData.filter((c) => c._id !== action.payload._id),
+        productsData: state.productsData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -217,7 +253,7 @@ export const ProductContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <ProductContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </ProductContext.Provider>
   );
 };
@@ -228,17 +264,19 @@ export const ProjectContext = createContext();
 
 export const projectReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_PROJECT':
+    case "GET_PROJECT":
       return {
         projectsData: action.payload,
       };
-    case 'CREATE_PROJECT':
+    case "CREATE_PROJECT":
       return {
         projectsData: [action.payload, ...state.projectsData],
       };
-    case 'DELETE_PROJECT':
+    case "DELETE_PROJECT":
       return {
-        projectsData: state.projectsData.filter((c) => c._id !== action.payload._id),
+        projectsData: state.projectsData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -253,7 +291,7 @@ export const ProjectContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <ProjectContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </ProjectContext.Provider>
   );
 };
@@ -264,15 +302,15 @@ export const UserContext = createContext();
 
 export const userReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_USER':
+    case "GET_USER":
       return {
         usersData: action.payload,
       };
-    case 'CREATE_USER':
+    case "CREATE_USER":
       return {
         usersData: [action.payload, ...state.usersData],
       };
-    case 'DELETE_USER':
+    case "DELETE_USER":
       return {
         usersData: state.usersData.filter((c) => c._id !== action.payload._id),
       };
@@ -289,7 +327,7 @@ export const UserContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <UserContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </UserContext.Provider>
   );
 };
@@ -300,17 +338,19 @@ export const RequestContext = createContext();
 
 export const requestReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_REQUEST':
+    case "GET_REQUEST":
       return {
         requestData: action.payload,
       };
-    case 'CREATE_REQUEST':
+    case "CREATE_REQUEST":
       return {
         requestData: [action.payload, ...state.requestData],
       };
-    case 'DELETE_REQUEST':
+    case "DELETE_REQUEST":
       return {
-        requestData: state.requestData.filter((c) => c._id !== action.payload._id),
+        requestData: state.requestData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -325,7 +365,7 @@ export const RequestContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <RequestContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </RequestContext.Provider>
   );
 };
@@ -336,17 +376,19 @@ export const SupplierProductContext = createContext();
 
 export const supplierProductReducer = (state, action) => {
   switch (action.type) {
-    case 'GET_SUPPLIERPRODUCT':
+    case "GET_SUPPLIERPRODUCT":
       return {
         supplierProductsData: action.payload,
       };
-    case 'CREATE_SUPPLIERPRODUCT':
+    case "CREATE_SUPPLIERPRODUCT":
       return {
         supplierProductsData: [action.payload, ...state.supplierProductsData],
       };
-    case 'DELETE_SUPPLIERPRODUCT':
+    case "DELETE_SUPPLIERPRODUCT":
       return {
-        supplierProductsData: state.supplierProductsData.filter((c) => c._id !== action.payload._id),
+        supplierProductsData: state.supplierProductsData.filter(
+          (c) => c._id !== action.payload._id
+        ),
       };
     default:
       return state;
@@ -361,8 +403,7 @@ export const SupplierProductContextProvider = ({ children }) => {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
     <SupplierProductContext.Provider value={{ ...state, dispatch }}>
-      { children }
+      {children}
     </SupplierProductContext.Provider>
   );
 };
-

@@ -55,7 +55,7 @@ const Products = () => {
   }, [dispatch]);
 
   const handleDelete = async () => {
-    const fetchString = "/api/product/" + selectedRecord;
+    const fetchString = `/api/product/` + selectedRecord;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
@@ -107,8 +107,6 @@ const Products = () => {
               "Content-Type": "application/json",
             },
           });
-
-          const json = await response.json();
 
           if (response.ok) {
             // console.log('Insert: ' + JSON.stringify(args.data));
