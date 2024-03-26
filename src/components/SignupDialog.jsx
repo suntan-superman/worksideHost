@@ -34,7 +34,7 @@ const SignupDialog = () => {
     });
     const json = await response.json();
     if (response.ok) {
-      dispatch({ type: "CREATE_USER", payload: json });
+      // dispatch({ type: "CREATE_USER", payload: json });
       navigate("/login");
     }
   };
