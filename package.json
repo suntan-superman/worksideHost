@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:4000",
+  "proxy": "https://keen-squid-lately.ngrok-free.app",
   "name": "worksidehost",
   "version": "1.0.0",
   "private": true,

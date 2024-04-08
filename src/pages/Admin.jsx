@@ -143,8 +143,9 @@ const Admin = () => {
       // setContactList(response.data);
 
       // toast.success(strAPI);
+      // const strAPI = `${apiURL}/api/contact`;
       // const response = await fetch(strAPI);
-      const response = await fetch("/api/contact");
+      // const response = await fetch("/api/contact");
       const json = await response.json();
       setContactList(json);
 
