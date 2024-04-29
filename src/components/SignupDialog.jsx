@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 // import { useStateContext } from '../contexts/ContextProvider';
 import { useUserContext } from "../hooks/useUserContext";
+import { toast } from "react-toastify";
 
 const SignupDialog = () => {
   const [data, setData] = useState({
@@ -34,7 +35,8 @@ const SignupDialog = () => {
     });
     const json = await response.json();
     if (response.ok) {
-      dispatch({ type: "CREATE_USER", payload: json });
+      toast.success("Check Email...");
+      // dispatch({ type: "CREATE_USER", payload: json });
       navigate("/login");
     }
   };

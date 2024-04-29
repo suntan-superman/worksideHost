@@ -52,13 +52,21 @@ const App = () => {
     setGlobalUserName,
   } = useStateContext();
   registerLicense(
+<<<<<<< HEAD
     'Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfdXVWQ2ZfV0V3WUc='
+=======
+    "Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfdXVWQ2ZfV0V3WUc="
+>>>>>>> 9bb5d149eca7466e6fbf8bfeea96bc1f801f8267
   );
   // Make sure token exists
   const [user, setUser] = useState(null);
 
   const onLogOut = () => {
+<<<<<<< HEAD
     toast.success('Logging Out...');
+=======
+    toast.success("Logging Out...");
+>>>>>>> 9bb5d149eca7466e6fbf8bfeea96bc1f801f8267
     // toast.success(message, {
     //   position: toast.POSITION.TOP_CENTER,
     //   autoClose: 3000, //3 seconds

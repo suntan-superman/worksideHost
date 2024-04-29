@@ -11,6 +11,7 @@ import {
   Page,
   Toolbar,
 } from "@syncfusion/ej2-react-grids";
+import { toast } from "react-toastify";
 import { Header } from "../components";
 import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
@@ -54,11 +55,11 @@ const Products = () => {
   }, [dispatch]);
 
   const handleDelete = async () => {
-    const fetchString = "/api/product/" + selectedRecord;
+    const fetchString = `/api/product/` + selectedRecord;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
-    const json = await response.json();
+    // const json = await response.json();
 
     // if (!response.ok) {
     //   setError(json.error);
@@ -106,8 +107,6 @@ const Products = () => {
               "Content-Type": "application/json",
             },
           });
-
-          const json = await response.json();
 
           if (response.ok) {
             // console.log('Insert: ' + JSON.stringify(args.data));
