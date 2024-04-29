@@ -15,7 +15,7 @@ import { Header } from "../components";
 import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
 
-const gridPageSize = 12;
+// const gridPageSize = 12;
 
 const Products = () => {
   // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();

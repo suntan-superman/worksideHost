@@ -13,11 +13,10 @@ import {
   Resize,
   Freeze,
 } from "@syncfusion/ej2-react-grids";
+import { toast } from "react-toastify";
 import { useProjectContext } from "../hooks/useProjectContext";
-import { projects, contextMenuItems } from "../data/dummy";
 import { Header } from "../components";
 import "../index.css";
-import { toast } from "react-toastify";
 
 const gridPageSize = 8;
 
@@ -95,7 +94,7 @@ const Projects = () => {
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
-    const json = await response.json();
+    // const json = await response.json();
 
     // if (!response.ok) {
     //   setError(json.error);
