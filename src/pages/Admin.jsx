@@ -136,18 +136,20 @@ const Admin = () => {
     const fetchContacts = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
+
+      // const strAPI = `${apiURL}/api/contact`;
       // const strAPI = `${apiURL}/api/contact`;
       // console.log("strAPI: ", strAPI);
-      // const response = await axios.get(strAPI);
-      // console.log("response data: ", response.data);
-      // setContactList(response.data);
+      const response = await axios.get("/api/contact");
+      console.log("response data: ", response.data);
+      setContactList(response.data);
 
       // toast.success(strAPI);
       // const strAPI = `${apiURL}/api/contact`;
       // const response = await fetch(strAPI);
       // const response = await fetch("/api/contact");
-      const json = await response.json();
-      setContactList(json);
+      // const json = await response.json();
+      // setContactList(json);
 
       // if (response.ok) {
       //   contactDispatch({ type: "GET_CONTACTS", payload: json });
