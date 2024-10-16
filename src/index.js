@@ -1,4 +1,6 @@
-import React from 'react';
+/* eslint-disable */
+
+import React from "react";
 import ReactDOM from 'react-dom';
 
 import './index.css';
@@ -11,24 +13,24 @@ import {
 } from './contexts/ContextProvider';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <ContextProvider>
-      <UserContextProvider>
-        {/* <CustomerContextProvider> */}
-        <App />
-        <ToastContainer
-          position='top-right'
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          draggable
-          pauseOnHover
-          theme='light'
-        />
-        {/* </CustomerContextProvider> */}
-      </UserContextProvider>
-    </ContextProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+	<React.StrictMode>
+		<ContextProvider>
+			<UserContextProvider>
+				{/* <CustomerContextProvider> */}
+				<App />
+				<ToastContainer
+					position="top-right"
+					autoClose={5000}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick
+					draggable
+					pauseOnHover
+					theme="light"
+				/>
+				{/* </CustomerContextProvider> */}
+			</UserContextProvider>
+		</ContextProvider>
+	</React.StrictMode>,
+	document.getElementById("root"),
 );

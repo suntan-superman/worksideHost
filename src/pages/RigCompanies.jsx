@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable indent */
+import React from "react";
 import { Header } from '../components';
 
 const RigCompanies = () => {

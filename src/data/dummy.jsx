@@ -1,20 +1,13 @@
 import React from 'react';
 import { AiOutlineCalendar } from 'react-icons/ai';
 import { FiBarChart } from 'react-icons/fi';
-import { BsCurrencyDollar, BsShield, BsChatLeft } from "react-icons/bs";
+import { BsCurrencyDollar, BsShield } from "react-icons/bs";
 import {
-	MdOutlineSupervisorAccount,
-	MdOutlineCancel,
-	MdHome,
 	MdSupervisorAccount,
 	MdDashboard,
 	MdNotifications,
 	MdAccountTree,
 	MdRequestPage,
-	MdLocalShipping,
-	MdAccessibility,
-	MdConstruction,
-	MdSettings,
 } from "react-icons/md";
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';

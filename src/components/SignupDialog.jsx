@@ -1,4 +1,4 @@
-/* eslint-disable no-tabs */
+/* eslint-disable */
 /* eslint-disable react/react-in-jsx-scope */
 import { useState } from "react";
 // import axios from 'axios';

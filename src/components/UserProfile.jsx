@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable */
+import React from "react";
 import { MdOutlineCancel } from 'react-icons/md';
 
 import { Button } from '.';

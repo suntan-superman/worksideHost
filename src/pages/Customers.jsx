@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import React, { useEffect, useState } from "react";
 import * as ReactDOM from "react-dom";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";

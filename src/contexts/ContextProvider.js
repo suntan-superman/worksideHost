@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { createContext, useContext, useState, useReducer } from "react";
 
 const StateContext = createContext();

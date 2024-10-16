@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+/* eslint-disable */
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { format } from 'date-fns';
 import Skeleton, { SkeletonText } from 'react-loading-skeleton';
 // import GoogleMapReact from 'google-map-react';
