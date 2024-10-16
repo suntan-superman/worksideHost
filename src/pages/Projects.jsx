@@ -120,11 +120,6 @@ const Projects = () => {
 					const response = await fetch(fetchString, {
 						method: "DELETE",
 					});
-					// const json = await response.json();
-
-					// if (!response.ok) {
-					//   setError(json.error);
-					// }
 					if (response.ok) {
 						// Clear form useStates
 						// ResetUseStates();
