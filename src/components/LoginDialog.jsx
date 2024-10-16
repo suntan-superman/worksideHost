@@ -7,23 +7,15 @@ import { MdLockOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { confirmAlert } from "react-confirm-alert";
 import { useStateContext } from "../contexts/ContextProvider";
-import { Alert } from "@mui/material";
-// import { useUserContext } from "../hooks/useUserContext";
-// import { Alert, Button } from '@material-tailwind/react';
 import "../index.css";
 
-// eslint-disable-next-line consistent-return
 const LoginDialog = () => {
   const { setIsLoggedIn, setGlobalUserName } = useStateContext();
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  // const [company, setCompany] = useState('');
   const [saveUserChecked, setSaveUserChecked] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  // const [alertFlag, setAlertFlag] = useState(false);
-  // const { usersData, dispatch } = useUserContext();
 
   const onSaveUserName = (user) => {
     localStorage.setItem("loginName", user);
@@ -72,12 +64,13 @@ const LoginDialog = () => {
 				document.getElementById("root").style.cursor = "wait";
 				const fetchString = `/api/user/${userName}?password=${password}`;
 
-				window.alert(`Fetch... ${fetchString}`);
+				// TODO remove alert
+				// window.alert(`Fetch... ${fetchString}`);
 
 				const response = await axios.get(fetchString);
 
 				if (response.ok) {
-					// Need to validate password
+					// TODO - Need to validate password
 					const json = await response.json();
 					setIsLoggedIn(true);
 					localStorage.setItem("logInFlag", "true");
@@ -127,11 +120,15 @@ const LoginDialog = () => {
   }, []);
 
   return (
-			// eslint-disable-next-line react/jsx-indent
 			<div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black bg-opacity-25 backdrop-blur-sm">
 				<div
 					onClick={(e) => {
 						e.stopPropagation();
+					}}
+					onKeyUp={(e) => {
+						if (e.key === "Enter") {
+							e.stopPropagation();
+						}
 					}}
 					className="modalContainer"
 				>

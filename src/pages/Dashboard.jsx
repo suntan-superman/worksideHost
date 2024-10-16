@@ -2,7 +2,7 @@ import React from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 // import { Header, Stacked, Pie, Button, LineChart, SparkLine } from '../components';
 import { Header } from "../components";
-import { worksideData, dropdownData } from "../data/dummy";
+import { worksideData } from "../data/dummy";
 import { useStateContext } from "../contexts/ContextProvider";
 
 // const DropDown = ({ currentMode }) => (

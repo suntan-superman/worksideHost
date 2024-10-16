@@ -78,7 +78,25 @@ const Projects = () => {
 					fetchFirms();
 				}, []);
 
-				// Set Location Type Selection Options
+				// Set Location Selection Options
+				const areaOptions = [
+					{ name: "GULF COAST", nameId: "1" },
+					{ name: "MID-CONTINENT", nameId: "2" },
+					{ name: "WEST COAST", nameId: "3" },
+					{ name: "WEST TEXAS", nameId: "4" },
+				];
+
+				const areaSelections = {
+					params: {
+						actionComplete: () => false,
+						allowFiltering: true,
+						dataSource: new DataManager(areaOptions),
+						fields: { text: "name", value: "name" },
+						query: new Query(),
+					},
+				};
+
+				// Set Company Selection Options
 				const companyOptions = [
 					{ name: "Aera Energy", nameId: "1" },
 					{ name: "Berry", nameId: "2" },
@@ -261,6 +279,7 @@ const Projects = () => {
 										editType="dropdownedit"
 										textAlign="Left"
 										width="100"
+										edit={areaSelections}
 									/>
 									{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
 									<ColumnDirective
