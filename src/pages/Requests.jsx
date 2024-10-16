@@ -18,6 +18,8 @@ import {
 import { useStateContext } from "../contexts/ContextProvider";
 import RequestDetailsModal from "../components/RequestDetailsModal";
 
+const apiUrl = process.env.REACT_APP_MONGO_URI;
+
 import { Header } from "../components";
 
 const gridPageSize = 8;
@@ -50,7 +52,8 @@ const Requests = () => {
     const fetchRequests = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-      const response = await fetch("/api/request");
+      // const response = await fetch(`${apiUrl}/api/request`);
+						const response = await fetch("/api/request");
       const json = await response.json();
 
       setRequestList(json);
@@ -91,12 +94,12 @@ const Requests = () => {
 
   const onRequestLoad = () => {
     const gridElement = document.getElementById("requestGridElement");
-    if (gridElement && gridElement.ej2_instances[0]) {
-      const gridInstance = gridElement.ej2_instances[0];
-      gridInstance.pageSettings.pageSize = gridPageSize;
-      // gridInstance.pageSettings.frozenColumns = 3;
-      // gridInstance.pageSettings.freeze = true;
-    }
+				if (gridElement?.ej2_instances[0]) {
+					const gridInstance = gridElement.ej2_instances[0];
+					gridInstance.pageSettings.pageSize = gridPageSize;
+					// gridInstance.pageSettings.frozenColumns = 3;
+					// gridInstance.pageSettings.freeze = true;
+				}
   };
 
   const rowSelectedRequest = () => {
@@ -139,181 +142,190 @@ const Requests = () => {
   };
 
   return (
-    <div className="App">
-      <div
-        id="requestFrame"
-        className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text"
-      >
-        <Header category="Workside" title="Requests" />
-        <GridComponent
-          id="requestGridElement"
-          dataSource={requestList}
-          allowSelection
-          allowFiltering
-          allowPaging
-          allowResizing
-          frozenColumns={2}
-          filterSettings={FilterOptions}
-          selectionSettings={settings}
-          toolbar={toolbarOptions}
-          rowSelected={rowSelectedRequest}
-          recordClick={recordClick}
-          editSettings={editOptions}
-          enablePersistence
-          load={onRequestLoad}
-          // width="auto"
-          width="1400px"
-          // eslint-disable-next-line no-return-assign
-          ref={(g) => (requestGrid = g)}
-        >
-          <ColumnsDirective>
-            <ColumnDirective
-              field="_id"
-              headerText="Id"
-              textAlign="Left"
-              width="50"
-              isPrimaryKey="true"
-              allowEditing="false"
-              visible={false}
-            />
-            <ColumnDirective
-              field="request_id"
-              headerText="Id"
-              textAlign="Left"
-              width="50"
-              allowEditing="false"
-              visible={false}
-            />
-            <ColumnDirective
-              headerText="Details"
-              textAlign="Center"
-              width="80"
-              template={gridTemplate}
-              allowEditing="false"
-            />
-            <ColumnDirective
-              field="requestname"
-              headerText="Request"
-              textAlign="Left"
-              width="100"
-            />
-            <ColumnDirective
-              field="customername"
-              headerText="Customer"
-              editType="dropdownedit"
-              textAlign="Left"
-              width="100"
-              edit={companySelections}
-            />
-            <ColumnDirective
-              field="customercontact"
-              headerText="Cust Contact"
-              textAlign="Left"
-              width="100"
-            />
-            <ColumnDirective
-              field="projectname"
-              headerText="Project"
-              textAlign="Left"
-              width="200"
-            />
-            <ColumnDirective
-              field="rigcompany"
-              headerText="Rig Company"
-              textAlign="left"
-              width="50"
-            />
-            <ColumnDirective
-              field="rigcompanycontact"
-              headerText="RC Contact"
-              textAlign="left"
-              width="50"
-            />
-            <ColumnDirective
-              field="creationdate"
-              headerText="Date Created"
-              type="date"
-              editType="datepickeredit"
-              format="MM/dd/yyy"
-              textAlign="Right"
-              width="140"
-            />
-            <ColumnDirective
-              field="quantity"
-              headerText="Quantity"
-              textAlign="Right"
-              width="100"
-            />
-            <ColumnDirective
-              field="vendortype"
-              headerText="Vendor Type"
-              editType="dropdownedit"
-              textAlign="Left"
-              width="100"
-            />
-            <ColumnDirective
-              field="datetimerequested"
-              headerText="Date Requested"
-              type="date"
-              editType="datepickeredit"
-              format="MM/dd/yyyy-hh:mm"
-              textAlign="Right"
-              width="140"
-            />
-            <ColumnDirective
-              field="comments"
-              headerText="Comments"
-              textAlign="left"
-              width="100"
-            />
-            <ColumnDirective
-              field="status"
-              headerText="Status"
-              editType="dropdownedit"
-              width="100"
-            />
-            <ColumnDirective
-              field="statusdate"
-              headerText="Status Date"
-              type="date"
-              editType="datepickeredit"
-              format="MM/dd/yyy"
-              textAlign="Right"
-              width="140"
-            />
-          </ColumnsDirective>
-          <Inject
-            services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
-          />
-        </GridComponent>
-      </div>
-      <div>
-        {showDialog && (
-          <DialogComponent
-            id="requestDetailsDialog"
-            header="Workside Request Details"
-            visible={showDialog}
-            showCloseIcon
-            // show
-            width="400px"
-            height="800px"
-            open={dialogOpen}
-            close={dialogClose}
-            position={position}
-            dialogAnimationSettings={dialogAnimationSettings}
-            closeOnEscape
-          >
-            <RequestDetailsModal
-              recordID={selectedRecord}
-              open={showDialog}
-              onOK={dialogClose}
-              onClose={dialogClose}
-            />
-          </DialogComponent>
-        )}
-      </div>
-    </div>
-  );
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<Header category="Workside" title="Requests" />
+				{/* <div className="flex-grow bg-white p-8 relative">
+				<Header category="Workside" title="Requests" /> */}
+				<div className="absolute top-[75px] left-[20px] w-[100%] flex flex-row items-center justify-start">
+					<GridComponent
+						id="requestGridElement"
+						dataSource={requestList}
+						allowSelection
+						allowFiltering
+						allowPaging
+						allowResizing
+						frozenColumns={2}
+						filterSettings={FilterOptions}
+						selectionSettings={settings}
+						toolbar={toolbarOptions}
+						rowSelected={rowSelectedRequest}
+						recordClick={recordClick}
+						editSettings={editOptions}
+						enablePersistence
+						load={onRequestLoad}
+						// width="auto"
+						width="95%"
+						// eslint-disable-next-line no-return-assign
+						ref={(g) => {
+							requestGrid = g;
+						}}
+					>
+						<ColumnsDirective>
+							<ColumnDirective
+								field="_id"
+								headerText="Id"
+								textAlign="Left"
+								width="50"
+								isPrimaryKey="true"
+								allowEditing="false"
+								visible={false}
+							/>
+							<ColumnDirective
+								field="request_id"
+								headerText="Id"
+								textAlign="Left"
+								width="50"
+								allowEditing="false"
+								visible={false}
+							/>
+							<ColumnDirective
+								headerText="Details"
+								textAlign="Center"
+								width="80"
+								template={gridTemplate}
+								allowEditing="false"
+							/>
+							<ColumnDirective
+								field="requestname"
+								headerText="Request"
+								textAlign="Left"
+								width="100"
+							/>
+							<ColumnDirective
+								field="customername"
+								headerText="Customer"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="100"
+								edit={companySelections}
+							/>
+							<ColumnDirective
+								field="customercontact"
+								headerText="Cust Contact"
+								textAlign="Left"
+								width="100"
+							/>
+							<ColumnDirective
+								field="projectname"
+								headerText="Project"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="rigcompany"
+								headerText="Rig Company"
+								textAlign="left"
+								width="50"
+							/>
+							<ColumnDirective
+								field="rigcompanycontact"
+								headerText="RC Contact"
+								textAlign="left"
+								width="50"
+							/>
+							<ColumnDirective
+								field="creationdate"
+								headerText="Date Created"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+							<ColumnDirective
+								field="quantity"
+								headerText="Quantity"
+								textAlign="Right"
+								width="100"
+							/>
+							<ColumnDirective
+								field="vendortype"
+								headerText="Vendor Type"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="100"
+							/>
+							<ColumnDirective
+								field="datetimerequested"
+								headerText="Date Requested"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyyy-hh:mm"
+								textAlign="Right"
+								width="140"
+							/>
+							<ColumnDirective
+								field="comments"
+								headerText="Comments"
+								textAlign="left"
+								width="100"
+							/>
+							<ColumnDirective
+								field="status"
+								headerText="Status"
+								editType="dropdownedit"
+								width="100"
+							/>
+							<ColumnDirective
+								field="statusdate"
+								headerText="Status Date"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+						</ColumnsDirective>
+						<Inject
+							services={[
+								Selection,
+								Edit,
+								Filter,
+								Page,
+								Toolbar,
+								Resize,
+								Freeze,
+							]}
+						/>
+					</GridComponent>
+				</div>
+				<div>
+					{showDialog && (
+						<DialogComponent
+							id="requestDetailsDialog"
+							header="Workside Request Details"
+							visible={showDialog}
+							showCloseIcon
+							// show
+							width="400px"
+							height="800px"
+							open={dialogOpen}
+							close={dialogClose}
+							position={position}
+							dialogAnimationSettings={dialogAnimationSettings}
+							closeOnEscape
+						>
+							<RequestDetailsModal
+								recordID={selectedRecord}
+								open={showDialog}
+								onOK={dialogClose}
+								onClose={dialogClose}
+							/>
+						</DialogComponent>
+					)}
+				</div>
+			</div>
+		);
 };
 
 export default Requests;

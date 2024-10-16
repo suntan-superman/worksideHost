@@ -8,12 +8,12 @@ import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { toast } from "react-toastify";
 
 import {
-  Navbar,
-  Footer,
-  Sidebar,
-  ThemeSettings,
-  LoginDialog,
-  SignupDialog,
+	Navbar,
+	Footer,
+	Sidebar,
+	ThemeSettings,
+	LoginDialog,
+	SignupDialog,
 } from "./components";
 import {
   Dashboard,
@@ -93,58 +93,58 @@ const App = () => {
   }, []);
 
   return (
-    <div className={currentMode === "Dark" ? "dark" : ""}>
-      <BrowserRouter>
-        <div className="flex relative dark:bg-main-dark-bg">
-          {/* Settings Button */}
-          <div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
-            <TooltipComponent content="Settings" position="Top">
-              <button
-                type="button"
-                onClick={() => setThemeSettings(true)}
-                style={{ background: currentColor, borderRadius: "50%" }}
-                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
-              >
-                <FiSettings />
-              </button>
-            </TooltipComponent>
-          </div>
-          {/* Log Out Button */}
-          <div className="fixed left-4 bottom-4" style={{ zIndex: "1000" }}>
-            <TooltipComponent content="Log Out" position="Top">
-              <button
-                type="button"
-                onClick={onLogOut}
-                style={{ background: currentColor, borderRadius: "50%" }}
-                className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
-              >
-                <BsFillLockFill />
-              </button>
-            </TooltipComponent>
-          </div>
-          {activeMenu ? (
-            <div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
-              <Sidebar />
-            </div>
-          ) : (
-            <div className="w-0 dark:bg-secondary-dark-bg">
-              <Sidebar />
-            </div>
-          )}
-          <div
-            className={
-              activeMenu
-                ? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  "
-                : "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
-            }
-          >
-            {/* Open Login Dialog Initially */}
-            <div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-              <Navbar />
-            </div>
-            <div>
-              {themeSettings && <ThemeSettings />}
-              {/* <CustomerContextProvider>
+			<div className={currentMode === "Dark" ? "dark" : ""}>
+				<BrowserRouter>
+					<div className="flex relative dark:bg-main-dark-bg">
+						{/* Settings Button */}
+						<div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
+							<TooltipComponent content="Settings" position="Top">
+								<button
+									type="button"
+									onClick={() => setThemeSettings(true)}
+									style={{ background: currentColor, borderRadius: "50%" }}
+									className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+								>
+									<FiSettings />
+								</button>
+							</TooltipComponent>
+						</div>
+						{/* Log Out Button */}
+						<div className="fixed left-4 bottom-4" style={{ zIndex: "1000" }}>
+							<TooltipComponent content="Log Out" position="Top">
+								<button
+									type="button"
+									onClick={onLogOut}
+									style={{ background: currentColor, borderRadius: "50%" }}
+									className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+								>
+									<BsFillLockFill />
+								</button>
+							</TooltipComponent>
+						</div>
+						{activeMenu ? (
+							<div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+								<Sidebar />
+							</div>
+						) : (
+							<div className="w-0 dark:bg-secondary-dark-bg">
+								<Sidebar />
+							</div>
+						)}
+						<div
+							className={
+								activeMenu
+									? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  "
+									: "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
+							}
+						>
+							{/* Open Login Dialog Initially */}
+							<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+								<Navbar />
+							</div>
+							<div>
+								{themeSettings && <ThemeSettings />}
+								{/* <CustomerContextProvider>
                 <Routes>
                   <Route element={<PrivateRoutes />}>
                     <Route path='/customers' exact element={<Customers />} />
@@ -152,67 +152,70 @@ const App = () => {
                 </Routes>
               </CustomerContextProvider> */}
 
-              <FirmContextProvider>
-                <ContactContextProvider>
-                  <RigContextProvider>
-                    <ProductContextProvider>
-                      <SupplierProductContextProvider>
-                        <Routes>
-                          <Route element={<PrivateRoutes />}>
-                            <Route path="/admin" exact element={<Admin />} />
-                          </Route>
-                        </Routes>
-                      </SupplierProductContextProvider>
-                    </ProductContextProvider>
-                  </RigContextProvider>
-                </ContactContextProvider>
-              </FirmContextProvider>
+								<FirmContextProvider>
+									<ContactContextProvider>
+										<RigContextProvider>
+											<ProductContextProvider>
+												<SupplierProductContextProvider>
+													<Routes>
+														<Route element={<PrivateRoutes />}>
+															<Route path="/admin" exact element={<Admin />} />
+														</Route>
+													</Routes>
+												</SupplierProductContextProvider>
+											</ProductContextProvider>
+										</RigContextProvider>
+									</ContactContextProvider>
+								</FirmContextProvider>
 
-              <RequestContextProvider>
-                <Routes>
-                  <Route element={<PrivateRoutes />}>
-                    <Route path="/requests" exact element={<Requests />} />
-                  </Route>
-                </Routes>
-              </RequestContextProvider>
+								<RequestContextProvider>
+									<Routes>
+										<Route element={<PrivateRoutes />}>
+											<Route path="/requests" exact element={<Requests />} />
+										</Route>
+									</Routes>
+								</RequestContextProvider>
 
-              <ProjectContextProvider>
-                <Routes>
-                  <Route element={<PrivateRoutes />}>
-                    <Route path="/projects" exact element={<Projects />} />
-                  </Route>
-                </Routes>
-              </ProjectContextProvider>
+								<ProjectContextProvider>
+									<Routes>
+										<Route element={<PrivateRoutes />}>
+											<Route path="/projects" exact element={<Projects />} />
+										</Route>
+									</Routes>
+								</ProjectContextProvider>
 
-              <Routes>
-                {!isLoggedIn && (
-                  <Route path="/signup" element={<SignupDialog />} />
-                )}
-                {!isLoggedIn && (
-                  <Route path="/login" element={<LoginDialog />} />
-                )}
-                <Route path="/" element={<Navigate replace to="/login" />} />
-                <Route element={<PrivateRoutes />}>
-                  <Route path="/dashboard" exact element={<Dashboard />} />
-                  <Route
-                    path="/notifications"
-                    exact
-                    element={<Notifications />}
-                  />
-                  {/* <Route path='/rigs' exact element={<RigCompanies />} />
+								<Routes>
+									{!isLoggedIn && (
+										<Route path="/signup" element={<SignupDialog />} />
+									)}
+									{!isLoggedIn && (
+										<Route path="/login" element={<LoginDialog />} />
+									)}
+									<Route path="/" element={<Navigate replace to="/login" />} />
+									<Route element={<PrivateRoutes />}>
+										<Route path="/dashboard" exact element={<Dashboard />} />
+										<Route
+											path="/notifications"
+											exact
+											element={<Notifications />}
+										/>
+										{/* <Route path='/rigs' exact element={<RigCompanies />} />
                   <Route path='/suppliers' exact element={<Suppliers />} /> */}
-                  <Route path="/settings" exact element={<Settings />} />
-                  <Route path="/scheduler" exact element={<Scheduler />} />
-                  <Route path="/" element={<Navigate replace to="/login" />} />
-                </Route>
-              </Routes>
-            </div>
-            <Footer />
-          </div>
-        </div>
-      </BrowserRouter>
-    </div>
-  );
+										<Route path="/settings" exact element={<Settings />} />
+										<Route path="/scheduler" exact element={<Scheduler />} />
+										<Route
+											path="/"
+											element={<Navigate replace to="/login" />}
+										/>
+									</Route>
+								</Routes>
+							</div>
+							<Footer />
+						</div>
+					</div>
+				</BrowserRouter>
+			</div>
+		);
 };
 
 export default App;

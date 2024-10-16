@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// import useState from 'react-usestateref';
 import {
   GridComponent,
   ColumnsDirective,
@@ -15,6 +14,8 @@ import { toast } from "react-toastify";
 import { Header } from "../components";
 import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
+
+const apiUrl = process.env.REACT_APP_MONGO_URI;
 
 // const gridPageSize = 12;
 
@@ -41,7 +42,8 @@ const Products = () => {
     const fetchProducts = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-      const response = await fetch("/api/product");
+      // const response = await fetch(`${apiUrl}/api/product`);
+			const response = await fetch("/api/product");
       const json = await response.json();
 
       if (response.ok) {
@@ -55,7 +57,8 @@ const Products = () => {
   }, [dispatch]);
 
   const handleDelete = async () => {
-    const fetchString = `/api/product/` + selectedRecord;
+    // const fetchString = `${apiUrl}/api/product/${selectedRecord}`;
+				const fetchString = `/api/product/${selectedRecord}`;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
@@ -100,13 +103,14 @@ const Products = () => {
         const { data } = args;
 
         if (insertFlag === true) {
-          const response = await fetch("/api/product/", {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+          // const response = await fetch(`${apiUrl}/api/product/`, {
+										const response = await fetch("/api/product/", {
+											method: "POST",
+											body: JSON.stringify(data),
+											headers: {
+												"Content-Type": "application/json",
+											},
+										});
 
           if (response.ok) {
             // console.log('Insert: ' + JSON.stringify(args.data));
@@ -142,75 +146,77 @@ const Products = () => {
   };
 
   return (
-    <div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
-      <Header category="Workside" title="Products" />
-      <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start">
-        <GridComponent
-          dataSource={filteredProducts}
-          actionComplete={actionComplete}
-          allowSelection
-          allowFiltering
-          allowPaging
-          filterSettings={FilterOptions}
-          selectionSettings={settings}
-          toolbar={toolbarOptions}
-          rowSelected={rowSelectedProduct}
-          editSettings={editOptions}
-          width="auto"
-          // eslint-disable-next-line no-return-assign
-          ref={(g) => (grid = g)}
-        >
-          <ColumnsDirective>
-            <ColumnDirective
-              field="projectId"
-              headerText="Id"
-              textAlign="Left"
-              width="50"
-              isPrimaryKey="true"
-              allowEditing="false"
-              visible={false}
-            />
-            <ColumnDirective
-              field="categoryname"
-              headerText="Category"
-              editType="dropdownedit"
-              textAlign="Left"
-              width="200"
-            />
-            <ColumnDirective
-              field="productname"
-              headerText="Service/Projects"
-              textAlign="Left"
-              width="200"
-            />
-            <ColumnDirective
-              field="description"
-              headerText="Description"
-              textAlign="Left"
-              width="200"
-            />
-            <ColumnDirective
-              field="status"
-              headerText="Status"
-              editType="dropdownedit"
-              textAlign="Left"
-              width="120"
-            />
-            <ColumnDirective
-              field="statusdate"
-              headerText="Date"
-              type="date"
-              editType="datepickeredit"
-              format="MM/dd/yyy"
-              textAlign="Right"
-              width="140"
-            />
-          </ColumnsDirective>
-          <Inject services={[Selection, Edit, Filter, Page, Toolbar]} />
-        </GridComponent>
-      </div>
-    </div>
-  );
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<Header category="Workside" title="Products" />
+				<div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start">
+					<GridComponent
+						dataSource={filteredProducts}
+						actionComplete={actionComplete}
+						allowSelection
+						allowFiltering
+						allowPaging
+						filterSettings={FilterOptions}
+						selectionSettings={settings}
+						toolbar={toolbarOptions}
+						rowSelected={rowSelectedProduct}
+						editSettings={editOptions}
+						width="auto"
+						// eslint-disable-next-line no-return-assign
+						ref={(g) => {
+							grid = g;
+						}}
+					>
+						<ColumnsDirective>
+							<ColumnDirective
+								field="projectId"
+								headerText="Id"
+								textAlign="Left"
+								width="50"
+								isPrimaryKey="true"
+								allowEditing="false"
+								visible={false}
+							/>
+							<ColumnDirective
+								field="categoryname"
+								headerText="Category"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="productname"
+								headerText="Service/Projects"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="description"
+								headerText="Description"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="status"
+								headerText="Status"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="120"
+							/>
+							<ColumnDirective
+								field="statusdate"
+								headerText="Date"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+						</ColumnsDirective>
+						<Inject services={[Selection, Edit, Filter, Page, Toolbar]} />
+					</GridComponent>
+				</div>
+			</div>
+		);
 };
 
 export default Products;

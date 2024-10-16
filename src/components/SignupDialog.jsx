@@ -26,13 +26,16 @@ const SignupDialog = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const response = await fetch("/api/user/", {
-      method: "POST",
-      body: JSON.stringify(data),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const apiUrl = process.env.REACT_APP_MONGO_URI;
+
+				// const response = await fetch(`${apiUrl}/api/user/`, {
+				const response = await fetch("/api/user/", {
+					method: "POST",
+					body: JSON.stringify(data),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				});
     const json = await response.json();
     if (response.ok) {
       toast.success("Check Email...");

@@ -9,9 +9,7 @@ import {
   LoadScript,
   Marker,
 } from '@react-google-maps/api';
-// import { Wrapper } from '@googlemaps/react-wrapper';
-// import { GoogleMapsProvider, useGoogleMap } from '@ubilabs/google-maps-react-hooks';
-import Map from './Map';
+import CustomMap from "./Map";
 
 const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
   if (!open || !recordID) return null;
@@ -63,85 +61,68 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
     );
   }
 
-  // const { isLoaded } = useLoadScript({
-  //   googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-  // });
-
   const center = useMemo(() => ({ lat: 35.393528, lng: -119.043732 }), []);
 
   // Utilize useEffect to get Request Details
   useEffect(() => {
     const fetchRequest = async () => {
-      const fetchString = `/api/request/${recordID}`;
-      // Set Wait Cursor
-      document.getElementById('root').style.cursor = 'wait';
-      const response = await fetch(fetchString);
-      const json = await response.json();
-      // Set the Customer Name and remove double quotes at beginning and end
-      setCustomerName(
-        JSON.stringify(json.customername).replace(/^"(.*)"$/, '$1')
-      );
-      setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, '$1'));
-      setRequestName(
-        JSON.stringify(json.requestname).replace(/^"(.*)"$/, '$1')
-      );
-      setRequestCategory(
-        JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, '$1')
-      );
-      const formattedDate = format(
-        new Date(json.datetimerequested),
-        'MMMM do yyyy, h:mm'
-      );
-      setDateTimeRequested(formattedDate);
-      // setDateTimeRequested(JSON.stringify(json.datetimerequested));
-      // Set Default Cursor
-      document.getElementById('root').style.cursor = 'default';
+      const apiUrl = process.env.REACT_APP_MONGO_URI;
+
+						// const fetchString = `${apiUrl}/api/request/${recordID}`;
+						const fetchString = `/api/request/${recordID}`;
+						// Set Wait Cursor
+						document.getElementById("root").style.cursor = "wait";
+						const response = await fetch(fetchString);
+						const json = await response.json();
+						// Set the Customer Name and remove double quotes at beginning and end
+						setCustomerName(
+							JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
+						);
+						setRigCompany(
+							JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"),
+						);
+						setRequestName(
+							JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
+						);
+						setRequestCategory(
+							JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, "$1"),
+						);
+						const formattedDate = format(
+							new Date(json.datetimerequested),
+							"MMMM do yyyy, h:mm",
+						);
+						setDateTimeRequested(formattedDate);
+						// setDateTimeRequested(JSON.stringify(json.datetimerequested));
+						// Set Default Cursor
+						document.getElementById("root").style.cursor = "default";
     };
     fetchRequest();
   }, []);
 
   return (
-    <div
-      id='requestFrame'
-      className='relative bg-gainsboro-100 w-full h-full overflow-hidden text-center text-lg text-black font-paragraph-button-text'
-    >
-      <div>
-        <p>Customer: {customername}</p>
-        <p>Rig Company: {rigcompany}</p>
-        <p>Request: {requestname}</p>
-        <p>Date Time Requested: {datetimerequested}</p>
-      </div>
-      <div className='map_box'>
-        {/* <Box position="absolute" left="0" top="0" height="100%" width="100%"> */}
-        {/* <GoogleMapsProvider
-            googleMapsAPIKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}
-            options={mapOptions}
-            mapContainer={mapContainer}
-          >
-            <div ref={(node) => setMapContainer(node)} style={{ height: '200px', width: '100%' }} />
-          </GoogleMapsProvider> */}
-        {/* {!isLoaded ? (
-            <h1>Loading...</h1>
-          ) : (
-            <GoogleMap
-              mapContainerClassName="map-container"
-              center={center}
-              zoom={10}
-            />
-          )} */}
-        {/* </Box> */}
-        <LoadScript
-          id='script-loader'
-          googleMapsApiKey={apiKey}
-          language='en'
-          region='EN'
-          version='weekly'
-        >
-          <Map reqLocation={reqLocation} delLocation={delLocation} />
-        </LoadScript>
-      </div>
-    </div>
-  );
+			<div
+				id="requestFrame"
+				className="relative bg-gainsboro-100 w-full h-full overflow-hidden text-center text-lg text-black font-paragraph-button-text"
+			>
+				<div>
+					<p>Customer: {customername}</p>
+					<p>Rig Company: {rigcompany}</p>
+					<p>Request: {requestname}</p>
+					<p>Date Time Requested: {datetimerequested}</p>
+				</div>
+				<div className="map_box">
+					<LoadScript
+						id="script-loader"
+						googleMapsApiKey={apiKey}
+						language="en"
+						region="EN"
+						version="weekly"
+					>
+						<CustomMap reqLocation={reqLocation} delLocation={delLocation} />
+					</LoadScript>
+				</div>
+			</div>
+		);
 };
 
 export default RequestDetailsTestModal;

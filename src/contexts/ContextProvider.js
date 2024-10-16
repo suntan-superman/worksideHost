@@ -19,9 +19,6 @@ export const ContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [globalUserName, setGlobalUserName] = useState("");
   const [deleteFlag, setDeleteFlag] = useState(false);
-  const [apiURL, setApiURL] = useState(
-    "https://keen-squid-lately.ngrok-free.app"
-  );
 
   const setMode = (e) => {
     setCurrentMode(e.target.value);
@@ -37,37 +34,36 @@ export const ContextProvider = ({ children }) => {
     setIsClicked({ ...initialState, [clicked]: true });
 
   return (
-    // eslint-disable-next-line react/jsx-no-constructed-context-values
-    <StateContext.Provider
-      value={{
-        currentColor,
-        currentMode,
-        activeMenu,
-        screenSize,
-        setScreenSize,
-        handleClick,
-        isClicked,
-        initialState,
-        setIsClicked,
-        setActiveMenu,
-        setCurrentColor,
-        setCurrentMode,
-        setMode,
-        setColor,
-        themeSettings,
-        setThemeSettings,
-        deleteFlag,
-        setDeleteFlag,
-        isLoggedIn,
-        setIsLoggedIn,
-        globalUserName,
-        setGlobalUserName,
-        apiURL,
-      }}
-    >
-      {children}
-    </StateContext.Provider>
-  );
+			// eslint-disable-next-line react/jsx-no-constructed-context-values
+			<StateContext.Provider
+				value={{
+					currentColor,
+					currentMode,
+					activeMenu,
+					screenSize,
+					setScreenSize,
+					handleClick,
+					isClicked,
+					initialState,
+					setIsClicked,
+					setActiveMenu,
+					setCurrentColor,
+					setCurrentMode,
+					setMode,
+					setColor,
+					themeSettings,
+					setThemeSettings,
+					deleteFlag,
+					setDeleteFlag,
+					isLoggedIn,
+					setIsLoggedIn,
+					globalUserName,
+					setGlobalUserName,
+				}}
+			>
+				{children}
+			</StateContext.Provider>
+		);
 };
 
 export const useStateContext = () => useContext(StateContext);
