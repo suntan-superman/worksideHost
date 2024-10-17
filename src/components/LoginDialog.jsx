@@ -9,6 +9,9 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useStateContext } from "../contexts/ContextProvider";
 import "../index.css";
+import CookieConsent from "./CookieConsent";
+import { useCookies } from "react-cookie";
+
 
 const LoginDialog = () => {
   const { setIsLoggedIn, setGlobalUserName } = useStateContext();
@@ -16,6 +19,8 @@ const LoginDialog = () => {
   const [password, setPassword] = useState("");
   const [saveUserChecked, setSaveUserChecked] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+	const [cookies] = useCookies(["cookieConsent"]);
 
   const onSaveUserName = (user) => {
     localStorage.setItem("loginName", user);
@@ -119,6 +124,11 @@ const LoginDialog = () => {
     getUserName();
   }, []);
 
+	const enabledButtonStyle =
+			"border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white";
+		const disabledButtonStyle =
+			"border-2 border-gray-500 text-gray-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-gray-500 hover:text-white";
+
   return (
 			<div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black bg-opacity-25 backdrop-blur-sm">
 				<div
@@ -190,13 +200,19 @@ const LoginDialog = () => {
 									)}
 									<button
 										type="button"
-										className="border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white"
+										className={
+											!userName || !password || !cookies.cookieConsent
+												? disabledButtonStyle
+												: enabledButtonStyle
+										}
 										onClick={onSignIn}
+										disabled={!userName || !password || !cookies.cookieConsent}
 									>
 										Sign In
 									</button>
 								</div>
 							</div>
+							{!cookies.cookieConsent && <CookieConsent />}{" "}
 						</div>
 						{/* Sign Up Section */}
 						<div className="w-2/5 bg-green-500 text-white rounded-tr-2xl rounded-br-2xl p-5 py-36 px-12 justify-center items-center content-center flex-col">
