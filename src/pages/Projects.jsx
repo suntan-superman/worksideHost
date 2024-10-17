@@ -45,38 +45,39 @@ const Projects = () => {
 		let projectsGrid = null;
 
 	useEffect(() => {
-		const fetchProjects = async () => {
-			// Set Wait Cursor
-			setIsLoading(true);
-			const response = await axios.get("/api/project");
+			const fetchProjects = async () => {
+				// Set Wait Cursor
+				setIsLoading(true);
+				const response = await axios.get("/api/project");
 
-			const json = await response.data;
-			if (response.status === 200) {
-				dispatch({ type: "GET_PROJECTS", payload: json });
-				setFilteredProjects(json);
-			}
-			setIsLoading(false);
-		};
-		fetchProjects();
-	}, [dispatch]);
+				const json = await response.data;
+				if (response.status === 200) {
+					// dispatch({ type: "GET_PROJECTS", payload: json });
+					setFilteredProjects(json);
+				}
+				setIsLoading(false);
+			};
+			fetchProjects();
+		}, []);
+		// }, [dispatch]);
 
-	useEffect(() => {
-		const fetchFirms = async () => {
-			// Set Wait Cursor
-			setIsLoading(true);
-			// const response = await fetch(`${apiUrl}/api/firm`);
-			const response = await fetch("/api/firm");
-			const jsonResults = await response.json();
-			// Filter The entire List to include companies only
-			const result = jsonResults.filter(
-				(jsonResult) => jsonResult.type === "CUSTOMER",
-			);
-			setFirmList(result);
-			// Set Default Cursor
-			setIsLoading(false);
-		};
-		fetchFirms();
-	}, []);
+		useEffect(() => {
+			const fetchFirms = async () => {
+				// Set Wait Cursor
+				setIsLoading(true);
+				// const response = await fetch(`${apiUrl}/api/firm`);
+				const response = await fetch("/api/firm");
+				const jsonResults = await response.json();
+				// Filter The entire List to include companies only
+				const result = jsonResults.filter(
+					(jsonResult) => jsonResult.type === "CUSTOMER",
+				);
+				setFirmList(result);
+				// Set Default Cursor
+				setIsLoading(false);
+			};
+			fetchFirms();
+		}, []);
 
 	// Set Location Selection Options
 	const areaOptions = [
