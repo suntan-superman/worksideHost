@@ -70,10 +70,10 @@ const LoginDialog = () => {
 				const fetchString = `/api/user/${userName}?password=${password}`;
 
 				// TODO remove alert
-				// window.alert(`Fetch... ${fetchString}`);
+				window.alert(`Fetch... ${fetchString}`);
 
 				const response = await axios.get(fetchString);
-
+window.alert(`Response... ${response}`);
 				if (response.ok) {
 					// TODO - Need to validate password
 					const json = await response.json();

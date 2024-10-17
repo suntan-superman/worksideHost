@@ -240,143 +240,153 @@ const Projects = () => {
 					</div>
 				)}
 			</div>
-			<div className="div-container">
-				<GridComponent
-					id="projectGridElement"
-					dataSource={filteredProjects}
-					actionComplete={actionComplete}
-					allowSelection
-					allowFiltering
-					allowPaging
-					allowResizing
-					frozenColumns={2}
-					filterSettings={FilterOptions}
-					selectionSettings={settings}
-					toolbar={toolbarOptions}
-					rowSelected={rowSelectedProject}
-					editSettings={editOptions}
-					enablePersistence
-					load={onProjectLoad}
-					width="80%"
-					// width="1000px"
-					// eslint-disable-next-line no-return-assign
-					// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-					ref={(g) => (projectsGrid = g)}
-				>
-					<ColumnsDirective>
-						<ColumnDirective
-							field="_id"
-							headerText="Id"
-							textAlign="Left"
-							width="50"
-							isPrimaryKey="true"
-							allowEditing="false"
-							visible={false}
+			{!isLoading && (
+				<div className="div-container">
+					<GridComponent
+						id="projectGridElement"
+						dataSource={filteredProjects}
+						actionComplete={actionComplete}
+						allowSelection
+						allowFiltering
+						allowPaging
+						allowResizing
+						frozenColumns={2}
+						filterSettings={FilterOptions}
+						selectionSettings={settings}
+						toolbar={toolbarOptions}
+						rowSelected={rowSelectedProject}
+						editSettings={editOptions}
+						enablePersistence
+						load={onProjectLoad}
+						width="80%"
+						// width="1000px"
+						// eslint-disable-next-line no-return-assign
+						// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+						ref={(g) => (projectsGrid = g)}
+					>
+						<ColumnsDirective>
+							<ColumnDirective
+								field="_id"
+								headerText="Id"
+								textAlign="Left"
+								width="50"
+								isPrimaryKey="true"
+								allowEditing="false"
+								visible={false}
+							/>
+							<ColumnDirective
+								field="Area"
+								headerText="Area"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="100"
+								edit={areaSelections}
+							/>
+							{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
+							<ColumnDirective
+								field="customer"
+								headerText="Customer"
+								editType="dropdownedit"
+								textAlign="Left"
+								width="100"
+								edit={companySelections}
+							/>
+							<ColumnDirective
+								field="projectname"
+								headerText="Name"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="description"
+								headerText="Description"
+								textAlign="Left"
+								width="200"
+							/>
+							<ColumnDirective
+								field="customercontact"
+								headerText="Cust Contact"
+								textAlign="Left"
+								width="50"
+							/>
+							<ColumnDirective
+								field="rigcompany"
+								headerText="Rig Company"
+								textAlign="left"
+								width="50"
+							/>
+							<ColumnDirective
+								field="status"
+								headerText="Status"
+								editType="dropdownedit"
+								width="100"
+							/>
+							<ColumnDirective
+								field="statusdate"
+								headerText="Date"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+							<ColumnDirective
+								field="projectedstartdate"
+								headerText="Proj Start"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+							<ColumnDirective
+								field="actualstartdate"
+								headerText="Act Start"
+								type="date"
+								editType="datepickeredit"
+								format="MM/dd/yyy"
+								textAlign="Right"
+								width="140"
+							/>
+							<ColumnDirective
+								field="expectedduration"
+								headerText="Proj Dur"
+								textAlign="Right"
+								width="50"
+							/>
+							<ColumnDirective
+								field="actualduration"
+								headerText="Act Dur"
+								textAlign="Right"
+								width="50"
+							/>
+							<ColumnDirective
+								field="latdec"
+								headerText="Latitude"
+								textAlign="Right"
+								width="100"
+							/>
+							<ColumnDirective
+								field="longdec"
+								headerText="Longitude"
+								textAlign="Right"
+								width="100"
+							/>
+						</ColumnsDirective>
+						<Inject
+							services={[
+								Selection,
+								Edit,
+								Filter,
+								Page,
+								Toolbar,
+								Resize,
+								Freeze,
+							]}
 						/>
-						<ColumnDirective
-							field="Area"
-							headerText="Area"
-							editType="dropdownedit"
-							textAlign="Left"
-							width="100"
-							edit={areaSelections}
-						/>
-						{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
-						<ColumnDirective
-							field="customer"
-							headerText="Customer"
-							editType="dropdownedit"
-							textAlign="Left"
-							width="100"
-							edit={companySelections}
-						/>
-						<ColumnDirective
-							field="projectname"
-							headerText="Name"
-							textAlign="Left"
-							width="200"
-						/>
-						<ColumnDirective
-							field="description"
-							headerText="Description"
-							textAlign="Left"
-							width="200"
-						/>
-						<ColumnDirective
-							field="customercontact"
-							headerText="Cust Contact"
-							textAlign="Left"
-							width="50"
-						/>
-						<ColumnDirective
-							field="rigcompany"
-							headerText="Rig Company"
-							textAlign="left"
-							width="50"
-						/>
-						<ColumnDirective
-							field="status"
-							headerText="Status"
-							editType="dropdownedit"
-							width="100"
-						/>
-						<ColumnDirective
-							field="statusdate"
-							headerText="Date"
-							type="date"
-							editType="datepickeredit"
-							format="MM/dd/yyy"
-							textAlign="Right"
-							width="140"
-						/>
-						<ColumnDirective
-							field="projectedstartdate"
-							headerText="Proj Start"
-							type="date"
-							editType="datepickeredit"
-							format="MM/dd/yyy"
-							textAlign="Right"
-							width="140"
-						/>
-						<ColumnDirective
-							field="actualstartdate"
-							headerText="Act Start"
-							type="date"
-							editType="datepickeredit"
-							format="MM/dd/yyy"
-							textAlign="Right"
-							width="140"
-						/>
-						<ColumnDirective
-							field="expectedduration"
-							headerText="Proj Dur"
-							textAlign="Right"
-							width="50"
-						/>
-						<ColumnDirective
-							field="actualduration"
-							headerText="Act Dur"
-							textAlign="Right"
-							width="50"
-						/>
-						<ColumnDirective
-							field="latdec"
-							headerText="Latitude"
-							textAlign="Right"
-							width="100"
-						/>
-						<ColumnDirective
-							field="longdec"
-							headerText="Longitude"
-							textAlign="Right"
-							width="100"
-						/>
-					</ColumnsDirective>
-					<Inject
-						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
-					/>
-				</GridComponent>
-			</div>
+					</GridComponent>
+				</div>
+			)}
 		</div>
 	);
 };
