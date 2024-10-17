@@ -19,6 +19,7 @@ import { useProjectContext } from "../hooks/useProjectContext";
 import { Header } from "../components";
 import "../index.css";
 import { confirmAlert } from "react-confirm-alert";
+import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
@@ -47,15 +48,13 @@ const Projects = () => {
 		const fetchProjects = async () => {
 			// Set Wait Cursor
 			setIsLoading(true);
-			// const response = await fetch("${apiUrl}/api/project");
-			const response = await fetch("/api/project");
-			const json = await response.json();
+			const response = await axios.get("/api/project");
 
-			if (response.ok) {
+			const json = await response.data;
+			if (response.status === 200) {
 				dispatch({ type: "GET_PROJECTS", payload: json });
 				setFilteredProjects(json);
 			}
-			// Set Default Cursor
 			setIsLoading(false);
 		};
 		fetchProjects();

@@ -69,12 +69,9 @@ const LoginDialog = () => {
 				document.getElementById("root").style.cursor = "wait";
 				const fetchString = `/api/user/${userName}?password=${password}`;
 
-				// TODO remove alert
-				window.alert(`Fetch... ${fetchString}`);
-
 				const response = await axios.get(fetchString);
-window.alert(`Response... ${response}`);
-				if (response.ok) {
+				// window.alert(`Response... ${JSON.stringify(response.data)}`);
+				if( response.ok) {
 					// TODO - Need to validate password
 					const json = await response.json();
 					setIsLoggedIn(true);
@@ -116,13 +113,14 @@ window.alert(`Response... ${response}`);
     setSaveUserChecked(!saveUserChecked);
   };
 
+	
   useEffect(() => {
-    const getUserName = () => {
-      const user = localStorage.getItem("loginName");
-      setUserName(user);
-    };
-    getUserName();
-  }, []);
+			const getUserName = () => {
+				const user = localStorage.getItem("loginName");
+				setUserName(user);
+			};
+			getUserName();
+		}, []);
 
 	const enabledButtonStyle =
 			"border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white";
