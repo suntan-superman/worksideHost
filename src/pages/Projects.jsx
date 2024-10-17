@@ -51,7 +51,7 @@ const Projects = () => {
 				const response = await axios.get("/api/project");
 
 				const json = response.data;
-				window.alert(`Response... ${JSON.stringify(response.data)}`);
+				window.alert(`Response... ${JSON.stringify(response)}`);
 				if (response.status === 200) {
 					// dispatch({ type: "GET_PROJECTS", payload: json });
 					setFilteredProjects(json);
