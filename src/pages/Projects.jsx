@@ -1,5 +1,4 @@
 /* eslint-disable */
-"use client";
 
 import React, { useEffect, useState } from "react";
 import { DataManager, Query } from "@syncfusion/ej2-data";

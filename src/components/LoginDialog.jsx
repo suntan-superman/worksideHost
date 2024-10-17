@@ -1,5 +1,5 @@
 /* eslint-disable */
-"use client";
+// "use client";
 
 import React, { useState, useEffect } from "react";
 import { FaRegEnvelope } from "react-icons/fa";
