@@ -53,6 +53,7 @@ const Projects = () => {
 		const response = await axios.get(fetchString);
 
 		const json = response.data;
+		// TODO Remove this for production
 		window.alert(`Response... ${JSON.stringify(response)}`);
 		if (response.status === 200) {
 			// dispatch({ type: "GET_PROJECTS", payload: json });
