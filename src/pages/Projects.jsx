@@ -51,6 +51,7 @@ const Projects = () => {
 		// Set Wait Cursor
 		setIsLoading(true);
 		const response = await axios.get(fetchString);
+		window.alert(`Response Code... ${response.status}`);
 
 		const json = response.data;
 		// TODO Remove this for production
