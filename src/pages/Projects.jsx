@@ -47,16 +47,10 @@ const Projects = () => {
 
 	useEffect(() => {
 			const fetchProjects = async () => {
+				const fetchString = "/api/project";
 				// Set Wait Cursor
 				setIsLoading(true);
-				{
-					const userName = "sroy@workside.com";
-					const password = "Pinnacle55";
-					const fetchString = `/api/user/${userName}?password=${password}`;
-					const response = await axios.get(fetchString);
-					window.alert(`Login... ${JSON.stringify(response.data)}`);
-				}
-				const response = await axios.get("/api/project");
+				const response = await axios.get(fetchString);
 
 				const json = response.data;
 				window.alert(`Response... ${JSON.stringify(response)}`);
