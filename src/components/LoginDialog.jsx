@@ -67,12 +67,12 @@ const LoginDialog = () => {
 				const apiUrl = process.env.REACT_APP_MONGO_URI;
 				// Set Wait Cursor
 				document.getElementById("root").style.cursor = "wait";
-				const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
-				// const fetchString = `/api/user/${userName}?password=${password}`;
-				window.alert(`FetchString ... ${fetchString}`);
+				// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+				const fetchString = `/api/user/${userName}?password=${password}`;
+				// window.alert(`FetchString ... ${fetchString}`);
 
 				const response = await axios.get(fetchString);
-				window.alert(`Response... ${JSON.stringify(response.data)}`);
+				// window.alert(`Response... ${JSON.stringify(response.data)}`);
 				if( response.ok) {
 					// TODO - Need to validate password
 					const json = await response.json();
