@@ -1,6 +1,7 @@
 /* eslint-disable */
 
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import {
 	GridComponent,
@@ -20,7 +21,6 @@ import { useProjectContext } from "../hooks/useProjectContext";
 import { Header } from "../components";
 import "../index.css";
 import { confirmAlert } from "react-confirm-alert";
-import axios from "axios";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
@@ -28,6 +28,7 @@ const gridPageSize = 8;
 
 const Projects = () => {
  	const [isLoading, setIsLoading] = useState(false);
+	const [haveData, setHaveData] = useState(false);
   // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
 		const [filteredProjects, setFilteredProjects] = useState(null);
 		const [firmList, setFirmList] = useState(null);
@@ -42,26 +43,28 @@ const Projects = () => {
 		const { projectsData, dispatch } = useProjectContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
-		const settings = { mode: "Row" };
+	const settings = { mode: "Row" };
 		let projectsGrid = null;
 
-	useEffect(() => {
-			const fetchProjects = async () => {
-				const fetchString = "/api/project";
-				// Set Wait Cursor
-				setIsLoading(true);
-				const response = await axios.get(fetchString);
+	const fetchProjects = async () => {
+		const fetchString = "/api/project";
+		// Set Wait Cursor
+		setIsLoading(true);
+		const response = await axios.get(fetchString);
 
-				const json = response.data;
-				window.alert(`Response... ${JSON.stringify(response)}`);
-				if (response.status === 200) {
-					// dispatch({ type: "GET_PROJECTS", payload: json });
-					setFilteredProjects(json);
-				}
-				setIsLoading(false);
-			};
-			fetchProjects();
-		}, []);
+		const json = response.data;
+		window.alert(`Response... ${JSON.stringify(response)}`);
+		if (response.status === 200) {
+			// dispatch({ type: "GET_PROJECTS", payload: json });
+			setFilteredProjects(json);
+			setHaveData(true);
+		}
+		setIsLoading(false);
+	};
+
+	// useEffect(() => {
+		// 	fetchProjects();
+		// }, []);
 		// }, [dispatch]);
 
 		useEffect(() => {
@@ -237,13 +240,18 @@ const Projects = () => {
 			{/* <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start"> */}
 			{/* <div className="absolute top-[100px] left-[20px] flex flex-row w-full"> */}
 			<div>
+				{!haveData && (
+					<button type="button" onClick={fetchProjects}>
+						Load Projects
+					</button>
+				)}
 				{isLoading && (
 					<div className="absolute top-[50%] left-[50%]">
 						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
 					</div>
 				)}
 			</div>
-			{!isLoading && (
+			{!isLoading && haveData && (
 				<div className="div-container">
 					<GridComponent
 						id="projectGridElement"
