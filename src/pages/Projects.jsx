@@ -119,6 +119,7 @@ const projectList = null;
 // ];
 
 const Projects = () => {
+	const [isLoading, setIsLoading] = useState(true);
 	const [filteredProjects, setFilteredProjects] = useState(null);
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
@@ -141,21 +142,21 @@ const Projects = () => {
 			document.getElementById("root").style.cursor = "wait";
 
 			// This works locally
-			// const response = await fetch("/api/project");
-			// const json = await response.json();
-			// window.alert(`Response... ${JSON.stringify(json)}`);
-			// setFilteredProjects(json);
-
-			const strAPI = "/api/project";
-			try {
-				await axios.get(strAPI).then((response) => {
-					window.alert(`Response... ${JSON.stringify(response)}`);
-					// projectList = response.data;
-					setFilteredProjects(response.data);
-				});
-			} catch (error) {
-				console.log("error", error);
-			}
+			const response = await fetch("/api/project");
+			const json = await response.json();
+			window.alert(`Response... ${JSON.stringify(json)}`);
+			setFilteredProjects(json);
+			setIsLoading(false);
+			// const strAPI = "/api/project";
+			// try {
+			// 	await axios.get(strAPI).then((response) => {
+			// 		window.alert(`Response... ${JSON.stringify(response)}`);
+			// 		// projectList = response.data;
+			// 		setFilteredProjects(response.data);
+			// 	});
+			// } catch (error) {
+			// 	console.log("error", error);
+			// }
 
 			// const response = await fetch("/api/project");
 			// const json = await response.data;
@@ -387,6 +388,7 @@ const Projects = () => {
 			<Header category="Workside" title="Projects" />
 			{/* <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start"> */}
 			{/* <div className="absolute top-[100px] left-[20px] flex flex-row w-full"> */}
+			{isLoading && <div className="loader" />}
 			<div className="div-container">
 				<GridComponent
 					id="projectGridElement"
