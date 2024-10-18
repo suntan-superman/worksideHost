@@ -1,5 +1,4 @@
 /* eslint-disable */
-
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { DataManager, Query } from "@syncfusion/ej2-data";
@@ -25,67 +24,215 @@ import { confirmAlert } from "react-confirm-alert";
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
 const gridPageSize = 8;
+const projectList = null;
+// let filteredProjects = [
+// 	{
+// 		_id: "6546d4df5c9a414395b1fdfd",
+// 		area: "WEST COAST",
+// 		customer: "CRC",
+// 		customercontact: "magnew@workside.com",
+// 		rigcompany: "GPS",
+// 		projectname: "188-7Z",
+// 		description: "Example Description",
+// 		projectedstartdate: "2023-06-15T08:00:00.000Z",
+// 		actualstartdate: "2023-06-15T08:00:00.000Z",
+// 		expectedduration: 5,
+// 		actualduration: 0,
+// 		status: "COMPLETED",
+// 		statusdate: "2023-06-15T08:00:00.000Z",
+// 		comment: "",
+// 		latdec: 35.393528,
+// 		longdec: -119.043732,
+// 	},
+// 	{
+// 		_id: "6546d4df5c9a414395b1fdfe",
+// 		area: "WEST COAST",
+// 		customer: "CRC",
+// 		customercontact: "magnew@workside.com",
+// 		rigcompany: "GPS",
+// 		projectname: "288-7R",
+// 		description: "Example Description",
+// 		projectedstartdate: "2023-06-15T08:00:00.000Z",
+// 		actualstartdate: "2023-06-15T08:00:00.000Z",
+// 		expectedduration: 5,
+// 		actualduration: 0,
+// 		status: "PENDING",
+// 		statusdate: "2023-06-15T08:00:00.000Z",
+// 		comment: "",
+// 		latdec: 35.393528,
+// 		longdec: -119.043732,
+// 	},
+// 	{
+// 		_id: "6546d4df5c9a414395b1fdff",
+// 		area: "WEST COAST",
+// 		customer: "CRC",
+// 		customercontact: "magnew@workside.com",
+// 		rigcompany: "GPS",
+// 		projectname: "327-26Z ",
+// 		description: "Example Description",
+// 		projectedstartdate: "2023-06-15T08:00:00.000Z",
+// 		actualstartdate: "2023-06-15T08:00:00.000Z",
+// 		expectedduration: 6,
+// 		actualduration: 0,
+// 		status: "ACTIVE",
+// 		statusdate: "2023-06-15T08:00:00.000Z",
+// 		comment: "",
+// 		latdec: 35.393528,
+// 		longdec: -119.043732,
+// 	},
+// 	{
+// 		_id: "6546d4df5c9a414395b1fdfc",
+// 		area: "WEST COAST",
+// 		customer: "CRC",
+// 		customercontact: "magnew@workside.com",
+// 		rigcompany: "GPS",
+// 		projectname: "383-26Z Redrill",
+// 		description: "Example Description",
+// 		projectedstartdate: "2023-06-15T08:00:00.000Z",
+// 		actualstartdate: "2023-06-15T08:00:00.000Z",
+// 		expectedduration: 3,
+// 		actualduration: 0,
+// 		status: "ACTIVE",
+// 		statusdate: "2023-06-15T08:00:00.000Z",
+// 		comment: "",
+// 		latdec: 35.393528,
+// 		longdec: -119.043732,
+// 	},
+// 	{
+// 		_id: "6546d4df5c9a414395b1fe00",
+// 		area: "WEST COAST",
+// 		customer: "CRC",
+// 		customercontact: "magnew@workside.com",
+// 		rigcompany: "GPS",
+// 		projectname: "88-26R",
+// 		description: "Example Description",
+// 		projectedstartdate: "2023-06-15T08:00:00.000Z",
+// 		actualstartdate: "2023-06-15T08:00:00.000Z",
+// 		expectedduration: 5,
+// 		actualduration: 0,
+// 		status: "POSTPONED",
+// 		statusdate: "2023-06-15T08:00:00.000Z",
+// 		comment: "",
+// 		latdec: 35.393528,
+// 		longdec: -119.043732,
+// 	},
+// ];
 
 const Projects = () => {
- 	const [isLoading, setIsLoading] = useState(false);
-	const [haveData, setHaveData] = useState(false);
-  // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
-		const [filteredProjects, setFilteredProjects] = useState(null);
-		const [firmList, setFirmList] = useState(null);
-		const [insertFlag, setInsertFlag] = useState(false);
-		const editOptions = {
-			allowEditing: true,
-			allowAdding: true,
-			allowDeleting: true,
-			mode: "Dialog",
-		};
-		const toolbarOptions = ["Add", "Edit", "Delete"];
-		const { projectsData, dispatch } = useProjectContext();
+	const [filteredProjects, setFilteredProjects] = useState(null);
+	const [firmList, setFirmList] = useState(null);
+	const [insertFlag, setInsertFlag] = useState(false);
+	const editOptions = {
+		allowEditing: true,
+		allowAdding: true,
+		allowDeleting: true,
+		mode: "Dialog",
+	};
+	const toolbarOptions = ["Add", "Edit", "Delete"];
+	const { projectsData, dispatch } = useProjectContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
-		let projectsGrid = null;
+	let projectsGrid = null;
 
-	const fetchProjects = async () => {
-		const fetchString = "/api/project";
-		// Set Wait Cursor
-		setIsLoading(true);
-		const response = await axios.get(fetchString);
-		window.alert(`Response Code... ${response.status}`);
+	useEffect(() => {
+		const fetchProjects = async () => {
+			// Set Wait Cursor
+			document.getElementById("root").style.cursor = "wait";
 
-		const json = response.data;
-		// TODO Remove this for production
-		window.alert(`Response... ${JSON.stringify(response)}`);
-		if (response.status === 200) {
-			// dispatch({ type: "GET_PROJECTS", payload: json });
+			// This works locally
+			const response = await fetch("/api/project");
+			const json = await response.json();
+			// window.alert(`Response... ${JSON.stringify(json)}`);
 			setFilteredProjects(json);
-			setHaveData(true);
-		}
-		setIsLoading(false);
-	};
+
+			// const strAPI = "/api/project";
+			// try {
+			// 	await axios.get(strAPI).then((response) => {
+			// 		window.alert(`Response... ${JSON.stringify(response)}`);
+			// 		projectList = response.data;
+			// 		setActiveProjects(response.data);
+			// 		if (projectList) setFilteredProjects(projectList);
+			// 	});
+			// } catch (error) {
+			// 	console.log("error", error);
+			// }
+
+			// const response = await fetch("/api/project");
+			// const json = await response.data;
+			// window.alert(`Status... ${JSON.stringify(response.status)}`);
+			// window.alert(`Response... ${JSON.stringify(response)}`);
+
+			// await fetch("/api/project").then((res) => {
+			// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
+			// 	window.alert(`Project List... ${JSON.stringify(projectList)}`);
+			// 	if (projectList) setFilteredProjects(projectList);
+			// 	window.alert(
+			// 		`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
+			// 	);
+			// });
+			// const json = await response.json();
+
+			// await axios.get("/api/project").then((res) => {
+			// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
+			// 	projectList = res.data;
+			// 	window.alert(`Project List... ${JSON.stringify(projectList)}`);
+			// 	if (projectList) setFilteredProjects(projectList);
+			// 	window.alert(
+			// 		`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
+			// 	);
+			// });
+			// const response = await fetch("/api/project");
+			// window.alert(`Response... ${JSON.stringify(response.data)}`);
+			// const json = await response.json();
+
+			// if (response.ok) {
+			// 	// dispatch({ type: "GET_PROJECTS", payload: json });
+			// 	setFilteredProjects(json);
+			// }
+			// Set Default Cursor
+			document.getElementById("root").style.cursor = "default";
+		};
+		fetchProjects();
+	}, []);
 
 	// useEffect(() => {
-		// 	fetchProjects();
-		// }, []);
-		// }, [dispatch]);
+	// 	const fetchProjects = async () => {
+	// 		// Set Wait Cursor
+	// 		document.getElementById("root").style.cursor = "wait";
+	// 		// const response = await fetch("${apiUrl}/api/project");
+	// 		const response = await fetch("/api/project");
+	// 		window.alert(`Response... ${JSON.stringify(response.data)}`);
+	// 		const json = await response.json();
 
-		useEffect(() => {
-			const fetchFirms = async () => {
-				// Set Wait Cursor
-				setIsLoading(true);
-				// const response = await fetch(`${apiUrl}/api/firm`);
-				const response = await fetch("/api/firm");
-				const jsonResults = await response.json();
-				// Filter The entire List to include companies only
-				const result = jsonResults.filter(
-					(jsonResult) => jsonResult.type === "CUSTOMER",
-				);
-				setFirmList(result);
-				// Set Default Cursor
-				setIsLoading(false);
-			};
-			fetchFirms();
-		}, []);
+	// 		if (response.ok) {
+	// 			dispatch({ type: "GET_PROJECTS", payload: json });
+	// 			setFilteredProjects(json);
+	// 		}
+	// 		// Set Default Cursor
+	// 		document.getElementById("root").style.cursor = "default";
+	// 	};
+	// 	fetchProjects();
+	// }, [dispatch]);
+
+	useEffect(() => {
+		const fetchFirms = async () => {
+			// Set Wait Cursor
+			document.getElementById("root").style.cursor = "wait";
+			// const response = await fetch(`${apiUrl}/api/firm`);
+
+			const response = await fetch("/api/firm");
+			const jsonResults = await response.json();
+			// Filter The entire List to include companies only
+			const result = jsonResults.filter(
+				(jsonResult) => jsonResult.type === "CUSTOMER",
+			);
+			setFirmList(result);
+			// Set Default Cursor
+			document.getElementById("root").style.cursor = "default";
+		};
+		fetchFirms();
+	}, []);
 
 	// Set Location Selection Options
 	const areaOptions = [
@@ -241,165 +388,143 @@ const Projects = () => {
 			<Header category="Workside" title="Projects" />
 			{/* <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start"> */}
 			{/* <div className="absolute top-[100px] left-[20px] flex flex-row w-full"> */}
-			<div>
-				{!haveData && (
-					<button type="button" onClick={fetchProjects}>
-						Load Projects
-					</button>
-				)}
-				{isLoading && (
-					<div className="absolute top-[50%] left-[50%]">
-						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
-					</div>
-				)}
-			</div>
-			{!isLoading && haveData && (
-				<div className="div-container">
-					<GridComponent
-						id="projectGridElement"
-						dataSource={filteredProjects}
-						actionComplete={actionComplete}
-						allowSelection
-						allowFiltering
-						allowPaging
-						allowResizing
-						frozenColumns={2}
-						filterSettings={FilterOptions}
-						selectionSettings={settings}
-						toolbar={toolbarOptions}
-						rowSelected={rowSelectedProject}
-						editSettings={editOptions}
-						enablePersistence
-						load={onProjectLoad}
-						width="80%"
-						// width="1000px"
-						// eslint-disable-next-line no-return-assign
-						// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-						ref={(g) => (projectsGrid = g)}
-					>
-						<ColumnsDirective>
-							<ColumnDirective
-								field="_id"
-								headerText="Id"
-								textAlign="Left"
-								width="50"
-								isPrimaryKey="true"
-								allowEditing="false"
-								visible={false}
-							/>
-							<ColumnDirective
-								field="Area"
-								headerText="Area"
-								editType="dropdownedit"
-								textAlign="Left"
-								width="100"
-								edit={areaSelections}
-							/>
-							{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
-							<ColumnDirective
-								field="customer"
-								headerText="Customer"
-								editType="dropdownedit"
-								textAlign="Left"
-								width="100"
-								edit={companySelections}
-							/>
-							<ColumnDirective
-								field="projectname"
-								headerText="Name"
-								textAlign="Left"
-								width="200"
-							/>
-							<ColumnDirective
-								field="description"
-								headerText="Description"
-								textAlign="Left"
-								width="200"
-							/>
-							<ColumnDirective
-								field="customercontact"
-								headerText="Cust Contact"
-								textAlign="Left"
-								width="50"
-							/>
-							<ColumnDirective
-								field="rigcompany"
-								headerText="Rig Company"
-								textAlign="left"
-								width="50"
-							/>
-							<ColumnDirective
-								field="status"
-								headerText="Status"
-								editType="dropdownedit"
-								width="100"
-							/>
-							<ColumnDirective
-								field="statusdate"
-								headerText="Date"
-								type="date"
-								editType="datepickeredit"
-								format="MM/dd/yyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="projectedstartdate"
-								headerText="Proj Start"
-								type="date"
-								editType="datepickeredit"
-								format="MM/dd/yyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="actualstartdate"
-								headerText="Act Start"
-								type="date"
-								editType="datepickeredit"
-								format="MM/dd/yyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="expectedduration"
-								headerText="Proj Dur"
-								textAlign="Right"
-								width="50"
-							/>
-							<ColumnDirective
-								field="actualduration"
-								headerText="Act Dur"
-								textAlign="Right"
-								width="50"
-							/>
-							<ColumnDirective
-								field="latdec"
-								headerText="Latitude"
-								textAlign="Right"
-								width="100"
-							/>
-							<ColumnDirective
-								field="longdec"
-								headerText="Longitude"
-								textAlign="Right"
-								width="100"
-							/>
-						</ColumnsDirective>
-						<Inject
-							services={[
-								Selection,
-								Edit,
-								Filter,
-								Page,
-								Toolbar,
-								Resize,
-								Freeze,
-							]}
+			<div className="div-container">
+				<GridComponent
+					id="projectGridElement"
+					dataSource={filteredProjects}
+					actionComplete={actionComplete}
+					allowSelection
+					allowFiltering
+					allowPaging
+					allowResizing
+					frozenColumns={2}
+					filterSettings={FilterOptions}
+					selectionSettings={settings}
+					toolbar={toolbarOptions}
+					rowSelected={rowSelectedProject}
+					editSettings={editOptions}
+					enablePersistence
+					load={onProjectLoad}
+					width="80%"
+					// width="1000px"
+					// eslint-disable-next-line no-return-assign
+					// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
+					ref={(g) => (projectsGrid = g)}
+				>
+					<ColumnsDirective>
+						<ColumnDirective
+							field="_id"
+							headerText="Id"
+							textAlign="Left"
+							width="50"
+							isPrimaryKey="true"
+							allowEditing="false"
+							visible={false}
 						/>
-					</GridComponent>
-				</div>
-			)}
+						<ColumnDirective
+							field="Area"
+							headerText="Area"
+							editType="dropdownedit"
+							textAlign="Left"
+							width="100"
+							edit={areaSelections}
+						/>
+						{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
+						<ColumnDirective
+							field="customer"
+							headerText="Customer"
+							editType="dropdownedit"
+							textAlign="Left"
+							width="100"
+							edit={companySelections}
+						/>
+						<ColumnDirective
+							field="projectname"
+							headerText="Name"
+							textAlign="Left"
+							width="200"
+						/>
+						<ColumnDirective
+							field="description"
+							headerText="Description"
+							textAlign="Left"
+							width="200"
+						/>
+						<ColumnDirective
+							field="customercontact"
+							headerText="Cust Contact"
+							textAlign="Left"
+							width="50"
+						/>
+						<ColumnDirective
+							field="rigcompany"
+							headerText="Rig Company"
+							textAlign="left"
+							width="50"
+						/>
+						<ColumnDirective
+							field="status"
+							headerText="Status"
+							editType="dropdownedit"
+							width="100"
+						/>
+						<ColumnDirective
+							field="statusdate"
+							headerText="Date"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="projectedstartdate"
+							headerText="Proj Start"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="actualstartdate"
+							headerText="Act Start"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="expectedduration"
+							headerText="Proj Dur"
+							textAlign="Right"
+							width="50"
+						/>
+						<ColumnDirective
+							field="actualduration"
+							headerText="Act Dur"
+							textAlign="Right"
+							width="50"
+						/>
+						<ColumnDirective
+							field="latdec"
+							headerText="Latitude"
+							textAlign="Right"
+							width="100"
+						/>
+						<ColumnDirective
+							field="longdec"
+							headerText="Longitude"
+							textAlign="Right"
+							width="100"
+						/>
+					</ColumnsDirective>
+					<Inject
+						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+					/>
+				</GridComponent>
+			</div>
 		</div>
 	);
 };

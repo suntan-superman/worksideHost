@@ -54,7 +54,7 @@ const Requests = () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
       // const response = await fetch(`${apiUrl}/api/request`);
-						const response = await fetch("/api/request");
+			const response = await fetch("/api/request");
       const json = await response.json();
 
       setRequestList(json);
