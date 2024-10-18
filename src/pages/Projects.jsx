@@ -155,7 +155,6 @@ const Projects = () => {
 			// setIsLoading(false);
 
 			try {
-				window.alert("Ready to Fetch Projects...");
 				await axios.get("/api/project").then((response) => {
 					window.alert(`Response... ${JSON.stringify(response.data)}`);
 					setFilteredProjects(response.data);
