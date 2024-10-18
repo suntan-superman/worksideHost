@@ -142,11 +142,36 @@ const Projects = () => {
 			document.getElementById("root").style.cursor = "wait";
 
 			// This works locally
-			const response = await fetch("/api/project");
-			const json = await response.json();
-			window.alert(`Response... ${JSON.stringify(json)}`);
-			setFilteredProjects(json);
+			// const response = await fetch("/api/project").then((res) => {
+			// 	window.alert(`Status... ${JSON.stringify(res.status)}`);
+			// 	window.alert(`Response... ${JSON.stringify(res)}`);
+			// const json = response.json();
+			// window.alert(`Response... ${JSON.stringify(json)}`);
+			// setFilteredProjects(json);
+			// window.alert(`Response... ${JSON.stringify(res)}`);
+			// });
+			// const json = response.json();
+			// window.alert(`Response... ${JSON.stringify(response)}`);
+			// setIsLoading(false);
+
+			try {
+				window.alert("Ready to Fetch Projects...");
+				await axios.get("/api/project").then((response) => {
+					window.alert(`Response... ${JSON.stringify(response.data)}`);
+					setFilteredProjects(response.data);
+				});
+			} catch (error) {
+				console.log("error", error);
+			}
 			setIsLoading(false);
+
+			// This works locally
+			// const response = await fetch("/api/project");
+			// const json = response.json();
+			// window.alert(`Response... ${JSON.stringify(json)}`);
+			// setFilteredProjects(json);
+			// setIsLoading(false);
+
 			// const strAPI = "/api/project";
 			// try {
 			// 	await axios.get(strAPI).then((response) => {
