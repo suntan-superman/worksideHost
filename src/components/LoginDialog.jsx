@@ -69,7 +69,7 @@ const LoginDialog = () => {
 				document.getElementById("root").style.cursor = "wait";
 				// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
 				const fetchString = `/api/user/${userName}?password=${password}`;
-				window.alert(`Fetch... ${fetchString}`);
+				// window.alert(`Fetch... ${fetchString}`);
 				const response = await axios.get(fetchString);
 				if( response.ok) {
 					// TODO - Need to validate password
