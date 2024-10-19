@@ -71,7 +71,6 @@ const LoginDialog = () => {
 				const fetchString = `/api/user/${userName}?password=${password}`;
 				window.alert(`Fetch... ${fetchString}`);
 				const response = await axios.get(fetchString);
-				window.alert(`Login Response... ${JSON.stringify(response.data)}`);
 				if( response.ok) {
 					// TODO - Need to validate password
 					const json = await response.json();
@@ -86,12 +85,13 @@ const LoginDialog = () => {
 					document.getElementById("root").style.cursor = "default";
 				}
 				if (!response.ok) {
+					window.alert(`Login Failed Response... ${JSON.stringify(response)}`);
 					// Set Default Cursor
 					document.getElementById("root").style.cursor = "default";
 					setIsLoggedIn(false);
 					// setErrorMsg("Invalid User");
 					localStorage.setItem("logInFlag", "false");
-					window.location = "/login";
+					//				window.location = "/login";
 				}
 				// Set Default Cursor
 				document.getElementById("root").style.cursor = "default";

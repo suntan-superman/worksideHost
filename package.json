@@ -1,5 +1,4 @@
 {
-	"proxy": "https://workside-software.wl.r.appspot.com",
 	"name": "worksidehost",
 	"version": "1.0.0",
 	"private": true,
