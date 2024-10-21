@@ -154,7 +154,7 @@ const Projects = () => {
 			// window.alert(`Response... ${JSON.stringify(response)}`);
 			// setIsLoading(false);
 			// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
-			const fetchString = `${apiUrl}/api/project}`;
+			const fetchString = `${apiUrl}/api/project/}`;
 
 			try {
 				window.alert("Before Fetch...");
