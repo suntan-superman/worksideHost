@@ -29,6 +29,7 @@ const LoginDialog = () => {
 		const onSignIn = async (e) => {
 			e.preventDefault();
 			toast.info("Logging In...");
+			window.location = "/dashboard";
 			// confirmAlert({
 			//   title: "Workside Software",
 			//   message: `Before Fetch...`,
