@@ -29,6 +29,10 @@ const LoginDialog = () => {
 		const onSignIn = async (e) => {
 			e.preventDefault();
 			toast.info("Logging In...");
+			localStorage.setItem("logInFlag", "true");
+			// localStorage.setItem("token", json.user.userToken);
+			setGlobalUserName("Stan");
+			setIsLoggedIn(true);
 			window.location = "/dashboard";
 			// confirmAlert({
 			//   title: "Workside Software",
