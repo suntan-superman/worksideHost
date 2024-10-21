@@ -72,31 +72,31 @@ const LoginDialog = () => {
 				// const fetchString = `/api/user/${userName}?password=${password}`;
 				window.alert(`FetchString ... ${fetchString}`);
 
-				const response = await axios.get(fetchString);
-				window.alert(`Response... ${JSON.stringify(response.data)}`);
-				if( response.ok) {
-					// TODO - Need to validate password
-					const json = await response.json();
-					setIsLoggedIn(true);
-					localStorage.setItem("logInFlag", "true");
-					localStorage.setItem("token", json.user.userToken);
-					setGlobalUserName(JSON.stringify(json.user.user));
-					localStorage.setItem("userName", JSON.stringify(json.user.user));
-					localStorage.setItem("userID", JSON.stringify(json.user.userId));
-					onSaveUserName(userName);
+				await axios.get(fetchString).then((res) => {
+					window.alert(`Response... ${JSON.stringify(res.data)}`);
+					if (res.status === 200) {
+						// TODO - Need to validate password
+						const json = res.data;
+						setIsLoggedIn(true);
+						localStorage.setItem("logInFlag", "true");
+						localStorage.setItem("token", json.user.userToken);
+						setGlobalUserName(JSON.stringify(json.user.user));
+						localStorage.setItem("userName", JSON.stringify(json.user.user));
+						localStorage.setItem("userID", JSON.stringify(json.user.userId));
+						onSaveUserName(userName);
+						// Set Default Cursor
+						document.getElementById("root").style.cursor = "default";
+					} else {
+						// Set Default Cursor
+						document.getElementById("root").style.cursor = "default";
+						setIsLoggedIn(false);
+						// setErrorMsg("Invalid User");
+						localStorage.setItem("logInFlag", "false");
+						window.location = "/login";
+					}
 					// Set Default Cursor
 					document.getElementById("root").style.cursor = "default";
-				}
-				if (!response.ok) {
-					// Set Default Cursor
-					document.getElementById("root").style.cursor = "default";
-					setIsLoggedIn(false);
-					// setErrorMsg("Invalid User");
-					localStorage.setItem("logInFlag", "false");
-					window.location = "/login";
-				}
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				});
 			} catch (error) {
 				if (
 					error.response &&
