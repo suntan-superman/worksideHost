@@ -26,7 +26,22 @@ const LoginDialog = () => {
     localStorage.setItem("loginName", user);
   };
 
-		const onSignIn = async (e) => {
+	const onSignIn = async (e) => {
+			e.preventDefault();
+			toast.info("Logging In...");
+			localStorage.setItem("logInFlag", "true");
+			// localStorage.setItem("token", json.user.userToken);
+			setGlobalUserName("Stan");
+			setIsLoggedIn(true);
+			window.location = "/dashboard";
+		};
+
+		const checkSaveUserHandler = () => {
+			setSaveUserChecked(!saveUserChecked);
+		};
+
+		/*
+			const onSignIn = async (e) => {
 			e.preventDefault();
 			toast.info("Logging In...");
 			localStorage.setItem("logInFlag", "true");
@@ -126,8 +141,10 @@ const LoginDialog = () => {
     setSaveUserChecked(!saveUserChecked);
   };
 
-	
-  useEffect(() => {
+
+	*/
+
+		useEffect(() => {
 			const getUserName = () => {
 				const user = localStorage.getItem("loginName");
 				setUserName(user);
