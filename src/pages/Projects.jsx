@@ -157,12 +157,15 @@ const Projects = () => {
 			const fetchString = `${apiUrl}/api/project}`;
 
 			try {
+				window.alert("Before Fetch...");
 				await axios.get(fetchString).then((response) => {
 					// await axios.get("/api/project").then((response) => {
 					window.alert(`Response... ${JSON.stringify(response.data)}`);
 					setFilteredProjects(response.data);
+				window.alert("After Fetch...");
 				});
 			} catch (error) {
+				window.alert(`Error... ${JSON.stringify(error)}`);
 				console.log("error", error);
 			}
 			setIsLoading(false);
