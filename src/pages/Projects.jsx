@@ -153,9 +153,12 @@ const Projects = () => {
 			// const json = response.json();
 			// window.alert(`Response... ${JSON.stringify(response)}`);
 			// setIsLoading(false);
+			// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+			const fetchString = `${apiUrl}/api/project}`;
 
 			try {
-				await axios.get("/api/project").then((response) => {
+				await axios.get(fetchString).then((response) => {
+					// await axios.get("/api/project").then((response) => {
 					window.alert(`Response... ${JSON.stringify(response.data)}`);
 					setFilteredProjects(response.data);
 				});
