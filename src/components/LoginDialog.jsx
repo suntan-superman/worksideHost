@@ -73,7 +73,7 @@ const LoginDialog = () => {
 				window.alert(`FetchString ... ${fetchString}`);
 
 				const response = await axios.get(fetchString);
-				// window.alert(`Response... ${JSON.stringify(response.data)}`);
+				window.alert(`Response... ${JSON.stringify(response.data)}`);
 				if( response.ok) {
 					// TODO - Need to validate password
 					const json = await response.json();
