@@ -72,40 +72,45 @@ const LoginDialog = () => {
 				// const fetchString = `/api/user/${userName}?password=${password}`;
 				window.alert(`FetchString ... ${fetchString}`);
 
-				await axios.get(fetchString).then((res) => {
-					window.alert(`Response... ${JSON.stringify(res.data)}`);
-					if (res.status === 200) {
-						// TODO - Need to validate password
-						const json = res.data;
-						setIsLoggedIn(true);
-						localStorage.setItem("logInFlag", "true");
-						localStorage.setItem("token", json.user.userToken);
-						setGlobalUserName(JSON.stringify(json.user.user));
-						localStorage.setItem("userName", JSON.stringify(json.user.user));
-						localStorage.setItem("userID", JSON.stringify(json.user.userId));
-						onSaveUserName(userName);
-						// Set Default Cursor
-						document.getElementById("root").style.cursor = "default";
-					} else {
-						// Set Default Cursor
-						document.getElementById("root").style.cursor = "default";
-						setIsLoggedIn(false);
-						// setErrorMsg("Invalid User");
-						localStorage.setItem("logInFlag", "false");
-						window.location = "/login";
-					}
-					// Set Default Cursor
-					document.getElementById("root").style.cursor = "default";
+				const response = await fetch(fetchString).then((r) => {
+					window.alert(`Response... ${JSON.stringify(r)}`);
+					console.log(r);
 				});
-			} catch (error) {
-				if (
-					error.response &&
-					error.response.status >= 400 &&
-					error.response.status <= 500
-				) {
-					setErrorMsg(error.response.data.message);
-				}
-			}
+
+			// 	await axios.get(fetchString).then((res) => {
+			// 		window.alert(`Response... ${JSON.stringify(res.data)}`);
+			// 		if (res.status === 200) {
+			// 			// TODO - Need to validate password
+			// 			const json = res.data;
+			// 			setIsLoggedIn(true);
+			// 			localStorage.setItem("logInFlag", "true");
+			// 			localStorage.setItem("token", json.user.userToken);
+			// 			setGlobalUserName(JSON.stringify(json.user.user));
+			// 			localStorage.setItem("userName", JSON.stringify(json.user.user));
+			// 			localStorage.setItem("userID", JSON.stringify(json.user.userId));
+			// 			onSaveUserName(userName);
+			// 			// Set Default Cursor
+			// 			document.getElementById("root").style.cursor = "default";
+			// 		} else {
+			// 			// Set Default Cursor
+			// 			document.getElementById("root").style.cursor = "default";
+			// 			setIsLoggedIn(false);
+			// 			// setErrorMsg("Invalid User");
+			// 			localStorage.setItem("logInFlag", "false");
+			// 			window.location = "/login";
+			// 		}
+			// 		// Set Default Cursor
+			// 		document.getElementById("root").style.cursor = "default";
+			// 	});
+			// } catch (error) {
+			// 	if (
+			// 		error.response &&
+			// 		error.response.status >= 400 &&
+			// 		error.response.status <= 500
+			// 	) {
+			// 		setErrorMsg(error.response.data.message);
+			// 	}
+			// }
 			// const user = localStorage.getItem('token');
 			// Set Default Cursor
 			document.getElementById("root").style.cursor = "default";
