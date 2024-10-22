@@ -105,13 +105,13 @@ const Products = () => {
 
         if (insertFlag === true) {
           // const response = await fetch(`${apiUrl}/api/product/`, {
-										const response = await fetch("/api/product/", {
-											method: "POST",
-											body: JSON.stringify(data),
-											headers: {
-												"Content-Type": "application/json",
-											},
-										});
+					const response = await fetch("/api/product/", {
+						method: "POST",
+						body: JSON.stringify(data),
+						headers: {
+							"Content-Type": "application/json",
+						},
+					});
 
           if (response.ok) {
             // console.log('Insert: ' + JSON.stringify(args.data));
