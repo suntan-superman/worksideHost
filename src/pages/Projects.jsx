@@ -81,9 +81,9 @@ const Projects = () => {
 		setIsLoading(false);
 	};
 
-	// useEffect(() => {
-		// 	fetchProjects();
-		// }, []);
+	useEffect(() => {
+		fetchProjects();
+	}, []);
 		// }, [dispatch]);
 
 		useEffect(() => {
@@ -258,7 +258,7 @@ const Projects = () => {
 			<Header category="Workside" title="Projects" />
 			{/* <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start"> */}
 			{/* <div className="absolute top-[100px] left-[20px] flex flex-row w-full"> */}
-			<div>
+			{/* <div>
 				{!haveData && (
 					<button type="button" onClick={fetchProjects}>
 						Load Projects
@@ -269,7 +269,7 @@ const Projects = () => {
 						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
 					</div>
 				)}
-			</div>
+			</div> */}
 			{!isLoading && haveData && (
 				<div className="div-container">
 					<GridComponent
