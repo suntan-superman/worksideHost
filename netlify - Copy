@@ -1,0 +1,14 @@
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+[[redirects]]
+  force = true
+  from = "/api/*"
+	to = "https://workside-software.wl.r.appspot.com/api/:splat"
+  status = 200
+  [redirect.headers]
+    x-from = "Netlify"
+
+
+
