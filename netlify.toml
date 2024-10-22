@@ -1,13 +1,21 @@
 [[redirects]]
-from = "/*"
-to = "/index.html"
-status = 200
-
-[[redirects]]
+  force = true
   from = "/api/*"
 	to = "https://workside-software.wl.r.appspot.com/api/:splat"
-  force = true
   status = 200
   [redirect.headers]
     x-from = "Netlify"
+
+[[redirects]]
+  force = true
+  from = "/api/project"
+	to = "https://workside-software.wl.r.appspot.com/api/project"
+  status = 200
+  [redirect.headers]
+    x-from = "Netlify"
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
 
