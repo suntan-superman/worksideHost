@@ -26,11 +26,13 @@ const apiUrl = process.env.REACT_APP_MONGO_URI;
 
 const gridPageSize = 8;
 
+let filteredProjects = null;
+
 const Projects = () => {
  	const [isLoading, setIsLoading] = useState(false);
 	const [haveData, setHaveData] = useState(false);
   // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
-		const [filteredProjects, setFilteredProjects] = useState(null);
+		// const [filteredProjects, setFilteredProjects] = useState(null);
 		const [firmList, setFirmList] = useState(null);
 		const [insertFlag, setInsertFlag] = useState(false);
 		const editOptions = {
@@ -50,17 +52,32 @@ const Projects = () => {
 		const fetchString = "/api/project";
 		// Set Wait Cursor
 		setIsLoading(true);
-		const response = await axios.get(fetchString);
-		window.alert(`Response Code... ${response.status}`);
-
-		const json = response.data;
-		// TODO Remove this for production
-		window.alert(`Response... ${JSON.stringify(response)}`);
-		if (response.status === 200) {
-			// dispatch({ type: "GET_PROJECTS", payload: json });
-			setFilteredProjects(json);
-			setHaveData(true);
-		}
+		// await axios.get(fetchString).then((res) => {
+		// 	window.alert(`Response Code... ${res.status}`);
+		// 	const json = res.data;
+		// 	// TODO Remove this for production
+		// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
+		// 	if (res.status === 200) {
+		// 		// dispatch({ type: "GET_PROJECTS", payload: json });
+		// 		setFilteredProjects(json);
+		// 		setHaveData(true);
+		// 	}
+		// });
+		await axios.get(fetchString).then((res) => {
+			// window.alert(`Response Code... ${res.status}`);
+			// const json = res.data;
+			// // TODO Remove this for production
+			// window.alert(`Response... ${JSON.stringify(res.data)}`);
+			if (res.status === 200) {
+				// dispatch({ type: "GET_PROJECTS", payload: json });
+				// setFilteredProjects(res.data);
+				filteredProjects = res.data;
+				// window.alert(
+				// 	`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
+				// );
+				setHaveData(true);
+			}
+		});
 		setIsLoading(false);
 	};
 
