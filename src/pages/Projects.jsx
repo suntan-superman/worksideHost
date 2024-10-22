@@ -53,31 +53,37 @@ const Projects = () => {
 		// Set Wait Cursor
 		setIsLoading(true);
 		// await axios.get(fetchString).then((res) => {
-		// 	window.alert(`Response Code... ${res.status}`);
-		// 	const json = res.data;
-		// 	// TODO Remove this for production
-		// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
-		// 	if (res.status === 200) {
-		// 		// dispatch({ type: "GET_PROJECTS", payload: json });
-		// 		setFilteredProjects(json);
-		// 		setHaveData(true);
-		// 	}
-		// });
-		await axios.get(fetchString).then((res) => {
-			// window.alert(`Response Code... ${res.status}`);
-			// const json = res.data;
-			// // TODO Remove this for production
-			// window.alert(`Response... ${JSON.stringify(res.data)}`);
-			if (res.status === 200) {
-				// dispatch({ type: "GET_PROJECTS", payload: json });
-				// setFilteredProjects(res.data);
-				filteredProjects = res.data;
-				// window.alert(
-				// 	`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
-				// );
-				setHaveData(true);
+			// 	window.alert(`Response Code... ${res.status}`);
+			// 	const json = res.data;
+			// 	// TODO Remove this for production
+			// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
+			// 	if (res.status === 200) {
+			// 		// dispatch({ type: "GET_PROJECTS", payload: json });
+			// 		setFilteredProjects(json);
+			// 		setHaveData(true);
+			// 	}
+			// });
+			try {
+				await axios.get(fetchString).then((res) => {
+					window.alert(`Response Code... ${res.status}`);
+					window.alert(`Response... ${JSON.stringify(res)}`);
+					if (res.status === 200) {
+						// const json = res.data;
+						// // TODO Remove this for production
+						// window.alert(`Response... ${JSON.stringify(res.data)}`);
+						// dispatch({ type: "GET_PROJECTS", payload: json });
+						// setFilteredProjects(res.data);
+						filteredProjects = res.data;
+						// window.alert(
+						// 	`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
+						// );
+						setHaveData(true);
+					}
+				});
+			} catch (error) {
+				window.alert(`Error Code... ${error}`);
+				console.error(error);
 			}
-		});
 		setIsLoading(false);
 	};
 
