@@ -34,7 +34,8 @@ const LoginDialog = () => {
 		// Set Wait Cursor
 		document.getElementById("root").style.cursor = "wait";
 		// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
-		const fetchString = `https://workside-software.wl.r.appspot.com/api/user/${userName}?password=${password}`;
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+		// const fetchString = `https://workside-software.wl.r.appspot.com/api/user/${userName}?password=${password}`;
 		// window.alert(`FetchString ... ${fetchString}`);
 		try {
 			const response = await fetch(fetchString);
