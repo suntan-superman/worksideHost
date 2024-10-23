@@ -53,9 +53,7 @@ const Customers = () => {
     const fetchCustomers = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-			const response = await fetch(
-				"https://workside-software.wl.r.appspot.com/api/customer",
-			);
+			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/customer`);
       const json = await response.json();
 
       if (response.ok) {
@@ -128,7 +126,7 @@ const Customers = () => {
     // Set Wait Cursor
     document.getElementById("root").style.cursor = "wait";
 		const response = await fetch(
-			"https://workside-software.wl.r.appspot.com/api/customer",
+			`${process.env.REACT_APP_MONGO_URI}/api/customer`,
 			{
 				method: "POST",
 				body: JSON.stringify(customer),
@@ -158,7 +156,7 @@ const Customers = () => {
   };
 
   const handleDelete = async () => {
-		const fetchString = `https://workside-software.wl.r.appspot.com/api/customer/${selectedRecord}`;
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customer/${selectedRecord}`;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });

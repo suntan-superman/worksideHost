@@ -21,7 +21,7 @@ const apiUrl = process.env.REACT_APP_MONGO_URI;
 // const gridPageSize = 12;
 
 const Products = () => {
-  // const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
+ 	const [isLoading, setIsLoading] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
   const editOptions = {
@@ -41,25 +41,23 @@ const Products = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      // Set Wait Cursor
-      document.getElementById("root").style.cursor = "wait";
-			const response = await fetch(
-				"https://workside-software.wl.r.appspot.com/api/product",
-			);
-      const json = await response.json();
+      setIsLoading(true);
+						const response = await fetch(
+							`${process.env.REACT_APP_MONGO_URI}/api/product`,
+						);
+						const json = await response.json();
 
-      if (response.ok) {
-        dispatch({ type: "GET_PRODUCTS", payload: json });
-        setFilteredProducts(json);
-      }
-      // Set Default Cursor
-      document.getElementById("root").style.cursor = "default";
+						if (response.ok) {
+							dispatch({ type: "GET_PRODUCTS", payload: json });
+							setFilteredProducts(json);
+						}
+						setIsLoading(false);
     };
     fetchProducts();
   }, [dispatch]);
 
   const handleDelete = async () => {
-		const fetchString = `https://workside-software.wl.r.appspot.com/api/product/${selectedRecord}`;
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
@@ -105,7 +103,7 @@ const Products = () => {
 
         if (insertFlag === true) {
 					const response = await fetch(
-						"https://workside-software.wl.r.appspot.com/api/product/",
+						`${process.env.REACT_APP_MONGO_URI}/api/product/`,
 						{
 							method: "POST",
 							body: JSON.stringify(data),
@@ -151,6 +149,11 @@ const Products = () => {
   return (
 			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
 				<Header category="Workside" title="Products" />
+				{isLoading && (
+					<div className="absolute top-[50%] left-[50%]">
+						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+					</div>
+				)}
 				<div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start">
 					<GridComponent
 						dataSource={filteredProducts}

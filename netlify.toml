@@ -5,7 +5,7 @@ status = 200
 [[redirects]]
   force = true
   from = "/api/*"
-	to = "https://workside-software.wl.r.appspot.com/api/:splat"
+	to = "${process.env.REACT_APP_MONGO_URI}/api/:splat"
   status = 200
   [redirect.headers]
     x-from = "Netlify"

@@ -52,9 +52,7 @@ const Projects = () => {
 		// Set Wait Cursor
 		setIsLoading(true);
 		try {
-			const response = await fetch(
-				"https://workside-software.wl.r.appspot.com/api/project/",
-			);
+			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/project/`);
 			const jsonData = await response.json();
 			setIsLoading(false);
 			// window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
@@ -79,7 +77,7 @@ const Projects = () => {
 			setIsLoading(true);
 			// const response = await fetch(`${apiUrl}/api/firm`);
 			const response = await fetch(
-				"https://workside-software.wl.r.appspot.com/api/firm/",
+				`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
 			);
 			const jsonResults = await response.json();
 			// Filter The entire List to include companies only
@@ -131,7 +129,7 @@ const Projects = () => {
 
 	const handleDelete = async () => {
 		// const fetchString = `${apiUrl}/api/project/${selectedRecord}`;
-		const fetchString = `https://workside-software.wl.r.appspot.com/api/project/${selectedRecord}`;
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${selectedRecord}`;
 		const response = await fetch(fetchString, {
 			method: "DELETE",
 		});
@@ -188,7 +186,7 @@ const Projects = () => {
 
 				if (insertFlag === true) {
 					const response = await fetch(
-						"https://workside-software.wl.r.appspot.com/api/project/",
+						`${process.env.REACT_APP_MONGO_URI}/api/project/`,
 						{
 							method: "POST",
 							body: JSON.stringify(data),

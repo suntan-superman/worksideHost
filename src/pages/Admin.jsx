@@ -34,7 +34,9 @@ const apiUrl = process.env.REACT_APP_API_URL;
 const gridPageSize = 8;
 
 const Admin = () => {
-  let firmsGridRef = useRef(null);
+ 		const [isLoading, setIsLoading] = useState(false);
+
+	  let firmsGridRef = useRef(null);
 		let rigsGridRef = useRef(null);
 		let contactsGridRef = useRef(null);
 		let productsGridRef = useRef(null);
@@ -102,10 +104,9 @@ const Admin = () => {
 
 		useEffect(() => {
 			const fetchFirms = async () => {
-				// Set Wait Cursor
-				document.getElementById("root").style.cursor = "wait";
+				setIsLoading(true);
 				const response = await fetch(
-					"https://workside-software.wl.r.appspot.com/api/firm",
+					`${process.env.REACT_APP_MONGO_URI}/api/firm`,
 				);
 				const json = await response.json();
 				setFirmList(json);
@@ -113,18 +114,16 @@ const Admin = () => {
 				if (response.ok) {
 					firmDispatch({ type: "GET_FIRM", payload: json });
 				}
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				setIsLoading(false);
 			};
 			fetchFirms();
 		}, [firmDispatch]);
 
 		useEffect(() => {
 			const fetchRigs = async () => {
-				// Set Wait Cursor
-				document.getElementById("root").style.cursor = "wait";
+				setIsLoading(true);
 				const response = await fetch(
-					"https://workside-software.wl.r.appspot.com/api/rig",
+					`${process.env.REACT_APP_MONGO_URI}/api/rig`,
 				);
 				const json = await response.json();
 
@@ -133,34 +132,29 @@ const Admin = () => {
 				if (response.ok) {
 					rigDispatch({ type: "GET_RIG", payload: json });
 				}
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				setIsLoading(true);
 			};
 			fetchRigs();
 		}, [rigDispatch]);
 
 		useEffect(() => {
 			const fetchContacts = async () => {
-				// Set Wait Cursor
-				document.getElementById("root").style.cursor = "wait";
-
+				setIsLoading(true);
 				const response = await fetch(
-					"https://workside-software.wl.r.appspot.com/api/contact",
+					`${process.env.REACT_APP_MONGO_URI}/api/contact`,
 				);
-				setContactList(response.data);
-
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				const json = await response.json();
+				setContactList(json);
+				setIsLoading(false);
 			};
 			fetchContacts();
-		}, [contactDispatch]);
+		}, []);
 
 		useEffect(() => {
 			const fetchProducts = async () => {
-				// Set Wait Cursor
-				document.getElementById("root").style.cursor = "wait";
+				setIsLoading(true);
 				const response = await fetch(
-					"https://workside-software.wl.r.appspot.com/api/product",
+					`${process.env.REACT_APP_MONGO_URI}/api/product`,
 				);
 				const json = await response.json();
 
@@ -169,37 +163,34 @@ const Admin = () => {
 				if (response.ok) {
 					productDispatch({ type: "GET_PRODUCTS", payload: json });
 				}
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				setIsLoading(false);
 			};
 			fetchProducts();
 		}, [productDispatch]);
 
 		useEffect(() => {
 			const fetchSupplierProducts = async () => {
-				// Set Wait Cursor
+				setIsLoading(true);
 				const response = await fetch(
-					"https://workside-software.wl.r.appspot.com/api/supplierproduct",
+					`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
 				);
 				const json = await response.json();
 
 				setSupplierProductList(json);
-
 				if (response.ok) {
 					supplierProductDispatch({
 						type: "GET_SUPPLIERPRODUCTS",
 						payload: json,
 					});
 				}
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				setIsLoading(false);
 			};
 			fetchSupplierProducts();
 		}, [supplierProductDispatch]);
 
 		const handleFirmDelete = async () => {
 			const response = await fetch(
-				`https://workside-software.wl.r.appspot.com/api/firm/${selectedRecord}`,
+				`${process.env.REACT_APP_MONGO_URI}/api/firm/${selectedRecord}`,
 				{
 					method: "DELETE",
 				},
@@ -218,7 +209,7 @@ const Admin = () => {
 
 		const handleContactDelete = async () => {
 			const response = await fetch(
-				`https://workside-software.wl.r.appspot.com/api/contact/${selectedRecord}`,
+				`${process.env.REACT_APP_MONGO_URI}/api/contact/${selectedRecord}`,
 				{
 					method: "DELETE",
 				},
@@ -240,7 +231,7 @@ const Admin = () => {
 
 		const handleRigDelete = async () => {
 			const response = await fetch(
-				`https://workside-software.wl.r.appspot.com/api/rig/${selectedRecord}`,
+				`${process.env.REACT_APP_MONGO_URI}/api/rig/${selectedRecord}`,
 				{
 					method: "DELETE",
 				},
@@ -258,7 +249,7 @@ const Admin = () => {
 
 		const handleProductDelete = async () => {
 			const response = await fetch(
-				`https://workside-software.wl.r.appspot.com/api/product/${selectedRecord}`,
+				`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
 				{
 					method: "DELETE",
 				},
@@ -300,16 +291,13 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						const response = await fetch(
-							"https://workside-software.wl.r.appspot.com/api/firm/",
-							{
-								method: "POST",
-								body: JSON.stringify(data),
-								headers: {
-									"Content-Type": "application/json",
-								},
+						const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm/`, {
+							method: "POST",
+							body: JSON.stringify(data),
+							headers: {
+								"Content-Type": "application/json",
 							},
-						);
+						});
 
 						const json = await response.json();
 
@@ -358,7 +346,7 @@ const Admin = () => {
 
 					if (insertFlag === true) {
 						const response = await fetch(
-							"https://workside-software.wl.r.appspot.com/api/contact/",
+							`${process.env.REACT_APP_MONGO_URI}/api/contact/`,
 							{
 								method: "POST",
 								body: JSON.stringify(data),
@@ -415,16 +403,13 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						const response = await fetch(
-							"https://workside-software.wl.r.appspot.com/api/rig/",
-							{
-								method: "POST",
-								body: JSON.stringify(data),
-								headers: {
-									"Content-Type": "application/json",
-								},
+						const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/rig/`, {
+							method: "POST",
+							body: JSON.stringify(data),
+							headers: {
+								"Content-Type": "application/json",
 							},
-						);
+						});
 
 						const json = await response.json();
 
@@ -474,7 +459,7 @@ const Admin = () => {
 
 					if (insertFlag === true) {
 						const response = await fetch(
-							"https://workside-software.wl.r.appspot.com/api/product/",
+							`${process.env.REACT_APP_MONGO_URI}/api/product/`,
 							{
 								method: "POST",
 								body: JSON.stringify(data),
@@ -664,6 +649,11 @@ const Admin = () => {
 		return (
 			<div>
 				<Header category="Workside" title="Administrative" />
+				{isLoading && (
+					<div className="absolute top-[50%] left-[50%]">
+						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+					</div>
+				)}
 				<TabComponent cssClass="e-fill" headerPlacement="Top">
 					{/* <TabItemsDirective> */}
 					<div className="e-tab-header">

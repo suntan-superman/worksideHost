@@ -27,6 +27,7 @@ const gridPageSize = 8;
 let requestGrid = null;
 
 const Requests = () => {
+ 		const [isLoading, setIsLoading] = useState(false);
   const { currentColor } = useStateContext();
   const [requestList, setRequestList] = useState(null);
   const editOptions = {
@@ -51,16 +52,14 @@ const Requests = () => {
 
   useEffect(() => {
     const fetchRequests = async () => {
-      // Set Wait Cursor
-      document.getElementById("root").style.cursor = "wait";
+			setIsLoading(true);
 			const response = await fetch(
-				"https://workside-software.wl.r.appspot.com/api/request",
+				`${process.env.REACT_APP_MONGO_URI}/api/request`,
 			);
-      const json = await response.json();
+			const json = await response.json();
 
-      setRequestList(json);
-      // Set Default Cursor
-      document.getElementById("root").style.cursor = "default";
+			setRequestList(json);
+			setIsLoading(false);
     };
     fetchRequests();
   }, []);
@@ -146,8 +145,11 @@ const Requests = () => {
   return (
 			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
 				<Header category="Workside" title="Requests" />
-				{/* <div className="flex-grow bg-white p-8 relative">
-				<Header category="Workside" title="Requests" /> */}
+				{isLoading && (
+					<div className="absolute top-[50%] left-[50%]">
+						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+					</div>
+				)}
 				<div className="absolute top-[75px] left-[20px] w-[100%] flex flex-row items-center justify-start">
 					<GridComponent
 						id="requestGridElement"
