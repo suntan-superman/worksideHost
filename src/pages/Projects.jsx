@@ -52,38 +52,35 @@ const Projects = () => {
 		const fetchString = "/api/project";
 		// Set Wait Cursor
 		setIsLoading(true);
-		// await axios.get(fetchString).then((res) => {
-			// 	window.alert(`Response Code... ${res.status}`);
-			// 	const json = res.data;
-			// 	// TODO Remove this for production
-			// 	window.alert(`Response... ${JSON.stringify(res.data)}`);
-			// 	if (res.status === 200) {
-			// 		// dispatch({ type: "GET_PROJECTS", payload: json });
-			// 		setFilteredProjects(json);
-			// 		setHaveData(true);
-			// 	}
-			// });
-			try {
-				await axios.get(fetchString).then((res) => {
-					window.alert(`Response Code... ${res.status}`);
-					window.alert(`Response... ${JSON.stringify(res)}`);
-					if (res.status === 200) {
-						// const json = res.data;
-						// // TODO Remove this for production
-						// window.alert(`Response... ${JSON.stringify(res.data)}`);
-						// dispatch({ type: "GET_PROJECTS", payload: json });
-						// setFilteredProjects(res.data);
-						filteredProjects = res.data;
-						// window.alert(
-						// 	`Filtered Projects... ${JSON.stringify(filteredProjects)}`,
-						// );
-						setHaveData(true);
-					}
-				});
-			} catch (error) {
-				window.alert(`Error Code... ${error}`);
-				console.error(error);
-			}
+				try {
+					const response = await fetch(
+						"https://workside-software.wl.r.appspot.com/api/project/",
+					);
+					const jsonData = await response.json();
+					setIsLoading(false);
+					window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
+					filteredProjects = jsonData;
+					setHaveData(true);
+				} catch (error) {
+					setIsLoading(false);
+					window.alert(`Error: ${error}`);
+					console.error(error);
+				}
+
+
+			// try {
+		// 	await axios.get(fetchString).then((res) => {
+		// 		window.alert(`Response Code... ${res.status}`);
+		// 		window.alert(`Response... ${JSON.stringify(res)}`);
+		// 		if (res.status === 200) {
+		// 			filteredProjects = res.data;
+		// 			setHaveData(true);
+		// 		}
+		// 	});
+		// } catch (error) {
+		// 	window.alert(`Error Code... ${error}`);
+		// 	console.error(error);
+		// }
 		setIsLoading(false);
 	};
 
