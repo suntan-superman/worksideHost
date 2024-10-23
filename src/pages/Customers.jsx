@@ -53,8 +53,9 @@ const Customers = () => {
     const fetchCustomers = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-      // const response = await fetch(`${apiUrl}/api/customer`);
-						const response = await fetch("/api/customer");
+			const response = await fetch(
+				"https://workside-software.wl.r.appspot.com/api/customer",
+			);
       const json = await response.json();
 
       if (response.ok) {
@@ -126,14 +127,16 @@ const Customers = () => {
     };
     // Set Wait Cursor
     document.getElementById("root").style.cursor = "wait";
-    // const response = await fetch(`${apiUrl}/api/customer`, {
-				const response = await fetch("/api/customer", {
-					method: "POST",
-					body: JSON.stringify(customer),
-					headers: {
-						"Content-Type": "application/json",
-					},
-				});
+		const response = await fetch(
+			"https://workside-software.wl.r.appspot.com/api/customer",
+			{
+				method: "POST",
+				body: JSON.stringify(customer),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
     const json = await response.json();
     // Set Default Cursor
     document.getElementById("root").style.cursor = "default";
@@ -155,8 +158,7 @@ const Customers = () => {
   };
 
   const handleDelete = async () => {
-    // const fetchString = `${apiUrl}/api/customer/${selectedRecord}`;
-				const fetchString = `/api/customer/${selectedRecord}`;
+		const fetchString = `https://workside-software.wl.r.appspot.com/api/customer/${selectedRecord}`;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });

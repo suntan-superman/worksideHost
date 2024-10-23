@@ -53,8 +53,9 @@ const Requests = () => {
     const fetchRequests = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-      // const response = await fetch(`${apiUrl}/api/request`);
-						const response = await fetch("/api/request");
+			const response = await fetch(
+				"https://workside-software.wl.r.appspot.com/api/request",
+			);
       const json = await response.json();
 
       setRequestList(json);

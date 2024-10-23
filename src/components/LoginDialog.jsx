@@ -26,95 +26,49 @@ const LoginDialog = () => {
     localStorage.setItem("loginName", user);
   };
 
-		const onSignIn = async (e) => {
-			e.preventDefault();
-			toast.info("Logging In...");
-			// confirmAlert({
-			//   title: "Workside Software",
-			//   message: `Before Fetch...`,
-			//   buttons: [
-			//     {
-			//       label: "Cancel",
-			//     },
-			//     {
-			//       label: "Ok",
-			//       onClick: () => {
-			//         toast.success(`Success`);
-			//       },
-			//     },
-			//   ],
-			// });
-
-			// setAlertFlag(true);
-			// <Alert
-			//   variant='gradient'
-			//   open={alertFlag}
-			//   action={
-			//     <Button
-			//       variant='text'
-			//       color='white'
-			//       size='sm'
-			//       className='!absolute top-3 right-3'
-			//       onClick={() => setAlertFlag(false)}
-			//     />
-			//   }
-			// >
-			//   Ready to Fetch
-			// </Alert>;
-			localStorage.removeItem("logInFlag");
-			setErrorMsg("");
-			try {
-				const apiUrl = process.env.REACT_APP_MONGO_URI;
-				// Set Wait Cursor
-				document.getElementById("root").style.cursor = "wait";
-				// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
-				const fetchString = `/api/user/${userName}?password=${password}`;
-				// window.alert(`FetchString ... ${fetchString}`);
-
-				const response = await axios.get(fetchString);
-				// window.alert(`Response... ${JSON.stringify(response.data)}`);
-				if( response.ok) {
-					// TODO - Need to validate password
-					const json = await response.json();
-					setIsLoggedIn(true);
-					localStorage.setItem("logInFlag", "true");
-					localStorage.setItem("token", json.user.userToken);
-					setGlobalUserName(JSON.stringify(json.user.user));
-					localStorage.setItem("userName", JSON.stringify(json.user.user));
-					localStorage.setItem("userID", JSON.stringify(json.user.userId));
-					onSaveUserName(userName);
-					// Set Default Cursor
-					document.getElementById("root").style.cursor = "default";
-				}
-				if (!response.ok) {
-					// Set Default Cursor
-					document.getElementById("root").style.cursor = "default";
-					setIsLoggedIn(false);
-					// setErrorMsg("Invalid User");
-					localStorage.setItem("logInFlag", "false");
-					window.location = "/login";
-				}
+	const onSignIn = async (e) => {
+		e.preventDefault();
+		toast.info("Logging In...");
+		localStorage.removeItem("logInFlag");
+		setErrorMsg("");
+		// Set Wait Cursor
+		document.getElementById("root").style.cursor = "wait";
+		// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+		const fetchString = `https://workside-software.wl.r.appspot.com/api/user/${userName}?password=${password}`;
+		// window.alert(`FetchString ... ${fetchString}`);
+		try {
+			const response = await fetch(fetchString);
+			if (response.status === 200) {
+				const jsonData = await response.json();
+				// TODO - Need to validate password
+				setIsLoggedIn(true);
+				localStorage.setItem("logInFlag", "true");
+				localStorage.setItem("token", jsonData.user.userToken);
+				setGlobalUserName(JSON.stringify(jsonData.user.user));
+				localStorage.setItem("userName", JSON.stringify(jsonData.user.user));
+				localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
+				onSaveUserName(userName);
 				// Set Default Cursor
 				document.getElementById("root").style.cursor = "default";
-			} catch (error) {
-				if (
-					error.response &&
-					error.response.status >= 400 &&
-					error.response.status <= 500
-				) {
-					setErrorMsg(error.response.data.message);
-				}
 			}
-			// const user = localStorage.getItem('token');
-			// Set Default Cursor
+		} catch (error) {
+			// setIsLoading(false);
+			window.alert(`Error: ${error}`);
+			console.error(error);
 			document.getElementById("root").style.cursor = "default";
-			window.location = "/dashboard";
-		};
+			setIsLoggedIn(false);
+			setErrorMsg(error.response.data.message);
+			localStorage.setItem("logInFlag", "false");
+			window.location = "/login";
+		}
 
-  const checkSaveUserHandler = () => {
-    setSaveUserChecked(!saveUserChecked);
-  };
+		document.getElementById("root").style.cursor = "default";
+		window.location = "/dashboard";
+	};
 
+	const checkSaveUserHandler = () => {
+		setSaveUserChecked(!saveUserChecked);
+	};
 	
   useEffect(() => {
 			const getUserName = () => {

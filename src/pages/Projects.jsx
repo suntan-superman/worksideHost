@@ -49,38 +49,22 @@ const Projects = () => {
 		let projectsGrid = null;
 
 	const fetchProjects = async () => {
-		const fetchString = "/api/project";
 		// Set Wait Cursor
 		setIsLoading(true);
-				try {
-					const response = await fetch(
-						"https://workside-software.wl.r.appspot.com/api/project/",
-					);
-					const jsonData = await response.json();
-					setIsLoading(false);
-					window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
-					filteredProjects = jsonData;
-					setHaveData(true);
-				} catch (error) {
-					setIsLoading(false);
-					window.alert(`Error: ${error}`);
-					console.error(error);
-				}
-
-
-			// try {
-		// 	await axios.get(fetchString).then((res) => {
-		// 		window.alert(`Response Code... ${res.status}`);
-		// 		window.alert(`Response... ${JSON.stringify(res)}`);
-		// 		if (res.status === 200) {
-		// 			filteredProjects = res.data;
-		// 			setHaveData(true);
-		// 		}
-		// 	});
-		// } catch (error) {
-		// 	window.alert(`Error Code... ${error}`);
-		// 	console.error(error);
-		// }
+		try {
+			const response = await fetch(
+				"https://workside-software.wl.r.appspot.com/api/project/",
+			);
+			const jsonData = await response.json();
+			setIsLoading(false);
+			// window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
+			filteredProjects = jsonData;
+			setHaveData(true);
+		} catch (error) {
+			setIsLoading(false);
+			window.alert(`Error: ${error}`);
+			console.error(error);
+		}
 		setIsLoading(false);
 	};
 
@@ -89,23 +73,25 @@ const Projects = () => {
 	}, []);
 		// }, [dispatch]);
 
-		useEffect(() => {
-			const fetchFirms = async () => {
-				// Set Wait Cursor
-				setIsLoading(true);
-				// const response = await fetch(`${apiUrl}/api/firm`);
-				const response = await fetch("/api/firm");
-				const jsonResults = await response.json();
-				// Filter The entire List to include companies only
-				const result = jsonResults.filter(
-					(jsonResult) => jsonResult.type === "CUSTOMER",
-				);
-				setFirmList(result);
-				// Set Default Cursor
-				setIsLoading(false);
-			};
-			fetchFirms();
-		}, []);
+	useEffect(() => {
+		const fetchFirms = async () => {
+			// Set Wait Cursor
+			setIsLoading(true);
+			// const response = await fetch(`${apiUrl}/api/firm`);
+			const response = await fetch(
+				"https://workside-software.wl.r.appspot.com/api/firm/",
+			);
+			const jsonResults = await response.json();
+			// Filter The entire List to include companies only
+			const result = jsonResults.filter(
+				(jsonResult) => jsonResult.type === "CUSTOMER",
+			);
+			setFirmList(result);
+			// Set Default Cursor
+			setIsLoading(false);
+		};
+		fetchFirms();
+	}, []);
 
 	// Set Location Selection Options
 	const areaOptions = [
@@ -145,7 +131,7 @@ const Projects = () => {
 
 	const handleDelete = async () => {
 		// const fetchString = `${apiUrl}/api/project/${selectedRecord}`;
-		const fetchString = `/api/project/${selectedRecord}`;
+		const fetchString = `https://workside-software.wl.r.appspot.com/api/project/${selectedRecord}`;
 		const response = await fetch(fetchString, {
 			method: "DELETE",
 		});
@@ -201,14 +187,16 @@ const Projects = () => {
 				});
 
 				if (insertFlag === true) {
-					// const response = await fetch(`${apiUrl}/api/project/`, {
-					const response = await fetch("/api/project/", {
-						method: "POST",
-						body: JSON.stringify(data),
-						headers: {
-							"Content-Type": "application/json",
+					const response = await fetch(
+						"https://workside-software.wl.r.appspot.com/api/project/",
+						{
+							method: "POST",
+							body: JSON.stringify(data),
+							headers: {
+								"Content-Type": "application/json",
+							},
 						},
-					});
+					);
 
 					const json = await response.json();
 

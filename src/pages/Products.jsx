@@ -43,8 +43,9 @@ const Products = () => {
     const fetchProducts = async () => {
       // Set Wait Cursor
       document.getElementById("root").style.cursor = "wait";
-      // const response = await fetch(`${apiUrl}/api/product`);
-			const response = await fetch("/api/product");
+			const response = await fetch(
+				"https://workside-software.wl.r.appspot.com/api/product",
+			);
       const json = await response.json();
 
       if (response.ok) {
@@ -58,8 +59,7 @@ const Products = () => {
   }, [dispatch]);
 
   const handleDelete = async () => {
-    // const fetchString = `${apiUrl}/api/product/${selectedRecord}`;
-				const fetchString = `/api/product/${selectedRecord}`;
+		const fetchString = `https://workside-software.wl.r.appspot.com/api/product/${selectedRecord}`;
     const response = await fetch(fetchString, {
       method: "DELETE",
     });
@@ -104,14 +104,16 @@ const Products = () => {
         const { data } = args;
 
         if (insertFlag === true) {
-          // const response = await fetch(`${apiUrl}/api/product/`, {
-					const response = await fetch("/api/product/", {
-						method: "POST",
-						body: JSON.stringify(data),
-						headers: {
-							"Content-Type": "application/json",
+					const response = await fetch(
+						"https://workside-software.wl.r.appspot.com/api/product/",
+						{
+							method: "POST",
+							body: JSON.stringify(data),
+							headers: {
+								"Content-Type": "application/json",
+							},
 						},
-					});
+					);
 
           if (response.ok) {
             // console.log('Insert: ' + JSON.stringify(args.data));

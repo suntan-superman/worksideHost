@@ -104,8 +104,9 @@ const Admin = () => {
 			const fetchFirms = async () => {
 				// Set Wait Cursor
 				document.getElementById("root").style.cursor = "wait";
-				// const response = await fetch(`${apiUrl}/api/firm`);
-				const response = await fetch("/api/firm");
+				const response = await fetch(
+					"https://workside-software.wl.r.appspot.com/api/firm",
+				);
 				const json = await response.json();
 				setFirmList(json);
 
@@ -122,8 +123,9 @@ const Admin = () => {
 			const fetchRigs = async () => {
 				// Set Wait Cursor
 				document.getElementById("root").style.cursor = "wait";
-				// const response = await fetch(`${apiUrl}/api/rig`);
-				const response = await fetch("/api/rig");
+				const response = await fetch(
+					"https://workside-software.wl.r.appspot.com/api/rig",
+				);
 				const json = await response.json();
 
 				setRigList(json);
@@ -142,8 +144,9 @@ const Admin = () => {
 				// Set Wait Cursor
 				document.getElementById("root").style.cursor = "wait";
 
-				// const response = await fetch(`${apiUrl}/api/contact`);
-				const response = await fetch("/api/contact");
+				const response = await fetch(
+					"https://workside-software.wl.r.appspot.com/api/contact",
+				);
 				setContactList(response.data);
 
 				// Set Default Cursor
@@ -156,8 +159,9 @@ const Admin = () => {
 			const fetchProducts = async () => {
 				// Set Wait Cursor
 				document.getElementById("root").style.cursor = "wait";
-				// const response = await fetch(`${apiUrl}/api/product`);
-				const response = await fetch("/api/product");
+				const response = await fetch(
+					"https://workside-software.wl.r.appspot.com/api/product",
+				);
 				const json = await response.json();
 
 				setProductList(json);
@@ -174,9 +178,9 @@ const Admin = () => {
 		useEffect(() => {
 			const fetchSupplierProducts = async () => {
 				// Set Wait Cursor
-				// document.getElementById("root").style.cursor = "wait";
-				// const response = await fetch(`${apiUrl}/api/supplierproduct`);
-				const response = await fetch("/api/supplierproduct");
+				const response = await fetch(
+					"https://workside-software.wl.r.appspot.com/api/supplierproduct",
+				);
 				const json = await response.json();
 
 				setSupplierProductList(json);
@@ -194,10 +198,12 @@ const Admin = () => {
 		}, [supplierProductDispatch]);
 
 		const handleFirmDelete = async () => {
-			// const response = await fetch(`${apiUrl}/api/firm/${selectedRecord}`, {
-			const response = await fetch(`/api/firm/${selectedRecord}`, {
-				method: "DELETE",
-			});
+			const response = await fetch(
+				`https://workside-software.wl.r.appspot.com/api/firm/${selectedRecord}`,
+				{
+					method: "DELETE",
+				},
+			);
 			const json = await response.json();
 
 			if (response.ok) {
@@ -211,10 +217,12 @@ const Admin = () => {
 		};
 
 		const handleContactDelete = async () => {
-			// const response = await fetch(`${apiUrl}/api/contact/${selectedRecord}`, {
-			const response = await fetch(`/api/contact/${selectedRecord}`, {
-				method: "DELETE",
-			});
+			const response = await fetch(
+				`https://workside-software.wl.r.appspot.com/api/contact/${selectedRecord}`,
+				{
+					method: "DELETE",
+				},
+			);
 			const json = await response.json();
 
 			// if (!response.ok) {
@@ -231,10 +239,12 @@ const Admin = () => {
 		};
 
 		const handleRigDelete = async () => {
-			// const response = await fetch(`${apiUrl}/api/rig/${selectedRecord}`, {
-			const response = await fetch(`/api/rig/${selectedRecord}`, {
-				method: "DELETE",
-			});
+			const response = await fetch(
+				`https://workside-software.wl.r.appspot.com/api/rig/${selectedRecord}`,
+				{
+					method: "DELETE",
+				},
+			);
 			const json = await response.json();
 
 			if (response.ok) {
@@ -247,10 +257,12 @@ const Admin = () => {
 		};
 
 		const handleProductDelete = async () => {
-			// const response = await fetch(`${apiUrl}/api/product/${selectedRecord}`, {
-			const response = await fetch(`/api/product/${selectedRecord}`, {
-				method: "DELETE",
-			});
+			const response = await fetch(
+				`https://workside-software.wl.r.appspot.com/api/product/${selectedRecord}`,
+				{
+					method: "DELETE",
+				},
+			);
 			const json = await response.json();
 
 			if (response.ok) {
@@ -288,14 +300,16 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						// const response = await fetch(`${apiUrl}/api/firm/`, {
-						const response = await fetch("/api/firm/", {
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
+						const response = await fetch(
+							"https://workside-software.wl.r.appspot.com/api/firm/",
+							{
+								method: "POST",
+								body: JSON.stringify(data),
+								headers: {
+									"Content-Type": "application/json",
+								},
 							},
-						});
+						);
 
 						const json = await response.json();
 
@@ -343,14 +357,16 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						// const response = await fetch(`${apiUrl}/api/contact/`, {
-						const response = await fetch(`/api/contact/`, {
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
+						const response = await fetch(
+							"https://workside-software.wl.r.appspot.com/api/contact/",
+							{
+								method: "POST",
+								body: JSON.stringify(data),
+								headers: {
+									"Content-Type": "application/json",
+								},
 							},
-						});
+						);
 
 						const json = await response.json();
 
@@ -399,14 +415,16 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						// const response = await fetch(`${apiUrl}/api/rig/`, {
-						const response = await fetch("/api/rig/", {
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
+						const response = await fetch(
+							"https://workside-software.wl.r.appspot.com/api/rig/",
+							{
+								method: "POST",
+								body: JSON.stringify(data),
+								headers: {
+									"Content-Type": "application/json",
+								},
 							},
-						});
+						);
 
 						const json = await response.json();
 
@@ -455,14 +473,16 @@ const Admin = () => {
 					const { data } = args;
 
 					if (insertFlag === true) {
-						// const response = await fetch(`${apiUrl}/api/product/`, {
-						const response = await fetch("/api/product/", {
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
+						const response = await fetch(
+							"https://workside-software.wl.r.appspot.com/api/product/",
+							{
+								method: "POST",
+								body: JSON.stringify(data),
+								headers: {
+									"Content-Type": "application/json",
+								},
 							},
-						});
+						);
 
 						const json = await response.json();
 
