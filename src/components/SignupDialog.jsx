@@ -1,154 +1,235 @@
 /* eslint-disable */
-/* eslint-disable react/react-in-jsx-scope */
-import { useState } from "react";
-// import axios from 'axios';
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-// import { useStateContext } from '../contexts/ContextProvider';
-import { useUserContext } from "../hooks/useUserContext";
 import { toast } from "react-toastify";
+import Select from "react-select";
 
 const SignupDialog = () => {
-  const [data, setData] = useState({
-    firstName: "",
-    lastName: "",
-    company: "",
-    email: "",
-    password: "",
-  });
-  const { usersData, dispatch } = useUserContext();
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
+	const [data, setData] = useState({
+		firstName: "",
+		lastName: "",
+		company: "",
+		phone: "",
+		email: "",
+		password: "",
+	});
 
-  const handleChange = ({ currentTarget: input }) => {
-    setData({ ...data, [input.name]: input.value });
-  };
+	const [options, setOptions] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const apiUrl = process.env.REACT_APP_MONGO_URI;
+	const [selectedOption, setSelectedOption] = useState(null);
+	const [error, setError] = useState("");
+	const navigate = useNavigate();
 
-				// const response = await fetch(`${apiUrl}/api/user/`, {
-				const response = await fetch("/api/user/", {
-					method: "POST",
-					body: JSON.stringify(data),
-					headers: {
-						"Content-Type": "application/json",
-					},
+	const handleChange = ({ currentTarget: input }) => {
+		setData({ ...data, [input.name]: input.value });
+	};
+
+	const handleSelectionChange = (selected) => {
+		setSelectedOption(selected.value);
+		setData({ ...data, company: selected.value });
+	};
+
+	const GetCompanyNames = async () => {
+		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
+		const json = await response.json();
+		if (response.ok) {
+			return json;
+		}
+		return;
+	};
+
+	useEffect(() => {
+		const fetchCompanyNames = async () => {
+			const companyNames = await GetCompanyNames();
+			if (companyNames) {
+				const options = companyNames.map((company) => {
+					return { value: company.name, label: company.name };
 				});
-    const json = await response.json();
-    if (response.ok) {
-      toast.success("Check Email...");
-      // dispatch({ type: "CREATE_USER", payload: json });
-      navigate("/login");
-    }
-  };
+				setOptions(options);
+			}
+		};
+		fetchCompanyNames();
+	}, []);
 
-  return (
-    // eslint-disable-next-line react/jsx-indent
-    <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black bg-opacity-25 backdrop-blur-sm">
-      <div
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        className="modalContainer"
-      >
-        <div className="bg-white rounded-2xl shadow-2xl flex flex-row w-full align-middle">
-          {/* Sign In Section */}
-          <div className="w-2/5 p-20">
-            <div className="text-left font-bold">
-              <span className="text-green-500">WORK</span>SIDE
-            </div>
-            <div className="bg-white w-72 p-2 flex flex-col items-center mb-3">
-              <h2 className="text-3xl font-bold text-green-500 mb-2">
-                Welcome Back!!
-              </h2>
-              <Link to="/login">
-                <button
-                  type="button"
-                  className="border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white"
-                >
-                  Sign In
-                </button>
-              </Link>
-            </div>
-          </div>
-          {/* Sign Up Section */}
-          <div className="w-2/5 p-5 bg-gray-500">
-            <div className="bg-gray-500 rounded-2xl shadow-2xl flex flex-col items-center w-full align-middle">
-              <div className="bg-gray-500 w-72 p-2 flex flex-col items-center mb-3">
-                <form
-                  className="flex flex-col items-center"
-                  onSubmit={handleSubmit}
-                >
-                  <h2 className="text-3xl font-bold text-green-500 mb-2">
-                    Create Account
-                  </h2>
-                  <input
-                    type="text"
-                    placeholder="First Name"
-                    name="firstName"
-                    onChange={handleChange}
-                    value={data.firstName}
-                    required
-                    // className="bg-gray-200 outline-none text-sm flex-1"
-                    className={styles.input}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Last Name"
-                    name="lastName"
-                    onChange={handleChange}
-                    value={data.lastName}
-                    required
-                    // className="bg-gray-200 outline-none text-sm flex-1"
-                    className={styles.input}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Company"
-                    name="company"
-                    onChange={handleChange}
-                    value={data.company}
-                    required
-                    // className="bg-gray-200 outline-none text-sm flex-1"
-                    className={styles.input}
-                  />
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    name="email"
-                    onChange={handleChange}
-                    value={data.email}
-                    required
-                    // className="bg-gray-200 outline-none text-sm flex-1"
-                    className={styles.input}
-                  />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    name="password"
-                    onChange={handleChange}
-                    value={data.password}
-                    required
-                    // className="bg-gray-200 outline-none text-sm flex-1"
-                    className={styles.input}
-                  />
-                  {error && <div className={styles.error_msg}>{error}</div>}
-                  <button
-                    type="submit"
-                    className="border-2 bg-white border-green-500 text-green-500 rounded-full px-12 py-3 inline-block font-semibold hover:bg-green-500 hover:text-white"
-                  >
-                    Sign Up
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+	const handleSubmit = async (e) => {
+		e.preventDefault();
+		if (data.firstName.length < 2 || data.firstName.length > 20) {
+			setError("First Name must be between 2 and 20 characters");
+			return;
+		}
+		if (data.lastName.length < 2 || data.lastName.length > 20) {
+			setError("Last Name must be between 2 and 20 characters");
+			return;
+		}
+		if (data.company.length < 2 || data.company.length > 20) {
+			setError("Company must be between 2 and 20 characters");
+			return;
+		}
+		if (data.phone.length < 10 || data.phone.length > 10) {
+			setError("Phone number must be 10 characters");
+			return;
+		}
+		if (data.email.length < 6 || data.email.length > 50) {
+			setError("Email must be between 6 and 50 characters");
+			return;
+		}
+		if (data.password.length < 6 || data.password.length > 20) {
+			setError("Password must be between 6 and 20 characters");
+			return;
+		}
+		const response = await fetch(
+			`${process.env.REACT_APP_MONGO_URI}/api/user/`,
+			{
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: {
+					"Content-Type": "application/json",
+				},
+			},
+		);
+		const json = await response.json();
+		if (response.ok) {
+			toast.success("Check Email to Validate...User Still Must Be Validated");
+			navigate("/login");
+		}
+	};
+
+	return (
+		<div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black bg-opacity-25 backdrop-blur-sm">
+			<div
+				onClick={(e) => {
+					e.stopPropagation();
+				}}
+				onKeyDown={(e) => {
+					if (e.key === "Enter") {
+						e.stopPropagation();
+					}
+				}}
+				className="modalContainer"
+			>
+				<div className="bg-white rounded-2xl shadow-2xl flex flex-row w-full align-middle">
+					{/* Sign In Section */}
+					<div className="w-2/5 p-20">
+						<div className="text-left font-bold text-3xl">
+							<span className="text-green-500">WORK</span>SIDE
+							<h2 className="text-3xl font-bold text-black mb-2 mt-3">
+								Welcome!!
+							</h2>
+						</div>
+					</div>
+					{/* Sign Up Section */}
+					<div className="w-2/5 p-5 bg-black">
+						<div className="bg-black rounded-2xl shadow-2xl flex flex-col items-center w-full align-middle">
+							<div className="bg-black w-72 p-2 flex flex-col items-center mb-3">
+								<form
+									className="flex flex-col items-center"
+									onSubmit={handleSubmit}
+								>
+									<h2 className="text-3xl font-bold text-green-500 mb-2">
+										Create Account
+									</h2>
+									<input
+										type="text"
+										placeholder="First Name"
+										name="firstName"
+										onChange={handleChange}
+										value={data.firstName}
+										required
+										className={styles.input}
+									/>
+									<input
+										type="text"
+										placeholder="Last Name"
+										name="lastName"
+										onChange={handleChange}
+										value={data.lastName}
+										required
+										className={styles.input}
+									/>
+									<div style={{ width: "300px" }}>
+										<Select
+											className="basic-single"
+											classNamePrefix="select"
+											defaultValue={selectedOption}
+											isDisabled={false}
+											onChange={handleSelectionChange}
+											// isLoading={isLoading}
+											// isClearable={isClearable}
+											// isRtl={isRtl}
+											// isSearchable={isSearchable}
+											name="company"
+											options={options}
+										/>
+									</div>
+									<input
+										type="text"
+										placeholder="Phone"
+										name="phone"
+										onChange={handleChange}
+										value={data.phone}
+										required
+										className={styles.input}
+									/>
+									<input
+										type="email"
+										placeholder="Email"
+										name="email"
+										onChange={handleChange}
+										value={data.email}
+										required
+										className={styles.input}
+									/>
+									<input
+										type="password"
+										placeholder="Password"
+										name="password"
+										onChange={handleChange}
+										value={data.password}
+										required
+										className={styles.input}
+									/>
+									{error && <div className={styles.error_msg}>{error}</div>}
+									<button
+										type="submit"
+										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg"
+									>
+										Sign Up
+									</button>
+									<button
+										type="button"
+										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
+										onClick={() => {
+											setData({
+												firstName: "",
+												lastName: "",
+												company: "",
+												phone: "",
+												email: "",
+												password: "",
+											});
+											setError("");
+										}}
+									>
+										Clear Form
+									</button>
+									<button
+										type="button"
+										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
+										onClick={() => {
+											window.location = "/login";
+										}}
+									>
+										Cancel
+									</button>
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default SignupDialog;

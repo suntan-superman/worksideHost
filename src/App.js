@@ -17,13 +17,13 @@ import {
 	SignupDialog,
 } from "./components";
 import {
-  Dashboard,
-  Projects,
-  Notifications,
-  Requests,
-  Admin,
-  Settings,
-  Scheduler,
+	Dashboard,
+	Projects,
+	Notifications,
+	Requests,
+	Admin,
+	Settings,
+	Scheduler,
 } from "./pages";
 import "./App.css";
 import PrivateRoutes from "./utils/PrivateRoutes";
