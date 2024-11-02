@@ -29,14 +29,15 @@ import "./App.css";
 import PrivateRoutes from "./utils/PrivateRoutes";
 
 import {
-  useStateContext,
-  ContactContextProvider,
-  FirmContextProvider,
-  RigContextProvider,
-  ProductContextProvider,
-  RequestContextProvider,
-  ProjectContextProvider,
-  SupplierProductContextProvider,
+	useStateContext,
+	ContactContextProvider,
+	FirmContextProvider,
+	RigContextProvider,
+	ProductContextProvider,
+	RequestContextProvider,
+	ProjectContextProvider,
+	ProjectRequestorsContextProvider,
+	SupplierProductContextProvider,
 } from "./contexts/ContextProvider";
 
 const App = () => {
@@ -53,8 +54,8 @@ const App = () => {
     setGlobalUserName,
   } = useStateContext();
   registerLicense(
-    "Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfdXVWQ2ZfV0V3WUc="
-  );
+			"Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE=",
+		);
   // Make sure token exists
   const [user, setUser] = useState(null);
 
@@ -178,11 +179,13 @@ const App = () => {
 								</RequestContextProvider>
 
 								<ProjectContextProvider>
-									<Routes>
-										<Route element={<PrivateRoutes />}>
-											<Route path="/projects" exact element={<Projects />} />
-										</Route>
-									</Routes>
+									<ProjectRequestorsContextProvider>
+										<Routes>
+											<Route element={<PrivateRoutes />}>
+												<Route path="/projects" exact element={<Projects />} />
+											</Route>
+										</Routes>
+									</ProjectRequestorsContextProvider>
 								</ProjectContextProvider>
 
 								<Routes>

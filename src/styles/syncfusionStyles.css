@@ -1,0 +1,11 @@
+    /* Change Grid styles */
+
+.e-grid .e-leftfreeze.e-freezeleftborder {
+    border-right-color: black;
+}
+    /* Change Tab styles */
+.e-tab .e-tab-header .e-indicator {
+    background: black;
+}
+
+ 

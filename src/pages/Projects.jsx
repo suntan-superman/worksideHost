@@ -29,7 +29,7 @@ const Projects = () => {
 
 	return (
 		<div>
-			<Header category="Workside" title="Administrative" />
+			<Header category="Workside" title="Projects" />
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
@@ -44,17 +44,12 @@ const Projects = () => {
 				<div className="e-content">
 					{/* Projects Tab */}
 					<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
-						{/* <div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start"> */}
 						<ProjectsTab />
 					</div>
-					{/* End of Companies Tab */}
-					{/* Rigs Tab */}
-					{/* <div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start"> */}
+					{/* Project Requestors Tab */}
 					<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
-						{/* <div>Tab 2</div> */}
 						<ProjectRequestorsTab />
 					</div>
-					{/* End of Supplier-Products Tab */}
 				</div>
 			</TabComponent>
 		</div>

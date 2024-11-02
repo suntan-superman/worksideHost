@@ -245,21 +245,6 @@ const ProjectsTab = () => {
 
 	return (
 		<div className="flex-grow bg-white p-2 relative">
-			{/*<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text"> */}
-			{/* <div className="absolute top-[50px] left-[20px] w-[140px] flex flex-row items-center justify-start"> */}
-			{/* <div className="absolute top-[100px] left-[20px] flex flex-row w-full"> */}
-			{/* <div>
-				{!haveData && (
-					<button type="button" onClick={fetchProjects}>
-						Load Projects
-					</button>
-				)}
-				{isLoading && (
-					<div className="absolute top-[50%] left-[50%]">
-						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
-					</div>
-				)}
-			</div> */}
 			{!isLoading && haveData && (
 				<div className="div-container">
 					<GridComponent

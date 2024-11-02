@@ -293,6 +293,44 @@ export const ProjectContextProvider = ({ children }) => {
   );
 };
 
+// Project Requestors Context
+
+export const ProjectRequestorsContext = createContext();
+
+export const projectRequestorsReducer = (state, action) => {
+	switch (action.type) {
+		case "GET_PROJECT_REQUESTORS":
+			return {
+				projectRequestorsData: action.payload,
+			};
+		case "CREATE_PROJECT_REQUESTORS":
+			return {
+				projectRequestorsData: [action.payload, ...state.projectRequestorsData],
+			};
+		case "DELETE_PROJECT_REQUESTORS":
+			return {
+				projectRequestorsData: state.projectRequestorsData.filter(
+					(c) => c._id !== action.payload._id,
+				),
+			};
+		default:
+			return state;
+	}
+};
+
+export const ProjectRequestorsContextProvider = ({ children }) => {
+	const [state, dispatch] = useReducer(projectRequestorsReducer, {
+		projectRequestorsData: null,
+	});
+
+	return (
+		// eslint-disable-next-line react/react-in-jsx-scope, react/jsx-no-constructed-context-values
+		<ProjectRequestorsContext.Provider value={{ ...state, dispatch }}>
+			{children}
+		</ProjectRequestorsContext.Provider>
+	);
+};
+
 // User Context
 
 export const UserContext = createContext();

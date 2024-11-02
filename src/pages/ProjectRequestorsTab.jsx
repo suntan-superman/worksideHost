@@ -5,11 +5,11 @@ import { TreeViewComponent } from "@syncfusion/ej2-react-navigations";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Select from "react-select";
-import Button from "@mui/material/Button";
+import Button from "../components/Button.jsx";
 import { MdOutlineRefresh } from "react-icons/md";
 import axios from "axios";
-// import { ContextMenuComponent } from "@syncfusion/ej2-react-popups";
 import "../index.css";
+import { toast } from "react-toastify";
 // import { Merge } from "@mui/icons-material";
 // import JsonDisplay from "./JsonDisplay";
 // import { expanded } from "@syncfusion/ej2-treegrid";
@@ -26,6 +26,7 @@ const ProjectRequestorsTab = () => {
 	const [addButtonEnabled, setAddButtonEnabled] = useState(false);
 	const [requestorName, setRequestorName] = useState("");
 	const [errorMsg, setErrorMsg] = useState("");
+	const [hasData, setHasData] = useState(false);
 
 	const [showPopup, setShowPopup] = useState(false);
 	const [selectedNodeData, setSelectedNodeData] = useState(null);
@@ -126,6 +127,7 @@ const ProjectRequestorsTab = () => {
 			const result = jsonResults.filter(
 				(jsonResult) =>
 					jsonResult.contactclass === "CUSTOMER" ||
+					// jsonResult.contactclass === "SUPPLIER" ||		// Do we need to add SUPPLIER?
 					jsonResult.contactclass === "RIGCOMPANY",
 			);
 			const extractedData = result.map((r) => ({
@@ -145,11 +147,6 @@ const ProjectRequestorsTab = () => {
 				const jsonResults = res.data;
 				setAssignedRequestorList(jsonResults);
 			});
-		// const response = await fetch(
-		// 	`${process.env.REACT_APP_MONGO_URI}/api/projectrequestor/`,
-		// );
-		// const jsonResults = await response.json();
-		// setAssignedRequestorList(jsonResults);
 	};
 
 	const MergeTreeData = () => {
@@ -173,8 +170,10 @@ const ProjectRequestorsTab = () => {
 				(requestor) => requestor.project_id === project._id,
 			),
 		}));
-		setTreeData(merged);
 		fetchAvailableRequestors();
+		setTreeData(merged);
+		setRefreshFlag(false);
+		// treeInstance.refresh();
 	};
 
 	useEffect(() => {
@@ -182,19 +181,23 @@ const ProjectRequestorsTab = () => {
 			// Set Wait Cursor
 			setIsLoading(true);
 			fetchProjects().then(() => {
-				// fetchAvailableRequestors();
+				fetchAvailableRequestors();
 				fetchAssignedRequestors();
 			});
 			setIsLoading(false);
 		};
 		GetData();
-	}, [refreshFlag]);
+		// }, [refreshFlag]);
+	}, []);
 
 	useEffect(() => {
 		const UpdateTree = async () => {
-			fetchAssignedRequestors();
+			fetchProjects().then(() => {
+				fetchAvailableRequestors();
+				fetchAssignedRequestors();
+			});
 			MergeTreeData();
-			setRefreshFlag(false);
+			setHasData(true);
 		};
 		UpdateTree();
 	}, [refreshFlag]);
@@ -260,22 +263,46 @@ const ProjectRequestorsTab = () => {
 		setIsLoading(false);
 	};
 
+	const RefreshData = () => {
+		setRefreshFlag(true);
+		// window.alert(`Tree Data: ${JSON.stringify(treeData)}`);
+	};
+
 	return (
-		<div className="flex-grow bg-white p-8 relative">
+		<div className="flex-grow bg-white p-2 relative">
+			<button
+				className="bg-gray-300 hover:bg-gray-500 text-black font-bold py-1 px-4 rounded mt-1"
+				type="button"
+				onClick={RefreshData}
+			>
+				Refresh
+			</button>
+			{/* <Button
+				icon={<MdOutlineRefresh />}
+				color="black"
+				bgHoverColor="light-red"
+				size="2xl"
+				borderRadius="50%"
+				onClick={RefreshData}
+			/> */}
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
 				</div>
 			)}
-			<TreeViewComponent
-				fields={fields}
-				style={{ fontSize: 24, fontWeight: 600 }}
-				nodeSelected={handleNodeSelect}
-				allowMultiSelection={false}
-				ref={(tree) => {
-					treeInstance = tree;
-				}}
-			/>
+			{hasData && (
+				<TreeViewComponent
+					fields={fields}
+					style={{ fontSize: 24, fontWeight: 600 }}
+					nodeSelected={handleNodeSelect}
+					allowMultiSelection={false}
+					// notificationSubscriptionNode={true}
+					// loadOnDemand={false}
+					ref={(tree) => {
+						treeInstance = tree;
+					}}
+				/>
+			)}
 			<div>
 				<Modal
 					open={open}
@@ -360,13 +387,6 @@ const ProjectRequestorsTab = () => {
 				</Modal>
 			</div>
 			<div>
-				<button
-					className="bg-gray-300 hover:bg-gray-700 hover:text-white text-black font-bold py-2 px-4 rounded"
-					type="button"
-					onClick={MergeTreeData}
-				>
-					Refresh
-				</button>
 				{/* <div>
 					<JsonDisplay data={treeData} />
 				</div> */}
