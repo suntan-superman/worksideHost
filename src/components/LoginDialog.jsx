@@ -38,8 +38,6 @@ const LoginDialog = () => {
 		e.preventDefault();
 		if (forgotPasswordChecked) {
 			setForgotPasswordFlag(true);
-			// toast.info("Forgot Password...Link will be send to your email.");
-			// window.location = "/forgotpassword";
 			return;
 		}
 		toast.info("Logging In...");
@@ -65,6 +63,11 @@ const LoginDialog = () => {
 				onSaveUserName(userName, email);
 				// Set Default Cursor
 				document.getElementById("root").style.cursor = "default";
+			}
+			else {
+				window.alert(jsonData.message);
+				document.getElementById("root").style.cursor = "default";
+				setIsLoggedIn(false);
 			}
 		} catch (error) {
 			// setIsLoading(false);
@@ -180,7 +183,7 @@ const LoginDialog = () => {
 								<button
 									type="button"
 									className={
-										!userName || !password
+										userName.length<6 || password.length<6
 											? disabledButtonStyle
 											: enabledButtonStyle
 									}
