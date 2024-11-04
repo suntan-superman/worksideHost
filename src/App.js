@@ -39,6 +39,7 @@ import {
 	ProjectRequestorsContextProvider,
 	SupplierProductContextProvider,
 } from "./contexts/ContextProvider";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const App = () => {
   const {
@@ -196,6 +197,7 @@ const App = () => {
 										<Route path="/login" element={<LoginDialog />} />
 									)}
 									<Route path="/" element={<Navigate replace to="/login" />} />
+									<Route path='/resetpassword' exact element={<ResetPasswordPage />} /> 
 									<Route element={<PrivateRoutes />}>
 										<Route path="/dashboard" exact element={<Dashboard />} />
 										<Route
@@ -204,7 +206,7 @@ const App = () => {
 											element={<Notifications />}
 										/>
 										{/* <Route path='/rigs' exact element={<RigCompanies />} />
-                  <Route path='/suppliers' exact element={<Suppliers />} /> */}
+                  	<Route path='/suppliers' exact element={<Suppliers />} /> */}
 										<Route path="/settings" exact element={<Settings />} />
 										<Route path="/scheduler" exact element={<Scheduler />} />
 										<Route

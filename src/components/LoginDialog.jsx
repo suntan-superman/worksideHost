@@ -1,5 +1,4 @@
 /* eslint-disable */
-// "use client";
 
 import React, { useState, useEffect } from "react";
 import { FaRegEnvelope } from "react-icons/fa";
@@ -8,45 +7,62 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { useStateContext } from "../contexts/ContextProvider";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 import "../index.css";
+import { set } from "lodash";
 // import CookieConsent from "./CookieConsent";
 // import { useCookies } from "react-cookie";
 
 const LoginDialog = () => {
-	const { setIsLoggedIn, setGlobalUserName } = useStateContext();
+	const { setIsLoggedIn, setGlobalUserName, setUserEmail, userEmail } = useStateContext();
 	const [userName, setUserName] = useState("");
 	const [password, setPassword] = useState("");
 	const [saveUserChecked, setSaveUserChecked] = useState(false);
+	const [forgotPasswordChecked, setForgotPasswordChecked] = useState(false);
+	const [forgotPasswordFlag, setForgotPasswordFlag] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
 
 	// const [cookies] = useCookies(["cookieConsent"]);
 
-	const onSaveUserName = (user) => {
+	const onSaveUserName = (user, email) => {
 		localStorage.setItem("loginName", user);
+		localStorage.setItem("email", email);
 	};
 
+	const dialogClose = () => {
+		setForgotPasswordFlag(false);
+		setForgotPasswordChecked(false);
+	};
+	
 	const onSignIn = async (e) => {
 		e.preventDefault();
+		if (forgotPasswordChecked) {
+			setForgotPasswordFlag(true);
+			// toast.info("Forgot Password...Link will be send to your email.");
+			// window.location = "/forgotpassword";
+			return;
+		}
 		toast.info("Logging In...");
 		localStorage.removeItem("logInFlag");
 		setErrorMsg("");
 		// Set Wait Cursor
 		document.getElementById("root").style.cursor = "wait";
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+		// const fetchString = `http://localhost:4000/api/user/${userName}?password=${password}`;
 		try {
 			const response = await fetch(fetchString);
 			const jsonData = await response.json();
 
 			if (jsonData.status === true) {
-				// window.alert(`User: ${JSON.stringify(jsonData.user)}`);
-				// TODO - Need to validate password
 				setIsLoggedIn(true);
 				localStorage.setItem("logInFlag", "true");
 				localStorage.setItem("token", jsonData.user.userToken);
 				setGlobalUserName(JSON.stringify(jsonData.user.user));
 				localStorage.setItem("userName", JSON.stringify(jsonData.user.user));
 				localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
-				onSaveUserName(userName);
+				const email = JSON.stringify(jsonData.user.email);
+				setUserEmail(email);
+				onSaveUserName(userName, email);
 				// Set Default Cursor
 				document.getElementById("root").style.cursor = "default";
 			}
@@ -67,6 +83,10 @@ const LoginDialog = () => {
 
 	const checkSaveUserHandler = () => {
 		setSaveUserChecked(!saveUserChecked);
+	};
+
+	const checkForgotPasswordHandler = () => {
+		setForgotPasswordChecked(!forgotPasswordChecked);
 	};
 
 	useEffect(() => {
@@ -142,7 +162,13 @@ const LoginDialog = () => {
 										Remember me
 									</label>
 									<label className="flex items-center text-xs">
-										<input type="checkbox" name="forgotpw" className="mr-1" />
+										<input
+											type="checkbox"
+											name="forgotpw"
+											className="mr-1"
+											checked={forgotPasswordChecked}
+											onChange={checkForgotPasswordHandler}
+										/>
 										Forgot Password?
 									</label>
 								</div>
@@ -153,26 +179,27 @@ const LoginDialog = () => {
 								)}
 								<button
 									type="button"
-									// className={
-									// 	!userName || !password ||
-									// 		? disabledButtonStyle
-									// 		: enabledButtonStyle
-									// }
 									className={
 										!userName || !password
 											? disabledButtonStyle
 											: enabledButtonStyle
 									}
 									onClick={onSignIn}
-									// disabled={!userName || !password || !cookies.cookieConsent}
 									disabled={!userName.length > 6 || !password.length > 6}
 								>
 									Sign In
 								</button>
 							</div>
 						</div>
-						{/* {!cookies.cookieConsent && <CookieConsent />}{" "} */}
 					</div>
+					{/* Forgot Password */}
+					{forgotPasswordFlag && (
+						<ForgotPasswordModal
+							open={forgotPasswordFlag}
+							onOK={dialogClose}
+							onClose={dialogClose}
+						/>
+					)}
 					{/* Sign Up Section */}
 					<div className="w-2/5 bg-green-500 text-white rounded-tr-2xl rounded-br-2xl p-5 py-36 px-12 justify-center items-center content-center flex-col">
 						<h2 className="text-3xl font-bold mb-2 text-center">

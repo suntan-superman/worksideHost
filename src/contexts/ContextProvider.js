@@ -20,6 +20,7 @@ export const ContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [globalUserName, setGlobalUserName] = useState("");
   const [deleteFlag, setDeleteFlag] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   const setMode = (e) => {
     setCurrentMode(e.target.value);
@@ -51,7 +52,7 @@ export const ContextProvider = ({ children }) => {
 					setCurrentColor,
 					setCurrentMode,
 					setMode,
-					setColor,
+					setColor, 
 					themeSettings,
 					setThemeSettings,
 					deleteFlag,
@@ -59,7 +60,9 @@ export const ContextProvider = ({ children }) => {
 					isLoggedIn,
 					setIsLoggedIn,
 					globalUserName,
-					setGlobalUserName,
+          setGlobalUserName,
+          userEmail,
+          setUserEmail,
 				}}
 			>
 				{children}
