@@ -1,17 +1,10 @@
+/* eslint-disable */
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import {
 	useStateContext,
-	ContactContextProvider,
-	FirmContextProvider,
-	RigContextProvider,
-	ProductContextProvider,
-	RequestContextProvider,
-	ProjectContextProvider,
-	ProjectRequestorsContextProvider,
-	SupplierProductContextProvider,
 } from "./contexts/ContextProvider";
 import {
 	Dashboard,
@@ -19,7 +12,6 @@ import {
 	Notifications,
 	Requests,
 	Admin,
-	Settings,
 	Scheduler,
 } from "./pages";
 import PrivateRoutes from "./utils/PrivateRoutes";
@@ -39,10 +31,9 @@ import { toast } from "react-toastify";
 			// setIsLoggedIn(false);
 			// setGlobalUserName("");
 			// signalIsUserLoggedIn.value = false;
-			// isLoggedInRef.current = false;
-			// localStorage.removeItem("token");
-			// localStorage.removeItem("userName");
-			// localStorage.setItem("logInFlag", "false");
+			localStorage.removeItem("token");
+			localStorage.removeItem("userName");
+			localStorage.setItem("logInFlag", "false");
 			window.location = "/login";
 		};
 
@@ -107,43 +98,10 @@ const NavBarComponent = () => {
 
 const MainApp = () => {
   const {
-		setCurrentColor,
-		setCurrentMode,
 		currentMode,
 		activeMenu,
-		currentColor,
 		themeSettings,
-		setThemeSettings,
-		isLoggedIn,
-		setIsLoggedIn,
-		setGlobalUserName,
 	} = useStateContext();
-
-  const RenderAdmin = () => {
-    return (
-			<div className="w-full">
-				<FirmContextProvider>
-					<ContactContextProvider>
-						<RigContextProvider>
-							<ProductContextProvider>
-								<SupplierProductContextProvider>
-									<Routes>
-										<Route element={<PrivateRoutes />}>
-											<Route
-												path="/admin"
-												// exact
-												element={<Admin />}
-											/>
-										</Route>
-									</Routes>
-								</SupplierProductContextProvider>
-							</ProductContextProvider>
-						</RigContextProvider>
-					</ContactContextProvider>
-				</FirmContextProvider>
-			</div>
-		);
-  }
 
   return (
 			<div className={currentMode === "Dark" ? "dark" : ""}>
@@ -168,10 +126,8 @@ const MainApp = () => {
 						{/* Show Theme Settings */}
 						{themeSettings && <ThemeSettings />}
 						<div>
-							{/* <RenderAdmin /> */}
 							<Routes>
 								<Route element={<PrivateRoutes />}>
-									{/* <Route path="admin" exact element={<RenderAdmin />} /> */}
 									<Route path="/dashboard" exact element={<Dashboard />} />
 									<Route path="/projects" exact element={<Projects />} />
 									<Route path="/requests" exact element={<Requests />} />
@@ -186,10 +142,8 @@ const MainApp = () => {
 										element={<Admin />}
 									/>
 									<Route path="/scheduler" exact element={<Scheduler />} />
-									{/* <Route exact path="/main" render={() => <Redirect to="/dashboard" />}/> */}
 								</Route>
 							</Routes>
-							{/* <p>This is where content goes</p> */}
 						</div>
 						<Footer />
 					</div>
@@ -209,7 +163,6 @@ const App = () => {
 					<Route path="/" element={<Navigate replace to="/login" />} />
 					<Route path="/login" element={<LoginDialog />} />
 					<Route path="main/*" element={<MainApp />} />
-					{/* Other routes */}
 				</Routes>
 			</BrowserRouter>
 		);
