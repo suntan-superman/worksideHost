@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ProjectsTab from "./ProjectsTab";
 import ProjectRequestorsTab from "./ProjectRequestorsTab";
+import useUserStore from '../stores/UserStore';
 
 import { Header } from "../components";
 import "../index.css";
@@ -26,6 +27,7 @@ const gridPageSize = 8;
 
 const Projects = () => {
 	const [isLoading, setIsLoading] = useState(false);
+  const accessLevel = useUserStore((state) => state.accessLevel);
 
 	return (
 		<div>
@@ -39,7 +41,9 @@ const Projects = () => {
 				{/* <TabItemsDirective> */}
 				<div className="e-tab-header">
 					<div className="text-xs font-bold">Projects</div>
-					<div className="text-xs font-bold">Requestors</div>
+					{accessLevel > 0 && (
+						<div className="text-xs font-bold">Requestors</div>
+					)}
 				</div>
 				<div className="e-content">
 					{/* Projects Tab */}
@@ -47,9 +51,11 @@ const Projects = () => {
 						<ProjectsTab />
 					</div>
 					{/* Project Requestors Tab */}
+					{accessLevel > 0 && (
 					<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
-						<ProjectRequestorsTab />
+							<ProjectRequestorsTab />
 					</div>
+					)}
 				</div>
 			</TabComponent>
 		</div>

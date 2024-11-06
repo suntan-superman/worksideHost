@@ -17,7 +17,6 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
-import { useRigContext } from "../hooks/useRigContext";
 import { Header } from "../components";
 import "../index.css";
 import { confirmAlert } from "react-confirm-alert";

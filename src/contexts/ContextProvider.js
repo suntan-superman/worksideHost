@@ -1,4 +1,5 @@
 /* eslint-disable */
+import { set } from "lodash";
 import React, { createContext, useContext, useState, useReducer } from "react";
 
 const StateContext = createContext();
@@ -21,6 +22,7 @@ export const ContextProvider = ({ children }) => {
   const [globalUserName, setGlobalUserName] = useState("");
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [accessLevel, setAccessLevel] = useState(0);
 
   const setMode = (e) => {
     setCurrentMode(e.target.value);
@@ -52,7 +54,7 @@ export const ContextProvider = ({ children }) => {
 					setCurrentColor,
 					setCurrentMode,
 					setMode,
-					setColor, 
+					setColor,
 					themeSettings,
 					setThemeSettings,
 					deleteFlag,
@@ -60,9 +62,11 @@ export const ContextProvider = ({ children }) => {
 					isLoggedIn,
 					setIsLoggedIn,
 					globalUserName,
-          setGlobalUserName,
-          userEmail,
-          setUserEmail,
+					setGlobalUserName,
+					userEmail,
+					setUserEmail,
+					accessLevel,
+					setAccessLevel,
 				}}
 			>
 				{children}

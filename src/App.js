@@ -1,33 +1,7 @@
-/* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { FiSettings } from "react-icons/fi";
-import { BsFillLockFill } from "react-icons/bs";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
-
-import { toast } from "react-toastify";
-
-import {
-	Navbar,
-	Footer,
-	Sidebar,
-	ThemeSettings,
-	LoginDialog,
-	SignupDialog,
-} from "./components";
-import {
-	Dashboard,
-	Projects,
-	Notifications,
-	Requests,
-	Admin,
-	Settings,
-	Scheduler,
-} from "./pages";
-import "./App.css";
-import PrivateRoutes from "./utils/PrivateRoutes";
-
 import {
 	useStateContext,
 	ContactContextProvider,
@@ -39,189 +13,207 @@ import {
 	ProjectRequestorsContextProvider,
 	SupplierProductContextProvider,
 } from "./contexts/ContextProvider";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-
-const App = () => {
-  const {
-    setCurrentColor,
-    setCurrentMode,
-    currentMode,
-    activeMenu,
-    currentColor,
-    themeSettings,
-    setThemeSettings,
-    isLoggedIn,
-    setIsLoggedIn,
-    setGlobalUserName,
-  } = useStateContext();
-  registerLicense(
-			"Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE=",
-		);
-  // Make sure token exists
-  const [user, setUser] = useState(null);
+import {
+	Dashboard,
+	Projects,
+	Notifications,
+	Requests,
+	Admin,
+	Settings,
+	Scheduler,
+} from "./pages";
+import PrivateRoutes from "./utils/PrivateRoutes";
+import {
+	LoginDialog, 
+  Sidebar,
+	Navbar,
+	ThemeSettings,
+	Footer,
+} from "./components";
+import { FiSettings } from "react-icons/fi";
+import { BsFillLockFill } from "react-icons/bs";
+import { toast } from "react-toastify";
 
   const onLogOut = () => {
-    toast.success("Logging Out...");
-    // toast.success(message, {
-    //   position: toast.POSITION.TOP_CENTER,
-    //   autoClose: 3000, //3 seconds
-    //   hideProgressBar: false,
-    //   closeOnClick: true,
-    //   pauseOnHover: true,
-    //   draggable: true,
-    //   transition: Slide
-    // });
-    setIsLoggedIn(false);
-    setGlobalUserName("");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.setItem("logInFlag", "false");
-    window.location = "/login";
-  };
+			toast.success("Logging Out...");
+			// setIsLoggedIn(false);
+			// setGlobalUserName("");
+			// signalIsUserLoggedIn.value = false;
+			// isLoggedInRef.current = false;
+			// localStorage.removeItem("token");
+			// localStorage.removeItem("userName");
+			// localStorage.setItem("logInFlag", "false");
+			window.location = "/login";
+		};
 
-  useEffect(() => {
-    // eslint-disable-next-line no-const-assign
-    // setUser(JSON.parse(localStorage.getItem('token')));
-    setUser(localStorage.getItem("userName"));
-    // const loggedInFLag = localStorage.getItem('logInFlag');
-    // setIsLoggedIn(!!loggedInFLag);
+const ThemeSettingButton = () => {
+  const {
+			currentColor,
+			setThemeSettings,
+		} = useStateContext();
 
-    const currentThemeColor = localStorage.getItem("colorMode");
-    const currentThemeMode = localStorage.getItem("themeMode");
-    if (currentThemeColor && currentThemeMode) {
-      setCurrentColor(currentThemeColor);
-      setCurrentMode(currentThemeMode);
-    }
-    console.log("Lets go from here");
-  }, []);
+    return (
+		<div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
+			<TooltipComponent content="Settings" position="Top">
+				<button
+					type="button"
+					onClick={() => setThemeSettings(true)}
+					style={{ background: currentColor, borderRadius: "50%" }}
+					className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+				>
+					<FiSettings />
+				</button>
+			</TooltipComponent>
+		</div>
+  );
+}
+
+const LogOutButton = () => {
+    const {
+					currentColor,
+				} = useStateContext();
+
+  return (
+    <div className="fixed left-4 bottom-4 pl-3" style={{ zIndex: "1000" }}>
+      <TooltipComponent content="Log Out" position="Top">
+        <button
+          type="button"
+          onClick={onLogOut}
+          style={{ background: currentColor, borderRadius: "50%" }}
+          className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+        >
+          <BsFillLockFill />
+        </button>
+      </TooltipComponent>
+    </div>
+  );
+}
+
+const SideBarComponent = () => {
+  return (
+		<div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+			<Sidebar />
+		</div>
+	);
+}
+
+const NavBarComponent = () => {
+  return (
+		<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+			<Navbar />
+		</div>
+  );
+}
+
+const MainApp = () => {
+  const {
+		setCurrentColor,
+		setCurrentMode,
+		currentMode,
+		activeMenu,
+		currentColor,
+		themeSettings,
+		setThemeSettings,
+		isLoggedIn,
+		setIsLoggedIn,
+		setGlobalUserName,
+	} = useStateContext();
+
+  const RenderAdmin = () => {
+    return (
+			<div className="w-full">
+				<FirmContextProvider>
+					<ContactContextProvider>
+						<RigContextProvider>
+							<ProductContextProvider>
+								<SupplierProductContextProvider>
+									<Routes>
+										<Route element={<PrivateRoutes />}>
+											<Route
+												path="/admin"
+												// exact
+												element={<Admin />}
+											/>
+										</Route>
+									</Routes>
+								</SupplierProductContextProvider>
+							</ProductContextProvider>
+						</RigContextProvider>
+					</ContactContextProvider>
+				</FirmContextProvider>
+			</div>
+		);
+  }
 
   return (
 			<div className={currentMode === "Dark" ? "dark" : ""}>
-				<BrowserRouter>
-					<div className="flex relative dark:bg-main-dark-bg">
-						{/* Settings Button */}
-						<div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
-							<TooltipComponent content="Settings" position="Top">
-								<button
-									type="button"
-									onClick={() => setThemeSettings(true)}
-									style={{ background: currentColor, borderRadius: "50%" }}
-									className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
-								>
-									<FiSettings />
-								</button>
-							</TooltipComponent>
+				<div className="flex relative dark:bg-main-dark-bg w-full">
+					{/* Theme Setting Button */}
+					<ThemeSettingButton />
+					{/* Log Out Button */}
+					<LogOutButton />
+					{/* Sidebar */}
+					<SideBarComponent />
+					{/* Navbar */}
+					<div
+						className={
+							activeMenu
+								? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full"
+								: "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2"
+						}
+					>
+						<div>
+							<NavBarComponent />
 						</div>
-						{/* Log Out Button */}
-						<div className="fixed left-4 bottom-4" style={{ zIndex: "1000" }}>
-							<TooltipComponent content="Log Out" position="Top">
-								<button
-									type="button"
-									onClick={onLogOut}
-									style={{ background: currentColor, borderRadius: "50%" }}
-									className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
-								>
-									<BsFillLockFill />
-								</button>
-							</TooltipComponent>
+						{/* Show Theme Settings */}
+						{themeSettings && <ThemeSettings />}
+						<div>
+							{/* <RenderAdmin /> */}
+							<Routes>
+								<Route element={<PrivateRoutes />}>
+									{/* <Route path="admin" exact element={<RenderAdmin />} /> */}
+									<Route path="/dashboard" exact element={<Dashboard />} />
+									<Route path="/projects" exact element={<Projects />} />
+									<Route path="/requests" exact element={<Requests />} />
+									<Route
+										path="/notifications"
+										exact
+										element={<Notifications />}
+									/>
+									<Route
+										path="/admin"
+										// exact
+										element={<Admin />}
+									/>
+									<Route path="/scheduler" exact element={<Scheduler />} />
+									{/* <Route exact path="/main" render={() => <Redirect to="/dashboard" />}/> */}
+								</Route>
+							</Routes>
+							{/* <p>This is where content goes</p> */}
 						</div>
-						{activeMenu ? (
-							<div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
-								<Sidebar />
-							</div>
-						) : (
-							<div className="w-0 dark:bg-secondary-dark-bg">
-								<Sidebar />
-							</div>
-						)}
-						<div
-							className={
-								activeMenu
-									? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full  "
-									: "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2 "
-							}
-						>
-							{/* Open Login Dialog Initially */}
-							<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-								<Navbar />
-							</div>
-							<div>
-								{themeSettings && <ThemeSettings />}
-								{/* <CustomerContextProvider>
-                <Routes>
-                  <Route element={<PrivateRoutes />}>
-                    <Route path='/customers' exact element={<Customers />} />
-                  </Route>
-                </Routes>
-              </CustomerContextProvider> */}
-
-								<FirmContextProvider>
-									<ContactContextProvider>
-										<RigContextProvider>
-											<ProductContextProvider>
-												<SupplierProductContextProvider>
-													<Routes>
-														<Route element={<PrivateRoutes />}>
-															<Route path="/admin" exact element={<Admin />} />
-														</Route>
-													</Routes>
-												</SupplierProductContextProvider>
-											</ProductContextProvider>
-										</RigContextProvider>
-									</ContactContextProvider>
-								</FirmContextProvider>
-
-								<RequestContextProvider>
-									<Routes>
-										<Route element={<PrivateRoutes />}>
-											<Route path="/requests" exact element={<Requests />} />
-										</Route>
-									</Routes>
-								</RequestContextProvider>
-
-								<ProjectContextProvider>
-									<ProjectRequestorsContextProvider>
-										<Routes>
-											<Route element={<PrivateRoutes />}>
-												<Route path="/projects" exact element={<Projects />} />
-											</Route>
-										</Routes>
-									</ProjectRequestorsContextProvider>
-								</ProjectContextProvider>
-
-								<Routes>
-									{!isLoggedIn && (
-										<Route path="/signup" element={<SignupDialog />} />
-									)}
-									{!isLoggedIn && (
-										<Route path="/login" element={<LoginDialog />} />
-									)}
-									<Route path="/" element={<Navigate replace to="/login" />} />
-									<Route path='/resetpassword' exact element={<ResetPasswordPage />} /> 
-									<Route element={<PrivateRoutes />}>
-										<Route path="/dashboard" exact element={<Dashboard />} />
-										<Route
-											path="/notifications"
-											exact
-											element={<Notifications />}
-										/>
-										{/* <Route path='/rigs' exact element={<RigCompanies />} />
-                  	<Route path='/suppliers' exact element={<Suppliers />} /> */}
-										<Route path="/settings" exact element={<Settings />} />
-										<Route path="/scheduler" exact element={<Scheduler />} />
-										<Route
-											path="/"
-											element={<Navigate replace to="/login" />}
-										/>
-									</Route>
-								</Routes>
-							</div>
-							<Footer />
-						</div>
+						<Footer />
 					</div>
-				</BrowserRouter>
+				</div>
 			</div>
 		);
 };
 
+const App = () => {
+ registerLicense(
+		"Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE=",
+	);
+
+  return (
+			<BrowserRouter>
+				<Routes>
+					<Route path="/" element={<Navigate replace to="/login" />} />
+					<Route path="/login" element={<LoginDialog />} />
+					<Route path="main/*" element={<MainApp />} />
+					{/* Other routes */}
+				</Routes>
+			</BrowserRouter>
+		);
+}
+
 export default App;
+

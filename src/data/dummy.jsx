@@ -19,27 +19,27 @@ export const links = [
 		links: [
 			{
 				name: "dashboard",
-				icon: <MdDashboard />,
+				icon: <MdDashboard style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "projects",
-				icon: <MdAccountTree />,
+				icon: <MdAccountTree style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "requests",
-				icon: <MdRequestPage />,
+				icon: <MdRequestPage style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "notifications",
-				icon: <MdNotifications />,
+				icon: <MdNotifications style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "admin",
-				icon: <MdSupervisorAccount />,
+				icon: <MdSupervisorAccount style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "scheduler",
-				icon: <AiOutlineCalendar />,
+				icon: <AiOutlineCalendar style={{ color: "green" }} size={24} />,
 			},
 		],
 	},

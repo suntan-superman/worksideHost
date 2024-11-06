@@ -1,36 +1,65 @@
-/* eslint-disable */
-
-import React from "react";
-import ReactDOM from 'react-dom';
-
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import './index.css';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import App from './App';
-import {
-  ContextProvider,
-  UserContextProvider,
-} from './contexts/ContextProvider';
+import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
+import {
+	useStateContext,
+	ContactContextProvider,
+	FirmContextProvider,
+	ProductContextProvider,
+	RequestContextProvider,
+	ProjectContextProvider,
+	ProjectRequestorsContextProvider,
+	SupplierProductContextProvider,
+} from "./contexts/ContextProvider";
+
+import {
+	ContextProvider,
+	UserContextProvider,
+} from "./contexts/ContextProvider";
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
 	<React.StrictMode>
 		<ContextProvider>
 			<UserContextProvider>
-				{/* <CustomerContextProvider> */}
-				<App />
-				<ToastContainer
-					position="top-right"
-					autoClose={5000}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick
-					draggable
-					pauseOnHover
-					theme="light"
-				/>
-				{/* </CustomerContextProvider> */}
+				<useStateContext>
+					<ContactContextProvider>
+						<FirmContextProvider>
+							<ProductContextProvider>
+								<RequestContextProvider>
+									<ProjectContextProvider>
+										<ProjectRequestorsContextProvider>
+											<SupplierProductContextProvider>
+												<App />
+												<ToastContainer
+													position="top-right"
+													autoClose={5000}
+													hideProgressBar={false}
+													newestOnTop={false}
+													closeOnClick
+													draggable
+													pauseOnHover
+													theme="light"
+												/>
+											</SupplierProductContextProvider>
+										</ProjectRequestorsContextProvider>
+									</ProjectContextProvider>
+								</RequestContextProvider>
+							</ProductContextProvider>
+						</FirmContextProvider>
+					</ContactContextProvider>
+				</useStateContext>
 			</UserContextProvider>
 		</ContextProvider>
 	</React.StrictMode>,
-	document.getElementById("root"),
 );
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();

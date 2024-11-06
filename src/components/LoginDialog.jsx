@@ -9,12 +9,24 @@ import { toast, ToastContainer } from "react-toastify";
 import { useStateContext } from "../contexts/ContextProvider";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import "../index.css";
-import { set } from "lodash";
+import useUserStore from "../stores/UserStore";
+import { signalAccessLevel } from "../stores/SignalStores";
 // import CookieConsent from "./CookieConsent";
 // import { useCookies } from "react-cookie";
 
 const LoginDialog = () => {
-	const { setIsLoggedIn, setGlobalUserName, setUserEmail, userEmail } = useStateContext();
+	const {
+		setIsLoggedIn,
+		setGlobalUserName,
+		setUserEmail,
+		userEmail,
+		accessLevel,
+		setAccessLevel,
+	} = useStateContext();
+	// const accessLevel = useUserStore((state) => state.accessLevel);
+	// const setAccessLevel = useUserStore((state) => state.setAccessLevel);
+	const setUserLoggedIn = useUserStore((state) => state.setUserLoggedIn);
+
 	const [userName, setUserName] = useState("");
 	const [password, setPassword] = useState("");
 	const [saveUserChecked, setSaveUserChecked] = useState(false);
@@ -33,7 +45,59 @@ const LoginDialog = () => {
 		setForgotPasswordFlag(false);
 		setForgotPasswordChecked(false);
 	};
-	
+
+	const isUserValidated = async (userName) => {
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
+		// const fetchString =
+		// 	"https://workside-software.wl.r.appspot.com/api/user/is-user-validated";
+		const res = await axios.post(fetchString, {
+			email: userName,
+			// email: userName.replace(/"/g, ''),
+		});
+		if (res.data.status === false) {
+			window.alert(`User Not Validated: ${userName}`);
+			// toast.error(res.data.message, {
+			//   autoClose: 5000,
+			//   position: "top-right",
+			// });
+			return false;
+		}
+		return true;
+	};
+
+	const getUserAccessLevel = async (userName) => {
+		// const fetchString = `https://workside-software.wl.r.appspot.com/api/contact/email/${userName}`;
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${userName}`;
+		let accessLevel = -1;
+
+		try {
+			const response = await fetch(fetchString);
+			const jsonData = await response.json().then((data) => {
+				switch (data[0].accesslevel) {
+					case "GUEST":
+						accessLevel = 0;
+						break;
+					case "STANDARD":
+						accessLevel = 1;
+						break;
+					case "POWER":
+						accessLevel = 2;
+						break;
+					case "ADMIN":
+						accessLevel = 3;
+						break;
+					default:
+						accessLevel = -1;
+						break;
+				}
+			});
+		} catch (error) {
+			console.error(error);
+			return -1;
+		}
+		return accessLevel;
+	};
+
 	const onSignIn = async (e) => {
 		e.preventDefault();
 		if (forgotPasswordChecked) {
@@ -50,38 +114,43 @@ const LoginDialog = () => {
 		try {
 			const response = await fetch(fetchString);
 			const jsonData = await response.json();
-
 			if (jsonData.status === true) {
-				setIsLoggedIn(true);
-				localStorage.setItem("logInFlag", "true");
-				localStorage.setItem("token", jsonData.user.userToken);
-				setGlobalUserName(JSON.stringify(jsonData.user.user));
-				localStorage.setItem("userName", JSON.stringify(jsonData.user.user));
-				localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
-				const email = JSON.stringify(jsonData.user.email);
-				setUserEmail(email);
-				onSaveUserName(userName, email);
-				// Set Default Cursor
-				document.getElementById("root").style.cursor = "default";
+				const validationFlag = await isUserValidated(userName);
+				if (validationFlag === true) {
+					const userAccessLevel = await getUserAccessLevel(userName).then(
+						(data) => {
+							setAccessLevel(data);
+							localStorage.setItem("accessLevel", data);
+							setIsLoggedIn(true);
+							setUserLoggedIn(true);
+							localStorage.setItem("logInFlag", "true");
+							localStorage.setItem("token", jsonData.user.userToken);
+							setGlobalUserName(JSON.stringify(jsonData.user.user));
+							localStorage.setItem("userName", JSON.stringify(jsonData.user.user));
+							localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
+							const email = JSON.stringify(jsonData.user.email);
+							setUserEmail(email);
+							onSaveUserName(userName, email);
+						},
+					);
+				}
 			}
 			else {
 				window.alert(jsonData.message);
 				document.getElementById("root").style.cursor = "default";
-				setIsLoggedIn(false);
+				window.location = "/login";
 			}
 		} catch (error) {
 			// setIsLoading(false);
 			window.alert(`Error: ${error}`);
 			console.error(error);
 			document.getElementById("root").style.cursor = "default";
-			setIsLoggedIn(false);
 			setErrorMsg(error.response.data.message);
 			localStorage.setItem("logInFlag", "false");
 			window.location = "/login";
 		}
-
 		document.getElementById("root").style.cursor = "default";
-		window.location = "/dashboard";
+		window.location = "/main/dashboard";
 	};
 
 	const checkSaveUserHandler = () => {

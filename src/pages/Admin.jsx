@@ -19,10 +19,8 @@ import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import { useContactContext } from "../hooks/useContactContext";
 import { useFirmContext } from "../hooks/useFirmContext";
-import { useRigContext } from "../hooks/useRigContext";
 import { useProductContext } from "../hooks/useProductContext";
 import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
-import RigsTab from "./RigsTab";
 import ValidateUsersTab from "./ValidateUsersTab";
 import { useStateContext } from "../contexts/ContextProvider";
 import axios from "axios";
@@ -60,7 +58,6 @@ const Admin = () => {
 		const toolbarOptions = ["Add", "Edit", "Delete"];
 		const { contactsData, dispatch: contactDispatch } = useContactContext();
 		const { firmData, dispatch: firmDispatch } = useFirmContext();
-		const { rigData, dispatch: rigDispatch } = useRigContext();
 		const { productData, dispatch: productDispatch } = useProductContext();
 		const { supplierProductData, dispatch: supplierProductDispatch } =
 			useSupplierProductContext();
@@ -121,24 +118,6 @@ const Admin = () => {
 			};
 			fetchFirms();
 		}, [firmDispatch]);
-
-		// useEffect(() => {
-		// 	const fetchRigs = async () => {
-		// 		setIsLoading(true);
-		// 		const response = await fetch(
-		// 			`${process.env.REACT_APP_MONGO_URI}/api/rig`,
-		// 		);
-		// 		const json = await response.json();
-
-		// 		setRigList(json);
-
-		// 		if (response.ok) {
-		// 			rigDispatch({ type: "GET_RIG", payload: json });
-		// 		}
-		// 		setIsLoading(true);
-		// 	};
-		// 	fetchRigs();
-		// }, [rigDispatch]);
 
 		useEffect(() => {
 			const fetchContacts = async () => {
@@ -379,61 +358,6 @@ const Admin = () => {
 			}
 		};
 
-		// const rigsActionComplete = async (args) => {
-		// 	if (!rigsGridRef) return;
-
-		// 	if (
-		// 		args.requestType === "beginEdit" ||
-		// 		args.requestType === "add" ||
-		// 		args.requestType === "update" ||
-		// 		args.requestType === "save" ||
-		// 		args.requestType === "delete"
-		// 	) {
-		// 		if (args.requestType === "beginEdit" || args.requestType === "add") {
-		// 			const { dialog } = args;
-		// 			dialog.header = "Workside Rigs";
-		// 		}
-		// 		if (args.requestType === "add") {
-		// 			// set insert flag
-		// 			setInsertFlag(true);
-		// 		}
-		// 		if (args.requestType === "update") {
-		// 			// set insert flag
-		// 			setInsertFlag(false);
-		// 		}
-		// 		if (args.requestType === "save") {
-		// 			// Save or Update Data
-		// 			const { data } = args;
-
-		// 			if (insertFlag === true) {
-		// 				const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/rig/`, {
-		// 					method: "POST",
-		// 					body: JSON.stringify(data),
-		// 					headers: {
-		// 						"Content-Type": "application/json",
-		// 					},
-		// 				});
-
-		// 				const json = await response.json();
-
-		// 				if (response.ok) {
-		// 					// console.log('Insert: ' + JSON.stringify(args.data));
-		// 					// dispatch({ type: 'CREATE_PRODUCT', payload: json });
-		// 				}
-		// 			} else {
-		// 				// dispatch({ type: 'CREATE_PRODUCT', payload: args.data });
-		// 				// console.log('Update: ' + JSON.stringify(args.data));
-		// 			}
-		// 			setInsertFlag(false);
-		// 		}
-		// 		if (args.requestType === "delete") {
-		// 			// Delete Data
-		// 			handleRigDelete();
-		// 			setInsertFlag(false);
-		// 		}
-		// 	}
-		// };
-
 		const productsActionComplete = async (args) => {
 			if (!productsGridRef) return;
 
@@ -608,16 +532,6 @@ const Admin = () => {
 				gridInstance.pageSettings.freeze = true;
 			}
 		};
-
-		// const onRigLoad = () => {
-		// 	const gridElement = document.getElementById("rigGridElement");
-		// 	if (gridElement?.ej2_instances[0]) {
-		// 		const gridInstance = gridElement.ej2_instances[0];
-		// 		gridInstance.pageSettings.pageSize = gridPageSize;
-		// 		gridInstance.pageSettings.frozenColumns = 3;
-		// 		gridInstance.pageSettings.freeze = true;
-		// 	}
-		// };
 
 		const onContactLoad = () => {
 			const gridElement = document.getElementById("contactGridElement");

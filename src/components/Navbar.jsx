@@ -1,9 +1,12 @@
+/* eslint-disable */
 import React, { useEffect } from 'react';
 import { AiOutlineMenu } from 'react-icons/ai';
 import { BsChatLeft } from 'react-icons/bs';
 import { RiNotification3Line } from 'react-icons/ri';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import useUserStore from '../stores/UserStore';
+import { signalAccessLevel } from "../stores/SignalStores";
 
 import avatar from '../data/avatar.jpg';
 // eslint-disable-next-line import/no-cycle
@@ -28,7 +31,10 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 );
 
 const Navbar = () => {
-  const { currentColor, activeMenu, setActiveMenu, handleClick, isClicked, setScreenSize, screenSize, globalUserName } = useStateContext();
+  const { currentColor, activeMenu, setActiveMenu, handleClick, isClicked, setScreenSize, screenSize, globalUserName, accessLevel } = useStateContext();
+  const [welcomePhrase, setWelcomePhrase] = React.useState("");
+  // const accessLevel = useUserStore((state) => state.accessLevel);
+  const [accessLabel, setAccessLabel] = React.useState("UNKNOWN"); 
 
   useEffect(() => {
     const handleResize = () => setScreenSize(window.innerWidth);
@@ -41,6 +47,28 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    const userName = localStorage.getItem('userName');
+    setWelcomePhrase(`Welcome, ${userName}`);
+    const accessLevel = Number(localStorage.getItem("accessLevel"));
+    switch (accessLevel) {
+      case 0:
+        setAccessLabel("GUEST");
+        break;
+      case 1:
+        setAccessLabel("STANDARD");
+        break;
+      case 2:
+        setAccessLabel("POWER");
+        break;
+      case 3:
+        setAccessLabel("ADMIN");
+        break;
+      default:
+        setAccessLabel("GUEST");
+    }
+  }, []);
+    
+  useEffect(() => {
     if (screenSize <= 900) {
       setActiveMenu(false);
     } else {
@@ -48,13 +76,10 @@ const Navbar = () => {
     }
   }, [screenSize]);
 
-  const userName = localStorage.getItem('userName');
-  if (userName) userName.replace('"', '');
-
   const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
   return (
-    <div className="flex justify-between p-2 md:ml-6 md:mr-6 relative">
+    <div className="flex justify-between p-2 md:ml-6 md:mr-6 ">
 
       <NavButton title="Menu" customFunc={handleActiveMenu} color={currentColor} icon={<AiOutlineMenu />} />
       <div className="flex">
@@ -64,22 +89,23 @@ const Navbar = () => {
           <div
             className="flex items-center gap-2 cursor-pointer p-1 hover:bg-light-gray rounded-lg"
             onClick={() => handleClick('userProfile')}
+            onKeyDown={(e) => { if (e.key === 'Enter') handleClick('userProfile'); }}
           >
-            <img
+            {/* <img
               className="rounded-full w-8 h-8"
               src={avatar}
               alt="user-profile"
-            />
+            /> */}
             <p>
-              <span className="text-gray-400 text-14">Hi,</span>{userName}
+              <span className="text-black font-bold text-14">{welcomePhrase}</span>
+              <br/>
               <span className="text-gray-400 font-bold ml-1 text-14">
-                {globalUserName}
+                Access Level: {accessLabel}
               </span>
             </p>
             <MdKeyboardArrowDown className="text-gray-400 text-14" />
           </div>
         </TooltipComponent>
-
         {isClicked.chat && (<Chat />)}
         {isClicked.notification && (<Notification />)}
         {isClicked.userProfile && (<UserProfile />)}

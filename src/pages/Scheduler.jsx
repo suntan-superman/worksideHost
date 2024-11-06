@@ -15,16 +15,16 @@ import {
 import { Header } from "../components";
 
 const Scheduler = () => {
-  <div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden">
-    <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-      <Header category="Workside" title="Scheduler" />
-      <ScheduleComponent>
-        <Inject
-          services={[Day, Week, WorkWeek, Month, Agenda, Resize, DragAndDrop]}
-        />
-      </ScheduleComponent>
-    </div>
-  </div>;
+  return (
+		<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+			<Header category="Workside" title="Scheduler" />
+			<ScheduleComponent>
+         <Inject services={[Day, Week, WorkWeek, Month, Agenda, Resize, DragAndDrop]} />
+     </ScheduleComponent>
+		</div>
+	);
 };
 
 export default Scheduler;
+
+
