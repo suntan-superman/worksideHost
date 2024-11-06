@@ -14,10 +14,11 @@ import {
 	Admin,
 	Scheduler,
 } from "./pages";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import {
-	LoginDialog, 
-  Sidebar,
+	LoginDialog,
+	Sidebar,
 	Navbar,
 	ThemeSettings,
 	Footer,
@@ -142,6 +143,11 @@ const MainApp = () => {
 										element={<Admin />}
 									/>
 									<Route path="/scheduler" exact element={<Scheduler />} />
+									<Route
+										path="/resetpassword"
+										exact
+										element={<ResetPasswordPage />}
+									/>
 								</Route>
 							</Routes>
 						</div>

@@ -19,7 +19,7 @@ import {
 
 const ResetPasswordPage = () => {
 	const [searchParams] = useSearchParams();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const name = searchParams.get("name");
   const email = searchParams.get("email");
   const token = searchParams.get("token");
@@ -69,4 +69,4 @@ const ResetPasswordPage = () => {
 	)
 }
 
-export default ResetPasswordPage
+export default ResetPasswordPage;
