@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable */
+import React from "react";
 import MapContainer from './MapContainer.jsx';
 
 function Maps(props) {

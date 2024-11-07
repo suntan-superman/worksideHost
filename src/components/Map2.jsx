@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable */ 
+import React from "react";
 import { GoogleMap, Marker } from '@react-google-maps/api';
 // import { MdLocalShipping,
 //   MdConstruction,
@@ -12,6 +13,8 @@ function Map2(props) {
 
   const reqLat = reqLocation.lat;
   const reqLng = reqLocation.lng;
+
+  window.alert(`reqLocation: ${JSON.stringify(reqLocation)} delLocation: ${JSON.stringify(delLocation)}`);
 
   const mapStyles = [
     {
@@ -191,35 +194,35 @@ function Map2(props) {
   ];
 
   return (
-    <GoogleMap
-      id="worksideRequestMap"
-      mapContainerStyle={{
-        height: '400px',
-        width: '800px',
-      }}
-      zoom={8}
-      reqLocation
-      center={{ lat: reqLat, lng: reqLng }}
-      options={{ styles: mapStyles }}
-    >
-      {/* Output the Rig Location */}
-      <Marker
-        key={0}
-        position={reqLocation}
-        icon={MyLocation}
-        title="Rig"
-        // onClick={() => props.onMarkerClick(marker)}
-      />
-      {/* Output the Supplier Location */}
-      <Marker
-        key={1}
-        position={delLocation}
-        icon={LocalShipping}
-        title="Supplier"
-        // onClick={() => props.onMarkerClick(marker)}
-      />
-    </GoogleMap>
-  );
+  <GoogleMap
+			id="worksideRequestMap"
+			mapContainerStyle={{
+				height: "400px",
+				width: "800px",
+			}}
+			zoom={8}
+			reqLocation
+			center={{ lat: reqLat, lng: reqLng }}
+			options={{ styles: mapStyles }}
+		>
+			{/* Output the Rig Location */}
+			<Marker
+				key={0}
+				position={reqLocation}
+				icon={MyLocation}
+				title="Rig"
+				// onClick={() => props.onMarkerClick(marker)}
+			/>
+			{/* Output the Supplier Location */}
+			<Marker
+				key={1}
+				position={delLocation}
+				icon={LocalShipping}
+				title="Supplier"
+				// onClick={() => props.onMarkerClick(marker)}
+			/>
+		</GoogleMap>
+   );
 }
 
 Map.defaultProps = {

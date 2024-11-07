@@ -16,15 +16,17 @@ import {
   Resize,
   Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { useStateContext } from "../contexts/ContextProvider";
-import RequestDetailsModal from "../components/RequestDetailsModal";
 
-const apiUrl = process.env.REACT_APP_MONGO_URI;
+import RequestInfoModal from "../components/RequestInfoModal";
+import { useStateContext } from "../contexts/ContextProvider";
+// import RequestDetailsModal from "../components/RequestDetailsModal";
 
 import { Header } from "../components";
 
 const gridPageSize = 8;
 let requestGrid = null;
+
+// TODO: All Primary Supplier Contact to add others to the list 
 
 const Requests = () => {
  		const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +42,8 @@ const Requests = () => {
   const toolbarOptions = ["Add", "Edit", "Delete"];
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
-  // const defaultDialogInstance = null;
-  // const PositioningInstance = null;
   const settings = { mode: "Row" };
-  const position = { X: "left", Y: "top" };
+  const position = { X: "center", Y: "center" };
   const dialogAnimationSettings = {
     effect: "FlipX",
     duration: 3000,
@@ -76,12 +76,14 @@ const Requests = () => {
     setShowDialog(true);
   };
 
-  // Set Location Type Selection Options
-  const companyOptions = [
-    { name: "Aera Energy", nameId: "1" },
-    { name: "Chevron", nameId: "2" },
-    { name: "CRC", nameId: "3" },
-  ];
+	// TODO Get Company Options from DB
+		// Set Location Type Selection Options
+		const companyOptions = [
+			{ name: "Aera Energy", nameId: "1" },
+			{ name: "Berry", nameId: "2" },
+			{ name: "Chevron", nameId: "3" },
+			{ name: "CRC", nameId: "4" },
+		];
 
   const companySelections = {
     params: {
@@ -98,8 +100,6 @@ const Requests = () => {
 				if (gridElement?.ej2_instances[0]) {
 					const gridInstance = gridElement.ej2_instances[0];
 					gridInstance.pageSettings.pageSize = gridPageSize;
-					// gridInstance.pageSettings.frozenColumns = 3;
-					// gridInstance.pageSettings.freeze = true;
 				}
   };
 
@@ -135,8 +135,6 @@ const Requests = () => {
       const rowObj = requestGrid.getRowObjectFromUID(
         closest(args.target, ".e-row").getAttribute("data-uid")
       );
-
-      // const selectedrowindex = requestGrid.getSelectedRowIndexes();
       setSelectedRecord(rowObj._id);
       setShowDialog(true);
     }
@@ -305,27 +303,11 @@ const Requests = () => {
 				</div>
 				<div>
 					{showDialog && (
-						<DialogComponent
-							id="requestDetailsDialog"
-							header="Workside Request Details"
-							visible={showDialog}
-							showCloseIcon
-							// show
-							width="400px"
-							height="800px"
-							open={dialogOpen}
-							close={dialogClose}
-							position={position}
-							dialogAnimationSettings={dialogAnimationSettings}
-							closeOnEscape
-						>
-							<RequestDetailsModal
-								recordID={selectedRecord}
-								open={showDialog}
-								onOK={dialogClose}
-								onClose={dialogClose}
-							/>
-						</DialogComponent>
+						<RequestInfoModal
+						recordID={selectedRecord}
+						open={dialogOpen}
+						onClose={dialogClose}
+					/>
 					)}
 				</div>
 			</div>

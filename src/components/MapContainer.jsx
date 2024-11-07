@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable */ 
+import React from "react";
 import Map2 from './Map2.jsx';
 
 // const MapContainer = ({ shownPin }) => {

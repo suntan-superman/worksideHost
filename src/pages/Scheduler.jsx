@@ -14,6 +14,9 @@ import {
 
 import { Header } from "../components";
 
+// TODO: Implement Scheduler component
+// Add Project and Requests to the Scheduler
+
 const Scheduler = () => {
   const [statusMsg, setStatusMsg] = useState(""); 
 

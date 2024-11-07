@@ -27,6 +27,8 @@ import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 
+// TODO: Implement privileges based on access level
+
   const onLogOut = () => {
 			toast.success("Logging Out...");
 			// setIsLoggedIn(false);

@@ -14,7 +14,6 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import MuiPhoneNumber from "material-ui-phone-number";
-import { DialogComponent } from "@syncfusion/ej2-react-popups";
 import {
 	Button,
 	Dialog,

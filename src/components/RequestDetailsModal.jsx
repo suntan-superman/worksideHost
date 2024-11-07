@@ -1,8 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { format } from 'date-fns';
-import Skeleton, { SkeletonText } from 'react-loading-skeleton';
-// import GoogleMapReact from 'google-map-react';
 import {
   useJsApiLoader,
   GoogleMap,
@@ -69,8 +67,8 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
     const fetchRequest = async () => {
       const apiUrl = process.env.REACT_APP_MONGO_URI;
 
-						// const fetchString = `${apiUrl}/api/request/${recordID}`;
-						const fetchString = `/api/request/${recordID}`;
+						const fetchString = `${apiUrl}/api/request/${recordID}`;
+						// const fetchString = `/api/request/${recordID}`;
 						// Set Wait Cursor
 						document.getElementById("root").style.cursor = "wait";
 						const response = await fetch(fetchString);
