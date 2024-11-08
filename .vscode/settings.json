@@ -1,6 +1,7 @@
 {
 	"cSpell.words": [
 		"accesslevel",
+		"contactclass",
 		"creationdate",
 		"Cust",
 		"customercontact",
@@ -15,8 +16,13 @@
 		"requestcategory",
 		"requestname",
 		"richtexteditor",
+		"rigclassification",
 		"rigcompany",
 		"rigcompanycontact",
+		"rigcompanyid",
+		"rigcompanyname",
+		"rigname",
+		"rignumber",
 		"selectedrowindex",
 		"statusdate",
 		"syncfusion",

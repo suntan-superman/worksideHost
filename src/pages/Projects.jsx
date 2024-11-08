@@ -1,19 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
-import {
-	GridComponent,
-	ColumnsDirective,
-	ColumnDirective,
-	Selection,
-	Edit,
-	Filter,
-	Inject,
-	Page,
-	Toolbar,
-	Resize,
-	Freeze,
-} from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
+import React, { useState } from "react";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ProjectsTab from "./ProjectsTab";
 import ProjectRequestorsTab from "./ProjectRequestorsTab";
@@ -37,27 +23,43 @@ const Projects = () => {
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
 				</div>
 			)}
-			<TabComponent cssClass="e-fill" headerPlacement="Top">
-				{/* <TabItemsDirective> */}
-				<div className="e-tab-header">
-					<div className="text-xs font-bold">Projects</div>
-					{accessLevel > 0 && (
-						<div className="text-xs font-bold">Requestors</div>
-					)}
+			{accessLevel > 2 && (
+				<div className="ml-2.5">
+					<TabComponent cssClass="e-fill" headerPlacement="Top">
+						{/* <TabItemsDirective> */}
+						<div className="e-tab-header">
+							<div className="text-xs font-bold">Projects</div>
+							<div className="text-xs font-bold">Requestors</div>
+						</div>
+						<div className="e-content">
+							{/* Projects Tab */}
+							<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
+								<ProjectsTab />
+							</div>
+							{/* Project Requestors Tab */}
+							<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
+								<ProjectRequestorsTab />
+							</div>
+						</div>
+					</TabComponent>
 				</div>
-				<div className="e-content">
-					{/* Projects Tab */}
-					<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
-						<ProjectsTab />
-					</div>
-					{/* Project Requestors Tab */}
-					{accessLevel > 0 && (
-					<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
-							<ProjectRequestorsTab />
-					</div>
-					)}
+			)}
+			{accessLevel <= 2 && (
+				<div className="ml-2.5">
+					<TabComponent cssClass="e-fill" headerPlacement="Top">
+						{/* <TabItemsDirective> */}
+						<div className="e-tab-header">
+							<div className="text-xs font-bold">Projects</div>
+						</div>
+						<div className="e-content">
+							{/* Projects Tab */}
+							<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
+								<ProjectsTab />
+							</div>
+						</div>
+					</TabComponent>
 				</div>
-			</TabComponent>
+			)}
 		</div>
 	);
 };

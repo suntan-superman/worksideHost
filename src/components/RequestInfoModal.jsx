@@ -14,16 +14,21 @@ import Draggable from "react-draggable";
 // import {
 // 	LoadScript,
 // } from "@react-google-maps/api";
-
+import mapStyles from "./MapStyles";
 import { format } from "date-fns";
 // import CustomMap from "./Map";
-import { APIProvider, Map as GoogleMap } from "@vis.gl/react-google-maps";
+import {
+	APIProvider,
+	Map as GoogleMap,
+	Marker,
+	AdvancedMarker,
+} from "@vis.gl/react-google-maps";
+import { MyLocation, LocalShipping } from "@mui/icons-material";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+// import { Truck } from "@mui/icons-material";
+// import { Construction } from "@mui/icons-material";
 
-const RequestInfoModal = ({
-	recordID,
-	open,
-	onClose,
-}) => {
+const RequestInfoModal = ({ recordID, open, onClose }) => {
 	if (!open || !recordID) return null;
 
 	const [customerName, setCustomerName] = useState(null);
@@ -33,9 +38,10 @@ const RequestInfoModal = ({
 	const [dateTimeRequested, setDateTimeRequested] = useState(null);
 	const [mapContainer, setMapContainer] = useState(null);
 
-  const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+	const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
+	const mapKey = process.env.REACT_APP_GOOGLE_MAPS_KEY;
 
-  const reqLocation = {
+	const reqLocation = {
 		lat: 35.2,
 		lng: -119.3,
 	};
@@ -45,17 +51,44 @@ const RequestInfoModal = ({
 		lng: -118.9,
 	};
 
-	  // function outputMap() {
-		// 		const [map, setMap] = useState();
-		// 		const ref = useRef();
+	// Create Material UI icons as SVG elements
+	// const truckIcon = document.createElement("div");
+	// truckIcon.innerHTML = LocalShipping({
+	// 	fontSize: "large",
+	// 	style: { color: "blue" },
+	// }).props.children;
 
-		// 		return (
-		// 			<>
-		// 				<div ref={ref} id="map" />
-		// 				{map}
-		// 			</>
-		// 		);
-		// 	}
+	// const constructionIcon = document.createElement("div");
+	// constructionIcon.innerHTML = MyLocation({
+	// 	fontSize: "large",
+	// 	style: { color: "orange" },
+	// }).props.children;
+
+	// Create the first AdvancedMarkerView with the truck icon
+	// const truckMarker = new google.maps.marker.AdvancedMarkerView({
+	// 	position: { delLocation },
+	// 	content: truckIcon,
+	// 	title: "Truck Location",
+	// });
+
+	// Create the second AdvancedMarkerView with the construction icon
+	// const constructionMarker = new google.maps.marker.AdvancedMarkerView({
+	// 	position: { reqLocation },
+	// 	content: constructionIcon,
+	// 	title: "Construction Location",
+	// });
+
+	// function outputMap() {
+	// 		const [map, setMap] = useState();
+	// 		const ref = useRef();
+
+	// 		return (
+	// 			<>
+	// 				<div ref={ref} id="map" />
+	// 				{map}
+	// 			</>
+	// 		);
+	// 	}
 
 	useEffect(() => {
 		const fetchRequest = async () => {
@@ -67,9 +100,7 @@ const RequestInfoModal = ({
 			setCustomerName(
 				JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
 			);
-			setRigCompany(
-				JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"),
-			);
+			setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
 			setRequestName(
 				JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
 			);
@@ -135,12 +166,27 @@ const RequestInfoModal = ({
 				<div className="map_box">
 					<APIProvider apiKey={apiKey}>
 						<GoogleMap
-							style={{ width: "100vw", height: "100vh" }}
-							defaultCenter={{ lat: 22.54992, lng: 0 }}
-							defaultZoom={3}
+							// key={"5064698848aecbfb "}
+							mapId={"DEMO_ID"}
+							style={{ width: "500px", height: "500px" }}
+							defaultCenter={reqLocation}
+							defaultZoom={8}
 							gestureHandling={"greedy"}
-							disableDefaultUI={true}
-						/>
+							options={{ styles: mapStyles }}
+						>
+							{/* <truckMarker /> */}
+							<AdvancedMarker
+								position={reqLocation}
+								gestureHandling={"greedy"}
+								icon={MyLocation}
+								title="Rig"
+							/>
+							<AdvancedMarker
+								position={delLocation}
+								icon={<LocationOnIcon />}
+								title="Delivery"
+							/>
+						</GoogleMap>
 					</APIProvider>
 					{/* <LoadScript
 						id="script-loader"

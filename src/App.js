@@ -63,9 +63,7 @@ const ThemeSettingButton = () => {
 }
 
 const LogOutButton = () => {
-    const {
-					currentColor,
-				} = useStateContext();
+  const { currentColor } = useStateContext();
 
   return (
     <div className="fixed left-4 bottom-4 pl-3" style={{ zIndex: "1000" }}>
@@ -100,11 +98,7 @@ const NavBarComponent = () => {
 }
 
 const MainApp = () => {
-  const {
-		currentMode,
-		activeMenu,
-		themeSettings,
-	} = useStateContext();
+  const { currentMode, activeMenu, themeSettings } = useStateContext();
 
   return (
 			<div className={currentMode === "Dark" ? "dark" : ""}>

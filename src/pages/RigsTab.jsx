@@ -27,7 +27,6 @@ const gridPageSize = 8;
 
 const RigsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const [haveData, setHaveData] = useState(false);
 	// const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
 	// const [filteredProjects, setFilteredProjects] = useState(null);
 	let rigsGridRef = useRef(null);

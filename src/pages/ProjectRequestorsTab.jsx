@@ -347,12 +347,12 @@ const ProjectRequestorsTab = () => {
 												/>
 											</div>
 											{errorMsg.length === 0 && (
-												<p className="text-center text-xs pt-1">
+												<p className="text-center text-sm pt-1">
 													Name Entered Must Match Requestor Name
 												</p>
 											)}
 											{errorMsg.length > 0 && (
-												<p className="text-center text-xs pt-1 text-red-500">
+												<p className="text-center text-sm pt-1 text-red-500">
 													{errorMsg}
 												</p>
 											)}
@@ -365,7 +365,7 @@ const ProjectRequestorsTab = () => {
 							<div className="flex items-center justify-center">
 								{selectedNodeData.parentID === null ? (
 									<button
-										className="bg-green-300 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3"
+										className="bg-green-300 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 										type="button"
 										disabled={!addButtonEnabled}
 										onClick={handleAddRequestor}
@@ -374,7 +374,7 @@ const ProjectRequestorsTab = () => {
 									</button>
 								) : (
 									<button
-										className="bg-red-300 hover:bg-red-700 text-black font-bold py-1 px-4 rounded mt-3"
+										className="bg-red-300 hover:bg-red-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 										type="button"
 										onClick={handleDeleteRequestor}
 									>
