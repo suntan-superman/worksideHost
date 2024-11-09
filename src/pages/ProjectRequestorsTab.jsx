@@ -5,14 +5,12 @@ import { TreeViewComponent } from "@syncfusion/ej2-react-navigations";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import Select from "react-select";
-import Button from "../components/Button.jsx";
-import { MdOutlineRefresh } from "react-icons/md";
 import axios from "axios";
 import "../index.css";
 import { toast } from "react-toastify";
-// import { Merge } from "@mui/icons-material";
-// import JsonDisplay from "./JsonDisplay";
-// import { expanded } from "@syncfusion/ej2-treegrid";
+
+// TODO Need to Add FIlter Options for Requestors
+// TODO FIlter by Date, By Status
 
 const ProjectRequestorsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -31,7 +29,7 @@ const ProjectRequestorsTab = () => {
 	const [showPopup, setShowPopup] = useState(false);
 	const [selectedNodeData, setSelectedNodeData] = useState(null);
 
-	let treeInstance = useRef(null);
+	const treeObj = useRef(null);
 
 	const [open, setOpen] = useState(false);
 
@@ -61,7 +59,20 @@ const ProjectRequestorsTab = () => {
 				requestOptions,
 			);
 			const jsonData = await response.json();
-			window.alert(`Data Deleted: ${JSON.stringify(jsonData)}`);
+			if (response.status === 200) {
+				toast.success(
+					`Requestor ${jsonData.userFirstName} ${jsonData.userLastName} Deleted...`,
+				);
+
+				if (treeObj.current) {
+					treeObj.current.removeNodes([jsonData._id]); // Pass the node ID to delete
+				}
+
+				// Update treeData state to exclude the deleted node
+				setTreeData((prevData) =>
+					prevData.filter((item) => item.id !== jsonData._id),
+				);
+			}
 		} catch (error) {
 			window.alert(`Error: ${error}`);
 			console.error(error);
@@ -173,7 +184,6 @@ const ProjectRequestorsTab = () => {
 		fetchAvailableRequestors();
 		setTreeData(merged);
 		setRefreshFlag(false);
-		// treeInstance.refresh();
 	};
 
 	useEffect(() => {
@@ -253,6 +263,18 @@ const ProjectRequestorsTab = () => {
 				`${process.env.REACT_APP_MONGO_URI}/api/projectrequestor/`,
 				requestOptions,
 			);
+			const jsonData = await response.json().then((data) => {
+				// Define the new node data
+				const newNode = {
+					id: data._id, // Unique ID for the new node
+					pid: selectedNodeData.id, // Parent ID for the new node
+					// value: data._id,
+					label: `${data.firstname} ${data.lastname}`,
+				};
+				if (treeObj.current !== null) {
+					treeObj.current.addNodes([newNode], selectedNodeData.id);
+				}
+			});
 			// const jsonData = await response.json();
 			setIsLoading(false);
 		} catch (error) {
@@ -298,9 +320,10 @@ const ProjectRequestorsTab = () => {
 					allowMultiSelection={false}
 					// notificationSubscriptionNode={true}
 					// loadOnDemand={false}
-					ref={(tree) => {
-						treeInstance = tree;
-					}}
+					ref={treeObj}
+					// ref={(tree) => {
+					// 	treeObj = tree;
+					// }}
 				/>
 			)}
 			<div>

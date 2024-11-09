@@ -6,7 +6,12 @@ import Box from "@mui/material/Box";
 import Select from "react-select";
 import Modal from "@mui/material/Modal";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "../index.css";
+import { Merge } from "@mui/icons-material";
+
+// TODO Need to Add FIlter Options for Rigs
+// TODO FIlter by Area, Company
 
 const NewRigsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,7 +30,7 @@ const NewRigsTab = () => {
 	const [showPopup, setShowPopup] = useState(false);
 	const [selectedNodeData, setSelectedNodeData] = useState(null);
 
-	let treeInstance = useRef(null);
+	const treeObj = useRef(null);
 
 	const [open, setOpen] = useState(false);
 
@@ -35,17 +40,17 @@ const NewRigsTab = () => {
 
 	const handleAddRig = () => {
 		onPostData();
+		MergeTreeData();
 		setOpen(false);
 	};
 
 	const DeleteRig = async () => {
-		setIsLoading(true);
-
 		const id = selectedNodeData.id;
 		const requestOptions = {
 			method: "DELETE",
 			headers: { "Content-Type": "application/json" },
 		};
+		setErrorMsg("");
 
 		try {
 			const response = await fetch(
@@ -53,22 +58,29 @@ const NewRigsTab = () => {
 				requestOptions,
 			);
 			const jsonData = await response.json();
-			// window.alert(`Data Deleted: ${JSON.stringify(jsonData)}`);
+			if (response.status === 200) {
+				toast.success(`Rig ${jsonData.rigname} Deleted...`);
+
+				if (treeObj.current) {
+					treeObj.current.removeNodes([jsonData._id]); // Pass the node ID to delete
+				}
+
+				// Update treeData state to exclude the deleted node
+				setTreeData((prevData) =>
+					prevData.filter((item) => item.id !== jsonData._id),
+				);
+			}
 		} catch (error) {
 			window.alert(`Error: ${error}`);
 			console.error(error);
 		}
-		setIsLoading(false);
 	};
 
 	const handleDeleteRig = () => {
-		// window.alert(
-		// 	`Requestor Name: ${requestorName} Selected Node: ${selectedNodeData.text}`,
-		// );
 		if (rigName.toLowerCase() === selectedNodeData.text.toLowerCase()) {
-			// Strings are equal (case-insensitive)
+			DeleteRig();
 			setErrorMsg("");
-			// DeleteRig();
+			MergeTreeData();
 			setOpen(false);
 		} else {
 			setErrorMsg("Rig Name Does Not Match");
@@ -112,14 +124,11 @@ const NewRigsTab = () => {
 	const fetchRigs = async () => {
 		axios.get(`${process.env.REACT_APP_MONGO_URI}/api/rig/`).then((res) => {
 			const jsonResults = res.data;
-			// window.alert(`Fetch Rigs: ${JSON.stringify(jsonResults)}`);
 			setRigList(jsonResults);
 		});
 	};
 
 	const MergeTreeData = () => {
-		// window.alert(`Rig Companies: ${JSON.stringify(rigCompanyList)}`);
-		// window.alert(`Rigs: ${JSON.stringify(rigList)}`);
 		const updatedRigs = rigList.map((rigs) => ({
 			...rigs,
 			id: rigs._id.toString(),
@@ -139,19 +148,27 @@ const NewRigsTab = () => {
 			),
 		}));
 		setTreeData(merged);
-
-		// fetchAvailableRequestors();
-		// setTreeData(merged);
-		// setRefreshFlag(false);
-		// treeInstance.refresh();
+		// window.alert(JSON.stringify(merged));
+		// if (treeObj.current !== null) {
+		// 	const updatedTreeData = treeObj.current.getTreeData();
+		// 	treeObj.current.refresh();
+		// 	// fetchAvailableRequestors();
+		// 	// setTreeData(merged);
+		// 	treeObj.current.fields = {
+		// 		dataSource: updatedTreeData,
+		// 		// dataSource: refreshFlag ? merged : treeData,
+		// 		id: "id",
+		// 		text: "label",
+		// 		child: "subChild",
+		// 	};
+		// 	setRefreshFlag(!refreshFlag);
+		// }
 	};
 
 	const GetData = async () => {
 		// setIsLoading(true);
 		fetchRigCompanies().then(() => {
-			fetchRigs().then(() => {
-				// window.alert(`Get Data Rigs: ${JSON.stringify(rigList)}`);
-			});
+			fetchRigs().then(() => {});
 		});
 		MergeTreeData();
 		setHasData(true);
@@ -162,9 +179,9 @@ const NewRigsTab = () => {
 		GetData();
 	}, []);
 
-	useEffect(() => {
-		GetData();
-	}, [refreshFlag]);
+	// useEffect(() => {
+	// 	GetData();
+	// }, [refreshFlag]);
 
 	const selectList = [
 		{ value: "MAJOR", label: "MAJOR" },
@@ -187,10 +204,6 @@ const NewRigsTab = () => {
 		setShowPopup(true);
 	};
 
-	const findById = (id) => {
-		return rigList.find((item) => item._id === id);
-	};
-
 	const validateData = () => {
 		if (rigName === "") {
 			setErrorMsg("Rig Name is Required");
@@ -210,12 +223,6 @@ const NewRigsTab = () => {
 	const handleSelectionChange = (selected) => {
 		setSelectedOption(selected.value);
 		setAddButtonEnabled(validateData());
-		// selected.value is user_id
-		// const idToFind = selected.value;
-		// window.alert(
-		// 	`Selected User Id: ${selected.value}\nSelected Node Id: ${selectedNodeData.id}`,
-		// );
-		// Search for the object with the matching id
 	};
 
 	const onPostData = async () => {
@@ -242,10 +249,16 @@ const NewRigsTab = () => {
 				requestOptions,
 			);
 			const jsonData = await response.json().then((data) => {
-				// const response = await fetch(
-				// 	`${process.env.REACT_APP_MONGO_URI}/api/rig/`,
-				// 	requestOptions,
-				// );
+				// Define the new node data
+				const newNode = {
+					id: data._id, // Unique ID for the new node
+					pid: selectedNodeData.id, // Parent ID for the new node
+					value: data._id,
+					label: data.rigname,
+				};
+				if (treeObj.current) {
+					treeObj.current.addNodes([newNode], selectedNodeData.id);
+				}
 			});
 			setIsLoading(false);
 		} catch (error) {
@@ -258,8 +271,6 @@ const NewRigsTab = () => {
 
 	const RefreshData = () => {
 		MergeTreeData();
-		setRefreshFlag(true);
-		// window.alert(`Tree Data: ${JSON.stringify(treeData)}`);
 	};
 
 	return (
@@ -290,11 +301,12 @@ const NewRigsTab = () => {
 				style={{ fontSize: 24, fontWeight: 600 }}
 				nodeSelected={handleNodeSelect}
 				allowMultiSelection={false}
-				// notificationSubscriptionNode={true}
+				// notificationSubscriptionMode={true}
 				// loadOnDemand={false}
-				ref={(tree) => {
-					treeInstance = tree;
-				}}
+				ref={treeObj}
+				// ref={(tree) => {
+				// 	treeInstance = tree;
+				// }}
 			/>
 			{/* )} */}
 			<div>
