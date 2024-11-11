@@ -31,8 +31,6 @@ let filteredProjects = null;
 const ProjectsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [haveData, setHaveData] = useState(false);
-	// const { currentColor, deleteFlag, setDeleteFlag } = useStateContext();
-	// const [filteredProjects, setFilteredProjects] = useState(null);
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const editOptions = {

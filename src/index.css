@@ -51,7 +51,7 @@ body{
 
 /* Customize Tab */
 
-.e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-wrap {
+/* .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-wrap {
   background: #08c;
 }
 .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-text,
@@ -67,7 +67,19 @@ body{
   .e-tab-wrap:hover
   .e-tab-icon {
   color: gray;
+} */
+
+.e-tab.e-fill .e-tab-header {
+    border-bottom: 8px Solid gray;
 }
+/* 
+.e-tab .e-tab-header .e-toolbar-item:not(.e-active) .e-tab-wrap:hover {
+  background: #f2f2f2;
+  color: #000;
+} */
+/* .e-tab .e-tab-header .e-indicator {
+    background: gray;
+} */
 
 errorMsgStyle {
     width: 370px;

@@ -8,4 +8,17 @@
     background: black;
 }
 
+.e-tab.e-fill .e-tab-header {
+    border-bottom: 2px Solid #20b716;
+}
+.e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-wrap {
+    background: #E5E7EB;
+  }
+  .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-text,
+  .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-icon,
+  .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-wrap:hover .e-tab-text,
+  .e-tab.e-fill .e-tab-header .e-toolbar-item.e-active .e-tab-wrap:hover .e-tab-icon {
+    color: gray;
+  }
+
  
