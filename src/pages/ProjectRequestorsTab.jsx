@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 const ProjectRequestorsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);
+	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);
 	const [projectList, setProjectList] = useState([]);
 	const [requestorList, setRequestorList] = useState([]);
 	const [assignedRequestorList, setAssignedRequestorList] = useState([]);
@@ -184,6 +185,7 @@ const ProjectRequestorsTab = () => {
 		fetchAvailableRequestors();
 		setTreeData(merged);
 		setRefreshFlag(false);
+		setNeedRefreshFlag(true);
 	};
 
 	useEffect(() => {
@@ -208,6 +210,7 @@ const ProjectRequestorsTab = () => {
 			});
 			MergeTreeData();
 			setHasData(true);
+			setNeedRefreshFlag(false);
 		};
 		UpdateTree();
 	}, [refreshFlag]);
@@ -293,7 +296,7 @@ const ProjectRequestorsTab = () => {
 	return (
 		<div className="flex-grow bg-white p-2 relative">
 			<button
-				className="bg-gray-300 hover:bg-gray-500 text-black font-bold py-1 px-4 rounded mt-1"
+				className={`${needRefreshFlag ? "bg-yellow-300" : "bg-green-500"} text-black font-bold py-1 px-4 rounded mt-1 text-sm`}
 				type="button"
 				onClick={RefreshData}
 			>

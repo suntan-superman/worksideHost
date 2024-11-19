@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ProjectsTab from "./ProjectsTab";
 import ProjectRequestorsTab from "./ProjectRequestorsTab";
+import ProjectDocumentsTab from "./ProjectDocumentsTab";
 import useUserStore from '../stores/UserStore';
 
 import { Header } from "../components";
@@ -30,6 +31,7 @@ const Projects = () => {
 						<div className="e-tab-header">
 							<div className="text-xs font-bold">Projects</div>
 							<div className="text-xs font-bold">Requestors</div>
+							<div className="text-xs font-bold">Documents</div>
 						</div>
 						<div className="e-content">
 							{/* Projects Tab */}
@@ -39,6 +41,10 @@ const Projects = () => {
 							{/* Project Requestors Tab */}
 							<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
 								<ProjectRequestorsTab />
+							</div>
+							{/* Project Documents Tab */}
+							<div className="absolute top-[10px] left-[10px] w-[100%] flex flex-row items-center justify-start">
+								<ProjectDocumentsTab />
 							</div>
 						</div>
 					</TabComponent>

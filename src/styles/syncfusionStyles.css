@@ -3,7 +3,23 @@
 .e-grid .e-leftfreeze.e-freezeleftborder {
     border-right-color: black;
 }
-    /* Change Tab styles */
+
+.tree-control_wrapper {
+  max-width: 500px;
+  margin: auto;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+}
+
+.mytree.e-treeview .e-list-item.e-active > .e-text-content .e-list-text {
+  line-height: 22px; /* Adjust it according to your requirement */
+  color: green; /* Change selected text color */
+}
+.mytree.e-treeview .e-list-item.e-active > .e-fullrow {
+  background-color: #D1D5DB; /* Change background color of selected node */
+}
+
+/* Change Tab styles */
 .e-tab .e-tab-header .e-indicator {
     background: black;
 }
