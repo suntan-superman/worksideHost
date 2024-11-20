@@ -21,7 +21,7 @@ import useUserStore from "../stores/UserStore";
 import "../index.css";
 import "../App.css";
 
-const gridPageSize = 10;
+let gridPageSize = 10;
 
 const ContactsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
@@ -50,6 +50,11 @@ const ContactsTab = () => {
 			setContactList(json);
 		};
 		fetchContacts();
+	}, []);
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
 	const handleContactDelete = async () => {

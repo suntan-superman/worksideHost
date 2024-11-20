@@ -2,14 +2,10 @@
 import React, { useEffect } from "react";
 import { Header } from "../components";
 import { worksideData } from "../data/dummy";
-// TODO Remove this for production
-// import { useCookies } from "react-cookie";
 import useUserStore from "../stores/UserStore";
 
 const Dashboard = () => {
 	const dashboardTitle = "Dashboard";
-	// TODO Remove this for production
-	const [localAccessLevel, setLocalAccessLevel] = React.useState(0);
 	const accessLevel = useUserStore((state) => state.accessLevel);
 	const setAccessLevel = useUserStore((state) => state.setAccessLevel);
 
@@ -19,10 +15,8 @@ const Dashboard = () => {
 	/////////////////////////////////////////////////////////////////
 	useEffect(() => {
 		const level = localStorage.getItem("accessLevel");
-		setLocalAccessLevel(level);
 		setAccessLevel(level);
-		// window.alert(`Access Level: ${localAccessLevel} zAccessLevel: ${accessLevel} Level: ${level}`);	
-	}, []);
+	}, [setAccessLevel]);
 
 	// Beautiful Dashboard
 	return (

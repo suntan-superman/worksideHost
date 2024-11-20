@@ -56,7 +56,7 @@ const customStyles = {
 ///////////////////////////////////////////////////////////////////
 // const apiUrl = process.env.REACT_APP_API_URL;
 
-const gridPageSize = 10;
+let gridPageSize = 10;
 
 const ValidateUsersTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -94,6 +94,11 @@ const ValidateUsersTab = () => {
 		status: "",
 		comment: "",
 	});
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
 
 	useEffect(() => {
 		const fetchUsers = async () => {

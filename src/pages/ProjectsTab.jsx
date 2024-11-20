@@ -24,7 +24,7 @@ import { confirmAlert } from "react-confirm-alert";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
-const gridPageSize = 8;
+let gridPageSize = 8;
 
 let filteredProjects = null;
 
@@ -45,6 +45,12 @@ const ProjectsTab = () => {
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
 	let projectsGrid = null;
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
+
 
 	const fetchProjects = async () => {
 		// Set Wait Cursor

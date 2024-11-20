@@ -24,7 +24,7 @@ import "../App.css";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
-const gridPageSize = 10;
+let gridPageSize = 10;
 
 const FirmsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -82,6 +82,11 @@ const FirmsTab = () => {
 			query: new Query(),
 		},
 	};
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
 
 	useEffect(() => {
 		const fetchFirms = async () => {
@@ -264,7 +269,6 @@ const FirmsTab = () => {
 					rowSelected={rowSelectedFirm}
 					editSettings={editOptions}
 					enablePersistence
-					// pageSize={gridPageSize}
 					frozenColumns={2}
 					load={onFirmLoad}
 					width="95%"

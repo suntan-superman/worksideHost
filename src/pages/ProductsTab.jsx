@@ -20,7 +20,7 @@ import useUserStore from "../stores/UserStore";
 import "../index.css";
 import "../App.css";
 
-const gridPageSize = 10;
+let gridPageSize = 10;
 
 const ProductsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
@@ -39,6 +39,12 @@ const ProductsTab = () => {
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
+
 
 	useEffect(() => {
 		const fetchProducts = async () => {

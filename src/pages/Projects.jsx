@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ProjectsTab from "./ProjectsTab";
 import ProjectRequestorsTab from "./ProjectRequestorsTab";
@@ -10,11 +10,18 @@ import { Header } from "../components";
 import "../index.css";
 import "../App.css";
 
-const gridPageSize = 8;
+let gridPageSize = 8;
 
 const Projects = () => {
 	const [isLoading, setIsLoading] = useState(false);
   const accessLevel = useUserStore((state) => state.accessLevel);
+
+	
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
+
 
 	return (
 		<div>

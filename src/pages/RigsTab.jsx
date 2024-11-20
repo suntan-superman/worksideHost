@@ -23,7 +23,7 @@ import { confirmAlert } from "react-confirm-alert";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
-const gridPageSize = 8;
+let gridPageSize = 8;
 
 const RigsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -44,6 +44,11 @@ const RigsTab = () => {
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
 	const rigsGrid = null;
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
 
 	useEffect(() => {
 		const fetchRigs = async () => {
@@ -179,8 +184,6 @@ const RigsTab = () => {
 				toolbar={toolbarOptions}
 				rowSelected={rowSelectedRig}
 				enablePersistence
-				// pageSize={gridPageSize}
-				// frozenColumns={2}
 				load={onRigLoad}
 				width="95%"
 				ref={(g) => {

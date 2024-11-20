@@ -34,7 +34,7 @@ const LoginDialog = () => {
 	const [forgotPasswordFlag, setForgotPasswordFlag] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
 
-	// const [cookies] = useCookies(["cookieConsent"]);
+	const isFormValid = userName.trim() !== "" && password.trim() !== "";
 
 	const onSaveUserName = (user, email) => {
 		localStorage.setItem("loginName", user);
@@ -169,7 +169,7 @@ const LoginDialog = () => {
 	}, []);
 
 	const enabledButtonStyle =
-		"border-2 border-green-500 text-green-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white";
+		"bg-green-500 border-2 border-black-500 text-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white";
 	const disabledButtonStyle =
 		"border-2 border-gray-500 text-gray-500 rounded-full px-12 py-2 inline-block font-semibold hover:bg-gray-500 hover:text-white";
 
@@ -206,6 +206,7 @@ const LoginDialog = () => {
 										type="email"
 										name="email"
 										placeholder="Email"
+										tabIndex={1}
 										value={userName}
 										onChange={(e) => setUserName(e.target.value)}
 										className="bg-gray-200 outline-none text-sm flex-1"
@@ -251,12 +252,10 @@ const LoginDialog = () => {
 								<button
 									type="button"
 									className={
-										userName.length<6 || password.length<6
-											? disabledButtonStyle
-											: enabledButtonStyle
+										isFormValid ? enabledButtonStyle : disabledButtonStyle
 									}
 									onClick={onSignIn}
-									disabled={!userName.length > 6 || !password.length > 6}
+									disabled={!isFormValid}
 								>
 									Sign In
 								</button>

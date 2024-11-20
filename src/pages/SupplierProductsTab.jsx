@@ -20,7 +20,7 @@ import useUserStore from "../stores/UserStore";
 import "../index.css";
 import "../App.css";
 
-const gridPageSize = 10;
+let gridPageSize = 10;
 
 const SupplierProductsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
@@ -41,21 +41,27 @@ const SupplierProductsTab = () => {
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
 
+	
 	useEffect(() => {
-		const fetchProducts = async () => {
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product`,
-			);
-			const json = await response.json();
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
 
-			setProductList(json);
+useEffect(() => {
+	const fetchProducts = async () => {
+		const response = await fetch(
+			`${process.env.REACT_APP_MONGO_URI}/api/product`,
+		);
+		const json = await response.json();
 
-			if (response.ok) {
-				productDispatch({ type: "GET_PRODUCTS", payload: json });
-			}
-		};
-		fetchProducts();
-	}, [productDispatch]);
+		setProductList(json);
+
+		if (response.ok) {
+			productDispatch({ type: "GET_PRODUCTS", payload: json });
+		}
+	};
+	fetchProducts();
+}, [productDispatch]);
 
 	useEffect(() => {
 		const fetchSupplierProducts = async () => {

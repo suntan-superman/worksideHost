@@ -23,7 +23,7 @@ import { useStateContext } from "../contexts/ContextProvider";
 
 import { Header } from "../components";
 
-const gridPageSize = 8;
+let gridPageSize = 8;
 let requestGrid = null;
 
 // TODO: All Primary Supplier Contact to add others to the list 
@@ -49,6 +49,11 @@ const Requests = () => {
     duration: 3000,
     delay: 1000,
   };
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
 
   useEffect(() => {
     const fetchRequests = async () => {

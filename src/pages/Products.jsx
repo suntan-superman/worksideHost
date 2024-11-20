@@ -18,7 +18,7 @@ import "../index.css";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
-// const gridPageSize = 12;
+let gridPageSize = 12;
 
 const Products = () => {
  	const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +38,13 @@ const Products = () => {
   // const [emptyFields, setEmptyFields] = useState([]);
   const settings = { mode: "Row" };
   let grid = null;
+
+  
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -167,6 +174,7 @@ const Products = () => {
 						rowSelected={rowSelectedProduct}
 						editSettings={editOptions}
 						width="auto"
+						gridPageSize={gridPageSize}
 						// eslint-disable-next-line no-return-assign
 						ref={(g) => {
 							grid = g;
