@@ -8,6 +8,7 @@ import {
 // import { TextField } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
+import { MdFilterList } from "react-icons/md";
 
 import {
 	Button,
@@ -17,23 +18,18 @@ import {
 	DialogActions,
 } from "@mui/material";
 import FormGroup from "@mui/material/FormGroup";
-// import FormControlLabel from "@mui/material/FormControlLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import { red, blue, green, grey, common } from "@mui/material/colors";
 
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import axios from "axios";
 import "../index.css";
 import { toast } from "react-toastify";
-import { set } from "lodash";
-// import { Delete } from "@mui/icons-material";
-// import { Form } from "react-router-dom";
 
 // TODO Need to Add FIlter Options for Documents
 // TODO FIlter by Date, By Status
-
-// TODO Add File Upload for Documents
-// TODO Add File View
-// TODO Add File Download and Store to MongoDB
 
 const ProjectDocumentsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -44,30 +40,35 @@ const ProjectDocumentsTab = () => {
 	const [treeData, setTreeData] = useState([]);
 	const [errorMsg, setErrorMsg] = useState("");
 	const [hasData, setHasData] = useState(false);
-	const [documentName, setDocumentName] = useState("");
 	const [docDescription, setDocDescription] = useState("");
 	const [currentFile, setCurrentFile] = useState(null);
 	const [documentPath, setDocumentPath] = useState("");
 	const [viewDocFlag, setViewDocFlag] = useState(false);
 	const [rightClickFlag, setRightClickFlag] = useState(false);
+	const [showFilterDialog, setShowFilterDialog] = useState(false);
 
 	const [selectedNodeData, setSelectedNodeData] = useState(null);
 	const [selectedNodeLabel, setSelectedNodeLabel] = useState("");
+	const [modalOpen, setModalOpen] = useState(false);
 
 	const treeObj = useRef(null);
 	let menuObj = useRef(null);
 	const cssClass = "mytree";
 
-	const [modalOpen, setModalOpen] = useState(false);
+	
+	const [filterData, setFilterData] = useState({
+		allProjects: true,
+		activeProjects: false,
+		pendingProjects: false,
+		canceledProjects: false,
+		postponedProjects: false,
+	});
 
 	const handleOpen = () => {
 		setModalOpen(true);
 	};
 
 	const handleAddDocument = async () => {
-		// TODO - Add Save Document to Project and Refresh Tree
-		// Need To Confirm The Selected Node and Selected Document
-		// onPostData();
 		const userID = localStorage.getItem("userID");
 
 		if (userID === null) {
@@ -91,17 +92,16 @@ const ProjectDocumentsTab = () => {
 
 		setIsLoading(true);
 		try {
-			// TODO set back to apiURL
-			const response = await fetch("http://localhost:4000/api/document", {
-				method: "POST",
-				body: formData,
-			});
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/document`,
+				{
+					method: "POST",
+					body: formData,
+				},
+			);
 
-			const jsonData = await response.json();
 			setIsLoading(false);
-			// window.alert(`Data Posted: ${JSON.stringify(jsonData)}`);
 			setRefreshFlag(true);
-			// setData(jsonData);
 		} catch (error) {
 			setIsLoading(false);
 			window.alert(`Error: ${error}`);
@@ -111,44 +111,57 @@ const ProjectDocumentsTab = () => {
 	};
 
 	const handleDeleteDocument = () => {
-		// TBD - Add Save Document to Project and Refresh Tree
-		// Need To Confirm The Selected Node and Selected Document
-		// onPostData();
+		DeleteDocument();
+		setSelectedNodeData(null);
 		setModalOpen(false);
 	};
 
 	const DeleteDocument = async () => {
 		setIsLoading(true);
+		const userID = localStorage.getItem("userID");
+		const accessLevel = Number(localStorage.getItem("accessLevel"));
+
+		if (userID === null) {
+			window.alert("User Not Logged In");
+			return;
+		}
 
 		const id = selectedNodeData.id;
-		const requestOptions = {
-			method: "DELETE",
-			headers: { "Content-Type": "application/json" },
-		};
-
+		const owner_id = userID;
+		// window.alert(`ID: ${id} Owner: ${owner_id} Access: ${accessLevel}`);
 		try {
-			// TODO set back to apiURL
-			const response = await fetch(
-				`http://localhost:4000/api/document/${id}`,
-				requestOptions,
-			);
-			// const response = await fetch(
-			// 	`${process.env.REACT_APP_MONGO_URI}/api/document/${id}`,
-			// 	requestOptions,
-			// );
-			const jsonData = await response.json();
-			if (response.status === 200) {
-				toast.success("Document Deleted...");
+			await axios
+				.delete("http://localhost:4000/api/document/", {
+					data: {
+						id: id,
+						owner_id: owner_id,
+						accessLevel: accessLevel,
+					},
+				})
+				.then((response) => {
+					if (response.status === 200) {
+						toast.success("Document Deleted...");
 
-				if (treeObj.current) {
-					treeObj.current.removeNodes([jsonData._id]); // Pass the node ID to delete
-				}
+						if (treeObj.current) {
+							treeObj.current.removeNodes([response.data._id]); // Pass the node ID to delete
+						}
 
-				// Update treeData state to exclude the deleted node
-				setTreeData((prevData) =>
-					prevData.filter((item) => item.id !== jsonData._id),
-				);
-			}
+						// Update treeData state to exclude the deleted node
+						setTreeData((prevData) =>
+							prevData.filter((item) => item.id !== response.data._id),
+						);
+
+						if (treeObj.current) {
+							treeObj.current.removeNodes([response.data._id]); // Pass the node ID to delete
+						}
+
+						// Update treeData state to exclude the deleted node
+						setTreeData((prevData) =>
+							prevData.filter((item) => item.id !== response.data._id),
+						);
+						setNeedRefreshFlag(true);
+					}
+				});
 		} catch (error) {
 			window.alert(`Error: ${error}`);
 			console.error(error);
@@ -177,13 +190,15 @@ const ProjectDocumentsTab = () => {
 	const fetchProjects = async () => {
 		// TODO set back to apiURL
 		try {
-			await axios.get("http://localhost:4000/api/project/").then((res) => {
-				if (res.status === 200) {
-					const jsonResults = res.data;
-					setProjectList(jsonResults);
-					// window.alert(jsonResults);
-				}
-			});
+			await axios
+				.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
+				.then((res) => {
+					if (res.status === 200) {
+						const jsonResults = res.data;
+						setProjectList(jsonResults);
+						// window.alert(jsonResults);
+					}
+				});
 			// await axios
 			// 	.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
 			// 	.then((res) => {
@@ -197,7 +212,7 @@ const ProjectDocumentsTab = () => {
 
 	const fetchDocuments = async () => {
 		// TODO set back to apiURL
-		const fetchString = "http://localhost:4000/api/document/";
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/document/`;
 
 		try {
 			axios.get(fetchString).then((res) => {
@@ -314,7 +329,7 @@ const ProjectDocumentsTab = () => {
 		try {
 			// TODO set back to apiURL
 			const response = await fetch(
-				"http://localhost:4000/api/document/",
+				`${process.env.REACT_APP_MONGO_URI}/api/document/`,
 				requestOptions,
 			);
 			// const response = await fetch(
@@ -363,30 +378,14 @@ const ProjectDocumentsTab = () => {
 		};
 
 		const result = await axios.post(
-			"http://localhost:4000/api/document",
+			`${process.env.REACT_APP_MONGO_URI}/api/document`,
 			requestOptions,
-			// {
-			//   headers: { "Content-Type": "multipart/form-data" },
-			// }
 		);
 		console.log(result);
 		if (result.data.status === 200) {
 			alert("Uploaded Successfully!!!");
 			// getPdf();
 		}
-
-		// const fileInput = document.createElement("input");
-		// fileInput.type = "file";
-		// fileInput.accept = ".pdf";
-		// fileInput.onchange = (e) => {
-		// 	const file = e.target.files[0];
-		// 	const reader = new FileReader();
-		// 	reader.onload = (e) => {
-		// 		setDocumentPath(e.target.result);
-		// 	};
-		// 	reader.readAsDataURL(file);
-		// };
-		// fileInput.click();
 	};
 
 	//Render the context menu with target as Treeview
@@ -430,7 +429,7 @@ const ProjectDocumentsTab = () => {
 			const id = selectedNodeData.id;
 
 			// TODO: Update the URL to the backend endpoint
-			const apiURL = `localhost:4000/api/document/${id}`;
+			const apiURL = `${process.env.REACT_APP_MONGO_URI}/api/document/${id}`;
 			const requestOptions = {
 				method: "GET",
 				// headers: { "Content-Type": "application/json" },
@@ -440,7 +439,7 @@ const ProjectDocumentsTab = () => {
 			try {
 				// window.alert(`API URL: ${apiURL}`);
 				const response = await fetch(
-					`http://localhost:4000/api/document/${id}`,
+					`${process.env.REACT_APP_MONGO_URI}/api/document/${id}`,
 					requestOptions,
 				);
 				let signedUrl = "";
@@ -501,15 +500,64 @@ const ProjectDocumentsTab = () => {
 		setViewDocFlag(false);
 	};
 
+	const OutputFilterLabel = () => {
+		return (
+			<div className="flex flow-row">
+				{filterData.allProjects && (
+					<p className="text-black text-sm font-bold">ALL</p>
+				)}
+				{filterData.activeProjects && (
+					<p className="text-green-500 text-sm font-bold pr-2">Active</p>
+				)}
+				{filterData.pendingProjects && (
+					<p className="text-blue-500 text-sm font-bold pr-2">Pending </p>
+				)}
+				{filterData.canceledProjects && (
+					<p className="text-red-500 text-sm font-bold pr-2">Canceled </p>
+				)}
+				{filterData.postponedProjects && (
+					<p className="text-black text-sm font-bold">Postponed </p>
+				)}
+			</div>
+		);
+	};
+
+	const filterDialogSave = () => {
+		// TODO Set the filter data
+
+		setShowFilterDialog(false);
+	};
+
+	const filterDialogClose = () => {
+		setShowFilterDialog(false);
+	};
+
 	return (
 		<div className="flex-grow bg-white p-2 relative">
-			<button
-				className={`${needRefreshFlag ? "bg-yellow-300" : "bg-green-500"} text-black font-bold py-1 px-4 rounded mt-1 text-sm`}
-				type="button"
-				onClick={RefreshData}
-			>
-				Refresh
-			</button>
+			<div className="flex flex-row justify-items-end justify-between gap-5 pr-2 pl-2 pt-1">
+				<div className="flex flex-row gap-2">
+					<p className="text-black text-sm font-bold">Filter Setting: </p>
+					<OutputFilterLabel />
+				</div>
+				<div className="mr-4">
+					<button
+						type="button"
+						onClick={() => setShowFilterDialog(!showFilterDialog)}
+					>
+						<MdFilterList size={20} />
+					</button>
+				</div>
+			</div>
+			<div>
+				<button
+					className={`${needRefreshFlag ? "bg-yellow-300" : "bg-green-500"} text-black font-bold py-1 px-4 rounded mt-1 text-sm`}
+					type="button"
+					onClick={RefreshData}
+				>
+					Refresh
+				</button>
+			</div>
+
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
@@ -565,7 +613,7 @@ const ProjectDocumentsTab = () => {
 										) : (
 											<DeleteDocumentForm
 												currentNodeText={selectedNodeLabel}
-												handleDeleteDocument={handleDeleteDocument}
+												DeleteDocument={handleDeleteDocument}
 											/>
 										)}
 									</>
@@ -573,6 +621,17 @@ const ProjectDocumentsTab = () => {
 							</p>
 						</Box>
 					</Modal>
+				)}
+			</div>
+			<div className="items-center">
+				{showFilterDialog && (
+					<DocumentsFilterModal
+						open={showFilterDialog}
+						onOK={filterDialogSave}
+						onClose={filterDialogClose}
+						data={filterData}
+						onUpdateData={setFilterData}
+					/>
 				)}
 			</div>
 		</div>
@@ -724,6 +783,228 @@ const ViewDocument = ({ onClose }) => {
 				</DialogActions>
 			</Dialog>
 		</div>
+	);
+};
+
+const DocumentsFilterModal = ({ open, onOK, onClose, data, onUpdateData }) => {
+	if (!open) return null;
+
+	const [allChecked, setAllChecked] = useState(false);
+	const [activeChecked, setActiveChecked] = React.useState(false);
+	const [pendingChecked, setPendingChecked] = React.useState(true);
+	const [canceledChecked, setCanceledChecked] = React.useState(false);
+	const [postponedChecked, setPostponedChecked] = React.useState(false);
+	// const [saveButtonDisabled, setSaveButtonDisabled] = React.useState(true);
+	const [errorMsg, setErrorMsg] = useState("");
+
+	function PaperComponent(props) {
+		return (
+			<Draggable
+				handle="#schedulerFilterDialog"
+				cancel={'[class*="MuiDialogContent-root"]'}
+			>
+				<Paper {...props} />
+			</Draggable>
+		);
+	}
+
+	useEffect(() => {
+		setAllChecked(data.allProjects);
+		setActiveChecked(data.activeProjects);
+		setPendingChecked(data.pendingProjects);
+		setCanceledChecked(data.canceledProjects);
+		setPostponedChecked(data.postponedProjects);
+	}, []);
+
+	const handleChange = (event) => {
+		const { name, checked } = event.target;
+		setErrorMsg("");
+
+		switch (name) {
+			case "allChecked":
+				setAllChecked(checked);
+				if (checked) {
+					setActiveChecked(!checked);
+					setPendingChecked(!checked);
+					setCanceledChecked(!checked);
+					setPostponedChecked(!checked);
+				}
+				break;
+			case "activeChecked":
+				setActiveChecked(checked);
+				break;
+			case "pendingChecked":
+				setPendingChecked(checked);
+				break;
+			case "canceledChecked":
+				setCanceledChecked(checked);
+				break;
+			case "postponedChecked":
+				setPostponedChecked(checked);
+				break;
+			default:
+				break;
+		}
+		// window.alert(`Event: ${JSON.stringify(event.target.name)}`);
+		// setChecked(event.target.checked);
+	};
+
+	const ValidateData = () => {
+		setErrorMsg("");
+
+		if (allChecked) return true;
+		if (activeChecked) return true;
+		if (pendingChecked) return true;
+		if (canceledChecked) return true;
+		if (postponedChecked) return true;
+		return false;
+	};
+
+	const onSaveData = () => {
+		if (ValidateData() === true) {
+			onUpdateData({
+				allProjects: allChecked,
+				activeProjects: activeChecked,
+				pendingProjects: pendingChecked,
+				canceledProjects: canceledChecked,
+				postponedProjects: postponedChecked,
+			});
+			// window.alert(`ModalSave Data${JSON.stringify(data)}`);
+			// data[0].value = allChecked;
+			// data[1].value = activeChecked;
+			// data[2].value = pendingChecked;
+			// data[3].value = canceledChecked;
+			// data[4].value = postponedChecked;
+			setErrorMsg("");
+			onOK();
+		} else {
+			setErrorMsg("Select at least one filter option");
+		}
+	};
+
+	return (
+		<Dialog
+			open={open}
+			aria-labelledby="schedulerFilterDialog"
+			PaperComponent={PaperComponent}
+		>
+			<DialogTitle id="schedulerFilterDialog">
+				<span className="text-bold text-green-300">WORK</span>SIDE Projects
+				Filter
+			</DialogTitle>
+			<DialogContent>
+				{/* <Stack spacing={2} margin={3}> */}
+				<FormGroup>
+					{/* <Typography variant="h5">Label All</Typography> */}
+					<FormControlLabel
+						control={
+							<Checkbox
+								defaultChecked={data.allChecked}
+								checked={allChecked}
+								onChange={handleChange}
+								name="allChecked"
+								sx={{
+									color: common.black,
+									"&.Mui-checked": {
+										color: common.black,
+									},
+								}}
+							/>
+						}
+						label="All"
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={activeChecked}
+								onChange={handleChange}
+								name="activeChecked"
+								disabled={allChecked}
+								sx={{
+									color: green[800],
+									"&.Mui-checked": {
+										color: green[600],
+									},
+								}}
+							/>
+						}
+						label="Active Projects"
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={pendingChecked}
+								onChange={handleChange}
+								name="pendingChecked"
+								disabled={allChecked}
+								sx={{
+									color: blue[800],
+									"&.Mui-checked": {
+										color: blue[600],
+									},
+								}}
+							/>
+						}
+						label="Pending Projects"
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={canceledChecked}
+								onChange={handleChange}
+								name="canceledChecked"
+								disabled={allChecked}
+								sx={{
+									color: red[800],
+									"&.Mui-checked": {
+										color: red[600],
+									},
+								}}
+							/>
+						}
+						label="Canceled Projects"
+					/>
+					<FormControlLabel
+						control={
+							<Checkbox
+								checked={postponedChecked}
+								onChange={handleChange}
+								name="postponedChecked"
+								disabled={allChecked}
+								sx={{
+									color: grey[800],
+									"&.Mui-checked": {
+										color: grey[600],
+									},
+								}}
+							/>
+						}
+						label="Postponed Projects"
+					/>
+				</FormGroup>
+				{errorMsg.length > 0 && (
+					<div className="text-center">
+						<p className="text-red-700 text-xs font-bold pt-2 pb-2">
+							{errorMsg}
+						</p>
+					</div>
+				)}
+				{/* </Stack> */}
+			</DialogContent>
+			<DialogActions>
+				<Button
+					variant="contained"
+					color="success"
+					onClick={onSaveData}
+					// disabled={saveButtonDisabled}
+				>
+					OK
+				</Button>
+				<Button variant="contained" color="error" onClick={onClose}>
+					Close
+				</Button>
+			</DialogActions>
+		</Dialog>
 	);
 };
 

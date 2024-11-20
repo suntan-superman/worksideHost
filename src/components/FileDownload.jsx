@@ -4,7 +4,7 @@ import axios from "axios";
 const FileDownload = () => {
 	const id = "67364d5e1c5887c50d0a262b";
 	// TODO: Update the URL to the backend endpoint
-	const apiURL = `http://localhost:4000/api/download/${id}`;
+	const apiURL = `${process.env.REACT_APP_MONGO_URI}/api/download/${id}`;
 
 	const handleDownload = async () => {
 		try {

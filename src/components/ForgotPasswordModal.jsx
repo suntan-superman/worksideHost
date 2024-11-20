@@ -57,8 +57,7 @@ const ForgotPasswordModal = ({
 	const onSaveData = async () => {
 		if (ValidateData() === true) {
 			// Check if User exists
-			const userEmail = email.replace(/"/g, '');
-			// const getUserFetchString = `http://localhost:4000/api/user/does-user-exist/${userEmail}`;
+			const userEmail = email.replace(/"/g, "");
 			const getUserFetchString = `${process.env.REACT_APP_MONGO_URI}api/user/does-user-exist/${userEmail}`;
 	    await axios.post(getUserFetchString).then((res) => {
 				if( res.status !== 200 ) {
@@ -73,7 +72,6 @@ const ForgotPasswordModal = ({
 
 			// window.alert(`Data is valid. Email: ${email}`);
 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/forgotPassword`;
-			// const fetchString = `http://localhost:4000/api/user/forgotpassword`;
 	    const res = await axios.post(fetchString, {
 				email: email.replace(/"/g, ''),
 			});

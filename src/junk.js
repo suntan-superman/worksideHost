@@ -47,7 +47,7 @@ const multer = Multer({
       callback(null, `${__dirname}/audio-files`);
     },
     filename: (req, file, callback) => {
-      callback(null, file.fieldname + "_" + Date.now() + "_" + file.originalname);
+      callback(null, `${file.fieldname}_${Date.now()}_${file.originalname}`);
     },
   }),
   limits: {

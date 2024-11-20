@@ -22,7 +22,6 @@ const ForgotPassword = () => {
     const data = new FormData(e.currentTarget);
     const email = data.get("email");
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/forgotpassword`;
-		// const fetchString = `http://localhost:4000/api/user/forgotpassword`;
     const res = await axios.post(fetchString, { email: email });
     if (res.data.success === false) {
       toast.error(res.data.message, {
