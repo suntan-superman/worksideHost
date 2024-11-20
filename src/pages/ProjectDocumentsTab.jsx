@@ -131,7 +131,7 @@ const ProjectDocumentsTab = () => {
 		// window.alert(`ID: ${id} Owner: ${owner_id} Access: ${accessLevel}`);
 		try {
 			await axios
-				.delete("http://localhost:4000/api/document/", {
+				.delete(`${process.env.REACT_APP_MONGO_URI}/api/document/`, {
 					data: {
 						id: id,
 						owner_id: owner_id,
