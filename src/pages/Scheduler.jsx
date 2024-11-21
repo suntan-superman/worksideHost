@@ -215,11 +215,22 @@ const Scheduler = () => {
 		applyCategoryColor(args, scheduleObj.current?.currentView);
 	};
 
-	const dialogSave = () => {
-		// TODO Set the filter data
+	useEffect(() => {
+		// Get Filter Data from Local Storage
+		const filterData = localStorage.getItem("schedulerFilter");
+		if (filterData) {
+			setFilterData(JSON.parse(filterData));
+		}
+	}, []);
 
+	const dialogSave = () => {
 		setShowDialog(false);
 	};
+
+	useEffect(() => {
+		// Save Filter Data to Local Storage
+		localStorage.setItem("schedulerFilter", JSON.stringify(filterData));
+	}, [filterData]);
 
 	const dialogClose = () => {
 		setShowDialog(false);
@@ -394,12 +405,6 @@ const SchedulerFilterModal = ({ open, onOK, onClose, data, onUpdateData }) => {
 				canceledProjects: canceledChecked,
 				postponedProjects: postponedChecked,
 			});
-			// window.alert(`ModalSave Data${JSON.stringify(data)}`);
-			// data[0].value = allChecked;
-			// data[1].value = activeChecked;
-			// data[2].value = pendingChecked;
-			// data[3].value = canceledChecked;
-			// data[4].value = postponedChecked;
 			setErrorMsg("");
 			onOK();
 		} else {

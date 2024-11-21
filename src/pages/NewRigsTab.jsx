@@ -18,7 +18,6 @@ const NewRigsTab = () => {
 	const [refreshFlag, setRefreshFlag] = useState(true);
 	const [rigCompanyList, setRigCompanyList] = useState([]);
 	const [rigList, setRigList] = useState([]);
-	const [assignedRequestorList, setAssignedRequestorList] = useState([]);
 	const [selectedOption, setSelectedOption] = useState(null);
 	const [treeData, setTreeData] = useState([]);
 	const [addButtonEnabled, setAddButtonEnabled] = useState(false);

@@ -1,7 +1,6 @@
 /* eslint-disable */
 
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import {
 	GridComponent,
@@ -18,7 +17,6 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
 import { useProjectContext } from "../hooks/useProjectContext";
-import { Header } from "../components";
 import "../index.css";
 import { confirmAlert } from "react-confirm-alert";
 

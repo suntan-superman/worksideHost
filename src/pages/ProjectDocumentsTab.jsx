@@ -38,7 +38,6 @@ const ProjectDocumentsTab = () => {
 	const [projectList, setProjectList] = useState([]);
 	const [documentList, setDocumentList] = useState([]);
 	const [treeData, setTreeData] = useState([]);
-	const [errorMsg, setErrorMsg] = useState("");
 	const [hasData, setHasData] = useState(false);
 	const [docDescription, setDocDescription] = useState("");
 	const [currentFile, setCurrentFile] = useState(null);
@@ -102,6 +101,7 @@ const ProjectDocumentsTab = () => {
 
 			setIsLoading(false);
 			setRefreshFlag(true);
+			setNeedRefreshFlag(true);
 		} catch (error) {
 			setIsLoading(false);
 			window.alert(`Error: ${error}`);
@@ -188,7 +188,6 @@ const ProjectDocumentsTab = () => {
 	};
 
 	const fetchProjects = async () => {
-		// TODO set back to apiURL
 		try {
 			await axios
 				.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
@@ -210,27 +209,24 @@ const ProjectDocumentsTab = () => {
 		}
 	};
 
-	const fetchDocuments = async () => {
-		// TODO set back to apiURL
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/document/`;
+	const getDocuments = async () => {
+		// Function to make Axios GET request inside a Promise
+		return new Promise((resolve, reject) => {
+			axios
+				.get(`${process.env.REACT_APP_MONGO_URI}/api/document/`) // Replace with your API endpoint
+				.then((response) => resolve(response.data))
+				.catch((err) => reject(err));
+		});
+	};
 
-		try {
-			axios.get(fetchString).then((res) => {
-				if (res.status === 200) {
-					const jsonResults = res.data;
-					setDocumentList(jsonResults);
-					// window.alert(jsonResults);
-				} else {
-					window.alert(`Error: ${res.status}`);
-				}
+	const fetchDocuments = async () => {
+		getDocuments()
+			.then((responseData) => {
+				setDocumentList(responseData);
+			})
+			.catch((err) => {
+				console.error(err.message);
 			});
-		} catch (error) {
-			console.error(error);
-		}
-		// axios.get(`${process.env.REACT_APP_MONGO_URI}/api/document/`).then((res) => {
-		// 	const jsonResults = res.data;
-		// 	setDocumentList(jsonResults);
-		// });
 	};
 
 	const MergeTreeData = () => {
@@ -327,7 +323,6 @@ const ProjectDocumentsTab = () => {
 			}),
 		};
 		try {
-			// TODO set back to apiURL
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/document/`,
 				requestOptions,
@@ -428,8 +423,6 @@ const ProjectDocumentsTab = () => {
 		if (args.item.text === "View Document") {
 			const id = selectedNodeData.id;
 
-			// TODO: Update the URL to the backend endpoint
-			const apiURL = `${process.env.REACT_APP_MONGO_URI}/api/document/${id}`;
 			const requestOptions = {
 				method: "GET",
 				// headers: { "Content-Type": "application/json" },
@@ -455,22 +448,6 @@ const ProjectDocumentsTab = () => {
 		}
 	};
 
-	// const handleContextMenu = (event) => {
-	// 	event.preventDefault();
-	// 	// Add your custom right-click logic here
-	// };
-
-	// const IsTargetNodeParent = (nodeId) => {
-	// 	console.log(`Node ID: ${nodeId}`);
-	// 	console.log(`Tree Data: ${JSON.stringify(treeData)}`);
-	// 	const targetNode = treeData.find((node) => node._id === nodeId);
-	// 	console.log(`Target Node: ${JSON.stringify(targetNode)}`);
-	// 	if (targetNode.isParent === true) {
-	// 		return true;
-	// 	}
-	// 	return false;
-	// };
-
 	// TODO Need to fix the right-click logic
 	const handleMouseClick = (event) => {
 		if (event.button === 0) {
@@ -486,7 +463,8 @@ const ProjectDocumentsTab = () => {
 					menuObj.enableItems(["View Document"], false);
 				else menuObj.enableItems(["View Document"], true);
 			} else {
-				toast.error("No Node Selected");
+				// TODO do we need this?
+				// toast.error("No Node Selected");
 			}
 		}
 	};
@@ -522,11 +500,22 @@ const ProjectDocumentsTab = () => {
 		);
 	};
 
-	const filterDialogSave = () => {
-		// TODO Set the filter data
+	useEffect(() => {
+		// Get Filter Data from Local Storage
+		const filterData = localStorage.getItem("documentsFilter");
+		if (filterData) {
+			setFilterData(JSON.parse(filterData));
+		}
+	}, []);
 
+	const filterDialogSave = () => {
 		setShowFilterDialog(false);
 	};
+
+	useEffect(() => {
+		// Save Filter Data to Local Storage
+		localStorage.setItem("documentsFilter", JSON.stringify(filterData));
+	}, [filterData]);
 
 	const filterDialogClose = () => {
 		setShowFilterDialog(false);
@@ -845,8 +834,6 @@ const DocumentsFilterModal = ({ open, onOK, onClose, data, onUpdateData }) => {
 			default:
 				break;
 		}
-		// window.alert(`Event: ${JSON.stringify(event.target.name)}`);
-		// setChecked(event.target.checked);
 	};
 
 	const ValidateData = () => {
@@ -869,12 +856,6 @@ const DocumentsFilterModal = ({ open, onOK, onClose, data, onUpdateData }) => {
 				canceledProjects: canceledChecked,
 				postponedProjects: postponedChecked,
 			});
-			// window.alert(`ModalSave Data${JSON.stringify(data)}`);
-			// data[0].value = allChecked;
-			// data[1].value = activeChecked;
-			// data[2].value = pendingChecked;
-			// data[3].value = canceledChecked;
-			// data[4].value = postponedChecked;
 			setErrorMsg("");
 			onOK();
 		} else {

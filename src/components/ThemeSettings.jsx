@@ -132,7 +132,6 @@ const ThemeSettings = () => {
 							</div>
 						</>
 					)}
-					{/* TODO - Add this to the settings */}
 					{resetPasswordFlag === false && (
 						<>
 							<div className="p-4 border-t-1 border-color ml-4">
@@ -150,7 +149,6 @@ const ThemeSettings = () => {
 							</div>
 						</>
 					)}
-					{/* TODO - Add this to the settings */}
 					<div className="p-4 border-t-1 border-color ml-4">
 						<div style={{ width: "200px" }}>
 							<p className="font-semibold text-xl ">Reset Password</p>
