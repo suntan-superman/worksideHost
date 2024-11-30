@@ -16,11 +16,17 @@ import {
 import { toast } from "react-toastify";
 import { useProductContext } from "../hooks/useProductContext";
 import useUserStore from "../stores/UserStore";
+import ProductsEditTemplate from "../components/ProductsEditTemplate";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 import "../index.css";
 import "../App.css";
 
 let gridPageSize = 10;
+
+// TODO Delete
+// TODO Update
+// TODO Create
 
 const ProductsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
@@ -29,11 +35,14 @@ const ProductsTab = () => {
 
 	const [productList, setProductList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [messageText, setMessageText] = useState("");
 	const editOptions = {
 		allowEditing: true,
 		allowAdding: true,
 		allowDeleting: true,
 		mode: "Dialog",
+		template: (props) => <ProductsEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
 
@@ -44,7 +53,6 @@ const ProductsTab = () => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
-
 
 	useEffect(() => {
 		const fetchProducts = async () => {
@@ -148,6 +156,40 @@ const ProductsTab = () => {
 		}
 	};
 
+	const SaveProductsData = async () => {
+		if (insertFlag === true) {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
+				{
+					method: "POST",
+					body: JSON.stringify(productData),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+			const json = await response.json();
+
+			if (response.ok) toast.success("Record Successfully Added...");
+			setOpenUpdateModal(false);
+		} else {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
+				{
+					method: "PATCH",
+					body: JSON.stringify(productData),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+			const json = await response.json();
+
+			if (response.ok) toast.success("Record Successfully Updated...");
+			setOpenUpdateModal(false);
+		}
+	};
+
 	const FilterOptions = {
 		type: "Menu",
 	};
@@ -189,7 +231,7 @@ const ProductsTab = () => {
 				>
 					<ColumnsDirective>
 						<ColumnDirective
-							field="projectId"
+							field="productid"
 							headerText="Id"
 							textAlign="Left"
 							width="50"
@@ -238,6 +280,14 @@ const ProductsTab = () => {
 					/>
 				</GridComponent>
 			</div>
+			{openUpdateModal && (
+				<ConfirmationDialog
+					open={openUpdateModal}
+					message={messageText}
+					onConfirm={() => SaveProductsData()}
+					onCancel={() => setOpenUpdateModal(false)}
+				/>
+			)}
 		</div>
 	);
 };

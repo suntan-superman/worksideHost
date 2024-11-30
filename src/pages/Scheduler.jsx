@@ -56,6 +56,10 @@ const Scheduler = () => {
 	const [showDialog, setShowDialog] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 
+	const [schedulerHeight, setSchedulerHeight] = useState(
+		window.innerHeight * 0.7,
+	);
+
 	const [filterData, setFilterData] = useState({
 		allProjects: true,
 		activeProjects: false,
@@ -63,6 +67,18 @@ const Scheduler = () => {
 		canceledProjects: false,
 		postponedProjects: false,
 	});
+
+	 useEffect(() => {
+			const handleResize = () => {
+				setSchedulerHeight(window.innerHeight * 0.7);
+			};
+
+			window.addEventListener("resize", handleResize);
+
+			return () => {
+				window.removeEventListener("resize", handleResize);
+			};
+		}, []);
 
 	const fetchProjects = async () => {
 		setIsLoading(true);
@@ -290,7 +306,7 @@ const Scheduler = () => {
 				ref={scheduleObj}
 				eventRendered={onEventRendered}
 				width={"98%"}
-				// height={600}
+				height={schedulerHeight}
 				eventSettings={{
 					dataSource: projectData,
 				}}

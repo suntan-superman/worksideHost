@@ -1,4 +1,7 @@
 /* eslint-disable */
+// TODO Delete
+// TODO Update
+// TODO Create
 
 import React, { useEffect, useState } from "react";
 import { DataManager, Query } from "@syncfusion/ej2-data";
@@ -16,11 +19,9 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
-import { useProjectContext } from "../hooks/useProjectContext";
 import "../index.css";
-import { confirmAlert } from "react-confirm-alert";
-
-const apiUrl = process.env.REACT_APP_MONGO_URI;
+import ConfirmationDialog from "../components/ConfirmationDialog";
+import ProjectEditTemplate from "../components/ProjectEditTemplate";
 
 let gridPageSize = 8;
 
@@ -31,18 +32,31 @@ const ProjectsTab = () => {
 	const [haveData, setHaveData] = useState(false);
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [messageText, setMessageText] = useState("");
+	const [currentRecord, setCurrentRecord] = useState(null);
+
 	const editOptions = {
 		allowEditing: true,
 		allowAdding: true,
 		allowDeleting: true,
 		mode: "Dialog",
+		template: (props) => <ProjectEditTemplate {...props} />,
+		// template: dialogTemplate,
 	};
-	const toolbarOptions = ["Add", "Edit", "Delete"];
-	const { projectsData, dispatch } = useProjectContext();
+	// const editOptions = {
+	// 	allowEditing: true,
+	// 	allowAdding: true,
+	// 	allowDeleting: true,
+	// 	mode: "Dialog",
+	// 	template: ProjectEditTemplate,
+	// };
+
+	const toolbarOptions = ["Add", "Edit"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
-	let projectsGrid = null;
+	const projectsGrid = null;
 
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
@@ -146,76 +160,101 @@ const ProjectsTab = () => {
 		// setEmptyFields([]);
 	};
 
-	const actionComplete = async (args) => {
-		if (!projectsGrid) return;
+	 const actionBegin = (args) => {
+			if (args.requestType === "save" && args.form) {
+				/** cast string to integer value */
+				// setValue("data.area", args.form.querySelector("#area").value, args);
+			}
+		};
 
-		if (
-			args.requestType === "beginEdit" ||
-			args.requestType === "add" ||
-			args.requestType === "update" ||
-			args.requestType === "save" ||
-			args.requestType === "delete"
-		) {
+		const actionComplete = async (args) => {
+			// console.log(`Action Complete: ${args.requestType}`);
 			if (args.requestType === "beginEdit" || args.requestType === "add") {
-				const { dialog } = args;
-				dialog.header = "Workside Projects";
-			}
-			if (args.requestType === "add") {
-				// set insert flag
-				setInsertFlag(true);
-			}
-			if (args.requestType === "update") {
-				// set insert flag
-				setInsertFlag(false);
+				const dialog = args.dialog;
+				dialog.showCloseIcon = false;
+				dialog.height = 600;
+				dialog.width = 600;
+				// Set Insert Flag
+				setInsertFlag(args.requestType === "add");
+				// change the header of the dialog
+				dialog.header =
+					args.requestType === "beginEdit"
+						? `Edit Record of ${args.rowData.projectname}`
+						: "New Project";
 			}
 			if (args.requestType === "save") {
 				// Save or Update Data
-				const { data } = args;
-
-				confirmAlert({
-					title: "Workside Software",
-					message: `Save... ${JSON.stringify(data)}`,
-					buttons: [
-						{
-							label: "Cancel",
-						},
-						{
-							label: "Ok",
-							onClick: () => {
-								// toast.success(`Success`);
-							},
-						},
-					],
-				});
-
-				if (insertFlag === true) {
-					const response = await fetch(
-						`${process.env.REACT_APP_MONGO_URI}/api/project/`,
-						{
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
-							},
-						},
-					);
-
-					const json = await response.json();
-
-					if (response.ok) {
-						// console.log('Insert: ' + JSON.stringify(args.data));
-						// dispatch({ type: 'CREATE_PRODUCT', payload: json });
-					}
-				} else {
-					// dispatch({ type: 'CREATE_PRODUCT', payload: args.data });
-					// console.log('Update: ' + JSON.stringify(args.data));
-				}
-				setInsertFlag(false);
+				const data = args.data;
+				// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+				setMessageText(`Update Project ${args.data.projectname} Details?`);
+				setCurrentRecord(data);
+				setOpenUpdateModal(true);
 			}
-			if (args.requestType === "delete") {
-				// Delete Data
-				handleDelete();
-				setInsertFlag(false);
+		};
+
+	const SaveProjectData = async () => {
+		setOpenUpdateModal(false);
+		// TODO Change API URL
+		const localHost = "http://localhost:4000";
+		if (insertFlag) {
+			// Insert Record
+			window.alert(`Insert Project: ${JSON.stringify(currentRecord)}`);
+			const response = await fetch(
+				`${localHost}/api/project/`,
+				// `${process.env.REACT_APP_MONGO_URI}/api/project/`,
+				{
+					method: "POST",
+					body: JSON.stringify(currentRecord),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+			const jsonData = await response.json();
+			if (response.status === 200) {
+				toast.success("Record Successfully Added...");
+			} else {
+				toast.error("Record Add Failed...");
+			}
+			setInsertFlag(false);
+		} else {
+			window.alert(`Update Project: ${JSON.stringify(currentRecord)}`);
+			window.alert(`Update Project ID: ${JSON.stringify(currentRecord._id)}`);
+			const requestOptions = {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					area: currentRecord.area,
+					customer: currentRecord.customer,
+					customercontact: currentRecord.customercontact,
+					rigcompany: currentRecord.rigcompany,
+					projectname: currentRecord.projectname,
+					description: currentRecord.description,
+					projectedstartdate: currentRecord.projectedstartdate,
+					actualstartdate: currentRecord.actualstartdate,
+					expectedduration: currentRecord.expectedduration,
+					actualduration: currentRecord.actualduration,
+					status: currentRecord.status,
+					statusdate: currentRecord.statusdate,
+					comment: currentRecord.comment,
+					latdec: currentRecord.latdec,
+					longdec: currentRecord.longdec,
+				}),
+			};
+			const fetchString = `http://localhost:4000/api/project/${currentRecord._id}`;
+			try {
+				const response = await fetch(fetchString, requestOptions);
+				const jsonData = await response.json();
+				if (response.status === 200) {
+					toast.success("Record Successfully Updated...");
+				} else {
+					toast.error("Record Update Failed...");
+				}
+				setIsLoading(false);
+			} catch (error) {
+				setIsLoading(false);
+				window.alert(`Error: ${error}`);
+				console.error(error);
 			}
 		}
 	};
@@ -252,6 +291,7 @@ const ProjectsTab = () => {
 					<GridComponent
 						id="projectGridElement"
 						dataSource={filteredProjects}
+						actionBegin={actionBegin}
 						actionComplete={actionComplete}
 						allowSelection
 						allowFiltering
@@ -266,10 +306,7 @@ const ProjectsTab = () => {
 						enablePersistence
 						load={onProjectLoad}
 						width="98%"
-						// width="1000px"
-						// eslint-disable-next-line no-return-assign
-						// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-						ref={(g) => (projectsGrid = g)}
+						ref={projectsGrid}
 					>
 						<ColumnsDirective>
 							<ColumnDirective
@@ -393,6 +430,14 @@ const ProjectsTab = () => {
 						/>
 					</GridComponent>
 				</div>
+			)}
+			{openUpdateModal && (
+				<ConfirmationDialog
+					open={openUpdateModal}
+					message={messageText}
+					onConfirm={() => SaveProjectData()}
+					onCancel={() => setOpenUpdateModal(false)}
+				/>
 			)}
 		</div>
 	);

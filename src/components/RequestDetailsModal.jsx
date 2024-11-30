@@ -1,13 +1,7 @@
 /* eslint-disable */
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { format } from 'date-fns';
-import {
-  useJsApiLoader,
-  GoogleMap,
-  useLoadScript,
-  LoadScript,
-  Marker,
-} from '@react-google-maps/api';
+import { LoadScript } from "@react-google-maps/api";
 import CustomMap from "./Map";
 
 const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
@@ -18,18 +12,8 @@ const RequestDetailsTestModal = ({ recordID, open, onOK, onClose }) => {
   const [requestname, setRequestName] = useState(null);
   const [requestcategory, setRequestCategory] = useState(null);
   const [datetimerequested, setDateTimeRequested] = useState(null);
-  const [mapContainer, setMapContainer] = useState(null);
 
   const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
-
-  const containerStyle = {
-    width: '300px',
-    height: '300px',
-  };
-
-  // const center = {
-  //   lat: 35.393528,
-  //   lng: -119.043732 };
 
   const reqLocation = {
     lat: 35.2,

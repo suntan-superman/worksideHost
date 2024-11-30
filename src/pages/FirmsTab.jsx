@@ -18,6 +18,8 @@ import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import { useFirmContext } from "../hooks/useFirmContext";
 import useUserStore from "../stores/UserStore";
+import FirmEditTemplate from "../components/FirmEditTemplate";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 import "../index.css";
 import "../App.css";
@@ -25,6 +27,10 @@ import "../App.css";
 const apiUrl = process.env.REACT_APP_API_URL;
 
 let gridPageSize = 10;
+
+// TODO Delete
+// TODO Update
+// TODO Create
 
 const FirmsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -34,11 +40,15 @@ const FirmsTab = () => {
 
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [messageText, setMessageText] = useState("");
+	const [currentRecord, setCurrentRecord] = useState([]);
 	const editOptions = {
 		allowEditing: true,
 		allowAdding: true,
 		allowDeleting: true,
 		mode: "Dialog",
+		template: (props) => <FirmEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
 	const { firmData, dispatch: firmDispatch } = useFirmContext();
@@ -97,9 +107,6 @@ const FirmsTab = () => {
 			const json = await response.json();
 			setFirmList(json);
 
-			if (response.ok) {
-				firmDispatch({ type: "GET_FIRM", payload: json });
-			}
 			setIsLoading(false);
 		};
 		fetchFirms();
@@ -122,6 +129,37 @@ const FirmsTab = () => {
 		}
 		// setDeleteFlag(false);
 		// setEmptyFields([]);
+	};
+
+	const actionComplete = async (args) => {
+		// console.log(`Action Complete: ${args.requestType}`);
+		if (args.requestType === "beginEdit" || args.requestType === "add") {
+			const dialog = args.dialog;
+			dialog.showCloseIcon = false;
+			dialog.height = 600;
+			dialog.width = 600;
+			// Set Insert Flag
+			setInsertFlag(args.requestType === "add");
+			// change the header of the dialog
+			dialog.header =
+				args.requestType === "beginEdit"
+					? `Edit Record of ${args.rowData.name}`
+					: "New Firm";
+		}
+		if (args.requestType === "save") {
+			// Save or Update Data
+			const data = args.data;
+			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+			setMessageText(`Update Firm ${args.data.name} Details?`);
+			console.log(`Action Complete Firms Data: ${JSON.stringify(data)}`);
+			setCurrentRecord(data);
+			setOpenUpdateModal(true);
+		}
+		if (args.requestType === "delete") {
+			// Delete Data
+			handleFirmDelete();
+			setInsertFlag(false);
+		}
 	};
 
 	const firmsActionComplete = async (args) => {
@@ -197,6 +235,60 @@ const FirmsTab = () => {
 		type: "Menu",
 	};
 
+	const SaveFirmsData = async () => {
+		// Close Modal
+		setOpenUpdateModal(false);
+		// Save or Update Data
+		if (insertFlag === true) {
+			const response = await fetch(
+				// "http://localhost:4000/api/firm/",
+				`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
+				{
+					method: "POST",
+					body: JSON.stringify(currentRecord),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			const json = await response.json();
+
+			if (response.ok) {
+				toast.success("Record Successfully Added...");
+			} else {
+				toast.error("Record Add Failed...");
+			}
+		} else {
+			currentRecord.statusdate = new Date();
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
+				{
+					method: "PATCH",
+					body: JSON.stringify(currentRecord),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+			const json = await response.json();
+			if (response.ok) {
+				toast.success("Record Successfully Updated...");
+				SaveLatestDefaults();
+			} else {
+				toast.error("Record Update Failed...");
+			}
+			setInsertFlag(false);
+		}
+	};
+
+	const SaveLatestDefaults = async () => {
+		localStorage.setItem("firmsLatestArea", currentRecord.area);
+		localStorage.setItem("firmsLatestType", currentRecord.type);
+		localStorage.setItem("firmsLatestCity", currentRecord.city);
+		localStorage.setItem("firmsLatestState", currentRecord.state);
+	};
+
 	// *******************************************************
 	// This is for custom phone and email editing in dialog
 	// *******************************************************
@@ -258,7 +350,7 @@ const FirmsTab = () => {
 				<GridComponent
 					id="firmGridElement"
 					dataSource={firmList}
-					actionComplete={firmsActionComplete}
+					actionComplete={actionComplete}
 					allowSelection
 					allowFiltering
 					allowPaging
@@ -376,6 +468,14 @@ const FirmsTab = () => {
 					/>
 				</GridComponent>
 			</div>
+			{openUpdateModal && (
+				<ConfirmationDialog
+					open={openUpdateModal}
+					message={messageText}
+					onConfirm={() => SaveFirmsData()}
+					onCancel={() => setOpenUpdateModal(false)}
+				/>
+			)}
 		</div>
 	);
 };

@@ -7,17 +7,20 @@ import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
 
 // Set Selection Options
-const areaOptions = ["GULF COAST", "MID-CONTINENT", "WEST COAST", "WEST TEXAS"];
-
-const statusOptions = [
-	"ACTIVE",
-	"CANCELED",
-	"COMPLETED",
-	"PENDING",
-	"POSTPONED",
+const contactClassOptions = [
+	"CUSTOMER",
+	"RIGCOMPANY",
+	"SUPPLIER",
+	"DELIVERYASSOC",
 ];
 
-const ProjectEditTemplate = (props) => {
+const statusOptions = ["ACTIVE", "INACTIVE", "PENDING"];
+
+const accessLevelOptions = ["ADMIN", "GUEST", "STANDARD", "POWER"];
+
+// TODO Complete the ContactEditTemplate component
+
+const ContactEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 
 	// Handle input changes
@@ -31,12 +34,25 @@ const ProjectEditTemplate = (props) => {
 	const [customerOptions, setCustomerOptions] = useState([]);
 	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
 	const [contactOptions, setContactOptions] = useState([]);
+	const [firmOptions, setFirmOptions] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
+
+	useEffect(() => {
+		// ReadOnly flag
+		if (data.isAdd) {
+			setReadOnlyFlag(false);
+		} else {
+			setReadOnlyFlag(true);
+		}
+	}, [data.isAdd]);
 
 	const fetchOptions = async () => {
 		setIsLoading(true);
 		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
 		const json = await response.json();
+
+		const firms = json.map((r) => r.name);
+		setFirmOptions(firms);
 
 		// Get Customers
 		const customerResult = json.filter((json) => json.type === "CUSTOMER");
@@ -51,54 +67,6 @@ const ProjectEditTemplate = (props) => {
 		setRigCompanyOptions(rigCompanies);
 
 		setIsLoading(false);
-	};
-
-	useEffect(() => {
-		// ReadOnly flag
-		if (data.isAdd) {
-			setReadOnlyFlag(false);
-			SetDefaultDates();
-		} else {
-			setReadOnlyFlag(true);
-		}
-	}, [data.isAdd]);
-
-	const SetDefaultDates = () => {
-		// Set Status Date to Today
-		let statusdate;
-		let startdate;
-		{
-			const today = new Date();
-			const dd = String(today.getDate()).padStart(2, "0");
-			const mm = String(today.getMonth() + 1).padStart(2, "0");
-			const yyyy = today.getFullYear();
-			statusdate = `${yyyy}-${mm}-${dd}`;
-		}
-		{
-			const tomorrow = new Date();
-			tomorrow.setDate(tomorrow.getDate() + 1);
-			const dd = String(tomorrow.getDate()).padStart(2, "0");
-			const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
-			const yyyy = tomorrow.getFullYear();
-			startdate = `${yyyy}-${mm}-${dd}`;
-		}
-		setData({
-			...data,
-			statusdate: statusdate,
-			projectedstartdate: startdate,
-		});
-	};
-
-	const SetDefaultStartDate = () => {
-		// Set Status Date to Today
-		{
-			const today = new Date();
-			const dd = String(today.getDate()).padStart(2, "0");
-			const mm = String(today.getMonth() + 1).padStart(2, "0");
-			const yyyy = today.getFullYear();
-			const formattedDate = `${yyyy}-${mm}-${dd}`;
-			setData({ ...data, projectedstartdate: formattedDate });
-		}
 	};
 
 	const fetchContacts = async () => {
@@ -140,17 +108,18 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 1 */}
 					<div className="flex flex-col w-1/2">
 						<label
-							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							className={`${readOnlyFlag ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
 							htmlFor="field1"
 						>
-							Area
+							First Name
 						</label>
-						<DropDownListComponent
-							id="area"
-							dataSource={areaOptions}
-							name="area"
-							value={data.area}
-							placeholder="Select Area"
+						<input
+							type="text"
+							id="firstname"
+							name="firstname"
+							defaultValue={data.firstname}
+							className="e-input"
+							placeholder="Enter First Name"
 							required={true}
 							onChange={onChange}
 							readonly={readOnlyFlag}
@@ -159,17 +128,18 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 2 */}
 					<div className="flex flex-col w-1/2">
 						<label
-							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							className={`${readOnlyFlag ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
 							htmlFor="field2"
 						>
-							Customer
+							Last Name
 						</label>
-						<DropDownListComponent
-							id="customer"
-							dataSource={customerOptions}
-							name="customer"
-							value={data.customer}
-							placeholder="Select Customer"
+						<input
+							type="text"
+							id="lastname"
+							name="lastname"
+							defaultValue={data.lastname}
+							className="e-input"
+							placeholder="Enter Last Name"
 							required={true}
 							onChange={onChange}
 							readonly={readOnlyFlag}
@@ -181,18 +151,17 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 3 */}
 					<div className="flex flex-col w-1/2">
 						<label
-							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							className={`${readOnlyFlag ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
 							htmlFor="field3"
 						>
-							Project Name
+							Firm
 						</label>
-						<input
-							type="text"
-							id="projectname"
-							name="projectname"
-							defaultValue={data.projectname}
-							className="e-input"
-							placeholder="Enter Project Name"
+						<DropDownListComponent
+							id="firm"
+							name="firm"
+							dataSource={firmOptions}
+							value={data.firm}
+							placeholder="Select Firm"
 							required={true}
 							onChange={onChange}
 							readonly={readOnlyFlag}
@@ -201,15 +170,15 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 4 */}
 					<div className="flex flex-col w-1/2">
 						<label className="text-sm font-medium mb-1" htmlFor="field4">
-							Project Description
+							Contact Class
 						</label>
-						<input
-							type="text"
-							id="description"
-							name="description"
-							defaultValue={data.description}
-							className="e-input"
-							placeholder="Enter Project Description"
+						<DropDownListComponent
+							id="contactclass"
+							name="contactclass"
+							dataSource={contactClassOptions}
+							value={data.contactclass}
+							placeholder="Select Contact Class"
+							required={true}
 							onChange={onChange}
 						/>
 					</div>
@@ -219,14 +188,14 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 5 */}
 					<div className="flex flex-col w-1/2">
 						<label className="text-sm font-medium mb-1" htmlFor="field5">
-							Project Status
+							Access Level
 						</label>
 						<DropDownListComponent
-							id="status"
-							name="status"
-							dataSource={statusOptions}
-							value={data.status}
-							placeholder="Select Project Status"
+							id="accesslevel"
+							name="accesslevel"
+							dataSource={accessLevelOptions}
+							value={data.accesslevel}
+							placeholder="Select Access Level"
 							required={true}
 							onChange={onChange}
 						/>
@@ -234,6 +203,122 @@ const ProjectEditTemplate = (props) => {
 					{/* Input 6 */}
 					<div className="flex flex-col w-1/2">
 						<label className="text-sm font-medium mb-1" htmlFor="field6">
+							Password
+						</label>
+						{/* Need to hide the password */}
+						<input
+							type="password"
+							id="userpassword"
+							name="userpassword"
+							defaultValue={data.userpassword}
+							className="e-input"
+							placeholder="Enter Password"
+							required={true}
+							onChange={onChange}
+							readonly={"true"}
+						/>
+					</div>
+				</div>
+				{/* Row 4 */}
+				<div className="flex gap-4">
+					{/* Input 7 */}
+					<div className="flex flex-col w-1/2">
+						<label
+							className={`${readOnlyFlag ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field7"
+						>
+							Primary Email
+						</label>
+						<input
+							type="text"
+							id="primaryemail"
+							name="primaryemail"
+							defaultValue={data.primaryemail}
+							className="e-input"
+							placeholder="Enter Primary Email"
+							required={true}
+							onChange={onChange}
+							readonly={readOnlyFlag}
+						/>
+					</div>
+					{/* Input 8 */}
+					<div className="flex flex-col w-1/2">
+						<label className="text-sm font-medium mb-1" htmlFor="field8">
+							Secondary Email
+						</label>
+						<input
+							type="text"
+							id="secondaryemail"
+							name="secondaryemail"
+							defaultValue={data.secondaryemail}
+							className="e-input"
+							placeholder="Enter Secondary Email"
+							required={true}
+							onChange={onChange}
+						/>
+					</div>
+				</div>
+				{/* Row 5 */}
+				<div className="flex gap-4">
+					{/* Input 9 */}
+					<div className="flex flex-col w-1/2">
+						<label className="text-sm font-medium mb-1" htmlFor="field9">
+							Primary Phone
+						</label>
+						<input
+							type="text"
+							id="primaryphone"
+							name="primaryphone"
+							defaultValue={data.primaryphone}
+							className="e-input"
+							placeholder="Enter Primary Phone"
+							required={true}
+							onChange={onChange}
+						/>
+					</div>
+					{/* Input 10 */}
+					<div className="flex flex-col w-1/2">
+						<label
+							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field10"
+						>
+							Secondary Phone
+						</label>
+						<input
+							type="text"
+							id="secondaryphone"
+							name="secondaryphone"
+							defaultValue={data.secondaryphone}
+							className="e-input"
+							placeholder="Enter Secondary Phone"
+							required={true}
+							onChange={onChange}
+						/>
+					</div>
+				</div>
+				{/* Row 6 */}
+				<div className="flex gap-4">
+					{/* Input 11 */}
+					<div className="flex flex-col w-1/2">
+						<label className="text-sm font-medium mb-1" htmlFor="field11">
+							Status
+						</label>
+						<DropDownListComponent
+							id="status"
+							name="status"
+							dataSource={statusOptions}
+							value={data.status}
+							placeholder="Select Status"
+							required={true}
+							onChange={onChange}
+						/>
+					</div>
+					{/* Input 12 */}
+					<div className="flex flex-col w-1/2">
+						<label
+							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field12"
+						>
 							Status Date
 						</label>
 						<DatePickerComponent
@@ -246,149 +331,11 @@ const ProjectEditTemplate = (props) => {
 						/>
 					</div>
 				</div>
-				{/* Row 4 */}
-				<div className="flex gap-4">
-					{/* Input 7 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field7">
-							Customer Contact
-						</label>
-						<DropDownListComponent
-							id="customercontact"
-							name="customercontact"
-							dataSource={contactOptions}
-							value={data.customercontact}
-							placeholder="Select Customer Contact"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-					{/* Input 8 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field8">
-							Rig Company
-						</label>
-						<DropDownListComponent
-							id="rigcompany"
-							name="rigcompany"
-							dataSource={rigCompanyOptions}
-							value={data.rigcompany}
-							placeholder="Select Rig Company"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-				</div>
-				{/* Row 5 */}
-				<div className="flex gap-4">
-					{/* Input 9 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field9">
-							Projected Start Date
-						</label>
-						<DatePickerComponent
-							id="projectedstartdate"
-							name="projectedstartdate"
-							value={data.projectedstartdate}
-							placeholder="Select Start Date"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-					{/* Input 10 */}
-					<div className="flex flex-col w-1/2">
-						<label
-							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
-							htmlFor="field10"
-						>
-							Actual Start Date
-						</label>
-						<DatePickerComponent
-							id="actualstartdate"
-							name="actualstartdate"
-							value={data.actualstartdate}
-							placeholder="Select Start Date"
-							disabled={true}
-							onChange={onChange}
-						/>
-					</div>
-				</div>
-				{/* Row 6 */}
-				<div className="flex gap-4">
-					{/* Input 11 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field11">
-							Expected Duration
-						</label>
-						<NumericTextBoxComponent
-							id="expectedduration"
-							name="expectedduration"
-							value={data.expectedduration}
-							placeholder="Enter Expected Duration"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-					{/* Input 12 */}
-					<div className="flex flex-col w-1/2">
-						<label
-							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
-							htmlFor="field12"
-						>
-							Actual Duration
-						</label>
-						<NumericTextBoxComponent
-							id="actualduration"
-							name="actualduration"
-							value={data.expectedduration}
-							placeholder="Enter Actual Duration"
-							disabled={true}
-							onChange={onChange}
-						/>
-					</div>
-				</div>
-				{/* Row 7 */}
-				<div className="flex gap-4">
-					{/* Input 13 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field13">
-							Latitude
-						</label>
-						<NumericTextBoxComponent
-							id="latdec"
-							name="latdec"
-							value={data.latdec}
-							placeholder="Enter Latitude"
-							showSpinButton={false}
-							decimals={5}
-							format="n5"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-					{/* Input 14 */}
-					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field14">
-							Longitude
-						</label>
-						<NumericTextBoxComponent
-							id="longdec"
-							name="longdec"
-							value={data.longdec}
-							placeholder="Enter Longitude"
-							showSpinButton={false}
-							decimals={5}
-							format="n5"
-							required={true}
-							onChange={onChange}
-						/>
-					</div>
-				</div>
 				{/* End of Input Fields */}
 			</div>
 		</div>
 	);
 };
 
-export default ProjectEditTemplate;
+export default ContactEditTemplate;
 

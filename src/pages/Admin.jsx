@@ -6,7 +6,7 @@ import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ValidateUsersTab from "./ValidateUsersTab";
 import FirmsTab from "./FirmsTab";
 import ContactsTab from "./ContactsTab";
-import NewRigsTab from "./NewRigsTab";
+import RigsTab from "./RigsTab";
 import ProductsTab from "./ProductsTab";
 import SupplierProductsTab from "./SupplierProductsTab";
 import useUserStore from "../stores/UserStore";
@@ -53,7 +53,7 @@ const Admin = () => {
 							</div>
 							{/* Rigs Tab */}
 							<div>
-								<NewRigsTab />
+								<RigsTab />
 							</div>
 							{/* Contacts Tab */}
 							<div>

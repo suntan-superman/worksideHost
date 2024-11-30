@@ -16,22 +16,33 @@ import {
 import { useProductContext } from "../hooks/useProductContext";
 import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
 import useUserStore from "../stores/UserStore";
+import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
 
 import "../index.css";
 import "../App.css";
 
 let gridPageSize = 10;
 
+// TODO Delete
+// TODO Update
+// TODO Create
+
 const SupplierProductsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
 	let supplierProductsGridRef = useRef(null);
 	const [productList, setProductList] = useState(null);
 	const [supplierProductList, setSupplierProductList] = useState(null);
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [messageText, setMessageText] = useState("");
+	const [insertFlag, setInsertFlag] = useState(false);
+	const [currentRecord, setCurrentRecord] = useState(null);
+
 	const editOptions = {
 		allowEditing: true,
 		allowAdding: true,
 		allowDeleting: true,
 		mode: "Dialog",
+		template: (props) => <SupplierProductEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
 	const { productData, dispatch: productDispatch } = useProductContext();
@@ -41,27 +52,26 @@ const SupplierProductsTab = () => {
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
 
-	
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
-useEffect(() => {
-	const fetchProducts = async () => {
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/product`,
-		);
-		const json = await response.json();
+	useEffect(() => {
+		const fetchProducts = async () => {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/product`,
+			);
+			const json = await response.json();
 
-		setProductList(json);
+			setProductList(json);
 
-		if (response.ok) {
-			productDispatch({ type: "GET_PRODUCTS", payload: json });
-		}
-	};
-	fetchProducts();
-}, [productDispatch]);
+			if (response.ok) {
+				productDispatch({ type: "GET_PRODUCTS", payload: json });
+			}
+		};
+		fetchProducts();
+	}, [productDispatch]);
 
 	useEffect(() => {
 		const fetchSupplierProducts = async () => {
@@ -81,8 +91,29 @@ useEffect(() => {
 		fetchSupplierProducts();
 	}, [supplierProductDispatch]);
 
-	const supplierProductsActionComplete = async (args) => {
-		if (!supplierProductsGridRef) return;
+	const actionComplete = async (args) => {
+		// console.log(`Action Complete: ${args.requestType}`);
+		if (args.requestType === "beginEdit" || args.requestType === "add") {
+			const dialog = args.dialog;
+			dialog.showCloseIcon = false;
+			dialog.height = 400;
+			dialog.width = 600;
+			// Set Insert Flag
+			setInsertFlag(args.requestType === "add");
+			// change the header of the dialog
+			dialog.header =
+				args.requestType === "beginEdit"
+					? `Edit Record of ${args.rowData.supplier}-${args.rowData.product}`
+					: "New Supplier-Product Record";
+		}
+		if (args.requestType === "save") {
+			// Save or Update Data
+			const data = args.data;
+			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+			setMessageText(`Update Project ${args.data.projectname} Details?`);
+			setCurrentRecord(data);
+			setOpenUpdateModal(true);
+		}
 	};
 
 	const rowSelectedSupplierProduct = () => {
@@ -110,13 +141,52 @@ useEffect(() => {
 		}
 	};
 
+	const SaveSupplierProductsData = async () => {
+		if (insertFlag === true) {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(currentRecord),
+				},
+			);
+			const jsonData = await response.json();
+			if (response.status === 200) {
+				toast.success("Record Successfully Added...");
+			} else {
+				toast.error("Record Add Failed...");
+			}
+			setInsertFlag(false);
+		} else {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct/${currentRecord._id}`,
+				{
+					method: "PATCH",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(currentRecord),
+				},
+			);
+			const jsonData = await response.json();
+			if (response.status === 200) {
+				toast.success("Record Successfully Updated...");
+			} else {
+				toast.error("Record Update Failed...");
+			}
+		}
+	};
+
 	return (
 		<div>
 			<div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start">
 				<GridComponent
 					id="supplierProductGridElement"
 					dataSource={supplierProductList}
-					actionComplete={supplierProductsActionComplete}
+					actionComplete={actionComplete}
 					allowSelection
 					allowFiltering
 					allowResizing
@@ -178,6 +248,14 @@ useEffect(() => {
 					/>
 				</GridComponent>
 			</div>
+			{openUpdateModal && (
+				<ConfirmationDialog
+					open={openUpdateModal}
+					message={messageText}
+					onConfirm={() => SaveSupplierProductsData()}
+					onCancel={() => setOpenUpdateModal(false)}
+				/>
+			)}
 		</div>
 	);
 };
