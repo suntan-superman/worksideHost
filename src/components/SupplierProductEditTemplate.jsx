@@ -4,8 +4,11 @@ import React, { useEffect, useState } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
+import { filter, set } from "lodash";
 
 const statusOptions = ["ACTIVE", "INACTIVE"];
+
+let productOptions = null;
 
 // TODO Complete the SupplierProductEditTemplate component
 
@@ -13,7 +16,7 @@ const SupplierProductEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [supplierOptions, setSupplierOptions] = useState([]);
 	const [categoryOptions, setCategoryOptions] = useState([]);
-	const [productOptions, setProductOptions] = useState([]);
+	// const [productOptions, setProductOptions] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
 	const [currentCategory, setCurrentCategory] = useState("");
@@ -22,17 +25,21 @@ const SupplierProductEditTemplate = (props) => {
 		// ReadOnly flag
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
+			data.status = "ACTIVE";
+			data.statusdate = new Date();
 		} else {
 			setReadOnlyFlag(true);
 		}
 	}, [data.isAdd]);
 
 	const FilterProducts = (selectedItem) => {
-		const products = productOptions.filter(
-			(p) => p.categoryname === selectedItem,
-		);
-		const productList = [...new Set(products.map((p) => p.productname))];
-		setFilteredProducts(productList);
+		if (productOptions !== null && productOptions.length > 0) {
+			const products = productOptions.filter(
+				(p) => p.categoryname === selectedItem,
+			);
+			const productList = [...new Set(products.map((p) => p.productname))];
+			setFilteredProducts(productList);
+		}
 	};
 
 	// Handle input changes
@@ -68,14 +75,43 @@ const SupplierProductEditTemplate = (props) => {
 		setFilteredProducts(productList);
 	};
 
+	const SetFilteredProducts = (category) => {
+		const products = productOptions.filter((p) => p.categoryname === category);
+		// console.log(`Category: ${category} Products: ${JSON.stringify(products)}`);
+		const productList = [...new Set(products.map((p) => p.productname))];
+		// console.log(`Product List: ${JSON.stringify(productList)}`);
+		setFilteredProducts(productList);
+	};
+
+	const getUniqueProductNames = (categoryName) => {
+		// console.log(
+		// 	`New Filtered Products Category: ${categoryName} ${JSON.stringify(productOptions)}`,
+		// );
+
+		const filteredProducts = productOptions
+			.filter((item) => item.categoryname === categoryName) // Filter by category
+			.map((item) => item.productname); // Extract product names
+		// console.log(
+		// 	`New Filtered Products Function: ${JSON.stringify(filteredProducts)}`,
+		// );
+		return [...new Set(filteredProducts)]; // Remove duplicates using Set
+	};
+
 	const fetchProducts = async () => {
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/product`,
-		);
+		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/product`);
 		const json = await response.json();
-		setProductOptions(json);
+		// setProductOptions(json);
+		productOptions = json;
+		// console.log(`Product Options: ${JSON.stringify(json)}`);
 		const cats = [...new Set(json.map((p) => p.categoryname))];
 		setCategoryOptions(cats);
+		if (data.isAdd === false) {
+			// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
+			const filteredProducts = getUniqueProductNames(data.category);
+			// window.alert(`New Filtered Products: ${filteredProducts}`);
+			setFilteredProducts(filteredProducts);
+			// SetFilteredProducts(data.category);
+		}
 	};
 
 	useEffect(() => {
@@ -83,7 +119,6 @@ const SupplierProductEditTemplate = (props) => {
 	}, [currentCategory]);
 
 	useEffect(() => {
-		// Get Customer and Rig Company Options from Firm Collection
 		fetchSupplierOptions();
 		fetchProducts();
 	}, []);

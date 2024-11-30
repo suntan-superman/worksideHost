@@ -47,6 +47,8 @@ const ProductsEditTemplate = (props) => {
 		// ReadOnly flag
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
+			data.status = "ACTIVE";
+			data.statusdate = new Date();
 		} else {
 			setReadOnlyFlag(true);
 		}
@@ -54,8 +56,6 @@ const ProductsEditTemplate = (props) => {
 
 	// Handle input changes
 	const onChange = (args) => {
-		// Only for debugging purposes
-		console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
 		setData({ ...data, [args.target.name]: args.target.value });
 	};
 
@@ -63,28 +63,17 @@ const ProductsEditTemplate = (props) => {
 
 	const fetchOptions = async () => {
 		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
-
-		// Get Customers
-		const customerResult = json.filter((json) => json.type === "CUSTOMER");
-		// Extract names into an array
-		const customers = customerResult.map((r) => r.name);
-		setCustomerOptions(customers);
-
+		if (data.isAdd) {
+			data.status = "ACTIVE";
+			data.statusdate = new Date();
+		}
 		setIsLoading(false);
 	};
 
-	// useEffect(() => {
-	// 	// Get Customer and Rig Company Options from Firm Collection
-	// 	fetchOptions();
-	// }, []);
-
-	// field="categoryname"
-	// field="productname"
-	// field="description"
-	// field="status"
-	// field="statusdate"
+	useEffect(() => {
+		// Get Customer and Rig Company Options from Firm Collection
+		fetchOptions();
+	}, []);
 
 	return (
 		<div className="flex justify-center items-center bg-white">
@@ -132,7 +121,8 @@ const ProductsEditTemplate = (props) => {
 							placeholder="Enter Product/Service"
 							required={true}
 							onChange={onChange}
-							readonly={readOnlyFlag}
+							disabled={readOnlyFlag}
+							// readonly={readOnlyFlag}
 						/>
 					</div>
 				</div>

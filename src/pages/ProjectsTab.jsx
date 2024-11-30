@@ -194,14 +194,9 @@ const ProjectsTab = () => {
 
 	const SaveProjectData = async () => {
 		setOpenUpdateModal(false);
-		// TODO Change API URL
-		const localHost = "http://localhost:4000";
 		if (insertFlag) {
-			// Insert Record
-			window.alert(`Insert Project: ${JSON.stringify(currentRecord)}`);
 			const response = await fetch(
-				`${localHost}/api/project/`,
-				// `${process.env.REACT_APP_MONGO_URI}/api/project/`,
+				`${process.env.REACT_APP_MONGO_URI}/api/project/`,
 				{
 					method: "POST",
 					body: JSON.stringify(currentRecord),
@@ -218,8 +213,6 @@ const ProjectsTab = () => {
 			}
 			setInsertFlag(false);
 		} else {
-			window.alert(`Update Project: ${JSON.stringify(currentRecord)}`);
-			window.alert(`Update Project ID: ${JSON.stringify(currentRecord._id)}`);
 			const requestOptions = {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
@@ -241,7 +234,8 @@ const ProjectsTab = () => {
 					longdec: currentRecord.longdec,
 				}),
 			};
-			const fetchString = `http://localhost:4000/api/project/${currentRecord._id}`;
+			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${currentRecord._id}`;
+			// const fetchString = `http://localhost:4000/api/project/${currentRecord._id}`;
 			try {
 				const response = await fetch(fetchString, requestOptions);
 				const jsonData = await response.json();

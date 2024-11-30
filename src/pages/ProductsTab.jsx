@@ -14,7 +14,6 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
-import { useProductContext } from "../hooks/useProductContext";
 import useUserStore from "../stores/UserStore";
 import ProductsEditTemplate from "../components/ProductsEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
@@ -24,6 +23,7 @@ import "../App.css";
 
 let gridPageSize = 10;
 
+
 // TODO Delete
 // TODO Update
 // TODO Create
@@ -31,20 +31,21 @@ let gridPageSize = 10;
 const ProductsTab = () => {
 	const accessLevel = useUserStore((state) => state.accessLevel);
 	let productsGridRef = useRef(null);
-	const { productData, dispatch: productDispatch } = useProductContext();
 
 	const [productList, setProductList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [currentRecord, setCurrentRecord] = useState([]);
+
 	const [messageText, setMessageText] = useState("");
 	const editOptions = {
 		allowEditing: true,
 		allowAdding: true,
-		allowDeleting: true,
+		// allowDeleting: true,
 		mode: "Dialog",
 		template: (props) => <ProductsEditTemplate {...props} />,
 	};
-	const toolbarOptions = ["Add", "Edit", "Delete"];
+	const toolbarOptions = ["Add", "Edit"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -62,13 +63,9 @@ const ProductsTab = () => {
 			const json = await response.json();
 
 			setProductList(json);
-
-			if (response.ok) {
-				productDispatch({ type: "GET_PRODUCTS", payload: json });
-			}
 		};
 		fetchProducts();
-	}, [productDispatch]);
+	}, []);
 
 	const handleProductDelete = async () => {
 		const response = await fetch(
@@ -80,68 +77,39 @@ const ProductsTab = () => {
 		const json = await response.json();
 
 		if (response.ok) {
-			// Clear form useStates
-			// ResetUseStates();
 			toast.success("Record Successfully Deleted...");
-			// dispatch({ type: 'DELETE_PRODUCT', payload: json });
 		}
 	};
 
-	const productsActionComplete = async (args) => {
-		if (!productsGridRef) return;
-
-		if (
-			args.requestType === "beginEdit" ||
-			args.requestType === "add" ||
-			args.requestType === "update" ||
-			args.requestType === "save" ||
-			args.requestType === "delete"
-		) {
-			if (args.requestType === "beginEdit" || args.requestType === "add") {
-				const { dialog } = args;
-				dialog.header = "Workside Products/Services";
-			}
-			if (args.requestType === "add") {
-				// set insert flag
-				setInsertFlag(true);
-			}
-			if (args.requestType === "update") {
-				// set insert flag
-				setInsertFlag(false);
-			}
-			if (args.requestType === "save") {
-				// Save or Update Data
-				const { data } = args;
-
-				if (insertFlag === true) {
-					const response = await fetch(
-						`${process.env.REACT_APP_MONGO_URI}/api/product/`,
-						{
-							method: "POST",
-							body: JSON.stringify(data),
-							headers: {
-								"Content-Type": "application/json",
-							},
-						},
-					);
-
-					const json = await response.json();
-
-					if (response.ok) {
-						// console.log('Insert: ' + JSON.stringify(args.data));
-						// dispatch({ type: 'CREATE_PRODUCT', payload: json });
-					}
-				} else {
-					// dispatch({ type: 'CREATE_PRODUCT', payload: args.data });
-					// console.log('Update: ' + JSON.stringify(args.data));
-				}
-				setInsertFlag(false);
-			}
-			if (args.requestType === "delete") {
-				// Delete Data
-				handleProductDelete();
-				setInsertFlag(false);
-			}
+	const actionComplete = async (args) => {
+		// console.log(`Action Complete: ${args.requestType}`);
+		if (args.requestType === "beginEdit" || args.requestType === "add") {
+			const dialog = args.dialog;
+			dialog.showCloseIcon = false;
+			dialog.height = 400;
+			dialog.width = 600;
+			// Set Insert Flag
+			setInsertFlag(args.requestType === "add");
+			// change the header of the dialog
+			dialog.header =
+				args.requestType === "beginEdit"
+					? `Edit Record of ${args.rowData.categoryname} - ${args.rowData.productname}`
+					: "New Product";
+		}
+		if (args.requestType === "save") {
+			// Save or Update Data
+			const data = args.data;
+			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+			setMessageText(
+				`Update ${args.data.categoryname}- ${args.data.productname} Details?`,
+			);
+			setCurrentRecord(data);
+			setOpenUpdateModal(true);
+		}
+		if (args.requestType === "delete") {
+			// Delete Data
+			handleProductDelete();
+			setInsertFlag(false);
 		}
 	};
 
@@ -157,12 +125,15 @@ const ProductsTab = () => {
 	};
 
 	const SaveProductsData = async () => {
+		// Close Modal
+		setOpenUpdateModal(false);
 		if (insertFlag === true) {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
+				// "http://localhost:4000/api/product/",
+				`${process.env.REACT_APP_MONGO_URI}/api/product/`,
 				{
 					method: "POST",
-					body: JSON.stringify(productData),
+					body: JSON.stringify(currentRecord),
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -174,10 +145,11 @@ const ProductsTab = () => {
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
+				// `http://localhost:4000/api/product/${currentRecord._id}`,
+				`${process.env.REACT_APP_MONGO_URI}/api/product/${currentRecord._id}`,
 				{
 					method: "PATCH",
-					body: JSON.stringify(productData),
+					body: JSON.stringify(currentRecord),
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -186,7 +158,6 @@ const ProductsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) toast.success("Record Successfully Updated...");
-			setOpenUpdateModal(false);
 		}
 	};
 
@@ -210,7 +181,7 @@ const ProductsTab = () => {
 				<GridComponent
 					id="productGridElement"
 					dataSource={productList}
-					actionComplete={productsActionComplete}
+					actionComplete={actionComplete}
 					allowSelection
 					allowFiltering
 					allowResizing
