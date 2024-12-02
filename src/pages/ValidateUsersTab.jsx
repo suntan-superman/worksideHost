@@ -31,6 +31,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 // import { CloseIcon } from "@mui/icons-material";
 import { useStateContext } from "../contexts/ContextProvider";
+import useUserStore from "../stores/UserStore";
 import _ from "lodash";
 
 import "../index.css";
@@ -61,15 +62,16 @@ let gridPageSize = 10;
 const ValidateUsersTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [showDialog, setShowDialog] = useState(false);
+	const accessLevel = useUserStore((state) => state.accessLevel);
 
 	let usersGridRef = useRef(null);
 	const [userList, setUserList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const editOptions = {
-		allowEditing: true,
-		allowUpdating: true,
-		allowAdding: true,
-		allowDeleting: true,
+		allowEditing: accessLevel > 2,
+		allowUpdating: accessLevel > 2,
+		allowAdding: accessLevel > 2,
+		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 	};
 

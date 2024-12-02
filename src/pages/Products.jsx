@@ -15,6 +15,7 @@ import { toast } from "react-toastify";
 import { Header } from "../components";
 import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
+import useUserStore from "../stores/UserStore";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
@@ -24,12 +25,14 @@ const Products = () => {
  	const [isLoading, setIsLoading] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
+	const accessLevel = useUserStore((state) => state.accessLevel);
+
   const editOptions = {
-    allowEditing: true,
-    allowAdding: true,
-    allowDeleting: true,
-    mode: "Dialog",
-  };
+			allowEditing: accessLevel > 2,
+			allowAdding: accessLevel > 2,
+			allowDeleting: accessLevel > 2,
+			mode: "Dialog",
+		};
   const toolbarOptions = ["Add", "Edit", "Delete"];
   const { productsData, dispatch } = useProductContext();
 

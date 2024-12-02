@@ -42,6 +42,7 @@ const statusOptions = ["ACTIVE", "INACTIVE"];
 const ProductsEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
+	const [allCategories, setAllCategories] = useState([]);
 
 	useEffect(() => {
 		// ReadOnly flag
@@ -70,9 +71,23 @@ const ProductsEditTemplate = (props) => {
 		setIsLoading(false);
 	};
 
+	const fetchCategories = async () => {
+		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/product`;
+
+		try {
+			const response = await axios.get(strAPI);
+			const products = response.data;
+			const cats = [...new Set(products.map((p) => p.categoryname))];
+			setAllCategories(cats);
+		} catch (error) {
+			console.log("error", error);
+		}
+	};
+
 	useEffect(() => {
 		// Get Customer and Rig Company Options from Firm Collection
 		fetchOptions();
+		fetchCategories();
 	}, []);
 
 	return (
@@ -95,7 +110,8 @@ const ProductsEditTemplate = (props) => {
 						</label>
 						<DropDownListComponent
 							id="categoryname"
-							dataSource={categoryOptions}
+							// dataSource={categoryOptions}
+							dataSource={allCategories}
 							name="categoryname"
 							value={data.categoryname}
 							placeholder="Select Category"

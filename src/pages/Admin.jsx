@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 
-import ValidateUsersTab from "./ValidateUsersTab";
 import FirmsTab from "./FirmsTab";
 import ContactsTab from "./ContactsTab";
+import ValidateUsersTab from "./ValidateUsersTab";
 import RigsTab from "./RigsTab";
 import ProductsTab from "./ProductsTab";
-import SupplierProductsTab from "./SupplierProductsTab";
+import CustomerSupplierMSATab from "./CustomerSupplierMSATab";
+
 import useUserStore from "../stores/UserStore";
 
 import { Header } from "../components";
@@ -41,35 +42,34 @@ const Admin = () => {
 						{/* <TabItemsDirective> */}
 						<div className="e-tab-header">
 							<div>Companies</div>
-							<div>Rigs</div>
 							<div>Contacts</div>
-							<div>Products/Services</div>
-							<div>Supplier-Products</div>
 							<div>Validate Users</div>
+							<div>Rigs</div>
+							<div>Products/Services</div>
+							<div>Supplier MSA</div>
 						</div>
 						<div className="e-content">
 							<div>
 								<FirmsTab />
 							</div>
-							{/* Rigs Tab */}
-							<div>
-								<RigsTab />
-							</div>
 							{/* Contacts Tab */}
 							<div>
 								<ContactsTab />
+							</div>
+							<div>
+								<ValidateUsersTab />
+							</div>
+							{/* Rigs Tab */}
+							<div>
+								<RigsTab />
 							</div>
 							{/* Products/Services Tab */}
 							<div>
 								<ProductsTab />
 							</div>
-							{/* Supplier-Products Tab */}
+							{/* Customer Supplier MSA Tab */}
 							<div>
-								<SupplierProductsTab />
-							</div>
-							{/* End of Supplier-Products Tab */}
-							<div>
-								<ValidateUsersTab />
+								<CustomerSupplierMSATab />
 							</div>
 						</div>
 					</TabComponent>
