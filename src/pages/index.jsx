@@ -8,5 +8,4 @@ export { default as Projects } from './Projects';
 export { default as Settings } from './Settings';
 export { default as Suppliers } from './Suppliers';
 export { default as Requests } from './Requests';
-export { default as Supplier } from "./Supplier";
 

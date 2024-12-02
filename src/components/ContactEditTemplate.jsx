@@ -41,8 +41,6 @@ const ContactEditTemplate = (props) => {
 		// ReadOnly flag
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
-			data.status = "ACTIVE";
-			data.statusdate = new Date();
 		} else {
 			setReadOnlyFlag(true);
 		}
@@ -124,7 +122,7 @@ const ContactEditTemplate = (props) => {
 							placeholder="Enter First Name"
 							required={true}
 							onChange={onChange}
-							readonly={readOnlyFlag ? "true" : "false"}
+							readonly={readOnlyFlag}
 						/>
 					</div>
 					{/* Input 2 */}
@@ -144,7 +142,7 @@ const ContactEditTemplate = (props) => {
 							placeholder="Enter Last Name"
 							required={true}
 							onChange={onChange}
-							readonly={readOnlyFlag ? "true" : "false"}
+							readonly={readOnlyFlag}
 						/>
 					</div>
 				</div>
@@ -240,8 +238,7 @@ const ContactEditTemplate = (props) => {
 							placeholder="Enter Primary Email"
 							required={true}
 							onChange={onChange}
-							readonly={"true"}
-							s
+							readonly={readOnlyFlag}
 						/>
 					</div>
 					{/* Input 8 */}
@@ -281,7 +278,10 @@ const ContactEditTemplate = (props) => {
 					</div>
 					{/* Input 10 */}
 					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field10">
+						<label
+							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field10"
+						>
 							Secondary Phone
 						</label>
 						<input
@@ -315,7 +315,10 @@ const ContactEditTemplate = (props) => {
 					</div>
 					{/* Input 12 */}
 					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field12">
+						<label
+							className={`${!data.isAdd ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field12"
+						>
 							Status Date
 						</label>
 						<DatePickerComponent

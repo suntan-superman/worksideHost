@@ -9,7 +9,6 @@ import {
 	MdAccountTree,
 	MdRequestPage,
 } from "react-icons/md";
-import { TbTruckDelivery } from "react-icons/tb";
 import avatar from './avatar.jpg';
 import avatar2 from './avatar2.jpg';
 import avatar3 from './avatar3.png';
@@ -35,16 +34,12 @@ export const links = [
 				icon: <MdNotifications style={{ color: "green" }} size={24} />,
 			},
 			{
-				name: "scheduler",
-				icon: <AiOutlineCalendar style={{ color: "green" }} size={24} />,
-			},
-			{
-				name: "supplier",
-				icon: <TbTruckDelivery style={{ color: "green" }} size={24} />,
-			},
-			{
 				name: "admin",
 				icon: <MdSupervisorAccount style={{ color: "green" }} size={24} />,
+			},
+			{
+				name: "scheduler",
+				icon: <AiOutlineCalendar style={{ color: "green" }} size={24} />,
 			},
 		],
 	},

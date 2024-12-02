@@ -27,8 +27,11 @@ import { Header } from "../components";
 let gridPageSize = 8;
 let requestGrid = null;
 
-// TODO: Allow Primary Supplier Contact to add others to the list
-// Do this through requestors tree
+// TODO Delete
+// TODO Update
+// TODO Create
+
+// TODO: All Primary Supplier Contact to add others to the list
 
 const Requests = () => {
 	const [isLoading, setIsLoading] = useState(false);

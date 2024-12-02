@@ -38,9 +38,9 @@ const SupplierProductsTab = () => {
 	const [currentRecord, setCurrentRecord] = useState(null);
 
 	const editOptions = {
-		allowEditing: accessLevel > 2,
-		allowAdding: accessLevel > 2,
-		allowDeleting: accessLevel > 2,
+		allowEditing: true,
+		allowAdding: true,
+		allowDeleting: true,
 		mode: "Dialog",
 		template: (props) => <SupplierProductEditTemplate {...props} />,
 	};

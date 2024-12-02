@@ -1,5 +1,4 @@
-@import "./styles/material.css";
-/* @import url('https://cdn.syncfusion.com/ej2/23.1.43/material.css'); */
+@import url('https://cdn.syncfusion.com/ej2/23.1.43/material.css');
 
 * {
   margin: 0;
