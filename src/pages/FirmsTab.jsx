@@ -16,7 +16,7 @@ import {
 import { toast } from "react-toastify";
 import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
-import { useFirmContext } from "../hooks/useFirmContext";
+// import { useFirmContext } from "../hooks/useFirmContext";
 import useUserStore from "../stores/UserStore";
 import FirmEditTemplate from "../components/FirmEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
@@ -54,7 +54,7 @@ const FirmsTab = () => {
 		template: (props) => <FirmEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
-	const { firmData, dispatch: firmDispatch } = useFirmContext();
+	// const { firmData, dispatch: firmDispatch } = useFirmContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -104,7 +104,8 @@ const FirmsTab = () => {
 			setIsLoading(false);
 		};
 		fetchFirms();
-	}, [firmDispatch]);
+	}, []);
+	// }, [firmDispatch]);
 
 	const handleFirmDelete = async () => {
 		const response = await fetch(

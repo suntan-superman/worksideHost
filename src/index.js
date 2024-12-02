@@ -24,31 +24,31 @@ root.render(
 		<ContextProvider>
 			<UserContextProvider>
 				<useStateContext>
-					<ContactContextProvider>
+					{/* <ContactContextProvider>
 						<FirmContextProvider>
 							<ProductContextProvider>
 								<RequestContextProvider>
 									<ProjectContextProvider>
 										<ProjectRequestorsContextProvider>
-											<SupplierProductContextProvider>
-												<App />
-												<ToastContainer
-													position="top-right"
-													autoClose={5000}
-													hideProgressBar={false}
-													newestOnTop={false}
-													closeOnClick
-													draggable
-													pauseOnHover
-													theme="light"
-												/>
-											</SupplierProductContextProvider>
+											<SupplierProductContextProvider> */}
+					<App />
+					<ToastContainer
+						position="top-right"
+						autoClose={3000}
+						hideProgressBar={false}
+						newestOnTop={false}
+						closeOnClick
+						draggable
+						pauseOnHover
+						theme="light"
+					/>
+					{/* </SupplierProductContextProvider>
 										</ProjectRequestorsContextProvider>
 									</ProjectContextProvider>
 								</RequestContextProvider>
 							</ProductContextProvider>
 						</FirmContextProvider>
-					</ContactContextProvider>
+					</ContactContextProvider> */}
 				</useStateContext>
 			</UserContextProvider>
 		</ContextProvider>

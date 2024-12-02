@@ -13,8 +13,8 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { useProductContext } from "../hooks/useProductContext";
-import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
+// import { useProductContext } from "../hooks/useProductContext";
+// import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
 import useUserStore from "../stores/UserStore";
 import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
 
@@ -45,9 +45,9 @@ const SupplierProductsTab = () => {
 		template: (props) => <SupplierProductEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
-	const { productData, dispatch: productDispatch } = useProductContext();
-	const { supplierProductData, dispatch: supplierProductDispatch } =
-		useSupplierProductContext();
+	// const { productData, dispatch: productDispatch } = useProductContext();
+	// const { supplierProductData, dispatch: supplierProductDispatch } =
+	// 	useSupplierProductContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -66,12 +66,13 @@ const SupplierProductsTab = () => {
 
 			setProductList(json);
 
-			if (response.ok) {
-				productDispatch({ type: "GET_PRODUCTS", payload: json });
-			}
+			// if (response.ok) {
+			// 	productDispatch({ type: "GET_PRODUCTS", payload: json });
+			// }
 		};
 		fetchProducts();
-	}, [productDispatch]);
+	}, []);
+	// }, [productDispatch]);
 
 	useEffect(() => {
 		const fetchSupplierProducts = async () => {
@@ -81,15 +82,16 @@ const SupplierProductsTab = () => {
 			const json = await response.json();
 
 			setSupplierProductList(json);
-			if (response.ok) {
-				supplierProductDispatch({
-					type: "GET_SUPPLIERPRODUCTS",
-					payload: json,
-				});
-			}
+			// if (response.ok) {
+			// 	supplierProductDispatch({
+			// 		type: "GET_SUPPLIERPRODUCTS",
+			// 		payload: json,
+			// 	});
+			// }
 		};
 		fetchSupplierProducts();
-	}, [supplierProductDispatch]);
+	}, []);
+	// }, [supplierProductDispatch]);
 
 	const actionComplete = async (args) => {
 		// console.log(`Action Complete: ${args.requestType}`);

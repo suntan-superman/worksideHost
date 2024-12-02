@@ -13,7 +13,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
 import { Header } from "../components";
-import { useProductContext } from "../hooks/useProductContext";
+// import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
 
@@ -34,9 +34,9 @@ const Products = () => {
 			mode: "Dialog",
 		};
   const toolbarOptions = ["Add", "Edit", "Delete"];
-  const { productsData, dispatch } = useProductContext();
+  // const { productsData, dispatch } = useProductContext();
 
-  const [selectedRecord, setSelectedRecord] = useState(null);
+		const [selectedRecord, setSelectedRecord] = useState(null);
   // const [error, setError] = useState(null);
   // const [emptyFields, setEmptyFields] = useState([]);
   const settings = { mode: "Row" };
@@ -50,40 +50,41 @@ const Products = () => {
 
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-						const response = await fetch(
-							`${process.env.REACT_APP_MONGO_URI}/api/product`,
-						);
-						const json = await response.json();
+			const fetchProducts = async () => {
+				setIsLoading(true);
+				const response = await fetch(
+					`${process.env.REACT_APP_MONGO_URI}/api/product`,
+				);
+				const json = await response.json();
 
-						if (response.ok) {
-							dispatch({ type: "GET_PRODUCTS", payload: json });
-							setFilteredProducts(json);
-						}
-						setIsLoading(false);
-    };
-    fetchProducts();
-  }, [dispatch]);
+				if (response.ok) {
+					// dispatch({ type: "GET_PRODUCTS", payload: json });
+					setFilteredProducts(json);
+				}
+				setIsLoading(false);
+			};
+			fetchProducts();
+		}, []);
+		// }, [dispatch]);
 
-  const handleDelete = async () => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`;
-    const response = await fetch(fetchString, {
-      method: "DELETE",
-    });
-    // const json = await response.json();
+		const handleDelete = async () => {
+			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`;
+			const response = await fetch(fetchString, {
+				method: "DELETE",
+			});
+			// const json = await response.json();
 
-    // if (!response.ok) {
-    //   setError(json.error);
-    // }
-    if (response.ok) {
-      // Clear form useStates
-      // ResetUseStates();
-      toast.success("Record Successfully Deleted...");
-    }
-    // setDeleteFlag(false);
-    // setEmptyFields([]);
-  };
+			// if (!response.ok) {
+			//   setError(json.error);
+			// }
+			if (response.ok) {
+				// Clear form useStates
+				// ResetUseStates();
+				toast.success("Record Successfully Deleted...");
+			}
+			// setDeleteFlag(false);
+			// setEmptyFields([]);
+		};
 
   const actionComplete = async (args) => {
     if (!grid) return;
