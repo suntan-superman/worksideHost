@@ -2286,6 +2286,20 @@
   dependencies:
     "@syncfusion/ej2-icons" "~27.1.50"
 
+"@syncfusion/ej2-base@~27.2.2":
+  version "27.2.2"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-base/-/ej2-base-27.2.2.tgz#5f95984041ad38333ae473ec65fe143764314f19"
+  integrity sha512-bc/CTAC4BYenD2aw60h2A5wqM5Bzne2QGtAUHR25cSNMtPApAkQ67/unChlE28ZV5eSW3tVfw94bLH2q2tnmRA==
+  dependencies:
+    "@syncfusion/ej2-icons" "~27.2.2"
+
+"@syncfusion/ej2-buttons@27.2.4":
+  version "27.2.4"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-buttons/-/ej2-buttons-27.2.4.tgz#93fdd3dfcdfde1fda91a7009d39b5f6e4ab0c0d3"
+  integrity sha512-kZ/MF/gIeqiNMNIEHB6IiLORKX4cs3pkeHALCO2qOPp/0R/2e4KablK40xNALko4g22mbHWBtn6S84Kd3FpVBA==
+  dependencies:
+    "@syncfusion/ej2-base" "~27.2.2"
+
 "@syncfusion/ej2-buttons@~27.1.50", "@syncfusion/ej2-buttons@~27.1.53", "@syncfusion/ej2-buttons@~27.1.58":
   version "27.1.58"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-buttons/-/ej2-buttons-27.1.58.tgz#17f9ebb4c6c464febbc2f5289db6a5c29f76e104"
@@ -2478,6 +2492,11 @@
   version "27.1.50"
   resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-27.1.50.tgz#af719706ced97c64b6c17eeee726a503cf29e435"
   integrity sha512-LisXluEss0VnFuSh+pNSgHqT/Cg1FKTvkxdKWoSvqAma3dpcuCfrWP4svyMKPAsCi/hxAGdyy3ShKHu0PUP9iA==
+
+"@syncfusion/ej2-icons@~27.2.2":
+  version "27.2.2"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-icons/-/ej2-icons-27.2.2.tgz#453f1e848728217a81c5f5e82b2e01b6e96c21e9"
+  integrity sha512-Jl4Dvu+rocNDmY2wEwcwyYlGWJ2xRf8izdnARffR5Lu41OjZIh8fgo4fU2lXHdbqNXApm7DeItDY4soBtjgDCQ==
 
 "@syncfusion/ej2-image-editor@~27.1.58":
   version "27.1.58"
@@ -2711,6 +2730,22 @@
   integrity sha512-mmU99YM+oHbSYVjH0zo8THxyCYc63WRks9JSMFlfF+Bq1uNxJ5a5Cwovhyl12uffrdZDmIxpH35yXy0T9ueCEQ==
   dependencies:
     "@syncfusion/ej2-base" "~27.1.50"
+
+"@syncfusion/ej2-react-base@~27.2.2":
+  version "27.2.2"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-react-base/-/ej2-react-base-27.2.2.tgz#87b9891e8492dc20f98b9c20a59433386576a975"
+  integrity sha512-zlrfeSBOb7abH3rII28usyMVsuml5VHEANJtY0ijwLAd0ildmeUPBl86r576iUK8yWMPgTKHCL9XDtONewYUBA==
+  dependencies:
+    "@syncfusion/ej2-base" "~27.2.2"
+
+"@syncfusion/ej2-react-buttons@^27.2.4":
+  version "27.2.4"
+  resolved "https://registry.yarnpkg.com/@syncfusion/ej2-react-buttons/-/ej2-react-buttons-27.2.4.tgz#6351893c9b84925dadd35e1d8268b49ed650a407"
+  integrity sha512-6qyrFlq/rAaKV6+5dmwlCiSIPaH78GX8JrtgSeg7B/Wuj5d9l42c63gx/3rYTrjcn0D6Ws/xDwpxXytGrH4OJg==
+  dependencies:
+    "@syncfusion/ej2-base" "~27.2.2"
+    "@syncfusion/ej2-buttons" "27.2.4"
+    "@syncfusion/ej2-react-base" "~27.2.2"
 
 "@syncfusion/ej2-react-calendars@^27.1.57":
   version "27.1.57"

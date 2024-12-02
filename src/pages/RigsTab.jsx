@@ -8,7 +8,7 @@ import Modal from "@mui/material/Modal";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "../index.css";
-import { Merge } from "@mui/icons-material";
+import useUserStore from "../stores/UserStore";
 
 // TODO Need to Add FIlter Options for Rigs
 // TODO FIlter by Area, Company
@@ -25,6 +25,7 @@ const RigsTab = () => {
 	const [rigDescription, setRigDescription] = useState("");
 	const [errorMsg, setErrorMsg] = useState("");
 	const [hasData, setHasData] = useState(false);
+	const accessLevel = useUserStore((state) => state.accessLevel);
 
 	const [showPopup, setShowPopup] = useState(false);
 	const [selectedNodeData, setSelectedNodeData] = useState(null);
@@ -396,7 +397,7 @@ const RigsTab = () => {
 									<button
 										className="bg-green-300 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3"
 										type="button"
-										// disabled={!addButtonEnabled}
+										disabled={accessLevel < 2}
 										onClick={handleAddRig}
 									>
 										Add Rig
@@ -405,6 +406,7 @@ const RigsTab = () => {
 									<button
 										className="bg-red-300 hover:bg-red-500 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 										type="button"
+										disabled={accessLevel < 2}
 										onClick={handleDeleteRig}
 									>
 										Delete Rig

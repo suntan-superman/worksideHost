@@ -22,6 +22,7 @@ import { toast } from "react-toastify";
 import "../index.css";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import ProjectEditTemplate from "../components/ProjectEditTemplate";
+import areaOptions from "../data/areaOptions";
 
 let gridPageSize = 8;
 
@@ -108,14 +109,6 @@ const ProjectsTab = () => {
 		};
 		fetchFirms();
 	}, []);
-
-	// Set Location Selection Options
-	const areaOptions = [
-		{ name: "GULF COAST", nameId: "1" },
-		{ name: "MID-CONTINENT", nameId: "2" },
-		{ name: "WEST COAST", nameId: "3" },
-		{ name: "WEST TEXAS", nameId: "4" },
-	];
 
 	const areaSelections = {
 		params: {

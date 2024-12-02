@@ -21,6 +21,8 @@ import useUserStore from "../stores/UserStore";
 import FirmEditTemplate from "../components/FirmEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
+import areaOptions from "../data/areaOptions";
+
 import "../index.css";
 import "../App.css";
 
@@ -43,10 +45,11 @@ const FirmsTab = () => {
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState([]);
+	 
 	const editOptions = {
-		allowEditing: true,
-		allowAdding: true,
-		allowDeleting: true,
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
+		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 		template: (props) => <FirmEditTemplate {...props} />,
 	};
@@ -74,20 +77,11 @@ const FirmsTab = () => {
 		},
 	};
 
-	// Set Location Type Selection Options
-	const locationOptions = [
-		{ location: "WESTCOAST", locationId: "1" },
-		{ location: "GULFCOAST", locationId: "2" },
-		{ location: "PERMIAN", locationId: "3" },
-		{ location: "EASTCOAST", locationId: "4" },
-		{ location: "MIDCONTINENT", locationId: "5" },
-	];
-
 	const locationSelections = {
 		params: {
 			actionComplete: () => false,
 			allowFiltering: true,
-			dataSource: new DataManager(locationOptions),
+			dataSource: new DataManager(areaOptions),
 			fields: { text: "location", value: "location" },
 			query: new Query(),
 		},
@@ -136,7 +130,7 @@ const FirmsTab = () => {
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
-			dialog.height = 600;
+			dialog.height = 500;
 			dialog.width = 600;
 			// Set Insert Flag
 			setInsertFlag(args.requestType === "add");

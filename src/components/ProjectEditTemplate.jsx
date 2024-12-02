@@ -1,13 +1,12 @@
 /* eslint-disable */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
 
-// Set Selection Options
-const areaOptions = ["GULF COAST", "MID-CONTINENT", "WEST COAST", "WEST TEXAS"];
+import areaOptions from "../data/areaOptions";
 
 const statusOptions = [
 	"ACTIVE",

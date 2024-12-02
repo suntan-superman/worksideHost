@@ -5,8 +5,7 @@ import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
 
-// Set Selection Options
-const areaOptions = ["GULF COAST", "MID-CONTINENT", "WEST COAST", "WEST TEXAS"];
+import areaOptions from "../data/areaOptions";
 
 const statusOptions = ["ACTIVE", "INACTIVE"];
 

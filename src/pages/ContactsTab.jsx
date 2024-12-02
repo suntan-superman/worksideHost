@@ -40,9 +40,8 @@ const ContactsTab = () => {
 	const [currentRecord, setCurrentRecord] = useState(null);
 
 	const editOptions = {
-		allowEditing: true,
-		allowAdding: true,
-		// allowDeleting: true,
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
 		mode: "Dialog",
 		template: (props) => <ContactEditTemplate {...props} />,
 	};

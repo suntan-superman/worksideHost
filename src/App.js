@@ -12,6 +12,7 @@ import {
 	Notifications,
 	Requests,
 	Admin,
+	Supplier,
 	Scheduler,
 } from "./pages";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -27,6 +28,7 @@ import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
 import { toast } from "react-toastify";
 
+import "./styles/material.css";
 // TODO: Implement privileges based on access level
 
   const onLogOut = () => {
@@ -137,6 +139,11 @@ const MainApp = () => {
 										path="/admin"
 										// exact
 										element={<Admin />}
+									/>
+									<Route
+										path="/supplier"
+										// exact
+										element={<Supplier />}
 									/>
 									<Route path="/scheduler" exact element={<Scheduler />} />
 									<Route

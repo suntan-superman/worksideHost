@@ -39,8 +39,8 @@ const ProductsTab = () => {
 
 	const [messageText, setMessageText] = useState("");
 	const editOptions = {
-		allowEditing: true,
-		allowAdding: true,
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
 		// allowDeleting: true,
 		mode: "Dialog",
 		template: (props) => <ProductsEditTemplate {...props} />,
