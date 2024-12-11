@@ -10,6 +10,16 @@ import "../index.css";
 import { toast } from "react-toastify";
 import useUserStore from "../stores/UserStore";
 
+// Customer-Supplier-MSA Data
+
+// Customer Name
+// Customer ID
+// Supplier Name
+// Supplier ID
+// MSA Status
+// MSA Status Date
+// MSA Renewal Date
+
 const CustomerSupplierMSATab = () => {
 	const [refreshFlag, setRefreshFlag] = useState(false);
 	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);

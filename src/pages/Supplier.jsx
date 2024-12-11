@@ -6,6 +6,7 @@ import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import SupplierProductsTab from "./SupplierProductsTab";
 import SupplierGroupsTab from "./SupplierGroupsTab";
 import SupplierGroupsUsersTab from "./SupplierGroupsUsersTab";
+import SupplierGroupUsersTabX from "./SupplierGroupUsersTabX";
 import useUserStore from "../stores/UserStore";
 
 import { Header } from "../components";
@@ -39,20 +40,15 @@ const Supplier = () => {
 					<div className="e-tab-header">
 						<div>Products</div>
 						<div>Group Setup </div>
-						<div>Group Users</div>
 					</div>
 					<div className="e-content">
 						{/* Supplier-Products Tab */}
 						<div>
 							<SupplierProductsTab />
 						</div>
-						{/* Group Setup Tab */}
-						<div>
-							<SupplierGroupsTab />
-						</div>
 						{/* Group Users Tab */}
 						<div>
-							<SupplierGroupsUsersTab />
+							<SupplierGroupUsersTabX />
 						</div>
 					</div>
 				</TabComponent>

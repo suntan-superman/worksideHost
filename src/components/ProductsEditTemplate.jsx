@@ -110,7 +110,6 @@ const ProductsEditTemplate = (props) => {
 						</label>
 						<DropDownListComponent
 							id="categoryname"
-							// dataSource={categoryOptions}
 							dataSource={allCategories}
 							name="categoryname"
 							value={data.categoryname}

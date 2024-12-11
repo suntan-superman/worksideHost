@@ -10,6 +10,15 @@ import "../index.css";
 import { toast } from "react-toastify";
 import useUserStore from "../stores/UserStore";
 
+// SupplierGroup Data
+
+// Supplier Name
+// Supplier ID
+// Supplier Group Name
+// Supplier Group Description
+// Supplier Group Status
+// Supplier Product Category
+
 const SupplierGroupsTab = () => {
 	const [refreshFlag, setRefreshFlag] = useState(false);
 	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);
@@ -21,22 +30,22 @@ const SupplierGroupsTab = () => {
 	const treeData = [
 		{
 			id: 1,
-			name: "Group 1",
+			name: "Supplier 1 Group 1",
 			hasChild: true,
 			expanded: true,
 			children: [
-				{ id: 2, name: "Category 1", msaStatus: "Active" },
-				{ id: 3, name: "Category 2", msaStatus: "Active" },
+				{ id: 2, name: "Category 1", status: "Active" },
+				{ id: 3, name: "Category 2", status: "Active" },
 			],
 		},
 		{
 			id: 4,
-			name: "Group 2",
+			name: "Supplier 1 Group 2",
 			hasChild: true,
 			expanded: true,
 			children: [
-				{ id: 5, name: "Category 1", msaStatus: "Active" },
-				{ id: 6, name: "Category 3", msaStatus: "Active" },
+				{ id: 5, name: "Category 1", status: "Active" },
+				{ id: 6, name: "Category 3", status: "Active" },
 			],
 		},
 		{
@@ -45,9 +54,9 @@ const SupplierGroupsTab = () => {
 			hasChild: true,
 			expanded: true,
 			children: [
-				{ id: 8, name: "Category 1", msaStatus: "Active" },
-				{ id: 9, name: "Category 2", msaStatus: "InActive" },
-				{ id: 10, name: "Category 4", msaStatus: "Active" },
+				{ id: 8, name: "Category 1", status: "Active" },
+				{ id: 9, name: "Category 2", status: "InActive" },
+				{ id: 10, name: "Category 4", status: "Active" },
 			],
 		},
 	];

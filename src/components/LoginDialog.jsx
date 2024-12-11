@@ -34,7 +34,7 @@ const LoginDialog = () => {
 	const [forgotPasswordFlag, setForgotPasswordFlag] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
 
-	const isFormValid = userName.trim() !== "" && password.trim() !== "";
+	const isFormValid = userName?.trim() !== "" && password?.trim() !== "";
 
 	const onSaveUserName = (user, email) => {
 		localStorage.setItem("loginName", user);
