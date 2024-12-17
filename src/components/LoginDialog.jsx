@@ -22,6 +22,8 @@ const LoginDialog = () => {
 		userEmail,
 		accessLevel,
 		setAccessLevel,
+		setCompanyName,
+		setCompanyID,
 	} = useStateContext();
 	// const accessLevel = useUserStore((state) => state.accessLevel);
 	// const setAccessLevel = useUserStore((state) => state.setAccessLevel);
@@ -125,11 +127,19 @@ const LoginDialog = () => {
 							localStorage.setItem("logInFlag", "true");
 							localStorage.setItem("token", jsonData.user.userToken);
 							setGlobalUserName(JSON.stringify(jsonData.user.user));
-							localStorage.setItem("userName", JSON.stringify(jsonData.user.user));
-							localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
+							localStorage.setItem(
+								"userName",
+								JSON.stringify(jsonData.user.user),
+							);
+							localStorage.setItem(
+								"userID",
+								JSON.stringify(jsonData.user.userId),
+							);
 							const email = JSON.stringify(jsonData.user.email);
 							setUserEmail(email);
 							onSaveUserName(userName, email);
+							setCompanyName(jsonData.user.company);
+							console.log("Company: ", jsonData.user.company);
 						},
 					);
 				}

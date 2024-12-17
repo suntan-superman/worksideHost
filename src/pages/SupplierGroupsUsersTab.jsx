@@ -436,8 +436,8 @@ const SupplierGroupsUsersTab = () => {
 				// console.log("Supplier ID: ", id);
 				axios
 					.get(
-						// `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`,
-						`http://localhost:4000/api/suppliergroup/${id}`,
+						`${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`,
+						// `http://localhost:4000/api/suppliergroup/${id}`,
 					)
 					.then((response) => {
 						console.log("Response: ", JSON.stringify(response.data));
@@ -446,11 +446,6 @@ const SupplierGroupsUsersTab = () => {
 							if (data) {
 								newGroupTreeData = data;
 								SetGroupTreeDataFromDB(newGroupTreeData);
-								// setGroupTreeData(data);
-								// setRefreshFlag(true);
-
-								// expandTree();
-								// console.log("Group Tree Data: ", JSON.stringify(groupTreeData));
 							} else {
 								InitializeGroupTreeData(supplierName, id);
 								console.log("Supplier Group Not Found");

@@ -228,7 +228,6 @@ const ProjectsTab = () => {
 				}),
 			};
 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${currentRecord._id}`;
-			// const fetchString = `http://localhost:4000/api/project/${currentRecord._id}`;
 			try {
 				const response = await fetch(fetchString, requestOptions);
 				const jsonData = await response.json();

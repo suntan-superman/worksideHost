@@ -120,6 +120,7 @@ const ProjectRequestorsTab = () => {
 				.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
 				.then((res) => {
 					const jsonResults = res.data;
+					console.log(`Projects: ${JSON.stringify(jsonResults)}`);
 					setProjectList(jsonResults);
 				});
 		} catch (error) {

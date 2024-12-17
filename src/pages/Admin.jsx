@@ -8,7 +8,7 @@ import ContactsTab from "./ContactsTab";
 import ValidateUsersTab from "./ValidateUsersTab";
 import RigsTab from "./RigsTab";
 import ProductsTab from "./ProductsTab";
-import CustomerSupplierMSATab from "./CustomerSupplierMSATab";
+import CustomerSupplierMSATabX from "./CustomerSupplierMSATabX";
 
 import useUserStore from "../stores/UserStore";
 
@@ -69,7 +69,7 @@ const Admin = () => {
 							</div>
 							{/* Customer Supplier MSA Tab */}
 							<div>
-								<CustomerSupplierMSATab />
+								<CustomerSupplierMSATabX />
 							</div>
 						</div>
 					</TabComponent>

@@ -778,7 +778,6 @@ const SupplierGroupUsersTabX = () => {
 	const GetSupplierGroupData = async (supplierName) => {
 		GetSupplierId(supplierName).then((id) => {
 			if (id) {
-				// const fetchString = `http://localhost:4000/api/suppliergroup/${id}`;
 				const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
 				const requestOptions = {
 					method: "GET",

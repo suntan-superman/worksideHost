@@ -22,6 +22,8 @@ export const ContextProvider = ({ children }) => {
   const [globalUserName, setGlobalUserName] = useState("");
   const [deleteFlag, setDeleteFlag] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [companyName, setCompanyName] = useState("");
+		const [companyID, setCompanyID] = useState(""); 
   const [accessLevel, setAccessLevel] = useState(0);
 
   const setMode = (e) => {
@@ -67,6 +69,10 @@ export const ContextProvider = ({ children }) => {
 					setUserEmail,
 					accessLevel,
 					setAccessLevel,
+					companyName,
+					setCompanyName,
+					companyID,
+					setCompanyID,
 				}}
 			>
 				{children}
