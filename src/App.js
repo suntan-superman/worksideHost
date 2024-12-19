@@ -7,7 +7,7 @@ import {
 	useStateContext,
 } from "./contexts/ContextProvider";
 import {
-	Dashboard,
+	DashboardXX,
 	Projects,
 	Notifications,
 	Requests,
@@ -127,7 +127,8 @@ const MainApp = () => {
 						<div>
 							<Routes>
 								<Route element={<PrivateRoutes />}>
-									<Route path="/dashboard" exact element={<Dashboard />} />
+									<Route path="/dashboard" exact element={<DashboardXX />} />
+									{/* <Route path="/dashboard" exact element={<Dashboard />} /> */}
 									<Route path="/projects" exact element={<Projects />} />
 									<Route path="/requests" exact element={<Requests />} />
 									<Route
