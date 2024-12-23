@@ -132,6 +132,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			open={open}
 			aria-labelledby="requestDetailsDialog"
 			PaperComponent={PaperComponent}
+			sx={{ height: "800px" }}
 		>
 			<DialogTitle id="requestDetailsDialog">
 				<span className="text-bold text-green-300 text-xl">WORK</span>
@@ -153,7 +154,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						</div>
 
 						{/* Column 2 */}
-						<div className="flex-1 ml-2.5 mr-2.5 text-left">
+						<div className="flex-1 ml-2.5 mr-2.5 text-left font-bold">
 							<p>{customerName}</p>
 							<p>{rigCompany}</p>
 							<p>{requestCategory}</p>
@@ -168,7 +169,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						<GoogleMap
 							// key={"5064698848aecbfb "}
 							mapId={"DEMO_ID"}
-							style={{ width: "500px", height: "500px" }}
+							style={{ width: "400px", height: "400px" }}
 							defaultCenter={reqLocation}
 							defaultZoom={8}
 							gestureHandling={"greedy"}

@@ -35,9 +35,11 @@ export function TopRatedSuppliers({ suppliers = [], sx }) {
 	};
 
 	return (
-		<Card sx={sx}>
+		<Card sx={{ minWidth: "300px" }}>
 			{/* Card Header */}
-			<CardHeader title="Top-Rated Suppliers" />
+			<Typography color="green" variant="h6" sx={{ textAlign: "left" }}>
+				Top-Rated Suppliers
+			</Typography>
 			<Divider />
 
 			{/* Supplier List */}
@@ -105,12 +107,12 @@ export function TopRatedSuppliers({ suppliers = [], sx }) {
 const SupplierRatingsModal = ({ open, onClose }) => {
 	const supplierList = [
 		{
-			id: "PRD-005",
+			id: "PRD-001",
 			name: "Baker Hughes",
 			rating: "5",
 		},
 		{
-			id: "PRD-004",
+			id: "PRD-002",
 			name: "Halliburton",
 			rating: "4.9",
 		},
@@ -120,12 +122,62 @@ const SupplierRatingsModal = ({ open, onClose }) => {
 			rating: "4.9",
 		},
 		{
-			id: "PRD-002",
+			id: "PRD-004",
 			name: "Basic",
 			rating: "4.85",
 		},
 		{
-			id: "PRD-001",
+			id: "PRD-005",
+			name: "San Joaquin Bit",
+			rating: "3.0",
+		},
+		{
+			id: "PRD-006",
+			name: "Baker Hughes",
+			rating: "5",
+		},
+		{
+			id: "PRD-007",
+			name: "Halliburton",
+			rating: "4.9",
+		},
+		{
+			id: "PRD-008",
+			name: "EnergyLink",
+			rating: "4.9",
+		},
+		{
+			id: "PRD-009",
+			name: "Basic",
+			rating: "4.85",
+		},
+		{
+			id: "PRD-010",
+			name: "San Joaquin Bit",
+			rating: "3.0",
+		},
+		{
+			id: "PRD-011",
+			name: "Baker Hughes",
+			rating: "5",
+		},
+		{
+			id: "PRD-012",
+			name: "Halliburton",
+			rating: "4.9",
+		},
+		{
+			id: "PRD-013",
+			name: "EnergyLink",
+			rating: "4.9",
+		},
+		{
+			id: "PRD-014",
+			name: "Basic",
+			rating: "4.85",
+		},
+		{
+			id: "PRD-015",
 			name: "San Joaquin Bit",
 			rating: "3.0",
 		},

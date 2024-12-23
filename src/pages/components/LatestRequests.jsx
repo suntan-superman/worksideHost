@@ -38,7 +38,10 @@ export function LatestRequests({ requests = [], sx }) {
 	return (
 		<Card sx={sx}>
 			{/* Header */}
-			<CardHeader title="Latest Requests" />
+			<Typography color="green" variant="h6" sx={{ textAlign: "left" }}>
+				Latest Requests
+			</Typography>
+			{/* <CardHeader title="Latest Requests" /> */}
 			<Divider />
 
 			{/* Table Container */}
@@ -105,35 +108,105 @@ export function LatestRequests({ requests = [], sx }) {
 const LatestRequestsModal = ({ open, onClose }) => {
 	const requestList = [
 		{
-			id: "ORD-007",
+			id: "ORD-001",
 			project: "383-26R Redrill",
 			request: "Drill Bit",
 			status: "pending",
 			createdAt: dayjs().subtract(10, "minutes").toDate(),
 		},
 		{
-			id: "ORD-006",
+			id: "ORD-002",
 			project: "66-7Z Pump Change",
 			request: "Electrical",
 			status: "pending",
 			createdAt: dayjs().subtract(10, "minutes").toDate(),
 		},
 		{
-			id: "ORD-004",
+			id: "ORD-003",
 			project: "35-18g Pump Change",
 			request: "Welder",
 			status: "awarded",
 			createdAt: dayjs().subtract(10, "minutes").toDate(),
 		},
 		{
-			id: "ORD-003",
+			id: "ORD-004",
 			project: "25A-18g Side Track",
 			request: "Vacuum Truck",
 			status: "pending",
 			createdAt: dayjs().subtract(10, "minutes").toDate(),
 		},
 		{
-			id: "ORD-002",
+			id: "ORD-005",
+			project: "388-22R Side Track",
+			request: "Vacuum Truck",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-006",
+			project: "383-26R Redrill",
+			request: "Drill Bit",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-007",
+			project: "66-7Z Pump Change",
+			request: "Electrical",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-008",
+			project: "35-18g Pump Change",
+			request: "Welder",
+			status: "awarded",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-009",
+			project: "25A-18g Side Track",
+			request: "Vacuum Truck",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-010",
+			project: "388-22R Side Track",
+			request: "Vacuum Truck",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-011",
+			project: "383-26R Redrill",
+			request: "Drill Bit",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-012",
+			project: "66-7Z Pump Change",
+			request: "Electrical",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-013",
+			project: "35-18g Pump Change",
+			request: "Welder",
+			status: "awarded",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-014",
+			project: "25A-18g Side Track",
+			request: "Vacuum Truck",
+			status: "pending",
+			createdAt: dayjs().subtract(10, "minutes").toDate(),
+		},
+		{
+			id: "ORD-015",
 			project: "388-22R Side Track",
 			request: "Vacuum Truck",
 			status: "pending",

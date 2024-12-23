@@ -6,9 +6,12 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
+import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
+import { toast } from "react-toastify";
 
 export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 	// Determine the Trend icon and color based on 'trend' prop
@@ -30,8 +33,7 @@ export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 					>
 						<Stack spacing={1}>
 							<Typography color="green" variant="h6">
-								{/* <Typography color="text.secondary" variant="overline"> */}
-								Requests This Month
+								Awarded This Month
 							</Typography>
 							<Typography variant="h4">{value}</Typography>
 						</Stack>
@@ -67,8 +69,28 @@ export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 							</Typography>
 						</Stack>
 					) : null}
+					<Button
+						color="inherit"
+						endIcon={
+							<ArrowRightIcon
+								fontSize="var(--icon-fontSize-md)"
+								color="black"
+							/>
+						}
+						size="small"
+						variant="text"
+						onClick={() => {
+							toast.info("Requests Awarded This Month", {
+								autoClose: 3000,
+								position: "top-right",
+							});
+						}}
+					>
+						Details
+					</Button>
 				</Stack>
 			</CardContent>
 		</Card>
 	);
 }
+

@@ -9,6 +9,8 @@ import { RequestsCompletedThisWeek } from "./components/RequestsCompletedThisWee
 import { RequestsCompletedThisMonth } from "./components/RequestsCompletedThisMonth";
 import { LatestRequests } from "./components/LatestRequests";
 import { TopRatedSuppliers } from "./components/TopRatedSuppliers";
+import { Header } from "../components";
+
 
 export default function DashboardXX() {
 	const supplierList = [
@@ -78,7 +80,8 @@ export default function DashboardXX() {
 	];
 
 	return (
-		<>
+		<div className="ml-3">
+			<Header category="Workside" title="Dashboard" />
 			<Grid2 container spacing={2} sx={{ height: "100vh", width: "100vw" }}>
 				<Grid2 container sx={{ height: "25%" }} spacing={2}>
 					{/* <Grid2 container spacing={3}> */}
@@ -129,12 +132,11 @@ export default function DashboardXX() {
 				<br />
 				<br />
 				{/* Second Row - 2 Items */}
-				{/* <Grid2 container sx={{ height: "75%", width: "100%" }} spacing={2}> */}
 				{/* First Item - 1/3 Width */}
 				<Grid2 container sx={{ height: "75%", width: "100%" }} spacing={2}>
 					{/* <Grid2 container spacing={3}> */}
 					{/* Top-Rated Suppliers */}
-					<Grid2 xs={5}>
+					<Grid2 xs={4}>
 						<TopRatedSuppliers
 							suppliers={supplierList}
 							sx={{ height: "100%", width: "100%" }}
@@ -142,7 +144,7 @@ export default function DashboardXX() {
 					</Grid2>
 
 					{/* Latest Requests */}
-					<Grid2 xs={7}>
+					<Grid2 xs={8}>
 						<LatestRequests
 							requests={requestList}
 							sx={{ height: "100%", width: "100%" }}
@@ -151,6 +153,6 @@ export default function DashboardXX() {
 				</Grid2>
 				{/* </Grid2> */}
 			</Grid2>
-		</>
+		</div>
 	);
 }

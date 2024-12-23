@@ -27,9 +27,6 @@ import { Header } from "../components";
 let gridPageSize = 8;
 let requestGrid = null;
 
-// TODO: Allow Primary Supplier Contact to add others to the list
-// Do this through requestors tree
-
 const Requests = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const { currentColor } = useStateContext();
