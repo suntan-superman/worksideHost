@@ -5,6 +5,14 @@ const userStore = (set) => ({
 	setAccessLevel: (value) => set({ accessLevel: value }),
 	userLoggedIn: false,
 	setUserLoggedIn: (value) => set({ userLoggedIn: value }),
+	currentUserMode: "CUSTOMER",
+	setCurrentUserMode: (value) => set({ currentUserMode: value }),
+	currentCompanyName: "",
+	setCurrentCompanyName: (value) => set({ currentCompanyName: value }),
+	currentCompanyID: "",
+	setCurrentCompanyID: (value) => set({ currentCompanyID: value }),
+	currentCompanyType: "",
+	setCurrentCompanyType: (value) => set({ currentCompanyType: value }),
 });
 
 const useUserStore = create(userStore);

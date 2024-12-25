@@ -18,19 +18,34 @@ const statusOptions = [
 
 const ProjectEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
-
-	// Handle input changes
-	const onChange = (args) => {
-		// Only for debugging purposes
-		console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
-		setData({ ...data, [args.target.name]: args.target.value });
-	};
-
 	const [isLoading, setIsLoading] = useState(false);
 	const [customerOptions, setCustomerOptions] = useState([]);
 	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
 	const [contactOptions, setContactOptions] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
+	const [validateLocationFlag, setValidateLocationFlag] = useState(false);
+	const [userLatitude, setUserLatitude] = useState(0);
+	const [userLongitude, setUserLongitude] = useState(0);
+
+// Handle input changes
+	const onChange = (args) => {
+		// Only for debugging purposes
+		// console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
+		if (args.target.name === "longdec" && validateLocationFlag) {
+			const distance = haversineDistance(
+				userLatitude,
+				userLongitude,
+				data.latdec,
+				args.target.value,
+			);
+			if (distance > 100)
+				alert(
+					"Distance between user location and project location is greater than 100 miles",
+				);
+			// console.log(`Distance: ${distance}`, null, 2);
+		}
+		setData({ ...data, [args.target.name]: args.target.value });
+	};
 
 	const fetchOptions = async () => {
 		setIsLoading(true);
@@ -52,11 +67,51 @@ const ProjectEditTemplate = (props) => {
 		setIsLoading(false);
 	};
 
+	const GetCurrentLocation = () => {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition((position) => {
+				const lat = position.coords.latitude;
+				const long = position.coords.longitude;
+				setData({ ...data, latdec: lat, longdec: long });
+				setUserLatitude(lat);
+				setUserLongitude(long);
+				setValidateLocationFlag(true);
+			});
+		} else {
+			alert("Geolocation is not supported by this browser.");
+			setValidateLocationFlag(false);
+		}
+	};
+
+	function haversineDistance(lat1, lon1, lat2, lon2) {
+		const toRadians = (degree) => (degree * Math.PI) / 180; // Convert degrees to radians
+
+		const R = 3958.8; // Radius of the Earth in miles
+		const dLat = toRadians(lat2 - lat1); // Delta latitude
+		const dLon = toRadians(lon2 - lon1); // Delta longitude
+		const radLat1 = toRadians(lat1); // Latitude 1 in radians
+		const radLat2 = toRadians(lat2); // Latitude 2 in radians
+
+		// Haversine formula
+		const a =
+			Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+			Math.cos(radLat1) *
+				Math.cos(radLat2) *
+				Math.sin(dLon / 2) *
+				Math.sin(dLon / 2);
+
+		const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+		const distance = R * c;
+
+		return distance; // Distance in miles
+	}
+
 	useEffect(() => {
 		// ReadOnly flag
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
 			SetDefaultDates();
+			GetCurrentLocation();
 		} else {
 			setReadOnlyFlag(true);
 		}

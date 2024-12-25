@@ -4,8 +4,8 @@ import React, { useEffect, useState } from "react";
 import { TabComponent } from "@syncfusion/ej2-react-navigations";
 
 import SupplierProductsTab from "./SupplierProductsTab";
-import SupplierGroupsTab from "./SupplierGroupsTab";
-import SupplierGroupsUsersTab from "./SupplierGroupsUsersTab";
+// import SupplierGroupsTab from "./SupplierGroupsTab";
+// import SupplierGroupsUsersTab from "./SupplierGroupsUsersTab";
 import SupplierGroupUsersTabX from "./SupplierGroupUsersTabX";
 import useUserStore from "../stores/UserStore";
 
