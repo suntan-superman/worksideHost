@@ -9,13 +9,6 @@ import App from './App';
 import {
 	ContextProvider,
 	UserContextProvider,
-	ContactContextProvider,
-	FirmContextProvider,
-	ProductContextProvider,
-	RequestContextProvider,
-	ProjectContextProvider,
-	ProjectRequestorsContextProvider,
-	SupplierProductContextProvider,
 } from "./contexts/ContextProvider";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -24,13 +17,6 @@ root.render(
 		<ContextProvider>
 			<UserContextProvider>
 				<useStateContext>
-					{/* <ContactContextProvider>
-						<FirmContextProvider>
-							<ProductContextProvider>
-								<RequestContextProvider>
-									<ProjectContextProvider>
-										<ProjectRequestorsContextProvider>
-											<SupplierProductContextProvider> */}
 					<App />
 					<ToastContainer
 						position="top-right"
@@ -42,13 +28,6 @@ root.render(
 						pauseOnHover
 						theme="light"
 					/>
-					{/* </SupplierProductContextProvider>
-										</ProjectRequestorsContextProvider>
-									</ProjectContextProvider>
-								</RequestContextProvider>
-							</ProductContextProvider>
-						</FirmContextProvider>
-					</ContactContextProvider> */}
 				</useStateContext>
 			</UserContextProvider>
 		</ContextProvider>

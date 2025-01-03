@@ -15,7 +15,6 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
 import { MaskedTextBox } from "@syncfusion/ej2-inputs";
-import { useContactContext } from "../hooks/useContactContext";
 import ContactEditTemplate from "../components/ContactEditTemplate";
 import useUserStore from "../stores/UserStore";
 

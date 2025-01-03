@@ -10,20 +10,14 @@ import { useStateContext } from "../contexts/ContextProvider";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
-import { signalAccessLevel } from "../stores/SignalStores";
-// import CookieConsent from "./CookieConsent";
-// import { useCookies } from "react-cookie";
 
 const LoginDialog = () => {
 	const {
 		setIsLoggedIn,
 		setGlobalUserName,
 		setUserEmail,
-		userEmail,
-		accessLevel,
 		setAccessLevel,
 		setCompanyName,
-		setCompanyID,
 	} = useStateContext();
 	// const accessLevel = useUserStore((state) => state.accessLevel);
 	// const setAccessLevel = useUserStore((state) => state.setAccessLevel);
@@ -50,25 +44,17 @@ const LoginDialog = () => {
 
 	const isUserValidated = async (userName) => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
-		// const fetchString =
-		// 	"https://workside-software.wl.r.appspot.com/api/user/is-user-validated";
 		const res = await axios.post(fetchString, {
 			email: userName,
-			// email: userName.replace(/"/g, ''),
 		});
 		if (res.data.status === false) {
 			window.alert(`User Not Validated: ${userName}`);
-			// toast.error(res.data.message, {
-			//   autoClose: 5000,
-			//   position: "top-right",
-			// });
 			return false;
 		}
 		return true;
 	};
 
 	const getUserAccessLevel = async (userName) => {
-		// const fetchString = `https://workside-software.wl.r.appspot.com/api/contact/email/${userName}`;
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${userName}`;
 		let accessLevel = -1;
 

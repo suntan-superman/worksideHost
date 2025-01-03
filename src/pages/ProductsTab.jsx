@@ -4,6 +4,7 @@ import {
 	GridComponent,
 	ColumnsDirective,
 	ColumnDirective,
+	ExcelExport,
 	Selection,
 	Edit,
 	Filter,
@@ -45,7 +46,7 @@ const ProductsTab = () => {
 		mode: "Dialog",
 		template: (props) => <ProductsEditTemplate {...props} />,
 	};
-	const toolbarOptions = ["Add", "Edit"];
+	const toolbarOptions = ["Add", "Edit", "ExcelExport"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -66,6 +67,14 @@ const ProductsTab = () => {
 		};
 		fetchProducts();
 	}, []);
+
+	const toolbarClick = (args) => {
+		console.log(`Toolbar Click: ${args.item.id}`);
+		if (productsGridRef && args.item.id === "productGridElement_excelexport") {
+			console.log("Excel Export");
+			productsGridRef.excelExport();
+		}
+	};
 
 	const handleProductDelete = async () => {
 		const response = await fetch(
@@ -186,9 +195,11 @@ const ProductsTab = () => {
 					allowFiltering
 					allowResizing
 					allowPaging
+					allowExcelExport
 					filterSettings={FilterOptions}
 					selectionSettings={settings}
 					toolbar={toolbarOptions}
+					toolbarClick={toolbarClick}
 					rowSelected={rowSelectedProduct}
 					enablePersistence
 					editSettings={editOptions}
@@ -247,7 +258,16 @@ const ProductsTab = () => {
 						/>
 					</ColumnsDirective>
 					<Inject
-						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+						services={[
+							Selection,
+							Edit,
+							Filter,
+							Page,
+							Toolbar,
+							Resize,
+							Freeze,
+							ExcelExport,
+						]}
 					/>
 				</GridComponent>
 			</div>
