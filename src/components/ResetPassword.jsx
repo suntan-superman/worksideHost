@@ -10,15 +10,10 @@ import Box from "@mui/material/Box";
 import LockResetIcon from "@mui/icons-material/LockReset";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import {
-  Card,
-  CardContent
-} from "@mui/material";
-import { toast } from "react-toastify";
-import { useStateContext } from "../contexts/ContextProvider";
+import { Card, CardContent } from "@mui/material";
 
 const ResetPassword = () => {
-	let userEmail = localStorage.getItem("email");
+	const userEmail = localStorage.getItem("email");
 
   const handleSubmit = async (e) => {
 		e.preventDefault();

@@ -16,12 +16,10 @@ import {
 import { toast } from "react-toastify";
 import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
-// import { useFirmContext } from "../hooks/useFirmContext";
-import useUserStore from "../stores/UserStore";
 import FirmEditTemplate from "../components/FirmEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
-import areaOptions from "../data/areaOptions";
+import { areaOptions } from "../data/worksideOptions";
 
 import "../index.css";
 import "../App.css";
@@ -36,7 +34,6 @@ let gridPageSize = 10;
 
 const FirmsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const accessLevel = useUserStore((state) => state.accessLevel);
 
 	let firmsGridRef = useRef(null);
 
@@ -45,7 +42,17 @@ const FirmsTab = () => {
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState([]);
-	 
+
+		const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
 		allowEditing: accessLevel > 2,
 		allowAdding: accessLevel > 2,

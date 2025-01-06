@@ -3,9 +3,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
-import {
-	useStateContext,
-} from "./contexts/ContextProvider";
+import { UseStateContext } from "./contexts/ContextProvider";
 import {
 	DashboardXX,
 	Projects,
@@ -43,10 +41,7 @@ import "./styles/material.css";
 		};
 
 const ThemeSettingButton = () => {
-  const {
-			currentColor,
-			setThemeSettings,
-		} = useStateContext();
+  const { currentColor, setThemeSettings } = UseStateContext();
 
     return (
 		<div className="fixed right-4 bottom-4" style={{ zIndex: "1000" }}>
@@ -65,7 +60,7 @@ const ThemeSettingButton = () => {
 }
 
 const LogOutButton = () => {
-  const { currentColor } = useStateContext();
+  const { currentColor } = UseStateContext();
 
   return (
     <div className="fixed left-4 bottom-4 pl-3" style={{ zIndex: "1000" }}>
@@ -100,7 +95,7 @@ const NavBarComponent = () => {
 }
 
 const MainApp = () => {
-  const { currentMode, activeMenu, themeSettings } = useStateContext();
+  const { currentMode, activeMenu, themeSettings } = UseStateContext();
 
   return (
 			<div className={currentMode === "Dark" ? "dark" : ""}>

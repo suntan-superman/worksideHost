@@ -13,9 +13,6 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-// import { useProductContext } from "../hooks/useProductContext";
-// import { useSupplierProductContext } from "../hooks/useSupplierProductContext";
-import useUserStore from "../stores/UserStore";
 import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
 
 import "../index.css";
@@ -28,7 +25,6 @@ let gridPageSize = 10;
 // TODO Create
 
 const SupplierProductsTab = () => {
-	const accessLevel = useUserStore((state) => state.accessLevel);
 	let supplierProductsGridRef = useRef(null);
 	const [productList, setProductList] = useState(null);
 	const [supplierProductList, setSupplierProductList] = useState(null);
@@ -36,6 +32,16 @@ const SupplierProductsTab = () => {
 	const [messageText, setMessageText] = useState("");
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
+
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
 
 	const editOptions = {
 		allowEditing: accessLevel > 2,
@@ -45,9 +51,6 @@ const SupplierProductsTab = () => {
 		template: (props) => <SupplierProductEditTemplate {...props} />,
 	};
 	const toolbarOptions = ["Add", "Edit", "Delete"];
-	// const { productData, dispatch: productDispatch } = useProductContext();
-	// const { supplierProductData, dispatch: supplierProductDispatch } =
-	// 	useSupplierProductContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };

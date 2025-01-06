@@ -16,19 +16,19 @@ root.render(
 	<React.StrictMode>
 		<ContextProvider>
 			<UserContextProvider>
-				<useStateContext>
-					<App />
-					<ToastContainer
-						position="top-right"
-						autoClose={3000}
-						hideProgressBar={false}
-						newestOnTop={false}
-						closeOnClick
-						draggable
-						pauseOnHover
-						theme="light"
-					/>
-				</useStateContext>
+				{/* <UseStateContext> */}
+				<App />
+				<ToastContainer
+					position="top-right"
+					autoClose={3000}
+					hideProgressBar={false}
+					newestOnTop={false}
+					closeOnClick
+					draggable
+					pauseOnHover
+					theme="light"
+				/>
+				{/* </UseStateContext> */}
 			</UserContextProvider>
 		</ContextProvider>
 	</React.StrictMode>,

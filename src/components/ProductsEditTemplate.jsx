@@ -30,7 +30,8 @@ const categoryOptions = [
 	"Rig Certification",
 ];
 
-const statusOptions = ["ACTIVE", "INACTIVE"];
+import { productStatusOptions } from "../data/worksideOptions";
+
 
 // TODO Complete the ProductsEditTemplate component
 // "categoryname"
@@ -173,7 +174,7 @@ const ProductsEditTemplate = (props) => {
 						<DropDownListComponent
 							id="status"
 							name="status"
-							dataSource={statusOptions}
+							dataSource={productStatusOptions}
 							value={data.status}
 							placeholder="Select Product Status"
 							required={true}

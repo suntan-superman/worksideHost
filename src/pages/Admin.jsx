@@ -10,34 +10,36 @@ import RigsTab from "./RigsTab";
 import ProductsTab from "./ProductsTab";
 import CustomerSupplierMSATabX from "./CustomerSupplierMSATabX";
 
-import useUserStore from "../stores/UserStore";
-
 import { Header } from "../components";
 import "../index.css";
 import "../App.css";
 
 const Admin = () => {
- 		const [isLoading, setIsLoading] = useState(false);
-  	const accessLevel = useUserStore((state) => state.accessLevel);
+	const [isLoading, setIsLoading] = useState(false);
+	const [showValidateUsersTab, setShowValidateUsersTab] = useState(false);
 
-		const [showValidateUsersTab, setShowValidateUsersTab] = useState(false);
+	useEffect(() => {
+		const GetAccessLevel = () => {
+			const value = localStorage.getItem("accessLevel");
+			if (value) {
+				if (value > 2) setShowValidateUsersTab(true);
+				return value;
+			}
+			return 0;
+		};
+		GetAccessLevel();
+	}, []);
 
-		useEffect(() => {
-			const SetAccessLevel = () => {
-				if (accessLevel > 2) setShowValidateUsersTab(true);
-			};
-			SetAccessLevel();
-		}, []);
-
-		return (
-			<div>
-				<Header category="Workside" title="Administrative" />
-				{isLoading && (
-					<div className="absolute top-[50%] left-[50%]">
-						<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
-					</div>
-				)}
-				<div className="ml-2.5">
+	return (
+		<div>
+			<Header category="Workside" title="Administrative" />
+			{isLoading && (
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+				</div>
+			)}
+			<div className="ml-2.5">
+				{showValidateUsersTab && (
 					<TabComponent cssClass="e-fill" headerPlacement="Top">
 						{/* <TabItemsDirective> */}
 						<div className="e-tab-header">
@@ -73,9 +75,43 @@ const Admin = () => {
 							</div>
 						</div>
 					</TabComponent>
-				</div>
+				)}
+				{!showValidateUsersTab && (
+					<TabComponent cssClass="e-fill" headerPlacement="Top">
+						{/* <TabItemsDirective> */}
+						<div className="e-tab-header">
+							<div>Companies</div>
+							<div>Contacts</div>
+							<div>Rigs</div>
+							<div>Products/Services</div>
+							<div>Supplier MSA</div>
+						</div>
+						<div className="e-content">
+							<div>
+								<FirmsTab />
+							</div>
+							{/* Contacts Tab */}
+							<div>
+								<ContactsTab />
+							</div>
+							{/* Rigs Tab */}
+							<div>
+								<RigsTab />
+							</div>
+							{/* Products/Services Tab */}
+							<div>
+								<ProductsTab />
+							</div>
+							{/* Customer Supplier MSA Tab */}
+							<div>
+								<CustomerSupplierMSATabX />
+							</div>
+						</div>
+					</TabComponent>
+				)}
 			</div>
-		);
+		</div>
+	);
 };
 
 export default Admin;

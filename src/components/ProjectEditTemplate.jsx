@@ -6,15 +6,7 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
 
-import areaOptions from "../data/areaOptions";
-
-const statusOptions = [
-	"ACTIVE",
-	"CANCELED",
-	"COMPLETED",
-	"PENDING",
-	"POSTPONED",
-];
+import { areaOptions, projectStatusOptions } from "../data/worksideOptions";
 
 const ProjectEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
@@ -278,7 +270,7 @@ const ProjectEditTemplate = (props) => {
 						<DropDownListComponent
 							id="status"
 							name="status"
-							dataSource={statusOptions}
+							dataSource={projectStatusOptions}
 							value={data.status}
 							placeholder="Select Project Status"
 							required={true}

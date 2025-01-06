@@ -4,11 +4,11 @@ import { MdOutlineCancel } from 'react-icons/md';
 
 import { Button } from '.';
 import { userProfileData } from '../data/dummy';
-import { useStateContext } from '../contexts/ContextProvider';
+import { UseStateContext } from "../contexts/ContextProvider";
 import avatar from '../data/avatar.jpg';
 
 const UserProfile = () => {
-  const { currentColor, globalUserName, setGlobalUserName, setIsLoggedIn } = useStateContext();
+  const { currentColor } = UseStateContext();
 
   const userName = localStorage.getItem('userName');
 

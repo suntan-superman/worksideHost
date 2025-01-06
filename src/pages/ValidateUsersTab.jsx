@@ -29,9 +29,7 @@ import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import Select from "react-select";
 import { toast } from "react-toastify";
-// import { CloseIcon } from "@mui/icons-material";
-import { useStateContext } from "../contexts/ContextProvider";
-import useUserStore from "../stores/UserStore";
+import { UseStateContext } from "../contexts/ContextProvider";
 import _ from "lodash";
 
 import "../index.css";
@@ -55,32 +53,41 @@ const customStyles = {
 	}),
 };
 ///////////////////////////////////////////////////////////////////
-// const apiUrl = process.env.REACT_APP_API_URL;
 
 let gridPageSize = 10;
 
 const ValidateUsersTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [showDialog, setShowDialog] = useState(false);
-	const accessLevel = useUserStore((state) => state.accessLevel);
 
 	let usersGridRef = useRef(null);
 	const [userList, setUserList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
+
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
-		allowEditing: accessLevel > 2,
+		// allowEditing: accessLevel > 2,
 		allowUpdating: accessLevel > 2,
 		allowAdding: accessLevel > 2,
 		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 	};
 
-	const toolbarOptions = ["Add", "Update", "Edit", "Delete"];
+	const toolbarOptions = ["Add", "Update", "Delete"];
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const [selectedRecordData, setSelectedRecordData] = useState(null);
 	const settings = { mode: "Row" };
 	const position = { X: "center", Y: "center" };
-	const { currentColor } = useStateContext();
+	const { currentColor } = UseStateContext();
 	const [contactData, setContactData] = useState(null);
 	const [contactID, setContactID] = useState(null);
 
@@ -320,7 +327,6 @@ const ValidateUsersTab = () => {
 				setContactData(data[0]);
 				setContactID(data[0]._id);
 			});
-
 		} catch (error) {
 			window.alert(`Error: ${error}`);
 		}
@@ -507,9 +513,7 @@ const ValidateUsersTab = () => {
 						width="100"
 					/>
 				</ColumnsDirective>
-				<Inject
-					services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
-				/>
+				<Inject services={[Selection, Filter, Page, Toolbar, Resize, Freeze]} />
 			</GridComponent>
 			<div className="items-center">
 				{showDialog && (
@@ -790,7 +794,9 @@ const MaterialValidationModal = ({
 			PaperComponent={PaperComponent}
 		>
 			<DialogTitle id="userValidationDialog">
-				<span className="text-bold text-green-300">WORK</span>SIDE User Validation</DialogTitle>
+				<span className="text-bold text-green-300">WORK</span>SIDE User
+				Validation
+			</DialogTitle>
 			<DialogContent>
 				<Stack spacing={2} margin={3}>
 					<TextField

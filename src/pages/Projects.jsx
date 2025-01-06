@@ -4,7 +4,6 @@ import { TabComponent } from "@syncfusion/ej2-react-navigations";
 import ProjectsTab from "./ProjectsTab";
 import ProjectRequestorsTab from "./ProjectRequestorsTab";
 import ProjectDocumentsTab from "./ProjectDocumentsTab";
-import useUserStore from '../stores/UserStore';
 
 import { Header } from "../components";
 import "../index.css";
@@ -14,14 +13,17 @@ let gridPageSize = 8;
 
 const Projects = () => {
 	const [isLoading, setIsLoading] = useState(false);
-  const accessLevel = useUserStore((state) => state.accessLevel);
+  let accessLevel = 0; 
 
 	
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			accessLevel = value;
+		}
 	}, []);
-
 
 	return (
 		<div>

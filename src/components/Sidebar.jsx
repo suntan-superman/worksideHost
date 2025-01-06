@@ -4,12 +4,12 @@ import { Link, NavLink } from "react-router-dom";
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { links } from '../data/dummy';
-import { useStateContext } from '../contexts/ContextProvider';
+import { UseStateContext } from "../contexts/ContextProvider";
 import { signalIsUserLoggedIn } from "../stores/SignalStores";
 
 const Sidebar = () => {
 	const { currentColor, activeMenu, setActiveMenu, screenSize } =
-		useStateContext();
+		UseStateContext();
 
 	const handleCloseSideBar = () => {
 		if (activeMenu !== undefined && screenSize <= 900) {
@@ -63,19 +63,15 @@ const Sidebar = () => {
 								</p>
 								{item.links.map((link) => (
 									<NavLink
-										// to={`/${link.name}`}
 										to={`/main/${link.name}`}
 										key={link.name}
-										isDisabled={!signalIsUserLoggedIn.value}
+										// isDisabled={!signalIsUserLoggedIn.value}
 										onClick={handleCloseSideBar}
-										// style={() => ({
-										// 	backgroundColor: "",
-										// })}
 										className={() =>
 											signalIsUserLoggedIn.value ? activeLink : normalLink
 										}
 									>
-										{link.icon }
+										{link.icon}
 										<span className="capitalize text-bold text-xl text-white">
 											{link.name}
 										</span>

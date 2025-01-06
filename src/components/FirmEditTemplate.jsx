@@ -5,11 +5,9 @@ import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
 
-import areaOptions from "../data/areaOptions";
+import { areaOptions } from "../data/worksideOptions";
 
-const statusOptions = ["ACTIVE", "INACTIVE"];
-
-const firmTypeOptions = ["CUSTOMER", "RIGCOMPANY", "SUPPLIER"];
+import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
 
 const FirmEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
@@ -271,7 +269,7 @@ const FirmEditTemplate = (props) => {
 						<DropDownListComponent
 							id="status"
 							name="status"
-							dataSource={statusOptions}
+							dataSource={firmStatusOptions}
 							value={data.status}
 							placeholder="Select Status"
 							required={true}

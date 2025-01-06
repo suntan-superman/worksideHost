@@ -17,19 +17,11 @@ import { toast } from "react-toastify";
 import axios from "axios";
 
 import useUserStore from "../stores/UserStore";
-import { useStateContext } from "../contexts/ContextProvider";
+import { UseStateContext } from "../contexts/ContextProvider";
 import "../index.css";
 
 const CustomerSupplierMSATabX = () => {
-	const accessLevel = useUserStore((state) => state.accessLevel);
-	const {
-		currentColor,
-		deleteFlag,
-		setDeleteFlag,
-		setCompanyID,
-		setCompanyName,
-		companyName,
-	} = useStateContext();
+	const { setCompanyID, setCompanyName } = UseStateContext();
 	const [openModal, setOpenModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentCustomerName, setCurrentCustomerName] = useState("");
@@ -203,6 +195,16 @@ const CustomerSupplierMSATabX = () => {
 		}
 	};
 
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+	
 	const editOptions = {
 		allowEditing: accessLevel > 2,
 		allowAdding: accessLevel > 2,

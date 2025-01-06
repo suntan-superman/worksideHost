@@ -15,7 +15,6 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
-import useUserStore from "../stores/UserStore";
 import ProductsEditTemplate from "../components/ProductsEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
@@ -30,7 +29,6 @@ let gridPageSize = 10;
 // TODO Create
 
 const ProductsTab = () => {
-	const accessLevel = useUserStore((state) => state.accessLevel);
 	let productsGridRef = useRef(null);
 
 	const [productList, setProductList] = useState(null);
@@ -39,6 +37,17 @@ const ProductsTab = () => {
 	const [currentRecord, setCurrentRecord] = useState([]);
 
 	const [messageText, setMessageText] = useState("");
+
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
 		allowEditing: accessLevel > 2,
 		allowAdding: accessLevel > 2,

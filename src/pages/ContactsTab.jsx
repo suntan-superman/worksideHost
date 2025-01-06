@@ -6,6 +6,7 @@ import {
 	ColumnDirective,
 	Selection,
 	Edit,
+	ExcelExport,
 	Filter,
 	Inject,
 	Page,
@@ -14,9 +15,7 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import { toast } from "react-toastify";
-import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import ContactEditTemplate from "../components/ContactEditTemplate";
-import useUserStore from "../stores/UserStore";
 
 import "../index.css";
 import "../App.css";
@@ -28,8 +27,6 @@ let gridPageSize = 10;
 // TODO Create
 
 const ContactsTab = () => {
-	const accessLevel = useUserStore((state) => state.accessLevel);
-
 	let contactsGridRef = useRef(null);
 
 	const [contactList, setContactList] = useState(null);
@@ -38,6 +35,21 @@ const ContactsTab = () => {
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
 
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+	}, []);
+
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
 		allowEditing: accessLevel > 2,
 		allowAdding: accessLevel > 2,
@@ -45,7 +57,7 @@ const ContactsTab = () => {
 		template: (props) => <ContactEditTemplate {...props} />,
 	};
 
-	const toolbarOptions = ["Add", "Edit"];
+	const toolbarOptions = ["Add", "Edit", "ExcelExport"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -61,10 +73,17 @@ const ContactsTab = () => {
 		fetchContacts();
 	}, []);
 
-	useEffect(() => {
-		const numGridRows = Number(localStorage.getItem("numGridRows"));
-		if (numGridRows) gridPageSize = numGridRows;
-	}, []);
+	const toolbarClick = (args) => {
+		console.log(`Toolbar Click: ${args.item.id}`);
+		if (contactsGridRef && args.item.id === "contactGridElement_excelexport") {
+			if (accessLevel <= 2) {
+				toast.error("You do not have permission to export data.");
+				return;
+			}
+			console.log("Excel Export");
+			contactsGridRef.excelExport();
+		}
+	};
 
 	const handleContactDelete = async () => {
 		const response = await fetch(
@@ -98,7 +117,6 @@ const ContactsTab = () => {
 		if (args.requestType === "save") {
 			// Save or Update Data
 			const data = args.data;
-			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
 			setMessageText(
 				`Update Firm ${args.data.firstname} ${args.rowData.lastname} Details?`,
 			);
@@ -151,8 +169,6 @@ const ContactsTab = () => {
 			const selectedrowindex = contactsGridRef.getSelectedRowIndexes();
 			/** Get the selected records. */
 			setSelectedRecord(contactList[selectedrowindex]._id);
-			// eslint-disable-next-line prefer-template
-			// setEmptyFields([]);
 		}
 	};
 
@@ -198,54 +214,10 @@ const ContactsTab = () => {
 		}
 	};
 
-	// *******************************************************
-	// This is for custom phone and email editing in dialog
-	// *******************************************************
-	// let phElem;
-	// let phObject;
-	// const createcusphonemaskinputn = () => {
-	// 	phElem = document.createElement("input");
-	// 	return phElem;
-	// };
-	// const destroycusphonemaskinputFn = () => {
-	// 	phObject.destroy();
-	// };
-	// const readcusphonemaskinputFn = () => phObject.value;
-	// const writecusphonemaskinputFn = (args) => {
-	// 	phObject = new MaskedTextBox({
-	// 		// value: args.rowData[args.column.field].toString(),
-	// 		value: args.rowData[args.column.field],
-	// 		mask: "000-000-0000",
-	// 		placeholder: "Phone",
-	// 		floatLabelType: "Always",
-	// 	});
-	// 	phObject.appendTo(phElem);
-	// };
-
-	// const custphonemaskinput = {
-	// 	create: createcusphonemaskinputn,
-	// 	destroy: destroycusphonemaskinputFn,
-	// 	read: readcusphonemaskinputFn,
-	// 	write: writecusphonemaskinputFn,
-	// };
-
-	// const mailidRules = { email: [true, 'Enter valid Email'] };
-	// *******************************************************
-	// End of custom code
-	// *******************************************************
 	const onFirmLoad = () => {
 		const gridElement = document.getElementById("firmGridElement");
 		if (gridElement?.ej2_instances[0]) {
 			const gridInstance = gridElement.ej2_instances[0];
-			/** height of the each row */
-			// const rowHeight = gridInstance.getRowHeight();
-			/** Grid height */
-			// const gridHeight = gridInstance.height;
-			/** initial page size */
-			// const pageSize = gridInstance.pageSettings.pageSize;
-			/** new page size is obtained here */
-			// const pageResize = (gridHeight - (pageSize * rowHeight)) / rowHeight;
-			// gridInstance.pageSettings.pageSize = pageSize + Math.round(pageResize);
 			gridInstance.pageSettings.pageSize = gridPageSize;
 			gridInstance.pageSettings.frozenColumns = 3;
 			gridInstance.pageSettings.freeze = true;
@@ -262,6 +234,13 @@ const ContactsTab = () => {
 		}
 	};
 
+	// const rowDataBound = (args) => {
+	// 	if (args.data.OrderID === 10249) {
+	// 		args.rowHeight = 90;
+	// 	}
+	// };
+	// <GridComponent dataSource={gridData} height={315} rowDataBound={rowDataBound}>
+
 	return (
 		<div>
 			<div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start">
@@ -273,14 +252,14 @@ const ContactsTab = () => {
 					allowFiltering
 					allowPaging
 					allowResizing
+					allowExcelExport
 					filterSettings={FilterOptions}
 					selectionSettings={settings}
 					toolbar={toolbarOptions}
+					toolbarClick={toolbarClick}
 					rowSelected={rowSelectedContact}
 					editSettings={editOptions}
 					enablePersistence
-					// pageSize={gridPageSize}
-					// frozenColumns={2}
 					load={onContactLoad}
 					width="95%"
 					ref={(g) => {
@@ -355,23 +334,20 @@ const ContactsTab = () => {
 							headerText="Password"
 							textAlign="Left"
 							width="100"
+							visible={false}
 						/>
 						<ColumnDirective
 							field="primaryphone"
 							headerText="Phone 1"
 							textAlign="Left"
 							width="100"
-							// edit={custphonemaskinput}
 						/>
 						<ColumnDirective
 							field="secondaryphone"
 							headerText="Phone 2"
 							textAlign="Left"
 							width="100"
-							// edit={custphonemaskinput}
 						/>
-						{/* <ColumnDirective field='primaryemail' headerText='Email 1' textAlign='Left' width='150' validationRules={mailidRules} />
-                <ColumnDirective field='secondaryemail' headerText='Email 2' textAlign='Left' width='150' validationRules={mailidRules} /> */}
 						<ColumnDirective
 							field="primaryemail"
 							headerText="Email 1"
@@ -408,7 +384,16 @@ const ContactsTab = () => {
 						/>
 					</ColumnsDirective>
 					<Inject
-						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+						services={[
+							Selection,
+							Edit,
+							Filter,
+							Page,
+							Toolbar,
+							Resize,
+							Freeze,
+							ExcelExport,
+						]}
 					/>
 				</GridComponent>
 			</div>

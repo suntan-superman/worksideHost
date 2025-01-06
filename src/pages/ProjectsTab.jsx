@@ -22,7 +22,7 @@ import { toast } from "react-toastify";
 import "../index.css";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import ProjectEditTemplate from "../components/ProjectEditTemplate";
-import areaOptions from "../data/areaOptions";
+import { areaOptions } from "../data/worksideOptions";
 
 let gridPageSize = 8;
 
@@ -37,21 +37,24 @@ const ProjectsTab = () => {
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
 
+	const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
-		allowEditing: true,
-		allowAdding: true,
-		allowDeleting: true,
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
+		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 		template: (props) => <ProjectEditTemplate {...props} />,
 		// template: dialogTemplate,
 	};
-	// const editOptions = {
-	// 	allowEditing: true,
-	// 	allowAdding: true,
-	// 	allowDeleting: true,
-	// 	mode: "Dialog",
-	// 	template: ProjectEditTemplate,
-	// };
 
 	const toolbarOptions = ["Add", "Edit"];
 

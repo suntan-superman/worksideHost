@@ -2,7 +2,7 @@
 
 import React from 'react'
 import ResetPassword from '../components/ResetPassword'
-import { useStateContext } from '../contexts/ContextProvider';
+import { UseStateContext } from "../contexts/ContextProvider";
 import {
 	Button,
 	Dialog,
@@ -24,10 +24,7 @@ const ResetPasswordPage = () => {
   const email = searchParams.get("email");
   const token = searchParams.get("token");
 
-	const {
-    setIsLoggedIn,
-    setGlobalUserName,
-  } = useStateContext();
+	const { setIsLoggedIn, setGlobalUserName } = UseStateContext();
 
   setIsLoggedIn(false);
   setGlobalUserName("");

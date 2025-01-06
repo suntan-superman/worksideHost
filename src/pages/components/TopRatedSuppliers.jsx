@@ -54,7 +54,7 @@ export function TopRatedSuppliers({ suppliers = [], sx }) {
 						/>
 						<Rating
 							name="text-feedback"
-							value={supplier.rating}
+							value={Number.parseFloat(supplier.rating)}
 							readOnly
 							precision={0.5}
 							size="small"

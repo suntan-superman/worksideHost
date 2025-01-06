@@ -6,22 +6,16 @@ import { MdLockOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useStateContext } from "../contexts/ContextProvider";
+import { UseStateContext } from "../contexts/ContextProvider";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
 
 const LoginDialog = () => {
-	const {
-		setIsLoggedIn,
-		setGlobalUserName,
-		setUserEmail,
-		setAccessLevel,
-		setCompanyName,
-	} = useStateContext();
-	// const accessLevel = useUserStore((state) => state.accessLevel);
-	// const setAccessLevel = useUserStore((state) => state.setAccessLevel);
+	const { setIsLoggedIn, setGlobalUserName, setUserEmail, setCompanyName } =
+		UseStateContext();
 	const setUserLoggedIn = useUserStore((state) => state.setUserLoggedIn);
+	const setUserAccessLevel = useUserStore((state) => state.setUserAccessLevel);
 
 	const [userName, setUserName] = useState("");
 	const [password, setPassword] = useState("");
@@ -104,30 +98,28 @@ const LoginDialog = () => {
 			if (jsonData.status === true) {
 				const validationFlag = await isUserValidated(userName);
 				if (validationFlag === true) {
-					const userAccessLevel = await getUserAccessLevel(userName).then(
-						(data) => {
-							setAccessLevel(data);
-							localStorage.setItem("accessLevel", data);
-							setIsLoggedIn(true);
-							setUserLoggedIn(true);
-							localStorage.setItem("logInFlag", "true");
-							localStorage.setItem("token", jsonData.user.userToken);
-							setGlobalUserName(JSON.stringify(jsonData.user.user));
-							localStorage.setItem(
-								"userName",
-								JSON.stringify(jsonData.user.user),
-							);
-							localStorage.setItem(
-								"userID",
-								JSON.stringify(jsonData.user.userId),
-							);
-							const email = JSON.stringify(jsonData.user.email);
-							setUserEmail(email);
-							onSaveUserName(userName, email);
-							setCompanyName(jsonData.user.company);
-							console.log("Company: ", jsonData.user.company);
-						},
-					);
+					await getUserAccessLevel(userName).then((data) => {
+						setUserAccessLevel(data);
+						localStorage.setItem("accessLevel", data);
+						setIsLoggedIn(true);
+						setUserLoggedIn(true);
+						localStorage.setItem("logInFlag", "true");
+						localStorage.setItem("token", jsonData.user.userToken);
+						setGlobalUserName(JSON.stringify(jsonData.user.user));
+						localStorage.setItem(
+							"userName",
+							JSON.stringify(jsonData.user.user),
+						);
+						localStorage.setItem(
+							"userID",
+							JSON.stringify(jsonData.user.userId),
+						);
+						const email = JSON.stringify(jsonData.user.email);
+						setUserEmail(email);
+						onSaveUserName(userName, email);
+						setCompanyName(jsonData.user.company);
+						console.log("Company: ", jsonData.user.company);
+					});
 				}
 			}
 			else {

@@ -11,7 +11,7 @@ import { signalAccessLevel } from "../stores/SignalStores";
 import avatar from '../data/avatar.jpg';
 // eslint-disable-next-line import/no-cycle
 import { Chat, Notification, UserProfile } from '.';
-import { useStateContext } from '../contexts/ContextProvider';
+import { UseStateContext } from "../contexts/ContextProvider";
 
 const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
   <TooltipComponent content={title} position="BottomCenter">
@@ -31,7 +31,17 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 );
 
 const Navbar = () => {
-  const { currentColor, activeMenu, setActiveMenu, handleClick, isClicked, setScreenSize, screenSize, globalUserName, accessLevel } = useStateContext();
+  const {
+			currentColor,
+			activeMenu,
+			setActiveMenu,
+			handleClick,
+			isClicked,
+			setScreenSize,
+			screenSize,
+			globalUserName,
+			accessLevel,
+		} = UseStateContext();
   const [welcomePhrase, setWelcomePhrase] = React.useState("");
   // const accessLevel = useUserStore((state) => state.accessLevel);
   const [accessLabel, setAccessLabel] = React.useState("UNKNOWN"); 

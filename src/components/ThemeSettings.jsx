@@ -5,15 +5,16 @@ import { BsCheck } from 'react-icons/bs';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
 
 import { themeColors } from '../data/dummy';
-import { useStateContext } from '../contexts/ContextProvider';
+import { UseStateContext } from "../contexts/ContextProvider";
 import Select from "react-select";
 import ResetPassword from "./ResetPassword";
 
 const ThemeSettings = () => {
-  const { setColor, setMode, currentMode, currentColor, setThemeSettings } = useStateContext();
+  const { setColor, setMode, currentMode, currentColor, setThemeSettings } =
+			UseStateContext();
 	const [resetPasswordFlag, setResetPasswordFlag] = React.useState(false);	
 	const [selectedOption, setSelectedOption] = React.useState(0);
-		const [numGridRowsIndex, setNumGridRowsIndex] = React.useState(0);
+	const [numGridRowsIndex, setNumGridRowsIndex] = React.useState(0);
 
 	const numRowsOptions = [
 		{ value: 8, label: "8" },

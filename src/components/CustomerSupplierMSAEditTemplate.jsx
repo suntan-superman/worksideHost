@@ -3,21 +3,20 @@
 import React, { useEffect, useState } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { useStateContext } from "../contexts/ContextProvider";
+import { UseStateContext } from "../contexts/ContextProvider";
 import "../styles/material.css";
 
 import axios from "axios";
 
 // Set Selection Options
-
-const statusOptions = ["ACTIVE", "INACTIVE"];
+import { msaStatusOptions } from "../data/worksideOptions";
 
 const CustomerSupplierMSAEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
 	const [supplierOptions, setSupplierOptions] = useState([]);
 	const [customerSupplierMSAData, setCustomerSupplierMSAData] = useState([]);
-	const { companyID, companyName } = useStateContext();
+	const { companyID, companyName } = UseStateContext();
 
 	useEffect(() => {
 		// ReadOnly flag
@@ -208,7 +207,7 @@ const CustomerSupplierMSAEditTemplate = (props) => {
 						<DropDownListComponent
 							id="msastatus"
 							name="msastatus"
-							dataSource={statusOptions}
+							dataSource={msaStatusOptions}
 							value={data.msastatus}
 							placeholder="Select MSA Status"
 							required={true}

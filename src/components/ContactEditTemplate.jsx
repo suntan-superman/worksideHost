@@ -3,22 +3,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
 
-// Set Selection Options
-const contactClassOptions = [
-	"CUSTOMER",
-	"RIGCOMPANY",
-	"SUPPLIER",
-	"DELIVERYASSOC",
-];
-
-const statusOptions = ["ACTIVE", "INACTIVE", "PENDING"];
-
-const accessLevelOptions = ["ADMIN", "GUEST", "STANDARD", "POWER"];
-
-// TODO Complete the ContactEditTemplate component
+import {
+	contactClassOptions,
+	statusOptions,
+	accessLevelOptions,
+} from "../data/worksideOptions";
 
 const ContactEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
@@ -46,6 +37,7 @@ const ContactEditTemplate = (props) => {
 		} else {
 			setReadOnlyFlag(true);
 		}
+		console.log(`Firm: ${data.firm}`);
 	}, [data.isAdd]);
 
 	const fetchOptions = async () => {

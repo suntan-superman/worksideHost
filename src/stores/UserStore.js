@@ -1,8 +1,8 @@
 import { create } from "zustand";
 
 const userStore = (set) => ({
-	accessLevel: 0,
-	setAccessLevel: (value) => set({ accessLevel: value }),
+	userAccessLevel: 0,
+	setUserAccessLevel: (value) => set({ userAccessLevel: value }),
 	userLoggedIn: false,
 	setUserLoggedIn: (value) => set({ userLoggedIn: value }),
 	currentUserMode: "CUSTOMER",

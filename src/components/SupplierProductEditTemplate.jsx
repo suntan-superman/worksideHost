@@ -4,9 +4,8 @@ import React, { useEffect, useState } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
-import { filter, set } from "lodash";
 
-const statusOptions = ["ACTIVE", "INACTIVE"];
+const productStatusOptions = ["ACTIVE", "INACTIVE"];
 
 let productOptions = null;
 
@@ -207,7 +206,7 @@ const SupplierProductEditTemplate = (props) => {
 						<DropDownListComponent
 							id="status"
 							name="status"
-							dataSource={statusOptions}
+							dataSource={productStatusOptions}
 							value={data.status}
 							placeholder="Select Status"
 							required={true}

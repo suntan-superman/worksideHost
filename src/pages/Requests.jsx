@@ -17,7 +17,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 
 import RequestInfoModal from "../components/RequestInfoModal";
-import { useStateContext } from "../contexts/ContextProvider";
+import { UseStateContext } from "../contexts/ContextProvider";
 import RequestEditTemplate from "../components/RequestEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { toast } from "react-toastify";
@@ -29,18 +29,28 @@ let requestGrid = null;
 
 const Requests = () => {
 	const [isLoading, setIsLoading] = useState(false);
-	const { currentColor } = useStateContext();
+	const { currentColor } = UseStateContext();
 	const [requestList, setRequestList] = useState(null);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
 
+		const GetAccessLevel = () => {
+		const value = localStorage.getItem("accessLevel");
+		if (value) {
+			return value;
+		}
+		return 0;
+	};
+
+	const accessLevel = GetAccessLevel();
+
 	const editOptions = {
-		allowEditing: true,
-		allowAdding: true,
-		allowEditOnDblClick: true,
-		allowDeleting: false,
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
+		allowEditOnDblClick: accessLevel > 2,
+		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 		template: (props) => <RequestEditTemplate {...props} />,
 	};

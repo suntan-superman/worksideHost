@@ -15,7 +15,6 @@ import { toast } from "react-toastify";
 import { Header } from "../components";
 // import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
-import useUserStore from "../stores/UserStore";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
@@ -25,7 +24,16 @@ const Products = () => {
  	const [isLoading, setIsLoading] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState(null);
   const [insertFlag, setInsertFlag] = useState(false);
-	const accessLevel = useUserStore((state) => state.accessLevel);
+
+	const GetAccessLevel = () => {
+			const value = localStorage.getItem("accessLevel");
+			if (value) {
+				return value;
+			}
+			return 0;
+		};
+
+		const accessLevel = GetAccessLevel();
 
   const editOptions = {
 			allowEditing: accessLevel > 2,

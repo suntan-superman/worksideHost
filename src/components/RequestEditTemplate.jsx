@@ -35,17 +35,7 @@ import { toast } from "react-toastify";
 // 	"Rig Certification",
 // ];
 
-const statusOptions = [
-	"OPEN",
-	"NOT-AWARDED",
-	"AWARDED-WOA",
-	"AWARDED-A",
-	"AWARDED-P",
-	"IN-PROGRESS",
-	"CANCELED",
-	"POSTPONED",
-	"COMPLETED",
-];
+import { requestStatusOptions } from "../data/worksideOptions";
 
 let allProducts = [];
 
@@ -487,7 +477,7 @@ const RequestEditTemplate = (props) => {
 						<DropDownListComponent
 							id="status"
 							name="status"
-							dataSource={statusOptions}
+							dataSource={requestStatusOptions}
 							value={data.status}
 							placeholder="Select Status"
 							required={true}
