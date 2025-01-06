@@ -5,7 +5,6 @@ import {
 	ColumnsDirective,
 	ColumnDirective,
 	Selection,
-	Edit,
 	Filter,
 	Inject,
 	Page,

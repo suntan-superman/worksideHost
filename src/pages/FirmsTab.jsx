@@ -6,6 +6,7 @@ import {
 	ColumnDirective,
 	Selection,
 	Edit,
+	ExcelExport,
 	Filter,
 	Inject,
 	Page,
@@ -60,7 +61,8 @@ const FirmsTab = () => {
 		mode: "Dialog",
 		template: (props) => <FirmEditTemplate {...props} />,
 	};
-	const toolbarOptions = ["Add", "Edit", "Delete"];
+
+	const toolbarOptions = ["Add", "Edit", "Delete", "ExcelExport"];
 	// const { firmData, dispatch: firmDispatch } = useFirmContext();
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
@@ -113,6 +115,20 @@ const FirmsTab = () => {
 		fetchFirms();
 	}, []);
 	// }, [firmDispatch]);
+
+	const toolbarClick = (args) => {
+		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
+			if (accessLevel <= 2) {
+				toast.error("You do not have permission to export data.");
+				return;
+			}
+			const excelExportProperties = {
+				fileName: "worksideFirms.xlsx",
+			};
+			console.log("Excel Export");
+			firmsGridRef.excelExport(excelExportProperties);
+		}
+	};
 
 	const handleFirmDelete = async () => {
 		const response = await fetch(
@@ -357,9 +373,11 @@ const FirmsTab = () => {
 					allowFiltering
 					allowPaging
 					allowResizing
+					allowExcelExport
 					filterSettings={FilterOptions}
 					selectionSettings={settings}
 					toolbar={toolbarOptions}
+					toolbarClick={toolbarClick}
 					rowSelected={rowSelectedFirm}
 					editSettings={editOptions}
 					enablePersistence
@@ -466,7 +484,16 @@ const FirmsTab = () => {
 						/>
 					</ColumnsDirective>
 					<Inject
-						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+						services={[
+							Selection,
+							Edit,
+							Filter,
+							Page,
+							Toolbar,
+							Resize,
+							Freeze,
+							ExcelExport,
+						]}
 					/>
 				</GridComponent>
 			</div>

@@ -20,6 +20,7 @@ import ContactEditTemplate from "../components/ContactEditTemplate";
 import "../index.css";
 import "../App.css";
 
+
 let gridPageSize = 10;
 
 // TODO Delete
@@ -80,8 +81,98 @@ const ContactsTab = () => {
 				toast.error("You do not have permission to export data.");
 				return;
 			}
+			const excelExportProperties = {
+				fileName: "worksideContacts.xlsx",
+				header: {
+					headerRows: 3,
+					rows: [
+						{
+							cells: [
+								{
+									colSpan: 4,
+									value: "Workside Software Contacts",
+									style: {
+										fontColor: "#DC2626",
+										fontSize: 20,
+										hAlign: "Center",
+										bold: true,
+									},
+								},
+							],
+						},
+						{
+							cells: [
+								{
+									colSpan: 4,
+									value: "Copyright 2025",
+									style: {
+										fontColor: "#0C0A09",
+										fontSize: 15,
+										hAlign: "Center",
+										bold: true,
+									},
+								},
+							],
+						},
+					],
+				},
+				// footer: {
+				// 	footerRows: 4,
+				// 	rows: [
+				// 		{
+				// 			cells: [
+				// 				{
+				// 					colSpan: 4,
+				// 					value: "Thank you for your business!",
+				// 					style: { hAlign: "Center", bold: true },
+				// 				},
+				// 			],
+				// 		},
+				// 		{
+				// 			cells: [
+				// 				{
+				// 					colSpan: 4,
+				// 					value: "!Visit Again!",
+				// 					style: { hAlign: "Center", bold: true },
+				// 				},
+				// 			],
+				// 		},
+				// 	],
+				// },
+			};
 			console.log("Excel Export");
-			contactsGridRef.excelExport();
+			contactsGridRef.excelExport(excelExportProperties);
+		}
+	};
+
+	const excelQueryCellInfo = (args) => {
+		if (args.column.field === "contactclass") {
+			const contactClass = args.data[args.column.field];
+			console.log(`Contact Class: ${contactClass}`);
+			if (contactClass === "SUPPLIER") {
+				args.style = { backColor: "#FCA5A5" };
+			} else if (contactClass === "DELIVERYASSOC") {
+				args.style = { backColor: "#ffffb3" };
+			} else if (contactClass === "RIGCOMPANY") {
+				args.style = { backColor: "#7DD3FC" };
+			} else {
+				args.style = { backColor: "#86EFAC" };
+			}
+		}
+	};
+
+	const queryCellInfo = (args) => {
+		if (args.column.field === "contactclass") {
+			const contactClass = args.data[args.column.field];
+			if (contactClass === "SUPPLIER") {
+				args.style = { backColor: "#FCA5A5" };
+			} else if (contactClass === "DELIVERYASSOC") {
+				args.style = { backColor: "#ffffb3" };
+			} else if (contactClass === "RIGCOMPANY") {
+				args.style = { backColor: "#7DD3FC" };
+			} else {
+				args.style = { backColor: "#86EFAC" };
+			}
 		}
 	};
 
@@ -260,6 +351,8 @@ const ContactsTab = () => {
 					rowSelected={rowSelectedContact}
 					editSettings={editOptions}
 					enablePersistence
+					excelQueryCellInfo={excelQueryCellInfo}
+					queryCellInfo={queryCellInfo}
 					load={onContactLoad}
 					width="95%"
 					ref={(g) => {

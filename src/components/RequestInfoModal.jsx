@@ -169,7 +169,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						<GoogleMap
 							// key={"5064698848aecbfb "}
 							mapId={"DEMO_ID"}
-							style={{ width: "400px", height: "400px" }}
+							style={{ width: "500px", height: "500px" }}
 							defaultCenter={reqLocation}
 							defaultZoom={8}
 							gestureHandling={"greedy"}

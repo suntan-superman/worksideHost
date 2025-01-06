@@ -1,19 +1,20 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import { closest } from "@syncfusion/ej2-base";
 import {
-  GridComponent,
-  ColumnsDirective,
-  ColumnDirective,
-  Selection,
-  Edit,
-  Filter,
-  Inject,
-  Page,
-  Toolbar,
-  Resize,
-  Freeze,
+	GridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+	Selection,
+	Edit,
+	ExcelExport,
+	Filter,
+	Inject,
+	Page,
+	Toolbar,
+	Resize,
+	Freeze,
 } from "@syncfusion/ej2-react-grids";
 
 import RequestInfoModal from "../components/RequestInfoModal";
@@ -25,9 +26,10 @@ import { toast } from "react-toastify";
 import { Header } from "../components";
 
 let gridPageSize = 8;
-let requestGrid = null;
 
 const Requests = () => {
+	let requestGridRef = useRef(null);
+
 	const [isLoading, setIsLoading] = useState(false);
 	const { currentColor } = UseStateContext();
 	const [requestList, setRequestList] = useState(null);
@@ -36,7 +38,7 @@ const Requests = () => {
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
 
-		const GetAccessLevel = () => {
+	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
 		if (value) {
 			return value;
@@ -54,7 +56,9 @@ const Requests = () => {
 		mode: "Dialog",
 		template: (props) => <RequestEditTemplate {...props} />,
 	};
-	const toolbarOptions = ["Add", "Edit"];
+
+	const toolbarOptions = ["Add", "Edit", "ExcelExport"];
+
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const [showDialog, setShowDialog] = useState(false);
 	const settings = { mode: "Row" };
@@ -86,6 +90,20 @@ const Requests = () => {
 
 	const FilterOptions = {
 		type: "Menu",
+	};
+
+	const toolbarClick = (args) => {
+		if (requestGridRef && args.item.id === "requestGridElement_excelexport") {
+			if (accessLevel <= 2) {
+				toast.error("You do not have permission to export data.");
+				return;
+			}
+			const excelExportProperties = {
+				fileName: "worksideRequests.xlsx",
+			};
+			requestGridRef.excelExport(excelExportProperties);
+			toast.success("Request Data Exported...");
+		}
 	};
 
 	const dialogClose = () => {
@@ -124,9 +142,9 @@ const Requests = () => {
 	};
 
 	const rowSelectedRequest = () => {
-		if (requestGrid) {
+		if (requestGridRef) {
 			/** Get the selected row indexes */
-			const selectedrowindex = requestGrid.getSelectedRowIndexes();
+			const selectedrowindex = requestGridRef.getSelectedRowIndexes();
 			/** Get the selected records. */
 			setSelectedRecord(requestList[selectedrowindex]._id);
 			// setEmptyFields([]);
@@ -250,7 +268,7 @@ const Requests = () => {
 
 	const recordClick = (args) => {
 		if (args.target.classList.contains("requestData")) {
-			const rowObj = requestGrid.getRowObjectFromUID(
+			const rowObj = requestGridRef.getRowObjectFromUID(
 				closest(args.target, ".e-row").getAttribute("data-uid"),
 			);
 			setSelectedRecord(rowObj._id);
@@ -276,12 +294,14 @@ const Requests = () => {
 					allowFiltering
 					allowPaging
 					allowResizing
+					allowExcelExport
 					frozenColumns={2}
 					actionBegin={actionBegin}
 					actionComplete={actionComplete}
 					filterSettings={FilterOptions}
 					selectionSettings={settings}
 					toolbar={toolbarOptions}
+					toolbarClick={toolbarClick}
 					rowSelected={rowSelectedRequest}
 					recordClick={recordClick}
 					editSettings={editOptions}
@@ -291,7 +311,7 @@ const Requests = () => {
 					width="95%"
 					// eslint-disable-next-line no-return-assign
 					ref={(g) => {
-						requestGrid = g;
+						requestGridRef = g;
 					}}
 				>
 					<ColumnsDirective>
@@ -411,7 +431,16 @@ const Requests = () => {
 						/>
 					</ColumnsDirective>
 					<Inject
-						services={[Selection, Edit, Filter, Page, Toolbar, Resize, Freeze]}
+						services={[
+							Selection,
+							Edit,
+							Filter,
+							Page,
+							Toolbar,
+							Resize,
+							Freeze,
+							ExcelExport,
+						]}
 					/>
 				</GridComponent>
 			</div>

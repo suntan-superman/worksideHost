@@ -80,8 +80,11 @@ const ProductsTab = () => {
 	const toolbarClick = (args) => {
 		console.log(`Toolbar Click: ${args.item.id}`);
 		if (productsGridRef && args.item.id === "productGridElement_excelexport") {
+			const excelExportProperties = {
+				fileName: "worksideProducts.xlsx",
+			};
 			console.log("Excel Export");
-			productsGridRef.excelExport();
+			productsGridRef.excelExport(excelExportProperties);
 		}
 	};
 
