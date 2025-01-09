@@ -85,8 +85,8 @@ const ProjectsTab = () => {
 	});
 
 	useEffect(() => {
-		console.log(`Projects Data: ${JSON.stringify(projData.data)}`);
-		setProjectData(projData.data);
+		console.log(`Projects Data: ${JSON.stringify(projData?.data)}`);
+		setProjectData(projData?.data);
 		setHaveData(true);
 	}, [projData]);
 	// if (isProjectsSuccess) {
