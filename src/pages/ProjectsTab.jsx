@@ -39,6 +39,7 @@ const ProjectsTab = () => {
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
+	const [projectData, setProjectData] = useState(null);
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -73,7 +74,7 @@ const ProjectsTab = () => {
 	// TODO Convert to React Query
 
 	// Get the project data
-	const { data: filteredProjects, isSuccess: isProjectsSuccess } = useQuery({
+	const { data: projData, isSuccess: isProjectsSuccess } = useQuery({
 		queryKey: ["projects"],
 		queryFn: GetAllProjects,
 		refetchInterval: 10000,
@@ -83,6 +84,11 @@ const ProjectsTab = () => {
 		retry: 3,
 	});
 
+	useEffect(() => {
+		console.log(`Projects Data: ${JSON.stringify(projData.data)}`);
+		setProjectData(projData.data);
+		setHaveData(true);
+	}, [projData]);
 	// if (isProjectsSuccess) {
 	// 	console.log(`Projects Data: ${JSON.stringify(filteredProjects.data)}`);
 	// 	setHaveData(true);
@@ -279,7 +285,7 @@ const ProjectsTab = () => {
 			/** Get the selected row indexes */
 			const selectedrowindex = projectsGrid.getSelectedRowIndexes();
 			/** Get the selected records. */
-			setSelectedRecord(filteredProjects[selectedrowindex]._id);
+			setSelectedRecord(projectData[selectedrowindex]._id);
 			// eslint-disable-next-line prefer-template
 			// setEmptyFields([]);
 		}
@@ -306,7 +312,7 @@ const ProjectsTab = () => {
 				<div className="div-container">
 					<GridComponent
 						id="projectGridElement"
-						dataSource={filteredProjects.data}
+						dataSource={projectData}
 						actionBegin={actionBegin}
 						actionComplete={actionComplete}
 						allowSelection
