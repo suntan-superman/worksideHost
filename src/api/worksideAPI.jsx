@@ -1,3 +1,6 @@
+/* eslint-disable */
+
+import axios from "axios";
 
 const GetAllFirms = async () => {
 	const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
