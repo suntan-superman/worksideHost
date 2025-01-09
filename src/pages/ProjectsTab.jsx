@@ -26,14 +26,17 @@ import { areaOptions } from "../data/worksideOptions";
 
 let gridPageSize = 8;
 
-let filteredProjects = null;
+import { GetAllProjects } from "../api/worksideAPI";
+import { useQuery, useMutation } from "@tanstack/react-query";
+
+// let filteredProjects = null;
 
 const ProjectsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [haveData, setHaveData] = useState(false);
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
 
@@ -67,31 +70,50 @@ const ProjectsTab = () => {
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
+	// TODO Convert to React Query
 
-	const fetchProjects = async () => {
-		// Set Wait Cursor
-		setIsLoading(true);
-		try {
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/project/`,
-			);
-			const jsonData = await response.json();
-			setIsLoading(false);
-			// window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
-			filteredProjects = jsonData;
-			setHaveData(true);
-		} catch (error) {
-			setIsLoading(false);
-			window.alert(`Error: ${error}`);
-			console.error(error);
-		}
-		setIsLoading(false);
-	};
+	// Get the project data
+	const { data: filteredProjects, isSuccess: isProjectsSuccess } = useQuery({
+		queryKey: ["projects"],
+		queryFn: GetAllProjects,
+		refetchInterval: 10000,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
 
-	useEffect(() => {
-		fetchProjects();
-	}, []);
+	// if (isProjectsSuccess) {
+	// 	console.log(`Projects Data: ${JSON.stringify(filteredProjects.data)}`);
+	// 	setHaveData(true);
+	// }
+
+	// const fetchProjects = async () => {
+	// 	// Set Wait Cursor
+	// 	setIsLoading(true);
+	// 	try {
+	// 		const response = await fetch(
+	// 			`${process.env.REACT_APP_MONGO_URI}/api/project/`,
+	// 		);
+	// 		const jsonData = await response.json();
+	// 		setIsLoading(false);
+	// 		// window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
+	// 		filteredProjects = jsonData;
+	// 		setHaveData(true);
+	// 	} catch (error) {
+	// 		setIsLoading(false);
+	// 		window.alert(`Error: ${error}`);
+	// 		console.error(error);
+	// 	}
+	// 	setIsLoading(false);
+	// };
+
+	// useEffect(() => {
+	// 	fetchProjects();
+	// }, []);
 	// }, [dispatch]);
+
+	// TODO Convert to React Query
 
 	useEffect(() => {
 		const fetchFirms = async () => {
@@ -141,6 +163,8 @@ const ProjectsTab = () => {
 		},
 	};
 
+	// TODO Convert to React Query
+
 	const handleDelete = async () => {
 		// const fetchString = `${apiUrl}/api/project/${selectedRecord}`;
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${selectedRecord}`;
@@ -156,37 +180,39 @@ const ProjectsTab = () => {
 		// setEmptyFields([]);
 	};
 
-	 const actionBegin = (args) => {
-			if (args.requestType === "save" && args.form) {
-				/** cast string to integer value */
-				// setValue("data.area", args.form.querySelector("#area").value, args);
-			}
-		};
+	const actionBegin = (args) => {
+		if (args.requestType === "save" && args.form) {
+			/** cast string to integer value */
+			// setValue("data.area", args.form.querySelector("#area").value, args);
+		}
+	};
 
-		const actionComplete = async (args) => {
-			// console.log(`Action Complete: ${args.requestType}`);
-			if (args.requestType === "beginEdit" || args.requestType === "add") {
-				const dialog = args.dialog;
-				dialog.showCloseIcon = false;
-				dialog.height = 600;
-				dialog.width = 600;
-				// Set Insert Flag
-				setInsertFlag(args.requestType === "add");
-				// change the header of the dialog
-				dialog.header =
-					args.requestType === "beginEdit"
-						? `Edit Record of ${args.rowData.projectname}`
-						: "New Project";
-			}
-			if (args.requestType === "save") {
-				// Save or Update Data
-				const data = args.data;
-				// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
-				setMessageText(`Update Project ${args.data.projectname} Details?`);
-				setCurrentRecord(data);
-				setOpenUpdateModal(true);
-			}
-		};
+	const actionComplete = async (args) => {
+		// console.log(`Action Complete: ${args.requestType}`);
+		if (args.requestType === "beginEdit" || args.requestType === "add") {
+			const dialog = args.dialog;
+			dialog.showCloseIcon = false;
+			dialog.height = 600;
+			dialog.width = 600;
+			// Set Insert Flag
+			setInsertFlag(args.requestType === "add");
+			// change the header of the dialog
+			dialog.header =
+				args.requestType === "beginEdit"
+					? `Edit Record of ${args.rowData.projectname}`
+					: "New Project";
+		}
+		if (args.requestType === "save") {
+			// Save or Update Data
+			const data = args.data;
+			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+			setMessageText(`Update Project ${args.data.projectname} Details?`);
+			setCurrentRecord(data);
+			setOpenUpdateModal(true);
+		}
+	};
+
+	// TODO Convert to React Query
 
 	const SaveProjectData = async () => {
 		setOpenUpdateModal(false);
@@ -275,11 +301,12 @@ const ProjectsTab = () => {
 
 	return (
 		<div className="flex-grow bg-white p-2 relative">
-			{!isLoading && haveData && (
+			{
+				// {!isLoading && haveData && (
 				<div className="div-container">
 					<GridComponent
 						id="projectGridElement"
-						dataSource={filteredProjects}
+						dataSource={filteredProjects.data}
 						actionBegin={actionBegin}
 						actionComplete={actionComplete}
 						allowSelection
@@ -419,7 +446,7 @@ const ProjectsTab = () => {
 						/>
 					</GridComponent>
 				</div>
-			)}
+			}
 			{openUpdateModal && (
 				<ConfirmationDialog
 					open={openUpdateModal}

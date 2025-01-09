@@ -41,6 +41,7 @@
 		"requestcategory",
 		"requestname",
 		"requestorid",
+		"requeststatus",
 		"richtexteditor",
 		"rigclassification",
 		"rigcompany",

@@ -11,23 +11,40 @@ import {
 	UserContextProvider,
 } from "./contexts/ContextProvider";
 
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient({
+	defaultOptions: {
+		queries: {
+			refetchOnWindowFocus: false,
+			staleTime: 1000 * 60 * 5, // 5 minutes
+			gcTime: 1000 * 60 * 10, // 10 minutes
+		},
+	},
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<React.StrictMode>
 		<ContextProvider>
 			<UserContextProvider>
 				{/* <UseStateContext> */}
-				<App />
-				<ToastContainer
-					position="top-right"
-					autoClose={3000}
-					hideProgressBar={false}
-					newestOnTop={false}
-					closeOnClick
-					draggable
-					pauseOnHover
-					theme="light"
-				/>
+				<QueryClientProvider client={queryClient}>
+					<App />
+					<ToastContainer
+						position="top-right"
+						autoClose={3000}
+						hideProgressBar={false}
+						newestOnTop={false}
+						closeOnClick
+						draggable
+						pauseOnHover
+						theme="light"
+					/>
+					<ReactQueryDevtools initialIsOpen={false} />
+				</QueryClientProvider>
 				{/* </UseStateContext> */}
 			</UserContextProvider>
 		</ContextProvider>
