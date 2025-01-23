@@ -17,6 +17,9 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 
+import { GetRequestsByCustomer } from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
+
 import RequestInfoModal from "../components/RequestInfoModal";
 import { UseStateContext } from "../contexts/ContextProvider";
 import RequestEditTemplate from "../components/RequestEditTemplate";
@@ -37,6 +40,7 @@ const Requests = () => {
 	const [messageText, setMessageText] = useState("");
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
+	const [ companyName, setCompanyName ] = useState("");
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -69,24 +73,43 @@ const Requests = () => {
 		delay: 1000,
 	};
 
+		// Get the requests data
+		const {
+			data: reqData,
+			isError: reqError,
+			isSuccess: reqSuccess,
+		} = useQuery({
+			queryKey: ["requests", companyName],
+			queryFn: () => GetRequestsByCustomer(companyName),
+			refetchInterval: 1000 * 10 * 60, // 1 minute refetch
+			refetchOnReconnect: true,
+			refetchOnWindowFocus: true,
+			// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+			retry: 3,
+		});
+	
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
+
+		const companyName = localStorage.getItem("companyName");
+		setCompanyName(companyName);
+
 	}, []);
 
+	const filterRequests = (data, customerName) => {
+	  return data.filter(item => item.customername === "CRC");
+	};
+	
 	useEffect(() => {
-		const fetchRequests = async () => {
-			setIsLoading(true);
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/request`,
-			);
-			const json = await response.json();
+		if (reqData) {
+			// Now filter the data
+			const data = reqData.response.data;
+			const requests = filterRequests(data, companyName);
 
-			setRequestList(json);
-			setIsLoading(false);
-		};
-		fetchRequests();
-	}, []);
+			setRequestList(requests);
+		}
+	}, [reqData]);
 
 	const FilterOptions = {
 		type: "Menu",
@@ -206,7 +229,6 @@ const Requests = () => {
 			// Insert Record
 			window.alert(`Insert Request: ${JSON.stringify(currentRecord)}`);
 			const response = await fetch(
-				// `${localHost}/api/request/`,
 				`${process.env.REACT_APP_MONGO_URI}/api/request/`,
 				{
 					method: "POST",

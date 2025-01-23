@@ -18,6 +18,9 @@ import { toast } from "react-toastify";
 import ProductsEditTemplate from "../components/ProductsEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
+import { GetProducts } from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
+
 import "../index.css";
 import "../App.css";
 
@@ -60,23 +63,30 @@ const ProductsTab = () => {
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
 
+	// Get the firms data
+	const {
+		data: productsData,
+	} = useQuery({
+		queryKey: ["products", "all"],
+		queryFn: () => GetProducts(),
+		refetchInterval: 1000 * 10, // 1 minute refetch
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+		retry: 3,
+	});
+
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
 	useEffect(() => {
-		const fetchProducts = async () => {
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product`,
-			);
-			const json = await response.json();
-
-			setProductList(json);
-		};
-		fetchProducts();
-	}, []);
-
+		if (productsData === undefined || productsData === null) return;
+		const { data } = productsData;
+		setProductList(data);
+	}, [productsData]);
+	
 	const toolbarClick = (args) => {
 		console.log(`Toolbar Click: ${args.item.id}`);
 		if (productsGridRef && args.item.id === "productGridElement_excelexport") {
@@ -150,7 +160,6 @@ const ProductsTab = () => {
 		setOpenUpdateModal(false);
 		if (insertFlag === true) {
 			const response = await fetch(
-				// "http://localhost:4000/api/product/",
 				`${process.env.REACT_APP_MONGO_URI}/api/product/`,
 				{
 					method: "POST",
@@ -166,7 +175,6 @@ const ProductsTab = () => {
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(
-				// `http://localhost:4000/api/product/${currentRecord._id}`,
 				`${process.env.REACT_APP_MONGO_URI}/api/product/${currentRecord._id}`,
 				{
 					method: "PATCH",
@@ -242,7 +250,7 @@ const ProductsTab = () => {
 						/>
 						<ColumnDirective
 							field="productname"
-							headerText="Service/Projects"
+							headerText="Service/Products"
 							textAlign="Left"
 							width="100"
 						/>

@@ -21,11 +21,11 @@ import FirmEditTemplate from "../components/FirmEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
 import { areaOptions } from "../data/worksideOptions";
+import { GetAllFirms } from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
 
 import "../index.css";
 import "../App.css";
-
-const apiUrl = process.env.REACT_APP_API_URL;
 
 let gridPageSize = 10;
 
@@ -96,26 +96,34 @@ const FirmsTab = () => {
 		},
 	};
 
+			// Get the firms data
+		const {
+			data: firmsData,
+			isError: reqError,
+			isSuccess: reqSuccess,
+		} = useQuery({
+			queryKey: ["firms"],
+			queryFn: () => GetAllFirms(),
+			refetchInterval: 1000 * 10 * 60, // 1 minute refetch
+			refetchOnReconnect: true,
+			refetchOnWindowFocus: true,
+			// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+			retry: 3,
+		});
+
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
 	useEffect(() => {
-		const fetchFirms = async () => {
-			setIsLoading(true);
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm`,
-			);
-			const json = await response.json();
-			setFirmList(json);
-
-			setIsLoading(false);
-		};
-		fetchFirms();
-	}, []);
-	// }, [firmDispatch]);
-
+		if (firmsData) {
+			// Now filter the data
+			const data = firmsData[0].data;
+			setFirmList(data);
+		}
+	}, [firmsData]);
+	
 	const toolbarClick = (args) => {
 		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
 			if (accessLevel <= 2) {

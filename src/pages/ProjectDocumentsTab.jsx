@@ -198,12 +198,6 @@ const ProjectDocumentsTab = () => {
 						// window.alert(jsonResults);
 					}
 				});
-			// await axios
-			// 	.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
-			// 	.then((res) => {
-			// 		const jsonResults = res.data;
-			// 		setProjectList(jsonResults);
-			// 	});
 		} catch (error) {
 			console.error(error);
 		}
@@ -327,10 +321,6 @@ const ProjectDocumentsTab = () => {
 				`${process.env.REACT_APP_MONGO_URI}/api/document/`,
 				requestOptions,
 			);
-			// const response = await fetch(
-			// 	`${process.env.REACT_APP_MONGO_URI}/api/document/`,
-			// 	requestOptions,
-			// );
 			const jsonData = await response.json().then((data) => {
 				// Define the new node data
 				const newNode = {
@@ -425,8 +415,6 @@ const ProjectDocumentsTab = () => {
 
 			const requestOptions = {
 				method: "GET",
-				// headers: { "Content-Type": "application/json" },
-				// responseType: "blob", // Important for handling binary data
 			};
 
 			try {

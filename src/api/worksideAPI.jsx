@@ -53,6 +53,19 @@ const GetAllSuppliers = async () => {
 	}
 };
 
+const GetAllRigCompanies = async () => {
+	try {
+		const response = await fetch(`${apiURL}/api/firm`);
+		const json = await response.json();
+		// Get Rig Companies
+		const rigCompanyResult = json.filter((json) => json.type === "RIGCOMPANY");
+		return { status: response.status, data: rigCompanyResult };
+	} catch (error) {
+		console.error("Error:", error.message);
+		return { status: error.status, data: [] };
+	}
+};
+
 const GetAllCustomers = async () => {
 	try {
 		const response = await fetch(`${apiURL}/api/firm`);
@@ -80,7 +93,7 @@ const GetAllContacts = async () => {
 const GetContactsByFirm = async (firm) => {
 	try {
 		const response = await fetch(`${apiURL}/api/contact`);
-		const json = await response.json();
+		const json = await response.json();  
 		// Get Customer Contacts
 		const contacts = json.filter((json) => json.firm === firm);
 		return [response.status, contacts];
@@ -302,15 +315,15 @@ const GetSupplierInfoFromID = async (id) => {
 	}
 };
 
-const GetRequestsByCustomer = async (customer) => {
+const GetRequestsByCustomer = async (companyName) => {
+	if (companyName === undefined) return { status: 500, data: [] };
 	try {
-		const response = await fetch(`${apiURL}/api/request`);
-		const json = await response.json();
-		const requests = json.filter((json) => json.customer === customer);
-		return [response.status, requests];
+		const response = await axios.get(`${apiURL}/api/request`);
+		const req = response.data;
+		return { status: 200, response };
 	} catch (error) {
-		console.error("Error:", err.message);
-		return [{ data: [] }];
+		console.error("Error:", error.message);
+		return { status: error.status, data: [] };
 	}
 };
 
@@ -546,14 +559,10 @@ const GetAllProjects = async () => {
 const GetProjectsByStatus = async ({ customer, status }) => {
 	try {
 		await axios.get(`${apiURL}/api/project`).then((response) => {
-			console.log(`API Projects: ${JSON.stringify(response.data, null, 2)}`);
 			const projects = response.data.filter((p) => {
 				if (p.status === status) return true;
 				return false;
 			});
-			console.log(
-				`API Filtered Projects: ${JSON.stringify(projects, null, 2)}`,
-			);
 			return { status: 200, data: projects[0] };
 		});
 	} catch (error) {
@@ -615,10 +624,10 @@ const GetRigs = async () => {
 	try {
 		const response = await fetch(`${apiURL}/api/rig`);
 		const json = await response.json();
-		return [response.status, json];
+		return { status: response.status, data: json };
 	} catch (error) {
-		console.error("Error:", err.message);
-		return [null];
+		console.error("Error:", error.message);
+		return { status: error.status, data: [] };
 	}
 };
 
@@ -668,6 +677,7 @@ export {
 	GetAllFirms,
 	GetAllFirmsForSelection,
 	GetAllSuppliers,
+	GetAllRigCompanies,
 	GetAllCustomers,
 	GetAllContacts,
 	GetContactsByFirm,

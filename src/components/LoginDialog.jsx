@@ -118,6 +118,7 @@ const LoginDialog = () => {
 						setUserEmail(email);
 						onSaveUserName(userName, email);
 						setCompanyName(jsonData.user.company);
+						localStorage.setItem("companyName", JSON.stringify(jsonData.user.company));
 						console.log("Company: ", jsonData.user.company);
 					});
 				}

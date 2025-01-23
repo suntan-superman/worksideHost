@@ -10,6 +10,9 @@ import { toast } from "react-toastify";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
 
+import { GetAllRigCompanies, GetRigs } from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
+
 // TODO Need to Add FIlter Options for Rigs
 // TODO FIlter by Area, Company
 
@@ -33,6 +36,83 @@ const RigsTab = () => {
 	const treeObj = useRef(null);
 
 	const [open, setOpen] = useState(false);
+
+	// Get the Rig Companies
+	const { data: rigCompanyData } = useQuery({
+		queryKey: ["rigCompanies"],
+		queryFn: () => GetAllRigCompanies(),
+		refetchInterval: 1000 * 60 * 2, // 2 Minutes
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+		retry: 3,
+	});
+
+	const { data: rigsData } = useQuery({
+		queryKey: ["rigs"],
+		queryFn: () => GetRigs(),
+		refetchInterval: 1000 * 60 * 2, // 2 Minutes
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+		retry: 3,
+	});
+
+	useEffect(() => {
+		if (rigCompanyData) {
+			const { data } = rigCompanyData;
+			// console.log(`API Rig Company Data: ${JSON.stringify(data, null, 2)}`);
+			setRigCompanyList(data);
+		}
+		if (rigsData) {
+			const { data } = rigsData;
+			// console.log(`API Rig Data: ${JSON.stringify(data, null, 2)}`);
+			setRigList(data);
+		}
+		if (rigCompanyData && rigsData) {
+			MergeTreeData();
+			setHasData(true);
+		}
+	}, [rigCompanyData, rigsData]);
+
+	// const fetchRigCompanies = async () => {
+	// 	try {
+	// 		await axios
+	// 			.get(`${process.env.REACT_APP_MONGO_URI}/api/firm/`)
+	// 			.then((res) => {
+	// 				const jsonResults = res.data;
+	// 				const result = jsonResults.filter(
+	// 					(jsonResult) => jsonResult.type === "RIGCOMPANY",
+	// 				);
+	// 				// console.log(`Rig Company List: ${JSON.stringify(result, null, 2)}`);
+	// 				setRigCompanyList(result);
+	// 			});
+	// 	} catch (error) {
+	// 		console.error(error);
+	// 	}
+	// };
+
+	// const fetchRigs = async () => {
+	// 	axios.get(`${process.env.REACT_APP_MONGO_URI}/api/rig/`).then((res) => {
+	// 		const jsonResults = res.data;
+	// 		// console.log(`Rig List: ${JSON.stringify(jsonResults, null, 2)}`);
+	// 		setRigList(jsonResults);
+	// 	});
+	// };
+
+	// const GetData = async () => {
+	// 	// setIsLoading(true);
+	// 	fetchRigCompanies().then(() => {
+	// 		fetchRigs().then(() => {});
+	// 	});
+	// 	MergeTreeData();
+	// 	setHasData(true);
+	// 	// setIsLoading(false);
+	// };
+
+	// useEffect(() => {
+	// 	GetData();
+	// }, []);
 
 	const handleOpen = () => {
 		setOpen(true);
@@ -105,29 +185,6 @@ const RigsTab = () => {
 		pb: 3,
 	};
 
-	const fetchRigCompanies = async () => {
-		try {
-			await axios
-				.get(`${process.env.REACT_APP_MONGO_URI}/api/firm/`)
-				.then((res) => {
-					const jsonResults = res.data;
-					const result = jsonResults.filter(
-						(jsonResult) => jsonResult.type === "RIGCOMPANY",
-					);
-					setRigCompanyList(result);
-				});
-		} catch (error) {
-			console.error(error);
-		}
-	};
-
-	const fetchRigs = async () => {
-		axios.get(`${process.env.REACT_APP_MONGO_URI}/api/rig/`).then((res) => {
-			const jsonResults = res.data;
-			setRigList(jsonResults);
-		});
-	};
-
 	const MergeTreeData = () => {
 		const updatedRigs = rigList.map((rigs) => ({
 			...rigs,
@@ -164,20 +221,6 @@ const RigsTab = () => {
 		// 	setRefreshFlag(!refreshFlag);
 		// }
 	};
-
-	const GetData = async () => {
-		// setIsLoading(true);
-		fetchRigCompanies().then(() => {
-			fetchRigs().then(() => {});
-		});
-		MergeTreeData();
-		setHasData(true);
-		// setIsLoading(false);
-	};
-
-	useEffect(() => {
-		GetData();
-	}, []);
 
 	// useEffect(() => {
 	// 	GetData();

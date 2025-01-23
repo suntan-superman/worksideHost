@@ -211,7 +211,7 @@ const Products = () => {
 							/>
 							<ColumnDirective
 								field="productname"
-								headerText="Service/Projects"
+								headerText="Service/Products"
 								textAlign="Left"
 								width="200"
 							/>
