@@ -309,6 +309,12 @@ img {
   }
 }
 
+.e-dialog .e-dlg-header {
+    color: green;
+    font-size: 20px;
+    font-weight: bold;
+}
+
 /* const Styles = styled.div
   .e-grid * {
     font-size: 12px !important;

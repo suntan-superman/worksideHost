@@ -188,7 +188,7 @@ const Requests = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.projectname} ${args.rowData.requestname}`
-					: "New Request";
+					: "Workside New Request";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data
@@ -228,23 +228,23 @@ const Requests = () => {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					requestorid: currentRecord.requestorid,
-					requestcategory: currentRecord.requestcategory,
-					requestname: currentRecord.requestname,
-					customername: currentRecord.customername,
-					customercontact: currentRecord.customercontact,
-					projectname: currentRecord.projectname,
-					rigcompany: currentRecord.rigcompany,
-					rigcompanycontact: currentRecord.rigcompanycontact,
-					creationdate: currentRecord.creationdate,
-					quantity: currentRecord.quantity,
-					vendortype: currentRecord.vendortype,
-					ssrVendorId: currentRecord.ssrVendorId,
-					datetimerequested: currentRecord.datetimerequested,
-					status: currentRecord.status,
-					statusdate: currentRecord.statusdate,
-					comments: currentRecord.comments,
-					project_id: currentRecord.project_id,
+					requestorid: currentRecord?.requestorid,
+					requestcategory: currentRecord?.requestcategory,
+					requestname: currentRecord?.requestname,
+					customername: currentRecord?.customername,
+					customercontact: currentRecord?.customercontact,
+					projectname: currentRecord?.projectname,
+					rigcompany: currentRecord?.rigcompany,
+					rigcompanycontact: currentRecord?.rigcompanycontact,
+					creationdate: currentRecord?.creationdate,
+					quantity: currentRecord?.quantity,
+					vendortype: currentRecord?.vendortype,
+					ssrVendorId: currentRecord?.ssrVendorId,
+					datetimerequested: currentRecord?.datetimerequested,
+					status: currentRecord?.status,
+					statusdate: currentRecord?.statusdate,
+					comment: currentRecord?.comment,
+					project_id: currentRecord?.project_id,
 				}),
 			};
 

@@ -32,6 +32,7 @@ const categoryOptions = [
 
 import { productStatusOptions } from "../data/worksideOptions";
 
+import { GetProducts } from "../api/worksideAPI";
 
 // TODO Complete the ProductsEditTemplate component
 // "categoryname"
@@ -73,16 +74,12 @@ const ProductsEditTemplate = (props) => {
 	};
 
 	const fetchCategories = async () => {
-		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/product`;
-
-		try {
-			const response = await axios.get(strAPI);
-			const products = response.data;
+		await GetProducts().then((response) => {
+			const products = response?.data;
+			if (products === undefined) return;
 			const cats = [...new Set(products.map((p) => p.categoryname))];
 			setAllCategories(cats);
-		} catch (error) {
-			console.log("error", error);
-		}
+		});
 	};
 
 	useEffect(() => {

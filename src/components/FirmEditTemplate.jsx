@@ -9,6 +9,8 @@ import { areaOptions } from "../data/worksideOptions";
 
 import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
 
+import { GetAllFirmsForSelection } from "../api/worksideAPI";
+
 const FirmEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
@@ -58,49 +60,47 @@ const FirmEditTemplate = (props) => {
 
 	const fetchOptions = async () => {
 		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
+		await GetAllFirmsForSelection().then((response) => {
+			// Get Customers
+			const customerResult = response.data.filter(
+				(json) => json.type === "CUSTOMER",
+			);
+			const customers = customerResult.map((r) => r.name);
+			setCustomerOptions(customers);
 
-		// Get Customers
-		const customerResult = json.filter((json) => json.type === "CUSTOMER");
-		// Extract names into an array
-		const customers = customerResult.map((r) => r.name);
-		setCustomerOptions(customers);
-
-		// Get Rig Companies
-		const rigResult = json.filter((json) => json.type === "RIGCOMPANY");
-		// Extract names into an array
-		const rigCompanies = rigResult.map((r) => r.name);
-		setRigCompanyOptions(rigCompanies);
-
+			const rigResult = response.data.filter((r) => r.type === "RIGCOMPANY");
+			// Extract names into an array
+			const rigCompanies = rigResult.map((r) => r.name);
+			setRigCompanyOptions(rigCompanies);
+		});
 		setIsLoading(false);
 	};
 
-	const fetchContacts = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact`,
-		);
-		const json = await response.json();
+	// const fetchContacts = async () => {
+	// 	setIsLoading(true);
+	// 	const response = await fetch(
+	// 		`${process.env.REACT_APP_MONGO_URI}/api/contact`,
+	// 	);
+	// 	const json = await response.json();
 
-		// Get Customer Contacts
-		const result = json.filter((json) => json.firm === data.customer);
-		// Extract names into an array
-		const contacts = result.map((r) => r.username);
-		setContactOptions(contacts);
+	// 	// Get Customer Contacts
+	// 	const result = json.filter((json) => json.firm === data.customer);
+	// 	// Extract names into an array
+	// 	const contacts = result.map((r) => r.username);
+	// 	setContactOptions(contacts);
 
-		setIsLoading(false);
-	};
+	// 	setIsLoading(false);
+	// };
 
 	useEffect(() => {
 		// Get Customer and Rig Company Options from Firm Collection
 		fetchOptions();
 	}, []);
 
-	useEffect(() => {
-		// Get Contact Options from Contact Collection
-		fetchContacts();
-	}, [data.customer]);
+	// useEffect(() => {
+	// 	// Get Contact Options from Contact Collection
+	// 	fetchContacts();
+	// }, [data.customer]);
 
 	return (
 		<div className="flex justify-center items-center bg-white">

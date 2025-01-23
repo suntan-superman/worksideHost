@@ -20,12 +20,7 @@ import ContactEditTemplate from "../components/ContactEditTemplate";
 import "../index.css";
 import "../App.css";
 
-
 let gridPageSize = 10;
-
-// TODO Delete
-// TODO Update
-// TODO Create
 
 const ContactsTab = () => {
 	let contactsGridRef = useRef(null);
@@ -176,19 +171,19 @@ const ContactsTab = () => {
 		}
 	};
 
-	const handleContactDelete = async () => {
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact/${selectedRecord}`,
-			{
-				method: "DELETE",
-			},
-		);
-		const json = await response.json();
+	// const handleContactDelete = async () => {
+	// 	const response = await fetch(
+	// 		`${process.env.REACT_APP_MONGO_URI}/api/contact/${selectedRecord}`,
+	// 		{
+	// 			method: "DELETE",
+	// 		},
+	// 	);
+	// 	const json = await response.json();
 
-		if (response.ok) {
-			toast.success("Record Successfully Deleted...");
-		}
-	};
+	// 	if (response.ok) {
+	// 		toast.success("Record Successfully Deleted...");
+	// 	}
+	// };
 
 	const actionComplete = async (args) => {
 		// console.log(`Action Complete: ${args.requestType}`);
@@ -203,7 +198,7 @@ const ContactsTab = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.firstname} ${args.rowData.lastname}`
-					: "New Contact";
+					: "Workside New Contact";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data
@@ -213,44 +208,6 @@ const ContactsTab = () => {
 			);
 			setCurrentRecord(data);
 			setOpenUpdateModal(true);
-		}
-	};
-
-	const contactsActionComplete = async (args) => {
-		if (!contactsGridRef) return;
-		if (
-			args.requestType === "beginEdit" ||
-			args.requestType === "add" ||
-			args.requestType === "update" ||
-			args.requestType === "save" ||
-			args.requestType === "delete"
-		) {
-			if (args.requestType === "beginEdit" || args.requestType === "add") {
-				const { dialog } = args;
-				dialog.header = "Workside Contacts";
-			}
-			if (args.requestType === "add") {
-				// set insert flag
-				setInsertFlag(true);
-			}
-			if (args.requestType === "update") {
-				// set insert flag
-				setInsertFlag(false);
-			}
-			if (args.requestType === "save") {
-				const data = args.data;
-				// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
-				setMessageText(
-					`Update User ${args.data.firstname} ${args.data.lastname} Details?`,
-				);
-				setCurrentRecord(data);
-				setOpenUpdateModal(true);
-			}
-			if (args.requestType === "delete") {
-				// Delete Data
-				handleContactDelete();
-				setInsertFlag(false);
-			}
 		}
 	};
 
@@ -305,16 +262,6 @@ const ContactsTab = () => {
 		}
 	};
 
-	const onFirmLoad = () => {
-		const gridElement = document.getElementById("firmGridElement");
-		if (gridElement?.ej2_instances[0]) {
-			const gridInstance = gridElement.ej2_instances[0];
-			gridInstance.pageSettings.pageSize = gridPageSize;
-			gridInstance.pageSettings.frozenColumns = 3;
-			gridInstance.pageSettings.freeze = true;
-		}
-	};
-
 	const onContactLoad = () => {
 		const gridElement = document.getElementById("contactGridElement");
 		if (gridElement?.ej2_instances[0]) {
@@ -324,13 +271,6 @@ const ContactsTab = () => {
 			gridInstance.pageSettings.freeze = true;
 		}
 	};
-
-	// const rowDataBound = (args) => {
-	// 	if (args.data.OrderID === 10249) {
-	// 		args.rowHeight = 90;
-	// 	}
-	// };
-	// <GridComponent dataSource={gridData} height={315} rowDataBound={rowDataBound}>
 
 	return (
 		<div>
@@ -398,21 +338,21 @@ const ContactsTab = () => {
 						<ColumnDirective
 							field="contactclass"
 							headerText="Class"
-							editType="dropdownedit"
+							// editType="dropdownedit"
 							textAlign="Left"
 							width="100"
 						/>
 						<ColumnDirective
 							field="firm"
 							headerText="Firm"
-							editType="dropdownedit"
+							// editType="dropdownedit"
 							textAlign="Left"
 							width="100"
 						/>
 						<ColumnDirective
 							field="accesslevel"
 							headerText="Access"
-							editType="dropdownedit"
+							// editType="dropdownedit"
 							textAlign="Left"
 							width="100"
 						/>
@@ -456,7 +396,7 @@ const ContactsTab = () => {
 						<ColumnDirective
 							field="status"
 							headerText="Status"
-							editType="dropdownedit"
+							// editType="dropdownedit"
 							textAlign="Left"
 							width="100"
 						/>

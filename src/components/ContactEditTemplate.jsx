@@ -11,22 +11,26 @@ import {
 	accessLevelOptions,
 } from "../data/worksideOptions";
 
+import {
+	GetAllFirms,
+} from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
+
 const ContactEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 
 	// Handle input changes
 	const onChange = (args) => {
 		// Only for debugging purposes
-		console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
+		// console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
 		setData({ ...data, [args.target.name]: args.target.value });
 	};
 
 	const [isLoading, setIsLoading] = useState(false);
-	const [customerOptions, setCustomerOptions] = useState([]);
-	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
-	const [contactOptions, setContactOptions] = useState([]);
 	const [firmOptions, setFirmOptions] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
+	const [modifyFlag, setModifyFlag] = useState(true);
+
 
 	useEffect(() => {
 		// ReadOnly flag
@@ -37,58 +41,33 @@ const ContactEditTemplate = (props) => {
 		} else {
 			setReadOnlyFlag(true);
 		}
-		console.log(`Firm: ${data.firm}`);
 	}, [data.isAdd]);
 
-	const fetchOptions = async () => {
-		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
+	// Get the firms data
+	const { data: firmData } = useQuery({
+		queryKey: ["firms"],
+		queryFn: () => GetAllFirms(),
+		refetchInterval: 10000,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
 
-		const firms = json.map((r) => r.name);
-		setFirmOptions(firms);
-
-		// Get Customers
-		const customerResult = json.filter((json) => json.type === "CUSTOMER");
-		// Extract names into an array
-		const customers = customerResult.map((r) => r.name);
-		setCustomerOptions(customers);
-
-		// Get Rig Companies
-		const rigResult = json.filter((json) => json.type === "RIGCOMPANY");
-		// Extract names into an array
-		const rigCompanies = rigResult.map((r) => r.name);
-		setRigCompanyOptions(rigCompanies);
-
-		setIsLoading(false);
+			// Get Firms
+	const getFirmOptions = (firms) => {
+		if (firms === undefined || firms === null) return [];
+		const firmList = firms.data?.map((f) => f.name);
+		return firmList;
 	};
 
-	const fetchContacts = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact`,
-		);
-		const json = await response.json();
-
-		// Get Customer Contacts
-		const result = json.filter((json) => json.firm === data.customer);
-		// Extract names into an array
-		const contacts = result.map((r) => r.username);
-		setContactOptions(contacts);
-
-		setIsLoading(false);
-	};
-
-	useEffect(() => {
-		// Get Customer and Rig Company Options from Firm Collection
-		fetchOptions();
-	}, []);
-
-	useEffect(() => {
-		// Get Contact Options from Contact Collection
-		fetchContacts();
-	}, [data.customer]);
-
+		useEffect(() => {
+			if (firmData) {
+				setFirmOptions(getFirmOptions(firmData[0]));
+				setModifyFlag(false);
+			}
+		}, [firmData, modifyFlag]);
+	
 	return (
 		<div className="flex justify-center items-center bg-white">
 			{isLoading && (

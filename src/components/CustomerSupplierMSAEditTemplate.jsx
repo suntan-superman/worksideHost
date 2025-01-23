@@ -6,7 +6,10 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { UseStateContext } from "../contexts/ContextProvider";
 import "../styles/material.css";
 
-import axios from "axios";
+import {
+	GetAllSuppliers,
+	GetCustomerSupplierMSAData,
+} from "../api/worksideAPI";
 
 // Set Selection Options
 import { msaStatusOptions } from "../data/worksideOptions";
@@ -76,61 +79,37 @@ const CustomerSupplierMSAEditTemplate = (props) => {
 
 	const fetchSuppliers = async () => {
 		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
-		// Get Suppliers
-		const supplierResult = json.filter((json) => json.type === "SUPPLIER");
-		// const result = filterSuppliers(supplierResult, customerSupplierMSAData);
-		// console.log("Supplier Options:", JSON.stringify(result, null, 2));
-		// Extract names into an array
-		const suppliers = supplierResult.map((r) => r.name);
-		setSupplierOptions(suppliers);
+		await GetAllSuppliers().then((response) => {
+			if (response.status === 200) {
+				const suppliers = response.data.map((r) => r.name);
+				setSupplierOptions(suppliers);
+				setIsLoading(false);
+			} else {
+				console.log("Error: ", response.status);
+			}
+		});
 		setIsLoading(false);
 	};
 
-	const GetCustomerSupplierMSAData = async (id) => {
+	const fetchCustomerSupplierMSAData = async (id) => {
 		setCustomerSupplierMSAData([]);
 		if (id) {
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customersuppliermsa/${id}`;
-			// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
-			try {
-				await axios.get(fetchString).then((response) => {
-					if (response.status === 200) {
-						if (response.data) {
-							setCustomerSupplierMSAData(response.data);
-						} else {
-							console.log("Customer-Supplier MSA Not Found");
-						}
-						// });
-					} else if (response.status === 300) {
-						console.log("No Data Found");
+			GetCustomerSupplierMSAData(id).then((response) => {
+				if (response.status === 200) {
+					if (response.data) {
+						setCustomerSupplierMSAData(response.data);
 					} else {
-						console.log("Error: ", response.status);
+						console.log("Customer-Supplier MSA Not Found");
 					}
-				});
-			} catch (error) {
-				setIsLoading(false);
-				window.alert(`Error: ${error}`);
-				console.error(error);
-			}
+				}
+			});
 		}
-	};
-
-	const filterSuppliers = (dataset1, dataset2) => {
-		// Extract supplier names from dataset2
-		const supplierNames = new Set(dataset2.map((item) => item.suppliername));
-		// Filter dataset1 to exclude items with names found in supplierNames
-		const filteredData = dataset1.filter(
-			(item) => !supplierNames.has(item.name),
-		);
-
-		return filteredData;
 	};
 
 	useEffect(() => {
 		fetchOptions();
 		if (data.isAdd) {
-			GetCustomerSupplierMSAData(companyID).then(() => {
+			fetchCustomerSupplierMSAData(companyID).then(() => {
 				fetchSuppliers();
 			});
 		}

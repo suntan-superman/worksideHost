@@ -311,7 +311,7 @@ const CustomerSupplierMSATabX = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.customername}/${args.rowData.suppliername}`
-					: "New MSA Record";
+					: "Workside New MSA Record";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data

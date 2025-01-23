@@ -73,15 +73,15 @@ const ValidateUsersTab = () => {
 
 	const accessLevel = GetAccessLevel();
 
-	const editOptions = {
-		// allowEditing: accessLevel > 2,
-		allowUpdating: accessLevel > 2,
-		allowAdding: accessLevel > 2,
-		allowDeleting: accessLevel > 2,
-		mode: "Dialog",
-	};
+	// const editOptions = {
+	// 	// allowEditing: accessLevel > 2,
+	// 	allowUpdating: accessLevel > 2,
+	// 	allowAdding: accessLevel > 2,
+	// 	allowDeleting: accessLevel > 2,
+	// 	mode: "Dialog",
+	// };
 
-	const toolbarOptions = ["Add", "Update", "Delete"];
+	// const toolbarOptions = ["Add", "Update", "Delete"];
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const [selectedRecordData, setSelectedRecordData] = useState(null);
 	const settings = { mode: "Row" };
@@ -438,10 +438,10 @@ const ValidateUsersTab = () => {
 				allowResizing
 				filterSettings={FilterOptions}
 				selectionSettings={settings}
-				toolbar={toolbarOptions}
+				// toolbar={toolbarOptions}
 				rowSelected={rowSelectedUser}
 				recordClick={recordClick}
-				editSettings={editOptions}
+				// editSettings={editOptions}
 				enablePersistence
 				load={onUserLoad}
 				width="95%"
@@ -512,7 +512,8 @@ const ValidateUsersTab = () => {
 						width="100"
 					/>
 				</ColumnsDirective>
-				<Inject services={[Selection, Filter, Page, Toolbar, Resize, Freeze]} />
+				{/* <Inject services={[Selection, Filter, Page, Toolbar, Resize, Freeze]} /> */}
+				<Inject services={[Selection, Filter, Page, Resize, Freeze]} />
 			</GridComponent>
 			<div className="items-center">
 				{showDialog && (

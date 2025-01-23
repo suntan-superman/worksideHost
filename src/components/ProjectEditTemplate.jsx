@@ -6,6 +6,12 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
 
+import {
+	GetAllFirms,
+	GetAllContacts,
+} from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
+
 import { areaOptions, projectStatusOptions } from "../data/worksideOptions";
 
 const ProjectEditTemplate = (props) => {
@@ -18,11 +24,11 @@ const ProjectEditTemplate = (props) => {
 	const [validateLocationFlag, setValidateLocationFlag] = useState(false);
 	const [userLatitude, setUserLatitude] = useState(0);
 	const [userLongitude, setUserLongitude] = useState(0);
+	const [modifyFlag, setModifyFlag] = useState(true);
 
 // Handle input changes
 	const onChange = (args) => {
 		// Only for debugging purposes
-		// console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
 		if (args.target.name === "longdec" && validateLocationFlag) {
 			const distance = haversineDistance(
 				userLatitude,
@@ -34,30 +40,71 @@ const ProjectEditTemplate = (props) => {
 				alert(
 					"Distance between user location and project location is greater than 100 miles",
 				);
-			// console.log(`Distance: ${distance}`, null, 2);
 		}
 		setData({ ...data, [args.target.name]: args.target.value });
 	};
 
-	const fetchOptions = async () => {
-		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
+	// Get the firms data
+	const { data: firmData } = useQuery({
+		queryKey: ["firms"],
+		queryFn: () => GetAllFirms(),
+		refetchInterval: 10000,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
 
+		// Get the contacts data
+		const { data: contactsData } = useQuery({
+			queryKey: ["contacts"],
+			queryFn: () => GetAllContacts(),
+			refetchInterval: 10000 * 60 * 10, // 10 minutes
+			refetchOnReconnect: true,
+			refetchOnWindowFocus: true,
+			staleTime: 1000 * 60 * 10, // 10 minutes
+			retry: 3,
+		});
+	
 		// Get Customers
-		const customerResult = json.filter((json) => json.type === "CUSTOMER");
-		// Extract names into an array
-		const customers = customerResult.map((r) => r.name);
-		setCustomerOptions(customers);
+	const getCustomerOptions = (firms) => {
+		if (firms === undefined || firms === null) return [];
+
+		const customerResult = firms.data.filter((json) => json.type === "CUSTOMER");	
+		const customers = customerResult?.map((r) => r.name);
+		return customers;
+	};
 
 		// Get Rig Companies
-		const rigResult = json.filter((json) => json.type === "RIGCOMPANY");
-		// Extract names into an array
-		const rigCompanies = rigResult.map((r) => r.name);
-		setRigCompanyOptions(rigCompanies);
+	const getRigCompanyOptions = (firms) => {
+		if (firms === undefined || firms === null) return [];
 
-		setIsLoading(false);
+		const rigResult = firms.data.filter((json) => json.type === "RIGCOMPANY");	
+		const rigCompanies = rigResult?.map((r) => r.name);
+		return rigCompanies;
 	};
+
+	useEffect(() => {
+		if (firmData) {
+			setCustomerOptions(getCustomerOptions(firmData[0]));
+			setRigCompanyOptions(getRigCompanyOptions(firmData[0]));
+			setModifyFlag(false);
+		}
+	}, [firmData, modifyFlag]);
+
+		// Get Contacts
+	const getContactOptions = (contacts) => {
+		if (contacts === undefined || contacts === null) return [];
+
+		const contactResult = contacts.filter((c) => c.firm === data.customer);
+		const contactList = contactResult?.map((r) => r.username);
+		return contactList;
+	};
+	
+	useEffect(() => {
+		if( contactsData) 
+			setContactOptions(getContactOptions(contactsData[0]));
+	}, [data.customer]);
 
 	const GetCurrentLocation = () => {
 		if (navigator.geolocation) {
@@ -103,6 +150,12 @@ const ProjectEditTemplate = (props) => {
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
 			SetDefaultDates();
+			data.area = "WEST COAST";
+			data.status = "PENDING";
+			data.statusdate = new Date();
+			data.projectedstartdate = new Date();
+			data.expectedduration = 1;
+
 			GetCurrentLocation();
 		} else {
 			setReadOnlyFlag(true);
@@ -146,32 +199,6 @@ const ProjectEditTemplate = (props) => {
 			setData({ ...data, projectedstartdate: formattedDate });
 		}
 	};
-
-	const fetchContacts = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact`,
-		);
-		const json = await response.json();
-
-		// Get Customer Contacts
-		const result = json.filter((json) => json.firm === data.customer);
-		// Extract names into an array
-		const contacts = result.map((r) => r.username);
-		setContactOptions(contacts);
-
-		setIsLoading(false);
-	};
-
-	useEffect(() => {
-		// Get Customer and Rig Company Options from Firm Collection
-		fetchOptions();
-	}, []);
-
-	useEffect(() => {
-		// Get Contact Options from Contact Collection
-		fetchContacts();
-	}, [data.customer]);
 
 	return (
 		<div className="flex justify-center items-center bg-white">

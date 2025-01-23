@@ -162,7 +162,7 @@ const FirmsTab = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.name}`
-					: "New Firm";
+					: "Workside New Firm";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data

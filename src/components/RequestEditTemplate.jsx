@@ -8,8 +8,16 @@ import {
 } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
-import axios from "axios";
 import { toast } from "react-toastify";
+
+import {
+	GetAllProjects,
+	GetAllFirms,
+	GetProducts,
+	GetAllContacts,
+	GetSupplierProductsByProduct,
+} from "../api/worksideAPI";
+import { useQuery } from "@tanstack/react-query";
 
 // Set Selection Options
 // const categoryOptions = [
@@ -37,10 +45,10 @@ import { toast } from "react-toastify";
 
 import { requestStatusOptions } from "../data/worksideOptions";
 
-let allProducts = [];
-
 const RequestEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
+
+	const [customerChangeFlag, setCustomerChangeFlag] = useState(false);
 
 	// Handle input changes
 	const onChange = (args) => {
@@ -56,6 +64,9 @@ const RequestEditTemplate = (props) => {
 				GetSSRVendors();
 			}
 		}
+		if (args.target.name === "customername") {
+			setCustomerChangeFlag(true);
+		}
 	};
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -67,10 +78,54 @@ const RequestEditTemplate = (props) => {
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
 	const [msaVendorOptions, setMSAVendorOptions] = useState([]);
 	const [allCategories, setAllCategories] = useState([]);
-	// const [allProducts, setAllProducts] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
-
+	
 	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
+
+	// Get the project data
+	const { data: projData } = useQuery({
+		queryKey: ["projects"],
+		queryFn: () => GetAllProjects(),
+		refetchInterval: 10000,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes+
+		retry: 3,
+	});
+
+	// Get the firms data
+	const { data: firmData } = useQuery({
+		queryKey: ["firms"],
+		queryFn: () => GetAllFirms(),
+		enabled: !!projData, // Only retrieve data if projData is available
+		refetchInterval: 10000,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
+
+	// Get the products data
+	const { data: productsData } = useQuery({
+		queryKey: ["products"],
+		queryFn: () => GetProducts(),
+		refetchInterval: 10000 * 60 * 10, // 10 minutes
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
+
+	// Get the contacts data
+	const { data: contactsData } = useQuery({
+		queryKey: ["contacts"],
+		queryFn: () => GetAllContacts(),
+		refetchInterval: 10000 * 60 * 10, // 10 minutes
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
 
 	useEffect(() => {
 		GetProducts().then(() => {
@@ -79,130 +134,127 @@ const RequestEditTemplate = (props) => {
 		});
 	}, []);
 
-	const fetchOptions = async () => {
-		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
+	const getCustomers = (firms) => {
+		if (firms === undefined || firms === null) return [];
+		return firms.data.filter((firm) => firm.type === "CUSTOMER");
+	};
 
-		// Get Customers
-		const customerResult = json.filter((json) => json.type === "CUSTOMER");
+	const getRigCompanies = (firms) => {
+		if (firms === undefined || firms === null) return [];
+		return firms.data.filter((firm) => firm.type === "RIGCOMPANY");
+	};
+
+	useEffect(() => {
+		if (firmData === undefined || firmData === undefined) return;
+
+		const customerResult = getCustomers(firmData[0]);
 		// Extract names into an array
-		const customers = customerResult.map((r) => r.name);
+		const customers = customerResult?.map((r) => r.name);
 		setCustomerOptions(customers);
 
 		// Get Rig Companies
-		const rigResult = json.filter((json) => json.type === "RIGCOMPANY");
+		const rigResult = getRigCompanies(firmData[0]);
 		// Extract names into an array
-		const rigCompanies = rigResult.map((r) => r.name);
+		const rigCompanies = rigResult?.map((r) => r.name);
 		setRigCompanyOptions(rigCompanies);
 
-		{
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/project`,
-			);
-			const json = await response.json();
-			// Get Projects
-			const projects = json.map((p) => p.projectname);
+		// Get Projects
+		if (projData !== undefined && projData !== null) {
+			const projects = projData.data.map((p) => p.projectname);
 			setProjectOptions(projects);
 		}
+	}, [projData, firmData]);
 
-		setIsLoading(false);
-	};
-
-	const GetProducts = async () => {
-		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/product`;
-
-		try {
-			const response = await axios.get(strAPI);
-			allProducts = response.data;
-			const cats = [...new Set(response.data.map((p) => p.categoryname))];
-			setAllCategories(cats);
-		} catch (error) {
-			console.log("error", error);
-		}
-	};
+	useEffect(() => {
+		if (productsData === undefined || productsData === null) return;
+		const cats = [...new Set(productsData[0].map((p) => p.categoryname))];
+		setAllCategories(cats);
+		if (data.requestcategory !== undefined)
+			FilterProducts(data.requestcategory);
+	}, [productsData]);
 
 	const FilterProducts = (selectedItem) => {
-		const products = allProducts.filter((p) => p.categoryname === selectedItem);
+		const products = productsData[0].filter((p) => p.categoryname === selectedItem);
 		const productList = [...new Set(products.map((p) => p.productname))];
 		setFilteredProducts(productList);
 	};
 
-	const fetchContacts = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact`,
-		);
-		const json = await response.json();
+		// const getContacts = (firm) => {
+	// 	return contactsData
+	// 		.flat()
+	// 		.filter((contact) => contact.firm === firm);
+	// };
 
-		// Get Customer Contacts
-		const result = json.filter((json) => json.firm === data.customer);
+	// Get Customer Contacts
+	useEffect(() => {
+		if (contactsData === undefined || contactsData === null) return;
+
+		const flattenedContacts = contactsData?.flat();
+		const result = flattenedContacts.filter(
+			(contact) => contact.firm === data.customername,
+		);
 		// Extract names into an array
 		const contacts = result.map((r) => r.username);
 		setContactOptions(contacts);
-
-		setIsLoading(false);
-	};
-
-	const fetchRigCompanyContacts = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/contact`,
-		);
-		const json = await response.json();
+		setCustomerChangeFlag(false);
+	}, [contactsData, data.customername, customerChangeFlag]);
 
 		// Get Rig Company Contacts
-		const result = json.filter((json) => json.firm === data.rigcompany);
+	useEffect(() => {
+		// Get Customer Contact Options from Contact Collection
+		if (contactsData === undefined || contactsData === null) return;
+		const result = contactsData[0].filter(
+			(contact) => contact.firm === data.rigcompany,
+		);
 		// Extract names into an array
 		const contacts = result.map((r) => r.username);
 		setRigCompanyContactOptions(contacts);
+	}, [contactsData, data.rigcompany]);
 
-		setIsLoading(false);
-	};
-
-	const GetSSRVendors = async () => {
-		const vendorAPI = `${process.env.REACT_APP_MONGO_URI}/api/supplierproductsview/byproduct`;
-
-		const suppliers = await axios.post(vendorAPI, {
-			category: data.requestcategory,
-			product: data.requestname,
-		});
-		const filteredSuppliers = suppliers.data.filter((s) => {
-			if (
-				s.category === "Fishing & Re-Entry" &&
-				s.product === "Impression Blocks"
-			) {
-				return true;
-			}
-			return false;
-		});
-
-		if (filteredSuppliers.length === 0) {
-			toast.error("No Sole Source Vendors/Suppliers Found!");
-		} else {
-			const suppliers = [...new Set(filteredSuppliers.map((s) => s.supplier))];
-			setMSAVendorOptions(suppliers);
+	const extractProducts = (response) => {
+		// Check if status is 200 and extract the data array
+		if (response.length > 0 && response[0].status === 200) {
+			return response[0].data;
 		}
+		return [];
+	};
+	const GetSSRVendors = async () => {
+		if (data.requestcategory === undefined || data.requestname === undefined) {
+			toast.error("Please select a Request Category and Request Name!");
+			return;
+		}
+		GetSupplierProductsByProduct().then((response) => {
+			const suppliers = extractProducts(response);
+			console.log("Suppliers: " + JSON.stringify(suppliers));
+			const filteredSuppliers = suppliers.filter((s) => {
+				if (
+					s.category === data.requestcategory &&
+					s.product === data.requestname
+				) {
+					return true;
+				}
+				return false;
+			});
+			if (filteredSuppliers.length === 0) {
+				toast.error("No Sole Source Vendors/Suppliers Found!");
+			} else {
+				const suppliers = [
+					...new Set(filteredSuppliers.map((s) => s.supplier)),
+				];
+				setMSAVendorOptions(suppliers);
+			}
+		});
 	};
 
-	useEffect(() => {
-		// Get Customer and Rig Company Options from Firm Collection
-		fetchOptions();
-	}, []);
-
-	useEffect(() => {
-		// Get Rig Company Contact Options from Contact Collection
-		fetchContacts();
-	}, [data.customername]);
-
-	useEffect(() => {
-		// Get Customer Contact Options from Contact Collection
-		fetchRigCompanyContacts();
-	}, [data.rigcompany]);
 
 	useEffect(() => {
 		// ReadOnly flag
 		if (data.isAdd) {
+			data.datetimerequested = new Date();
+			data.creationdate = new Date();
+			data.status = "OPEN";
+			data.statusdate = new Date();
+
 			setReadOnlyFlag(false);
 		} else {
 			setReadOnlyFlag(true);
@@ -444,7 +496,7 @@ const RequestEditTemplate = (props) => {
 							value={data.vendorName}
 							placeholder="Select Sole Source Vendor"
 							required={false}
-							readonly={data.vendorType !== "SSR"}
+							// readonly={data.vendorType !== "SSR"}
 							onChange={onChange}
 						/>
 					</div>
@@ -460,7 +512,7 @@ const RequestEditTemplate = (props) => {
 							type="text"
 							id="comments"
 							name="comments"
-							defaultValue={data.comments}
+							defaultValue={data?.comment}
 							className="e-input"
 							placeholder="Enter Comments"
 							onChange={onChange}

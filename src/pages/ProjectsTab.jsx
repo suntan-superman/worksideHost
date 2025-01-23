@@ -4,7 +4,6 @@
 // TODO Create
 
 import React, { useEffect, useState } from "react";
-import { DataManager, Query } from "@syncfusion/ej2-data";
 import {
 	GridComponent,
 	ColumnsDirective,
@@ -22,24 +21,28 @@ import { toast } from "react-toastify";
 import "../index.css";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import ProjectEditTemplate from "../components/ProjectEditTemplate";
-import { areaOptions } from "../data/worksideOptions";
 
 let gridPageSize = 8;
 
-import { GetAllProjects } from "../api/worksideAPI";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+	GetAllProjects,
+	DeleteProject,
+	SaveProject,
+	UpdateProject,
+} from "../api/worksideAPI";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
 // let filteredProjects = null;
 
 const ProjectsTab = () => {
-	const [isLoading, setIsLoading] = useState(false);
 	const [haveData, setHaveData] = useState(false);
-	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
 	const [projectData, setProjectData] = useState(null);
+
+	const queryClient = useQueryClient();
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -61,6 +64,7 @@ const ProjectsTab = () => {
 	};
 
 	const toolbarOptions = ["Add", "Edit"];
+	// const toolbarOptions = ["Add", "Edit", "Delete"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -71,10 +75,8 @@ const ProjectsTab = () => {
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
-	// TODO Convert to React Query
-
 	// Get the project data
-	const { data: projData, isSuccess: isProjectsSuccess } = useQuery({
+	const { data: projData, isLoading: isProjectsLoading } = useQuery({
 		queryKey: ["projects"],
 		queryFn: GetAllProjects,
 		refetchInterval: 10000,
@@ -85,105 +87,65 @@ const ProjectsTab = () => {
 	});
 
 	useEffect(() => {
-		console.log(`Projects Data: ${JSON.stringify(projData?.data)}`);
 		setProjectData(projData?.data);
 		setHaveData(true);
 	}, [projData]);
-	// if (isProjectsSuccess) {
-	// 	console.log(`Projects Data: ${JSON.stringify(filteredProjects.data)}`);
-	// 	setHaveData(true);
-	// }
 
-	// const fetchProjects = async () => {
-	// 	// Set Wait Cursor
-	// 	setIsLoading(true);
-	// 	try {
-	// 		const response = await fetch(
-	// 			`${process.env.REACT_APP_MONGO_URI}/api/project/`,
-	// 		);
-	// 		const jsonData = await response.json();
-	// 		setIsLoading(false);
-	// 		// window.alert(`Data Received: ${JSON.stringify(jsonData)}`);
-	// 		filteredProjects = jsonData;
-	// 		setHaveData(true);
-	// 	} catch (error) {
-	// 		setIsLoading(false);
-	// 		window.alert(`Error: ${error}`);
-	// 		console.error(error);
-	// 	}
-	// 	setIsLoading(false);
-	// };
-
-	// useEffect(() => {
-	// 	fetchProjects();
-	// }, []);
-	// }, [dispatch]);
-
-	// TODO Convert to React Query
-
-	useEffect(() => {
-		const fetchFirms = async () => {
-			// Set Wait Cursor
-			setIsLoading(true);
-			// const response = await fetch(`${apiUrl}/api/firm`);
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
-			);
-			const jsonResults = await response.json();
-			// Filter The entire List to include companies only
-			const result = jsonResults.filter(
-				(jsonResult) => jsonResult.type === "CUSTOMER",
-			);
-			setFirmList(result);
-			// Set Default Cursor
-			setIsLoading(false);
-		};
-		fetchFirms();
-	}, []);
-
-	const areaSelections = {
-		params: {
-			actionComplete: () => false,
-			allowFiltering: true,
-			dataSource: new DataManager(areaOptions),
-			fields: { text: "name", value: "name" },
-			query: new Query(),
+	// Define the mutation to delete the data
+	const deleteProjectMutation = useMutation({
+		mutationFn: async (id) => {
+			const { status, data } = await DeleteProject(id);
+			if (status === 200) {
+				return data;
+			}
 		},
-	};
-
-	// Set Company Selection Options
-	const companyOptions = [
-		{ name: "Aera Energy", nameId: "1" },
-		{ name: "Berry", nameId: "2" },
-		{ name: "Chevron", nameId: "3" },
-		{ name: "CRC", nameId: "4" },
-	];
-
-	const companySelections = {
-		params: {
-			actionComplete: () => false,
-			allowFiltering: true,
-			dataSource: new DataManager(companyOptions),
-			fields: { text: "name", value: "name" },
-			query: new Query(),
+		onSuccess: (data) => {
+			toast.success("Project successfully deleted");
+			queryClient.invalidateQueries("projects");
 		},
-	};
+		onError: (error) => {
+			toast.error(`Error deleting project...${error}`);
+		},
+	});
 
-	// TODO Convert to React Query
+	// Define the mutation to save the data
+	const saveProjectMutation = useMutation({
+		mutationFn: async (projectData) => {
+			const { status, data } = await SaveProject(projectData);
+			if (status === 200) {
+				return data;
+			}
+		},
+		onSuccess: (data) => {
+			toast.success("Project saved successfully:");
+			queryClient.invalidateQueries("projects");
+		},
+		onError: (error) => {
+			toast.error(`Error saving project: ${error}`);
+		},
+	});
+
+	// Define the mutation to update the data
+	const updateProjectMutation = useMutation({
+		mutationFn: async (id, body) => {
+			const { status, data } = await UpdateProject(id, body);
+			if (status === 200) {
+				return data;
+			}
+		},
+		onSuccess: (data) => {
+			toast.success("Project updated successfully:");
+			queryClient.invalidateQueries("projects");
+		},
+		onError: (error) => {
+			toast.error(`Error updating project: ${error}`);
+		},
+	});
 
 	const handleDelete = async () => {
-		// const fetchString = `${apiUrl}/api/project/${selectedRecord}`;
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${selectedRecord}`;
-		const response = await fetch(fetchString, {
-			method: "DELETE",
-		});
-		if (response.ok) {
-			// Clear form useStates
-			// ResetUseStates();
-			toast.success("Record Successfully Deleted...");
+		if (window.confirm("Are you sure you want to delete this project?")) {
+			deleteProjectMutation.mutate(selectedRecord);
 		}
-		// setDeleteFlag(false);
-		// setEmptyFields([]);
 	};
 
 	const actionBegin = (args) => {
@@ -206,7 +168,7 @@ const ProjectsTab = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.projectname}`
-					: "New Project";
+					: "Workside New Project";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data
@@ -218,65 +180,32 @@ const ProjectsTab = () => {
 		}
 	};
 
-	// TODO Convert to React Query
-
 	const SaveProjectData = async () => {
 		setOpenUpdateModal(false);
 		if (insertFlag) {
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/project/`,
-				{
-					method: "POST",
-					body: JSON.stringify(currentRecord),
-					headers: {
-						"Content-Type": "application/json",
-					},
-				},
-			);
-			const jsonData = await response.json();
-			if (response.status === 200) {
-				toast.success("Record Successfully Added...");
-			} else {
-				toast.error("Record Add Failed...");
-			}
+			saveProjectMutation.mutate(currentRecord); // Trigger the mutation
+
 			setInsertFlag(false);
 		} else {
-			const requestOptions = {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					area: currentRecord.area,
-					customer: currentRecord.customer,
-					customercontact: currentRecord.customercontact,
-					rigcompany: currentRecord.rigcompany,
-					projectname: currentRecord.projectname,
-					description: currentRecord.description,
-					projectedstartdate: currentRecord.projectedstartdate,
-					actualstartdate: currentRecord.actualstartdate,
-					expectedduration: currentRecord.expectedduration,
-					actualduration: currentRecord.actualduration,
-					status: currentRecord.status,
-					statusdate: currentRecord.statusdate,
-					comment: currentRecord.comment,
-					latdec: currentRecord.latdec,
-					longdec: currentRecord.longdec,
-				}),
+			const body = {
+				area: currentRecord.area,
+				customer: currentRecord.customer,
+				customercontact: currentRecord.customercontact,
+				rigcompany: currentRecord.rigcompany,
+				projectname: currentRecord.projectname,
+				description: currentRecord.description,
+				projectedstartdate: currentRecord.projectedstartdate,
+				actualstartdate: currentRecord.actualstartdate,
+				expectedduration: currentRecord.expectedduration,
+				actualduration: currentRecord.actualduration,
+				status: currentRecord.status,
+				statusdate: currentRecord.statusdate,
+				comment: currentRecord.comment,
+				latdec: currentRecord.latdec,
+				longdec: currentRecord.longdec,
 			};
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/project/${currentRecord._id}`;
-			try {
-				const response = await fetch(fetchString, requestOptions);
-				const jsonData = await response.json();
-				if (response.status === 200) {
-					toast.success("Record Successfully Updated...");
-				} else {
-					toast.error("Record Update Failed...");
-				}
-				setIsLoading(false);
-			} catch (error) {
-				setIsLoading(false);
-				window.alert(`Error: ${error}`);
-				console.error(error);
-			}
+
+			updateProjectMutation.mutate(currentRecord._id, body); // Trigger the mutation
 		}
 	};
 
@@ -286,8 +215,6 @@ const ProjectsTab = () => {
 			const selectedrowindex = projectsGrid.getSelectedRowIndexes();
 			/** Get the selected records. */
 			setSelectedRecord(projectData[selectedrowindex]._id);
-			// eslint-disable-next-line prefer-template
-			// setEmptyFields([]);
 		}
 	};
 
@@ -301,14 +228,12 @@ const ProjectsTab = () => {
 			const gridInstance = gridElement.ej2_instances[0];
 			gridInstance.pageSettings.pageSize = gridPageSize;
 			gridInstance.pageSettings.frozenColumns = 3;
-			// gridInstance.pageSettings.freeze = true;
 		}
 	};
 
 	return (
 		<div className="flex-grow bg-white p-2 relative">
-			{
-				// {!isLoading && haveData && (
+			{!isProjectsLoading && haveData && (
 				<div className="div-container">
 					<GridComponent
 						id="projectGridElement"
@@ -343,19 +268,18 @@ const ProjectsTab = () => {
 							<ColumnDirective
 								field="Area"
 								headerText="Area"
-								editType="dropdownedit"
+								// editType="dropdownedit"
 								textAlign="Left"
 								width="100"
-								edit={areaSelections}
+								// edit={areaSelections}
 							/>
-							{/* <ColumnDirective field="customer" headerText="Customer" textAlign="Left" editType="dropdownedit" width="100" /> */}
 							<ColumnDirective
 								field="customer"
 								headerText="Customer"
-								editType="dropdownedit"
+								// editType="dropdownedit"
 								textAlign="Left"
 								width="100"
-								edit={companySelections}
+								// edit={companySelections}
 							/>
 							<ColumnDirective
 								field="projectname"
@@ -452,7 +376,7 @@ const ProjectsTab = () => {
 						/>
 					</GridComponent>
 				</div>
-			}
+			)}
 			{openUpdateModal && (
 				<ConfirmationDialog
 					open={openUpdateModal}

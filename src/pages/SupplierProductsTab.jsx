@@ -109,7 +109,7 @@ const SupplierProductsTab = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.supplier}-${args.rowData.product}`
-					: "New Supplier-Product Record";
+					: "Workside New Supplier-Product Record";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data

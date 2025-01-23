@@ -115,7 +115,7 @@ const ProductsTab = () => {
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Record of ${args.rowData.categoryname} - ${args.rowData.productname}`
-					: "New Product";
+					: "Workside New Product";
 		}
 		if (args.requestType === "save") {
 			// Save or Update Data

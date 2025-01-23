@@ -9,6 +9,8 @@ const productStatusOptions = ["ACTIVE", "INACTIVE"];
 
 let productOptions = null;
 
+import { GetProducts, GetAllFirms } from "../api/worksideAPI";
+
 // TODO Complete the SupplierProductEditTemplate component
 
 const SupplierProductEditTemplate = (props) => {
@@ -55,14 +57,21 @@ const SupplierProductEditTemplate = (props) => {
 
 	const fetchSupplierOptions = async () => {
 		setIsLoading(true);
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
-		// Get Customers
-		const supplierResult = json.filter((json) => json.type === "SUPPLIER");
-		// Extract names into an array
-		const suppliers = supplierResult.map((r) => r.name);
-		setSupplierOptions(suppliers);
-		fetchProducts();
+		await GetAllFirms().then((response) => {
+			const jsonData = response[0]?.data;
+			if (jsonData === undefined) {
+				setIsLoading(false);
+				return;
+			}
+			// Get Suppliers
+			const supplierResult = jsonData.filter(
+				(json) => json.type === "SUPPLIER",
+			);
+			// Extract names into an array
+			const suppliers = supplierResult.map((r) => r.name);
+			setSupplierOptions(suppliers);
+			fetchProducts();
+		});
 		setIsLoading(false);
 	};
 
@@ -97,20 +106,32 @@ const SupplierProductEditTemplate = (props) => {
 	};
 
 	const fetchProducts = async () => {
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/product`);
-		const json = await response.json();
-		// setProductOptions(json);
-		productOptions = json;
-		// console.log(`Product Options: ${JSON.stringify(json)}`);
-		const cats = [...new Set(json.map((p) => p.categoryname))];
-		setCategoryOptions(cats);
-		if (data.isAdd === false) {
-			// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
-			const filteredProducts = getUniqueProductNames(data.category);
-			// window.alert(`New Filtered Products: ${filteredProducts}`);
-			setFilteredProducts(filteredProducts);
-			// SetFilteredProducts(data.category);
-		}
+		await GetProducts().then((response) => {
+			productOptions = response.data;
+			const cats = [...new Set(response.data.map((p) => p.categoryname))];
+			setCategoryOptions(cats);
+			if (data.isAdd === false) {
+				// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
+				const filteredProducts = getUniqueProductNames(data.category);
+				// window.alert(`New Filtered Products: ${filteredProducts}`);
+				setFilteredProducts(filteredProducts);
+				// SetFilteredProducts(data.category);
+			}
+		});
+		// const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/product`);
+		// const json = await response.json();
+		// // setProductOptions(json);
+		// productOptions = json;
+		// // console.log(`Product Options: ${JSON.stringify(json)}`);
+		// const cats = [...new Set(json.map((p) => p.categoryname))];
+		// setCategoryOptions(cats);
+		// if (data.isAdd === false) {
+		// 	// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
+		// 	const filteredProducts = getUniqueProductNames(data.category);
+		// 	// window.alert(`New Filtered Products: ${filteredProducts}`);
+		// 	setFilteredProducts(filteredProducts);
+		// 	// SetFilteredProducts(data.category);
+		// }
 	};
 
 	useEffect(() => {
