@@ -45,7 +45,7 @@ const ProjectEditTemplate = (props) => {
 	};
 
 	// Get the firms data
-	const { data: firmData } = useQuery({
+	const { data: firmData, isSuccess: isFirmSuccess, isError: isFirmError } = useQuery({
 		queryKey: ["firms"],
 		queryFn: () => GetAllFirms(),
 		refetchInterval: 10000,
@@ -69,8 +69,7 @@ const ProjectEditTemplate = (props) => {
 		// Get Customers
 	const getCustomerOptions = (firms) => {
 		if (firms === undefined || firms === null) return [];
-
-		const customerResult = firms.data.filter((json) => json.type === "CUSTOMER");	
+		const customerResult = firms.filter((json) => json.type === "CUSTOMER");	
 		const customers = customerResult?.map((r) => r.name);
 		return customers;
 	};
@@ -79,15 +78,15 @@ const ProjectEditTemplate = (props) => {
 	const getRigCompanyOptions = (firms) => {
 		if (firms === undefined || firms === null) return [];
 
-		const rigResult = firms.data.filter((json) => json.type === "RIGCOMPANY");	
+		const rigResult = firms.filter((json) => json.type === "RIGCOMPANY");	
 		const rigCompanies = rigResult?.map((r) => r.name);
 		return rigCompanies;
 	};
 
 	useEffect(() => {
-		if (firmData) {
-			setCustomerOptions(getCustomerOptions(firmData[0]));
-			setRigCompanyOptions(getRigCompanyOptions(firmData[0]));
+		if (firmData?.data) {
+			setCustomerOptions(getCustomerOptions(firmData.data));
+			setRigCompanyOptions(getRigCompanyOptions(firmData.data));
 			setModifyFlag(false);
 		}
 	}, [firmData, modifyFlag]);
@@ -95,15 +94,14 @@ const ProjectEditTemplate = (props) => {
 		// Get Contacts
 	const getContactOptions = (contacts) => {
 		if (contacts === undefined || contacts === null) return [];
-
 		const contactResult = contacts.filter((c) => c.firm === data.customer);
 		const contactList = contactResult?.map((r) => r.username);
 		return contactList;
 	};
 	
 	useEffect(() => {
-		if( contactsData) 
-			setContactOptions(getContactOptions(contactsData[0]));
+		if (contactsData)
+			setContactOptions(getContactOptions(contactsData.data));
 	}, [data.customer]);
 
 	const GetCurrentLocation = () => {
@@ -199,6 +197,14 @@ const ProjectEditTemplate = (props) => {
 			setData({ ...data, projectedstartdate: formattedDate });
 		}
 	};
+
+	if (isFirmError) {
+		console.log("Error in fetching firms data");
+	}
+
+	if (isFirmSuccess) {
+		console.log("Firms data fetched successfully");
+	}
 
 	return (
 		<div className="flex justify-center items-center bg-white">

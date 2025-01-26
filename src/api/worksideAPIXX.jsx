@@ -1,6 +1,5 @@
 /* eslint-disable */
 import axios from "axios";
-import { format } from "date-fns";
 
 const apiURL = "https://workside-software.wl.r.appspot.com";
 
@@ -385,6 +384,7 @@ const apiRequest = async (endpoint, method, payload) => {
 const SaveNewRequest = async (reqData) =>
 	apiRequest("/api/request", "POST", reqData);
 
+
 /**
  * Update an existing request.
  * @param {string} reqID - Request ID to update.
@@ -516,56 +516,23 @@ const GetSupplierInfoFromID = async (id) => {
 	}
 };
 
-const cleanUpStr = (url) => {
-	// Remove double quotes from the URL string
-	let formattedStr = url.replace(/"([^"]*)"/g, '$1');
-	formattedStr= formattedStr.trimStart();
-	formattedStr= formattedStr.trimEnd();
-    return formattedStr;
-};
-
 /**
  * Fetches requests by customer name.
  *
  * @param {string} companyName - The name of the customer.
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to the requests data.
  */
-
-const GetRequestsByCustomer = async ({ clientName: companyName } ) => {
+const GetRequestsByCustomer = async (companyName) => {
+	if (!companyName || typeof companyName !== "string") {
+		console.error("Invalid company name provided to GetRequestsByCustomer.");
+		return { status: 400, data: [] };
+	}
 	try {
-		// Input validation
-		if (!companyName) {
-			return { status: 500, data: ["No Customer Name"] };
-		}
-
-		const cleanCompanyName = cleanUpStr(companyName);
-		const fetchString = `${apiURL}/api/request/bycustomername/${cleanCompanyName}`;
-		let data = [];
-		// Make the API request
-		await axios.get(fetchString).then((res) => {
-			data = res.data
-			return { status: 200, data: data };
-		});
-		// Handle successful response
-		
-		return { status: 200, data: data };
-
+		const response = await axios.get(`${apiURL}/api/request`);
+		return { status: 200, data: response.data };
 	} catch (error) {
-		// Log detailed error information
-		if (error.response) {
-			console.error('Server error:', error.response.data);
-		} else if (error.request) {
-			console.error('No response received:', error.request);
-		} else {
-			console.error('Request setup error:', error.message);
-		}
-
-		// Return appropriate error response
-		return {
-			status: error.response?.status || 500,
-			data: [],
-			error: error.message
-		};
+		console.error("Error fetching requests by customer:", error.message);
+		return { status: error.response?.status || 500, data: [] };
 	}
 };
 

@@ -147,13 +147,13 @@ const RequestEditTemplate = (props) => {
 	useEffect(() => {
 		if (firmData === undefined || firmData === undefined) return;
 
-		const customerResult = getCustomers(firmData[0]);
+		const customerResult = getCustomers(firmData);
 		// Extract names into an array
 		const customers = customerResult?.map((r) => r.name);
 		setCustomerOptions(customers);
 
 		// Get Rig Companies
-		const rigResult = getRigCompanies(firmData[0]);
+		const rigResult = getRigCompanies(firmData);
 		// Extract names into an array
 		const rigCompanies = rigResult?.map((r) => r.name);
 		setRigCompanyOptions(rigCompanies);
@@ -167,35 +167,30 @@ const RequestEditTemplate = (props) => {
 
 	useEffect(() => {
 		if (productsData === undefined || productsData === null) return;
-		const cats = [...new Set(productsData[0].map((p) => p.categoryname))];
+		const cats = [...new Set(productsData.data.map((p) => p.categoryname))];
 		setAllCategories(cats);
 		if (data.requestcategory !== undefined)
 			FilterProducts(data.requestcategory);
 	}, [productsData]);
 
 	const FilterProducts = (selectedItem) => {
-		const products = productsData[0].filter((p) => p.categoryname === selectedItem);
+		const products = productsData?.data?.filter((p) => p.categoryname === selectedItem);
 		const productList = [...new Set(products.map((p) => p.productname))];
 		setFilteredProducts(productList);
 	};
 
-		// const getContacts = (firm) => {
-	// 	return contactsData
-	// 		.flat()
-	// 		.filter((contact) => contact.firm === firm);
-	// };
+	const filterContactsByFirm = (contacts, firm) => {
+  return contacts?.filter((contact) => contact?.firm === firm);
+};
 
 	// Get Customer Contacts
 	useEffect(() => {
 		if (contactsData === undefined || contactsData === null) return;
 
-		const flattenedContacts = contactsData?.flat();
-		const result = flattenedContacts.filter(
-			(contact) => contact.firm === data.customername,
-		);
-		// Extract names into an array
-		const contacts = result.map((r) => r.username);
-		setContactOptions(contacts);
+		const contacts = contactsData.data;
+		const result = filterContactsByFirm(contacts, data.customername);
+		const contactsList = result.map((r) => r.username);
+		setContactOptions(contactsList);
 		setCustomerChangeFlag(false);
 	}, [contactsData, data.customername, customerChangeFlag]);
 
@@ -203,7 +198,7 @@ const RequestEditTemplate = (props) => {
 	useEffect(() => {
 		// Get Customer Contact Options from Contact Collection
 		if (contactsData === undefined || contactsData === null) return;
-		const result = contactsData[0].filter(
+		const result = contactsData.data.filter(
 			(contact) => contact.firm === data.rigcompany,
 		);
 		// Extract names into an array
@@ -225,7 +220,6 @@ const RequestEditTemplate = (props) => {
 		}
 		GetSupplierProductsByProduct().then((response) => {
 			const suppliers = extractProducts(response);
-			console.log("Suppliers: " + JSON.stringify(suppliers));
 			const filteredSuppliers = suppliers.filter((s) => {
 				if (
 					s.category === data.requestcategory &&

@@ -119,7 +119,7 @@ const FirmsTab = () => {
 	useEffect(() => {
 		if (firmsData) {
 			// Now filter the data
-			const data = firmsData[0].data;
+			const data = firmsData.data;
 			setFirmList(data);
 		}
 	}, [firmsData]);

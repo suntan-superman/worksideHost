@@ -63,7 +63,7 @@ const ContactEditTemplate = (props) => {
 
 		useEffect(() => {
 			if (firmData) {
-				setFirmOptions(getFirmOptions(firmData[0]));
+				setFirmOptions(getFirmOptions(firmData));
 				setModifyFlag(false);
 			}
 		}, [firmData, modifyFlag]);

@@ -18,7 +18,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 
 import { GetRequestsByCustomer } from "../api/worksideAPI";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import RequestInfoModal from "../components/RequestInfoModal";
 import { UseStateContext } from "../contexts/ContextProvider";
@@ -29,9 +29,11 @@ import { toast } from "react-toastify";
 import { Header } from "../components";
 
 let gridPageSize = 8;
+let clientName = "CRC";
 
 const Requests = () => {
 	let requestGridRef = useRef(null);
+	const queryClient = useQueryClient();
 
 	const [isLoading, setIsLoading] = useState(false);
 	const { currentColor } = UseStateContext();
@@ -51,6 +53,18 @@ const Requests = () => {
 	};
 
 	const accessLevel = GetAccessLevel();
+
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
+
+		const companyName = localStorage.getItem("companyName");
+		clientName = companyName;
+		console.log(`Company Name: ${companyName}`);
+		setCompanyName(companyName);
+
+	}, []);
+
 
 	const editOptions = {
 		allowEditing: accessLevel > 2,
@@ -77,11 +91,14 @@ const Requests = () => {
 		const {
 			data: reqData,
 			isError: reqError,
-			isSuccess: reqSuccess,
+			isSuccess: isReqSuccess,
 		} = useQuery({
-			queryKey: ["requests", companyName],
-			queryFn: () => GetRequestsByCustomer(companyName),
-			refetchInterval: 1000 * 10 * 60, // 1 minute refetch
+			queryKey: ["requests"],
+			queryFn: async () => {
+				const res = await GetRequestsByCustomer({ clientName });
+				return res;
+			 },
+			refetchInterval: 1000 * 20, // 1 minute refetch
 			refetchOnReconnect: true,
 			refetchOnWindowFocus: true,
 			// staleTime: 1000 * 60 * 60 * 24, // 1 Day
@@ -89,27 +106,32 @@ const Requests = () => {
 		});
 	
 	useEffect(() => {
-		const numGridRows = Number(localStorage.getItem("numGridRows"));
-		if (numGridRows) gridPageSize = numGridRows;
-
-		const companyName = localStorage.getItem("companyName");
-		setCompanyName(companyName);
-
-	}, []);
-
-	const filterRequests = (data, customerName) => {
-	  return data.filter(item => item.customername === "CRC");
-	};
+		queryClient.invalidateQueries("requests");
+	}, [companyName]);
 	
 	useEffect(() => {
 		if (reqData) {
 			// Now filter the data
-			const data = reqData.response.data;
-			const requests = filterRequests(data, companyName);
+			// console.log(`UseEffect Request Data: ${JSON.stringify(reqData, null, 2)}`);
+			const data = reqData?.data;
+			if( data ) {
+				setRequestList(data);
+			}
+			// const requests = filterRequests(data);
 
-			setRequestList(requests);
+			// console.log(`Request List: ${JSON.stringify(requests, null, 2)}`);
+
+			// setRequestList(requests);
 		}
 	}, [reqData]);
+
+	if (reqError) {
+		console.log(`Error: ${reqError}`);
+	}
+	
+	// if (reqData && isReqSuccess) {
+	// 	console.log(`Request Data: ${JSON.stringify(reqData, null, 2)}`);
+	// }
 
 	const FilterOptions = {
 		type: "Menu",

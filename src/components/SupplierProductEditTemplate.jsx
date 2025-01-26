@@ -58,7 +58,7 @@ const SupplierProductEditTemplate = (props) => {
 	const fetchSupplierOptions = async () => {
 		setIsLoading(true);
 		await GetAllFirms().then((response) => {
-			const jsonData = response[0]?.data;
+			const jsonData = response?.data;
 			if (jsonData === undefined) {
 				setIsLoading(false);
 				return;
