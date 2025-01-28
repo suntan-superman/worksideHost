@@ -99,6 +99,7 @@ const FirmsTab = () => {
 			// Get the firms data
 		const {
 			data: firmsData,
+			isLoading: firmsLoading,
 			isError: reqError,
 			isSuccess: reqSuccess,
 		} = useQuery({
@@ -369,13 +370,21 @@ const FirmsTab = () => {
 		}
 	};
 
+	if (firmsLoading) {
+		return (
+			<div className="absolute top-[50%] left-[50%]">
+				<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-900" />
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			{/* Companies Tab */}
 			<div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start">
 				<GridComponent
 					id="firmGridElement"
-					dataSource={firmList}
+					dataSource={firmsData?.data}
 					actionComplete={actionComplete}
 					allowSelection
 					allowFiltering

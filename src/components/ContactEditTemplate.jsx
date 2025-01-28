@@ -142,7 +142,10 @@ const ContactEditTemplate = (props) => {
 					</div>
 					{/* Input 4 */}
 					<div className="flex flex-col w-1/2">
-						<label className="text-sm font-medium mb-1" htmlFor="field4">
+						<label
+							className={`${readOnlyFlag ? "text-red-500" : "text-black"} text-sm font-medium mb-1`}
+							htmlFor="field4"
+						>
 							Contact Class
 						</label>
 						<DropDownListComponent
@@ -153,6 +156,7 @@ const ContactEditTemplate = (props) => {
 							placeholder="Select Contact Class"
 							required={true}
 							onChange={onChange}
+							readonly={readOnlyFlag}
 						/>
 					</div>
 				</div>

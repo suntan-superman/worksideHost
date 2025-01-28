@@ -147,6 +147,12 @@ const SignupDialog = () => {
 								Welcome!!
 							</h2>
 						</div>
+						<img
+							src={`${process.env.PUBLIC_URL}background.jpg`}
+							alt="Background"
+							className="w-[100%] h-[70%]"
+							// className="w-full h-full object-cover"
+						/>
 					</div>
 					{/* Sign Up Section */}
 					<div className="w-2/5 p-5 bg-black">
