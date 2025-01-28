@@ -140,10 +140,10 @@ const SignupDialog = () => {
 				<ToastContainer />
 				<div className="bg-white rounded-2xl shadow-2xl flex flex-row w-full align-middle">
 					{/* Sign In Section */}
-					<div className="w-2/5 p-20">
-						<div className="text-left font-bold text-3xl">
+					<div className="w-2/5 p-10">
+						<div className="font-bold text-4xl text-center">
 							<span className="text-green-500">WORK</span>SIDE
-							<h2 className="text-3xl font-bold text-black mb-2 mt-3">
+							<h2 className="text-4xl font-bold text-black mb-2 mt-3">
 								Welcome!!
 							</h2>
 						</div>
@@ -153,16 +153,19 @@ const SignupDialog = () => {
 							className="w-[100%] h-[70%]"
 							// className="w-full h-full object-cover"
 						/>
+						<h2 className="text-xs font-bold text-black mb-2 text-center">
+							Copyright Workside Software 2025
+						</h2>
 					</div>
 					{/* Sign Up Section */}
-					<div className="w-2/5 p-5 bg-black">
+					<div className="w-3/5 p-5 bg-black">
 						<div className="bg-black rounded-2xl shadow-2xl flex flex-col items-center w-full align-middle">
 							<div className="bg-black w-72 p-2 flex flex-col items-center mb-3">
 								<form
 									className="flex flex-col items-center"
 									onSubmit={handleSubmit}
 								>
-									<h2 className="text-3xl font-bold text-green-500 mb-2">
+									<h2 className="text-2xl font-bold text-green-500 mb-2">
 										Create Account
 									</h2>
 									<input
