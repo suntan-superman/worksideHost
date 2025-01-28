@@ -121,10 +121,6 @@ const ValidateUsersTab = () => {
 		if (numGridRows) gridPageSize = numGridRows;
 	}, []);
 
-	useEffect(() => {
-		console.log(`New User: ${newUser}`);
-	}, [newUser]);
-
 	const usersActionComplete = async (args) => {
 		if (!usersGridRef) return;
 		if (
@@ -329,7 +325,6 @@ const ValidateUsersTab = () => {
 			const jsonData = await response.json().then((data) => {
 				if (data.length === 0) {
 					setNewUser(true);
-					// console.log("User Not found in Contacts...");
 					setContactData(null);
 					setContactID(null);
 					return;
@@ -372,10 +367,6 @@ const ValidateUsersTab = () => {
 				statusdate: new Date(),
 			}),
 		};
-		// console.log(
-		// 	"PATCH Contact Data: ",
-		// 	JSON.stringify(requestOptions, null, 2),
-		// );
 		try {
 			const response = await fetch(fetchString, requestOptions);
 			const jsonData = await response.json();
@@ -389,7 +380,6 @@ const ValidateUsersTab = () => {
 	const AddContactData = async () => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact`;
 		const { firmType } = await GetFirmType(formData.company);
-		console.log(`Get Firm Type: ${firmType}`);
 
 		const requestOptions = {
 			method: "POST",
@@ -410,7 +400,6 @@ const ValidateUsersTab = () => {
 				statusdate: new Date(),
 			}),
 		};
-		console.log("POST Contact Data: ", JSON.stringify(requestOptions, null, 2));
 		try {
 			const response = await fetch(fetchString, requestOptions);
 			const jsonData = await response.json();
@@ -434,13 +423,20 @@ const ValidateUsersTab = () => {
 				// Delete Contact Record
 				// DeleteContactData();
 			} else {
-				console.log(`New User? ${newUser}`);
 				// Update User Record with updated nickname, company, cell number, access level, status
 				if (newUser === true) {
 					AddContactData();
 				} else {
 					UpdateContactData();
 				}
+				toast.success("User Validated...", {
+					position: "top-center",
+					autoClose: 3000,
+					hideProgressBar: false,
+					closeOnClick: true,
+					pauseOnHover: true,
+					draggable: true,
+				});
 			}
 		});
 		setModifyFlag(false);
@@ -448,10 +444,6 @@ const ValidateUsersTab = () => {
 
 	const dialogSave = (data) => {
 		updatedContactData = data;
-		console.log(
-			"In Dialog Save Updated Contact Data: ",
-			JSON.stringify(updatedContactData, null, 2),
-		);
 		setModifyFlag(true);
 		setShowDialog(false);
 	};

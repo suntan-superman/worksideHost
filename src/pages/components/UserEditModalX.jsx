@@ -184,7 +184,7 @@ const UserEditModalX = ({ isOpen, onClose, onSubmit, userData }) => {
 			</DialogTitle>
 
 			<DialogContent style={{ paddingTop: "10px" }}>
-				<Grid container spacing={2} columns={12} disableEqualOverflow>
+				<Grid container spacing={2} columns={12}>
 					{/* First Row - Names */}
 					<Grid size={6}>
 						<TextField
