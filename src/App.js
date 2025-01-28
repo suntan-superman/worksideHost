@@ -17,6 +17,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import {
 	LoginDialog,
+	SignupDialog,
 	Sidebar,
 	Navbar,
 	ThemeSettings,
@@ -167,6 +168,7 @@ const App = () => {
 				<Routes>
 					<Route path="/" element={<Navigate replace to="/login" />} />
 					<Route path="/login" element={<LoginDialog />} />
+					<Route path="/signup" element={<SignupDialog />} />
 					<Route path="main/*" element={<MainApp />} />
 				</Routes>
 			</BrowserRouter>

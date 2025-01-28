@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import Select from "react-select";
 
 const SignupDialog = () => {
@@ -52,6 +52,13 @@ const SignupDialog = () => {
 		fetchCompanyNames();
 	}, []);
 
+	const containsWord = (inputString, word) => {
+		if (typeof inputString !== "string") {
+			console.error("Invalid input: expected a string");
+			return false;
+		}
+		return inputString.toLowerCase().includes(word.toLowerCase());
+	};
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (data.firstName.length < 2 || data.firstName.length > 20) {
@@ -89,10 +96,32 @@ const SignupDialog = () => {
 			},
 		);
 		const json = await response.json();
-		if (response.ok) {
-			toast.success("Check Email to Validate...User Still Must Be Validated");
-			navigate("/login");
+		const { status } = response;
+		console.log(`Status: ${status}`);
+		if (status < 300) {
+			toast.success("Check Email to Validate...", {
+				autoClose: 3000,
+				position: "top-right",
+				className: "custom-toast",
+			});
+			setTimeout(() => {
+				navigate("/login");
+			}, 3000);
+		} else {
+			console.log(`Status: ${status}`);
+			console.log("Error Creating User. User Exists");
+			toast.error(`User Exists: ${data.email}`, {
+				autoClose: 3000,
+				position: "top-right",
+				className: "custom-toast",
+			});
 		}
+		// console.log(`Status: ${status}`);
+		// console.log(`Response: ${JSON.stringify(response, null, 2)}`);
+		// if (json.message) {
+		// 	toast.success("Check Email to Validate...User Still Must Be Validated");
+		// 	navigate("/login");
+		// }
 	};
 
 	return (
@@ -108,6 +137,7 @@ const SignupDialog = () => {
 				}}
 				className="modalContainer"
 			>
+				<ToastContainer />
 				<div className="bg-white rounded-2xl shadow-2xl flex flex-row w-full align-middle">
 					{/* Sign In Section */}
 					<div className="w-2/5 p-20">

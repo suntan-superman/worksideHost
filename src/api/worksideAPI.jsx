@@ -222,6 +222,17 @@ const GetFirmID = async (firm) => {
 };
 
 /**
+ * Fetch firm TYPE based on firm name.
+ * @param {string} firm - Firm name to search.
+ * @returns {Promise<object>} - Firm ID or empty object.
+ */
+const GetFirmType = async (firm) => {
+	const { status, data } = await GetAllFirms();
+	const firmData = data.find((r) => r.name === firm);
+	return { status, firmType: firmData?.type || null };
+};
+
+/**
  * Fetches the contact ID based on the given username.
  *
  * @param {string} contact - The username of the contact to find.
@@ -394,6 +405,24 @@ const SaveNewRequest = async (reqData) =>
 const UpdateRequest = async (reqID, reqData) =>
 	apiRequest(`/api/request/${reqID}`, "PATCH", reqData);
 
+const DoesRequestBidExist = async (reqID, supplierID) => {
+	const strAPI = `${apiURL}/api/requestbid/doesBidExist`;
+	const body = {
+		requestid: reqID,
+		supplierid: supplierID,
+	};
+
+	try {
+		const response = await axios.post(strAPI, body);
+		if (response.status === 200) {
+			return { status: 200, data: response.data };
+		}
+		return { status: 400 };
+	} catch (error) {
+		return { status: 500 };
+	}
+};
+
 /**
  * Fetches request bids from the API.
  *
@@ -489,6 +518,22 @@ const SetAwardedRequestBidStatus = async (reqID, status) => {
 	}
 };
 
+const GetDeliveryAssociates = async (supplierId) => {
+	const strAPI = `${apiURL}/api/deliveryassociate`;
+	let filteredDA = [];
+	try {
+		const response = await axios.get(strAPI);
+		// Filter Associates by Supplier
+		filteredDA = null;
+		filteredDA = response.data.filter((da) => da.supplierid === supplierId);
+		// console.log("GetDeliveryAssociates ", filteredDA);
+	} catch (error) {
+		console.log("error", error);
+		return { status: 500 };
+	}
+	return { status: 200, data: filteredDA };
+};
+
 /**
  * Retrieves supplier information based on the supplier ID.
  *
@@ -518,10 +563,10 @@ const GetSupplierInfoFromID = async (id) => {
 
 const cleanUpStr = (url) => {
 	// Remove double quotes from the URL string
-	let formattedStr = url.replace(/"([^"]*)"/g, '$1');
-	formattedStr= formattedStr.trimStart();
-	formattedStr= formattedStr.trimEnd();
-    return formattedStr;
+	let formattedStr = url.replace(/"([^"]*)"/g, "$1");
+	formattedStr = formattedStr.trimStart();
+	formattedStr = formattedStr.trimEnd();
+	return formattedStr;
 };
 
 /**
@@ -531,7 +576,7 @@ const cleanUpStr = (url) => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to the requests data.
  */
 
-const GetRequestsByCustomer = async ({ clientName: companyName } ) => {
+const GetRequestsByCustomer = async ({ clientName: companyName }) => {
 	try {
 		// Input validation
 		if (!companyName) {
@@ -543,28 +588,27 @@ const GetRequestsByCustomer = async ({ clientName: companyName } ) => {
 		let data = [];
 		// Make the API request
 		await axios.get(fetchString).then((res) => {
-			data = res.data
+			data = res.data;
 			return { status: 200, data: data };
 		});
 		// Handle successful response
-		
-		return { status: 200, data: data };
 
+		return { status: 200, data: data };
 	} catch (error) {
 		// Log detailed error information
 		if (error.response) {
-			console.error('Server error:', error.response.data);
+			console.error("Server error:", error.response.data);
 		} else if (error.request) {
-			console.error('No response received:', error.request);
+			console.error("No response received:", error.request);
 		} else {
-			console.error('Request setup error:', error.message);
+			console.error("Request setup error:", error.message);
 		}
 
 		// Return appropriate error response
 		return {
 			status: error.response?.status || 500,
 			data: [],
-			error: error.message
+			error: error.message,
 		};
 	}
 };
@@ -596,6 +640,12 @@ const GetRequestOptions = async () => {
 		console.error("Error fetching request options:", error.message);
 		return { status: 500, data: [] };
 	}
+};
+
+const GetRequestByID = async (reqID) => {
+	const response = await fetch(`${apiURL}/api/request/${reqID}`);
+	const json = await response.json();
+	return { status: 200, data: json };
 };
 
 /**
@@ -704,6 +754,21 @@ const GetRequestStatusOptions = async () => {
 		return { status: response.status, data: requestStatusOptions };
 	} catch (error) {
 		console.error("Error fetching request status options:", error.message);
+		return { status: 500, data: [] };
+	}
+};
+
+const GetAllUsers = async () => {
+	try {
+		const response = await fetch(`${apiURL}/api/user`);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch users with status: ${response.status}`);
+		}
+
+		const json = await response.json();
+		return { status: response.status, data: json };
+	} catch (error) {
+		console.error("Error fetching all users:", error.message);
 		return { status: 500, data: [] };
 	}
 };
@@ -1202,6 +1267,7 @@ export {
 	GetSupplierOptions,
 	GetContactOptions,
 	GetFirmID,
+	GetFirmType,
 	GetContactID,
 	GetCustomerSupplierMSAData,
 	GetSupplierGroupData,
@@ -1209,18 +1275,22 @@ export {
 	GetAllRequestsByProject,
 	SaveNewRequest,
 	UpdateRequest,
+	DoesRequestBidExist,
 	GetRequestBids,
 	UpdateRequestStatus,
 	SetRequestBidsStatus,
 	SetAwardedRequestBidStatus,
+	GetDeliveryAssociates,
 	GetSupplierInfoFromID,
 	GetRequestsByCustomer,
 	GetRequestData,
 	GetRequestOptions,
+	GetRequestByID,
 	GetRequestID,
 	GetRequestCategoryOptions,
 	GetRequestCategoryID,
 	GetRequestStatusOptions,
+	GetAllUsers,
 	UserForgotPassword,
 	UserDoesExist,
 	UserResetPassword,

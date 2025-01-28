@@ -4,6 +4,12 @@
 @import '../node_modules/@syncfusion/ej2-popups/styles/material.css';
 @import '../node_modules/@syncfusion/ej2-react-navigations/styles/material.css';
 
+/* styles.css */
+.custom-toast {
+  min-width: 400px;
+  min-height: 100px; /* Optional: Adjust as needed */
+}
+
 * {
   margin: 0;
   padding: 0;

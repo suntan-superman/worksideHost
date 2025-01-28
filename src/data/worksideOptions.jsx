@@ -17,6 +17,8 @@ const contactClassOptions = [
 
 const statusOptions = ["ACTIVE", "INACTIVE", "PENDING"];
 
+const userStatusOptions = ["ACTIVE", "INACTIVE", "PENDING", "DECLINED"];
+
 const msaStatusOptions = ["ACTIVE", "INACTIVE"];
 
 const firmStatusOptions = ["ACTIVE", "INACTIVE"];
@@ -51,6 +53,7 @@ export {
 	areaOptions,
 	contactClassOptions,
 	statusOptions,
+	userStatusOptions,
 	accessLevelOptions,
 	msaStatusOptions,
 	firmStatusOptions,

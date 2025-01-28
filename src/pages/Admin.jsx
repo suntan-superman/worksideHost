@@ -5,7 +5,7 @@ import { TabComponent } from "@syncfusion/ej2-react-navigations";
 
 import FirmsTab from "./FirmsTab";
 import ContactsTab from "./ContactsTab";
-import ValidateUsersTab from "./ValidateUsersTab";
+import ValidateUsersTab from "./ValidateUsersTabX";
 import RigsTab from "./RigsTab";
 import ProductsTab from "./ProductsTab";
 import CustomerSupplierMSATabX from "./CustomerSupplierMSATabX";
