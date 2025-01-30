@@ -12,7 +12,6 @@ import Modal from "@mui/material/Modal";
 import Select from "react-select";
 import axios from "axios";
 import "../index.css";
-import { toast } from "react-toastify";
 import {
 	Menu,
 	MenuItem,
@@ -24,10 +23,13 @@ import {
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 
-// import RichObjectTreeView from "./RichObjectTreeView";
-
-// import { set } from "lodash";
 import _ from "lodash";
+
+import {
+	showErrorDialog,
+	showWarningDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 const theme = createTheme({
 	palette: {
@@ -186,7 +188,7 @@ const SupplierGroupUsersTabX = () => {
 			// Get Suppliers
 			const supplierResult = json.filter((json) => json.type === "SUPPLIER");
 			if (supplierResult.length === 0) {
-				toast.error("No Suppliers Found");
+				showErrorDialog("No Suppliers Found");
 				setIsLoading(false);
 				return;
 			}
@@ -259,21 +261,18 @@ const SupplierGroupUsersTabX = () => {
 		const name = data;
 		name?.trim();
 		if (name === "") {
-			window.alert("Name Cannot Be Empty");
-			// toast.error("Name Cannot Be Empty");
+			showWarningDialog("Name Cannot Be Empty");
 			return;
 		}
 		setAddGroupModalOpen(false);
 		setOpen(false);
 		// Define the new group node to add
 		if (currentSupplier === null) {
-			window.alert("No Supplier Selected");
-			// toast.error("No Supplier Selected");
+			showWarningDialog("No Supplier Selected");
 			return;
 		}
 		if (CheckIfLabelExists(groupTreeData, data, "group") === true) {
-			window.alert("Group Already Exists");
-			// toast.error("Group Already Exists");
+			showWarningDialog("Group Already Exists");
 			return;
 		}
 		const updatedGroupTreeData = addGroupWithChildren(
@@ -343,7 +342,7 @@ const SupplierGroupUsersTabX = () => {
 		return data.includes(target);
 	};
 
-	const handleAddCategory = (data) => {
+	const handleAddCategory = async (data) => {
 		const labels = getCategoryLabels(
 			groupTreeData,
 			selectedNodeLabel,
@@ -352,8 +351,7 @@ const SupplierGroupUsersTabX = () => {
 		);
 		const exists = doesItemExist(labels, data);
 		if (exists) {
-			// toast.error("Category Already Exists");
-			window.alert("Category Already Exists");
+			await showWarningDialog("Category Already Exists");
 			return;
 		}
 		const updatedWithCategory = addCategoryToSpecificGroupCategory(
@@ -379,10 +377,10 @@ const SupplierGroupUsersTabX = () => {
 			"group",
 			"group-user",
 		);
+
 		const exists = doesItemExist(labels, userLabel);
 		if (exists) {
-			// toast.error("Category Already Exists");
-			window.alert("User Already Exists");
+			showErrorDialog("User Already Exists");
 			return;
 		}
 
@@ -745,7 +743,7 @@ const SupplierGroupUsersTabX = () => {
 		const data = response.data;
 		const supplierResult = data.filter((d) => d.name === supplierName);
 		if (supplierResult.length === 0) {
-			toast.error("Supplier Not Found");
+			showErrorDialog("Supplier Not Found");
 			return null;
 		}
 		const supplierId = supplierResult[0]._id;
@@ -804,7 +802,7 @@ const SupplierGroupUsersTabX = () => {
 					});
 				} catch (error) {
 					setIsLoading(false);
-					window.alert(`Error: ${error}`);
+					showErrorDialog(`Error: ${error}`);
 					console.error(error);
 				}
 			}
@@ -881,13 +879,11 @@ const SupplierGroupUsersTabX = () => {
 			);
 			const jsonData = await response.json();
 			setIsLoading(false);
-			// toast.success("Changes Saved");
-			window.alert("Changes Saved ", JSON.stringify(jsonData));
+			showSuccessDialogWithTimer("Changes Saved ");
 			setHasUnsavedChanges(false);
 		} catch (error) {
 			setIsLoading(false);
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Error: ${error}`);
 		}
 	};
 

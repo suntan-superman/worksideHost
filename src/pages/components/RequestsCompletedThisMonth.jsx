@@ -13,6 +13,8 @@ import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 import { toast } from "react-toastify";
 
+import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
+
 export function RequestsCompletedThisMonth({ diff, trend, sx, value }) {
 	// Determine the Trend icon and color based on 'trend' prop
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
@@ -81,10 +83,7 @@ export function RequestsCompletedThisMonth({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							toast.info("Requests Completed This Month", {
-								autoClose: 3000,
-								position: "top-right",
-							});
+							showSuccessDialogWithTimer("Requests Completed This Month");
 						}}
 					>
 						Details

@@ -17,7 +17,6 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
 import "../index.css";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import ProjectEditTemplate from "../components/ProjectEditTemplate";
@@ -31,6 +30,12 @@ import {
 	UpdateProject,
 } from "../api/worksideAPI";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+
+import {
+	showConfirmationDialog,
+	showErrorDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 // let filteredProjects = null;
 
@@ -100,11 +105,11 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			toast.success("Project successfully deleted");
+			showSuccessDialogWithTimer("Project successfully deleted");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			toast.error(`Error deleting project...${error}`);
+			showErrorDialog(`Error deleting project...${error}`);
 		},
 	});
 
@@ -117,11 +122,11 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			toast.success("Project saved successfully:");
+			showSuccessDialogWithTimer("Project saved successfully:");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			toast.error(`Error saving project: ${error}`);
+			showErrorDialog(`Error saving project: ${error}`);
 		},
 	});
 
@@ -134,16 +139,19 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			toast.success("Project updated successfully:");
+			showSuccessDialogWithTimer("Project updated successfully:");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			toast.error(`Error updating project: ${error}`);
+			showErrorDialog(`Error updating project: ${error}`);
 		},
 	});
 
 	const handleDelete = async () => {
-		if (window.confirm("Are you sure you want to delete this project?")) {
+		const deleteFlag = await showConfirmationDialog(
+			"Are you sure you want to delete this project?",
+		);
+		if (deleteFlag === true) {
 			deleteProjectMutation.mutate(selectedRecord);
 		}
 	};
@@ -167,7 +175,7 @@ const ProjectsTab = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.projectname}`
+					? `Edit Project ${args.rowData.projectname}`
 					: "Workside New Project";
 		}
 		if (args.requestType === "save") {

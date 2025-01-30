@@ -13,10 +13,11 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { GetAllUsers, GetFirmType } from "../api/worksideAPI";
-// import { GetPendingUsers, GetAllUsers } from "../api/worksideAPI";
-
-import { toast } from "react-toastify";
+import {
+	GetAllUsers,
+	GetFirmType,
+	fetchWithHandling,
+} from "../api/worksideAPI";
 import { UseStateContext } from "../contexts/ContextProvider";
 import _ from "lodash";
 import UserEditModalX from "./components/UserEditModalX";
@@ -24,7 +25,14 @@ import UserEditModalX from "./components/UserEditModalX";
 import "../index.css";
 import "../App.css";
 import "../styles/syncfusionStyles.css";
+// import { Send } from "@mui/icons-material";
 
+import {
+	showErrorDialog,
+	showWarningDialog,
+	showSuccessDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 ///////////////////////////////////////////////////////////////////
 
 let gridPageSize = 10;
@@ -231,21 +239,14 @@ const ValidateUsersTab = () => {
 	const recordClick = (args) => {
 		if (args.target.classList.contains("userData")) {
 			if (args.rowData.isEmailValid === false) {
-				toast.error("Email is not Validated...");
+				showErrorDialog("Email is not Validated...");
 				return;
 			}
 			if (
 				args.rowData.isEmailValid === true &&
 				args.rowData.isUserValidated === true
 			) {
-				toast.error("User Already Validated...", {
-					position: "top-center",
-					autoClose: 3000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-				});
+				showErrorDialog("User Already Validated...");
 				return;
 			}
 			resetFormData();
@@ -309,8 +310,7 @@ const ValidateUsersTab = () => {
 			const response = await fetch(fetchString, requestOptions);
 			const jsonData = await response.json();
 		} catch (error) {
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Error: ${error}`);
 		}
 	};
 
@@ -334,18 +334,12 @@ const ValidateUsersTab = () => {
 				setNewUser(false);
 			});
 		} catch (error) {
-			window.alert(`Error: ${error}`);
+			showErrorDialog(`Error: ${error}`);
 		}
 		return;
 	};
 
 	const UpdateContactData = async () => {
-		// setIsLoading(true);
-
-		// if (newUser === false && contactData === null) {
-		// 	window.alert("Contact Data is Null");
-		// 	return;
-		// }
 		const id = contactID;
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/${id}`;
 		const requestOptions = {
@@ -372,7 +366,7 @@ const ValidateUsersTab = () => {
 			const jsonData = await response.json();
 			setContactData(jsonData);
 		} catch (error) {
-			window.alert(`Error: ${error}`);
+			showErrorDialog(`Error: ${error}`);
 			console.error(error);
 		}
 	};
@@ -405,9 +399,29 @@ const ValidateUsersTab = () => {
 			const jsonData = await response.json();
 			setContactData(jsonData);
 		} catch (error) {
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Error: ${error}`);
 		}
+	};
+
+	const SendEmailValidation = async (email) => {
+		console.log(`SendEmailValidation: ${email}`);
+
+		const requestOptions = {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				emailAddress: email,
+				emailSubject: "Workside User Validated",
+				emailMessage:
+					"Your access has been approved by your Workside Administrator...",
+			}),
+		};
+		const { status, data } = await fetchWithHandling(
+			"/api/email",
+			requestOptions,
+		);
+		console.log(`SendEmailValidation: ${status}`);
+		return status;
 	};
 
 	useEffect(() => {
@@ -429,14 +443,8 @@ const ValidateUsersTab = () => {
 				} else {
 					UpdateContactData();
 				}
-				toast.success("User Validated...", {
-					position: "top-center",
-					autoClose: 3000,
-					hideProgressBar: false,
-					closeOnClick: true,
-					pauseOnHover: true,
-					draggable: true,
-				});
+				const status = SendEmailValidation(selectedRecordData.email);
+				showSuccessDialogWithTimer("User Validated...Check Email");
 			}
 		});
 		setModifyFlag(false);

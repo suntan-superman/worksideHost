@@ -12,6 +12,8 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Card, CardContent } from "@mui/material";
 
+import { showErrorDialog } from "../utils/useSweetAlert";
+
 const ResetPassword = () => {
 	const userEmail = localStorage.getItem("email");
 
@@ -21,18 +23,10 @@ const ResetPassword = () => {
     const newpassword = data.get("newpassword");
     const confirmpassword = data.get("confirmpassword");
 		if (newpassword !== confirmpassword) {
-			window.alert("New Password and Confirm Password do not match!");
-			// toast.error(`New Password and Confirm Password do not match!`, {
-			// 	autoClose: 5000,
-			// 	position: "top-right",
-			// });
+			await showErrorDialog("New Password and Confirm Password do not match!");
 		}
 		else if (newpassword.length < 8) {
-			window.alert("Password must be at least 8 characters long");
-			// toast.error(`Password must be at least 8 characters long`, {
-			// 	autoClose: 5000,
-			// 	position: "top-right",
-			// });
+			await showErrorDialog("Password must be at least 8 characters long");
 		}
     else {
 	const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/resetpassword`;
@@ -41,17 +35,9 @@ const ResetPassword = () => {
 			password: newpassword
     });
     if (res.data.status === false) {
-				window.alert(res.data.message);
-        // toast.error(res.data.message, {
-        //     autoClose: 5000,
-        //     position: "top-right",
-        // });
+				await showErrorDialog(res.data.message);
       } else {
-				window.alert(res.data.message);
-        // toast.success(res.data.message, {
-        //   autoClose: 5000,
-        //   position: "top-right",
-        // });
+				await showErrorDialog(res.data.message);
         setTimeout(() => {
 					window.location = "/login";
         }, 2000);

@@ -402,6 +402,8 @@ const ProjectEditTemplate = (props) => {
 						<NumericTextBoxComponent
 							id="expectedduration"
 							name="expectedduration"
+							min={0.5}
+							max={365}
 							value={data.expectedduration}
 							placeholder="Enter Expected Duration"
 							required={true}
@@ -419,6 +421,8 @@ const ProjectEditTemplate = (props) => {
 						<NumericTextBoxComponent
 							id="actualduration"
 							name="actualduration"
+							min={0.5}
+							max={365}
 							value={data.expectedduration}
 							placeholder="Enter Actual Duration"
 							disabled={true}
@@ -436,6 +440,8 @@ const ProjectEditTemplate = (props) => {
 						<NumericTextBoxComponent
 							id="latdec"
 							name="latdec"
+							min={-90}
+							max={90}
 							value={data.latdec}
 							placeholder="Enter Latitude"
 							showSpinButton={false}
@@ -453,6 +459,8 @@ const ProjectEditTemplate = (props) => {
 						<NumericTextBoxComponent
 							id="longdec"
 							name="longdec"
+							min={-180}
+							max={180}
 							value={data.longdec}
 							placeholder="Enter Longitude"
 							showSpinButton={false}

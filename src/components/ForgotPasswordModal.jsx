@@ -7,13 +7,13 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	Stack,
 	TextField,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { showErrorDialog } from "../utils/useSweetAlert";
 
 const ForgotPasswordModal = ({
 	open, 
@@ -39,9 +39,9 @@ const ForgotPasswordModal = ({
 		setEmail(input.value);
 	};
 
-	const ValidateData = () => {
-		if( email.length < 6 || email.length > 50 ) {
-			toast.error("Email must be between 6 and 50 characters");
+	const ValidateData = async () => {
+		if (email.length < 6 || email.length > 50) {
+			await showErrorDialog("Email must be between 6 and 50 characters");
 			return false;
 		}
 		return true;
@@ -61,13 +61,11 @@ const ForgotPasswordModal = ({
 			const getUserFetchString = `${process.env.REACT_APP_MONGO_URI}api/user/does-user-exist/${userEmail}`;
 	    await axios.post(getUserFetchString).then((res) => {
 				if( res.status !== 200 ) {
-		      toast.error(`User Does Not Exist: ${userEmail}`, {
-						autoClose: 5000,
-						position: "top-right",
-						});
-						return;
+		      showErrorDialog(`User Does Not Exist: ${userEmail}`).then(() => {
+									return;
+								});
 				}}).catch((err) => {
-					window.alert(`Error Status: ${JSON.stringify(err.status)}`);
+		      showErrorDialog(`Error Status: ${JSON.stringify(err.status)}`);
 				});
 
 			// window.alert(`Data is valid. Email: ${email}`);
@@ -77,15 +75,9 @@ const ForgotPasswordModal = ({
 			});
 			
 	    if (res.data.status === false) {
-	      toast.error(res.data.message, {
-		      autoClose: 5000,
-		      position: "top-right",
-	      });
+				await showErrorDialog(res.data.message);
 	    } else {
-	        toast.success(res.data.message, {
-	          autoClose: 5000,
-	          position: "top-right",
-	        });
+				await showSuccessDialog(res.data.message);
 	    }
 			onOK();
 		}

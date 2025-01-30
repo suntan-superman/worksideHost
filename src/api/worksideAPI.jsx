@@ -1255,6 +1255,7 @@ const GetSupplierProductsByProduct = async (category, product) => {
 };
 
 export {
+	fetchWithHandling,
 	GetAllFirms,
 	GetAllFirmsForSelection,
 	GetAllSuppliers,

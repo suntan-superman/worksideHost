@@ -14,12 +14,13 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
 import ProductsEditTemplate from "../components/ProductsEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
 import { GetProducts } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
+
+import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
 
 import "../index.css";
 import "../App.css";
@@ -108,7 +109,7 @@ const ProductsTab = () => {
 		const json = await response.json();
 
 		if (response.ok) {
-			toast.success("Record Successfully Deleted...");
+			showSuccessDialogWithTimer("Record Successfully Deleted...");
 		}
 	};
 
@@ -124,7 +125,7 @@ const ProductsTab = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.categoryname} - ${args.rowData.productname}`
+					? `Edit ${args.rowData.categoryname} - ${args.rowData.productname} Record`
 					: "Workside New Product";
 		}
 		if (args.requestType === "save") {
@@ -171,7 +172,7 @@ const ProductsTab = () => {
 			);
 			const json = await response.json();
 
-			if (response.ok) toast.success("Record Successfully Added...");
+			if (response.ok) showSuccessDialogWithTimer("Record Successfully Added...");
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(
@@ -186,7 +187,8 @@ const ProductsTab = () => {
 			);
 			const json = await response.json();
 
-			if (response.ok) toast.success("Record Successfully Updated...");
+			if (response.ok)
+				showSuccessDialogWithTimer("Record Successfully Updated...");
 		}
 	};
 

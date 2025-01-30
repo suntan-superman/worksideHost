@@ -11,7 +11,8 @@ import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/Arrow
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
-import { toast } from "react-toastify";
+
+import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
 export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 	// Determine the Trend icon and color based on 'trend' prop
@@ -80,10 +81,7 @@ export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							toast.info("Requests Awarded This Month", {
-								autoClose: 3000,
-								position: "top-right",
-							});
+							showSuccessDialogWithTimer("Requests Awarded This Month");
 						}}
 					>
 						Details

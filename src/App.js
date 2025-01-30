@@ -25,21 +25,24 @@ import {
 } from "./components";
 import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
-import { toast } from "react-toastify";
+
+import { showConfirmationDialog } from "./utils/useSweetAlert";
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
 
-  const onLogOut = () => {
-			toast.success("Logging Out...");
-			// setIsLoggedIn(false);
-			// setGlobalUserName("");
-			// signalIsUserLoggedIn.value = false;
+	const onLogOut = async () => {
+		const logoutFlag = await showConfirmationDialog(
+			"Are you sure you want to log out?",
+		);
+
+		if (logoutFlag === true) {
 			localStorage.removeItem("token");
 			localStorage.removeItem("userName");
 			localStorage.setItem("logInFlag", "false");
 			window.location = "/login";
-		};
+		}
+	};
 
 const ThemeSettingButton = () => {
   const { currentColor, setThemeSettings } = UseStateContext();

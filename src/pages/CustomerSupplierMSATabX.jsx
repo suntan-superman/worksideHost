@@ -16,15 +16,17 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-import useUserStore from "../stores/UserStore";
 import { UseStateContext } from "../contexts/ContextProvider";
+import {
+	showErrorDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
+
 import "../index.css";
 
 const CustomerSupplierMSATabX = () => {
 	const { setCompanyID, setCompanyName } = UseStateContext();
-	const [openModal, setOpenModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
-	const [currentCustomerName, setCurrentCustomerName] = useState("");
 	const [currentCustomerId, setCurrentCustomerId] = useState("");
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [abortFlag, setAbortFlag] = useState(false);
@@ -124,14 +126,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					toast.success("Record Successfully Added...");
+					showSuccessDialogWithTimer("Record Successfully Added...");
 				} else {
-					toast.error("Record Add Failed...");
+					showErrorDialog(`Record Add Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Record Add Failed...${error}`);
 		}
 	};
 
@@ -156,14 +157,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					toast.success("Record Successfully Updated...");
+					showSuccessDialogWithTimer("Record Successfully Updated...");
 				} else {
-					toast.error("Record Update Failed...");
+					showErrorDialog(`Record Update Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Error: ${error}`);
 		}
 	};
 
@@ -184,14 +184,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					toast.success("Record Successfully Deleted...");
+					showSuccessDialogWithTimer("Record Successfully Deleted...");
 				} else {
-					toast.error("Record Delete Failed...");
+					showErrorDialog(`Record Delete Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			window.alert(`Error: ${error}`);
-			console.error(error);
+			showErrorDialog(`Error: ${error}`);
 		}
 	};
 
@@ -310,7 +309,7 @@ const CustomerSupplierMSATabX = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.customername}/${args.rowData.suppliername}`
+					? `Edit MSA Record of ${args.rowData.customername}/${args.rowData.suppliername}`
 					: "Workside New MSA Record";
 		}
 		if (args.requestType === "save") {

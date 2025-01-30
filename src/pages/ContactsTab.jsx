@@ -14,8 +14,12 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
 import ContactEditTemplate from "../components/ContactEditTemplate";
+
+import {
+	showWarningDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 import "../index.css";
 import "../App.css";
@@ -73,7 +77,7 @@ const ContactsTab = () => {
 		console.log(`Toolbar Click: ${args.item.id}`);
 		if (contactsGridRef && args.item.id === "contactGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				toast.error("You do not have permission to export data.");
+				showWarningDialog("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
@@ -171,20 +175,6 @@ const ContactsTab = () => {
 		}
 	};
 
-	// const handleContactDelete = async () => {
-	// 	const response = await fetch(
-	// 		`${process.env.REACT_APP_MONGO_URI}/api/contact/${selectedRecord}`,
-	// 		{
-	// 			method: "DELETE",
-	// 		},
-	// 	);
-	// 	const json = await response.json();
-
-	// 	if (response.ok) {
-	// 		toast.success("Record Successfully Deleted...");
-	// 	}
-	// };
-
 	const actionComplete = async (args) => {
 		// console.log(`Action Complete: ${args.requestType}`);
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
@@ -197,7 +187,7 @@ const ContactsTab = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.firstname} ${args.rowData.lastname}`
+					? `Edit User: ${args.rowData.firstname} ${args.rowData.lastname}`
 					: "Workside New Contact";
 		}
 		if (args.requestType === "save") {
@@ -239,7 +229,7 @@ const ContactsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				toast.success("Record Successfully Added...");
+				await showSuccessDialogWithTimer("Record Successfully Added...");
 				setOpenUpdateModal(false);
 			}
 		} else {
@@ -256,7 +246,7 @@ const ContactsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				toast.success("Record Successfully Updated...");
+				await showSuccessDialogWithTimer("Record Successfully Updated...");
 				setOpenUpdateModal(false);
 			}
 		}

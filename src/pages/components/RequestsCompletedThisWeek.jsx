@@ -11,7 +11,8 @@ import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/Arr
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { CurrencyDollar as CurrencyDollarIcon } from "@phosphor-icons/react/dist/ssr/CurrencyDollar";
-import { toast } from "react-toastify";
+
+import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
 export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
@@ -80,10 +81,7 @@ export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							toast.info("Requests Completed This Month", {
-								autoClose: 3000,
-								position: "top-right",
-							});
+							showSuccessDialogWithTimer("Requests Completed This Month");
 						}}
 					>
 						Details

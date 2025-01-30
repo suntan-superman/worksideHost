@@ -5,13 +5,19 @@ import { TreeViewComponent } from "@syncfusion/ej2-react-navigations";
 import Box from "@mui/material/Box";
 import Select from "react-select";
 import Modal from "@mui/material/Modal";
-import axios from "axios";
-import { toast } from "react-toastify";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
 
 import { GetAllRigCompanies, GetRigs } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
+
+import {
+	showConfirmationDialog,
+	showErrorDialog,
+	showWarningDialog,
+	showSuccessDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 // TODO Need to Add FIlter Options for Rigs
 // TODO FIlter by Area, Company
@@ -139,7 +145,7 @@ const RigsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				toast.success(`Rig ${jsonData.rigname} Deleted...`);
+				showSuccessDialogWithTimer(`Rig ${jsonData.rigname} Deleted...`);
 
 				if (treeObj.current) {
 					treeObj.current.removeNodes([jsonData._id]); // Pass the node ID to delete
@@ -151,7 +157,7 @@ const RigsTab = () => {
 				);
 			}
 		} catch (error) {
-			window.alert(`Error: ${error}`);
+			showErrorDialog(`Error: ${error}`);
 			console.error(error);
 		}
 	};
@@ -205,21 +211,6 @@ const RigsTab = () => {
 			),
 		}));
 		setTreeData(merged);
-		// window.alert(JSON.stringify(merged));
-		// if (treeObj.current !== null) {
-		// 	const updatedTreeData = treeObj.current.getTreeData();
-		// 	treeObj.current.refresh();
-		// 	// fetchAvailableRequestors();
-		// 	// setTreeData(merged);
-		// 	treeObj.current.fields = {
-		// 		dataSource: updatedTreeData,
-		// 		// dataSource: refreshFlag ? merged : treeData,
-		// 		id: "id",
-		// 		text: "label",
-		// 		child: "subChild",
-		// 	};
-		// 	setRefreshFlag(!refreshFlag);
-		// }
 	};
 
 	// useEffect(() => {

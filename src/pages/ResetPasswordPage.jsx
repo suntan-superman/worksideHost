@@ -3,24 +3,13 @@
 import React from 'react'
 import ResetPassword from '../components/ResetPassword'
 import { UseStateContext } from "../contexts/ContextProvider";
-import {
-	Button,
-	Dialog,
-	DialogTitle,
-	DialogContent,
-	DialogActions,
-} from "@mui/material";
+import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-import {
-    useSearchParams,
-    useNavigate
-} from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 const ResetPasswordPage = () => {
 	const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const name = searchParams.get("name");
   const email = searchParams.get("email");
   const token = searchParams.get("token");
 

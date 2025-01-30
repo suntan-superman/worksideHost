@@ -14,7 +14,6 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
 import { MaskedTextBox } from "@syncfusion/ej2-inputs";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import FirmEditTemplate from "../components/FirmEditTemplate";
@@ -23,6 +22,12 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import { areaOptions } from "../data/worksideOptions";
 import { GetAllFirms } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
+
+import {
+	showErrorDialog,
+	showWarningDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 import "../index.css";
 import "../App.css";
@@ -128,7 +133,7 @@ const FirmsTab = () => {
 	const toolbarClick = (args) => {
 		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				toast.error("You do not have permission to export data.");
+				showWarningDialog("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
@@ -149,17 +154,11 @@ const FirmsTab = () => {
 		const json = await response.json();
 
 		if (response.ok) {
-			// Clear form useStates
-			// ResetUseStates();
-			toast.success("Record Successfully Deleted...");
-			// dispatch({ type: 'DELETE_PRODUCT', payload: json });
+			showSuccessDialogWithTimer("Record Successfully Deleted...");
 		}
-		// setDeleteFlag(false);
-		// setEmptyFields([]);
 	};
 
 	const actionComplete = async (args) => {
-		// console.log(`Action Complete: ${args.requestType}`);
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
@@ -170,7 +169,7 @@ const FirmsTab = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.name}`
+					? `Edit ${args.rowData.name}`
 					: "Workside New Firm";
 		}
 		if (args.requestType === "save") {
@@ -282,9 +281,9 @@ const FirmsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				toast.success("Record Successfully Added...");
+				showSuccessDialogWithTimer("Record Successfully Added...");
 			} else {
-				toast.error("Record Add Failed...");
+				showErrorDialog(`Record Add Failed...${json.message}`);
 			}
 		} else {
 			currentRecord.statusdate = new Date();
@@ -300,10 +299,10 @@ const FirmsTab = () => {
 			);
 			const json = await response.json();
 			if (response.ok) {
-				toast.success("Record Successfully Updated...");
+				showSuccessDialogWithTimer("Record Successfully Updated...");
 				SaveLatestDefaults();
 			} else {
-				toast.error("Record Update Failed...");
+				showErrorDialog(`Record Update Failed...${json.message}`);
 			}
 			setInsertFlag(false);
 		}

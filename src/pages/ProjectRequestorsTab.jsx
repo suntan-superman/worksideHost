@@ -7,7 +7,11 @@ import Modal from "@mui/material/Modal";
 import Select from "react-select";
 import axios from "axios";
 import "../index.css";
-import { toast } from "react-toastify";
+
+import {
+	showErrorDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 // TODO Need to Add FIlter Options for Requestors
 // TODO FIlter by Date, By Status
@@ -62,7 +66,7 @@ const ProjectRequestorsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				toast.success(
+				showSuccessDialogWithTimer(
 					`Requestor ${jsonData.userFirstName} ${jsonData.userLastName} Deleted...`,
 				);
 
@@ -76,16 +80,13 @@ const ProjectRequestorsTab = () => {
 				);
 			}
 		} catch (error) {
-			window.alert(`Error: ${error}`);
+			showErrorDialog(`Error: ${error}`);
 			console.error(error);
 		}
 		setIsLoading(false);
 	};
 
 	const handleDeleteRequestor = () => {
-		// window.alert(
-		// 	`Requestor Name: ${requestorName} Selected Node: ${selectedNodeData.text}`,
-		// );
 		if (requestorName.toLowerCase() === selectedNodeData.text.toLowerCase()) {
 			// Strings are equal (case-insensitive)
 			setErrorMsg("");
@@ -237,12 +238,6 @@ const ProjectRequestorsTab = () => {
 	const handleSelectionChange = (selected) => {
 		setSelectedOption(selected.value);
 		setAddButtonEnabled(true);
-		// selected.value is user_id
-		// const idToFind = selected.value;
-		// window.alert(
-		// 	`Selected User Id: ${selected.value}\nSelected Node Id: ${selectedNodeData.id}`,
-		// );
-		// Search for the object with the matching id
 	};
 
 	const onPostData = async () => {
@@ -284,7 +279,7 @@ const ProjectRequestorsTab = () => {
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
-			window.alert(`Error: ${error}`);
+			showErrorDialog(`Error: ${error}`);
 			console.error(error);
 		}
 		setIsLoading(false);
@@ -292,7 +287,6 @@ const ProjectRequestorsTab = () => {
 
 	const RefreshData = () => {
 		setRefreshFlag(true);
-		// window.alert(`Tree Data: ${JSON.stringify(treeData)}`);
 	};
 
 	return (

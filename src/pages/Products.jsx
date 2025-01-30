@@ -1,20 +1,21 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
 import {
-  GridComponent,
-  ColumnsDirective,
-  ColumnDirective,
-  Selection,
-  Edit,
-  Filter,
-  Inject,
-  Page,
-  Toolbar,
+	GridComponent,
+	ColumnsDirective,
+	ColumnDirective,
+	Selection,
+	Edit,
+	Filter,
+	Inject,
+	Page,
+	Toolbar,
 } from "@syncfusion/ej2-react-grids";
-import { toast } from "react-toastify";
 import { Header } from "../components";
 // import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
+
+import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
 
 const apiUrl = process.env.REACT_APP_MONGO_URI;
 
@@ -80,18 +81,9 @@ const Products = () => {
 			const response = await fetch(fetchString, {
 				method: "DELETE",
 			});
-			// const json = await response.json();
-
-			// if (!response.ok) {
-			//   setError(json.error);
-			// }
 			if (response.ok) {
-				// Clear form useStates
-				// ResetUseStates();
-				toast.success("Record Successfully Deleted...");
+				showSuccessDialogWithTimer("Record Successfully Deleted...");
 			}
-			// setDeleteFlag(false);
-			// setEmptyFields([]);
 		};
 
   const actionComplete = async (args) => {

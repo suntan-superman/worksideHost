@@ -26,7 +26,8 @@ import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import axios from "axios";
 import "../index.css";
-import { toast } from "react-toastify";
+
+import { showSuccessDialog } from "../utils/useSweetAlert";
 
 // TODO Need to Add FIlter Options for Documents
 // TODO FIlter by Date, By Status
@@ -140,7 +141,7 @@ const ProjectDocumentsTab = () => {
 				})
 				.then((response) => {
 					if (response.status === 200) {
-						toast.success("Document Deleted...");
+						showSuccessDialog("Document Deleted...");
 
 						if (treeObj.current) {
 							treeObj.current.removeNodes([response.data._id]); // Pass the node ID to delete
@@ -452,7 +453,7 @@ const ProjectDocumentsTab = () => {
 				else menuObj.enableItems(["View Document"], true);
 			} else {
 				// TODO do we need this?
-				// toast.error("No Node Selected");
+				// "No Node Selected"
 			}
 		}
 	};

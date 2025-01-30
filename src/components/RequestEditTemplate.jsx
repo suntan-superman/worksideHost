@@ -8,7 +8,6 @@ import {
 } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
-import { toast } from "react-toastify";
 
 import {
 	GetAllProjects,
@@ -18,6 +17,8 @@ import {
 	GetSupplierProductsByProduct,
 } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
+
+import { showErrorDialog } from "../utils/useSweetAlert";
 
 // Set Selection Options
 // const categoryOptions = [
@@ -215,7 +216,7 @@ const RequestEditTemplate = (props) => {
 	};
 	const GetSSRVendors = async () => {
 		if (data.requestcategory === undefined || data.requestname === undefined) {
-			toast.error("Please select a Request Category and Request Name!");
+			await showErrorDialog("Please select a Request Category and Request Name!");
 			return;
 		}
 		GetSupplierProductsByProduct().then((response) => {
@@ -230,7 +231,7 @@ const RequestEditTemplate = (props) => {
 				return false;
 			});
 			if (filteredSuppliers.length === 0) {
-				toast.error("No Sole Source Vendors/Suppliers Found!");
+				showErrorDialog("No Sole Source Vendors/Suppliers Found!");
 			} else {
 				const suppliers = [
 					...new Set(filteredSuppliers.map((s) => s.supplier)),

@@ -15,6 +15,11 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
 
+import {
+	showErrorDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
+
 import "../index.css";
 import "../App.css";
 
@@ -108,7 +113,7 @@ const SupplierProductsTab = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.supplier}-${args.rowData.product}`
+					? `Edit ${args.rowData.supplier}-${args.rowData.product} Record`
 					: "Workside New Supplier-Product Record";
 		}
 		if (args.requestType === "save") {
@@ -160,9 +165,9 @@ const SupplierProductsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				toast.success("Record Successfully Added...");
+				showSuccessDialogWithTimer("Record Successfully Added...");
 			} else {
-				toast.error("Record Add Failed...");
+				showErrorDialog(`Record Add Failed...${response.status}`);
 			}
 			setInsertFlag(false);
 		} else {
@@ -178,9 +183,9 @@ const SupplierProductsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				toast.success("Record Successfully Updated...");
+				showSuccessDialogWithTimer("Record Successfully Updated...");
 			} else {
-				toast.error("Record Update Failed...");
+				showErrorDialog(`Record Update Failed...${response.status}`);
 			}
 		}
 	};

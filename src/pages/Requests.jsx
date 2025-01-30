@@ -24,9 +24,14 @@ import RequestInfoModal from "../components/RequestInfoModal";
 import { UseStateContext } from "../contexts/ContextProvider";
 import RequestEditTemplate from "../components/RequestEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
-import { toast } from "react-toastify";
 
 import { Header } from "../components";
+
+import {
+	showErrorDialog,
+	showWarningDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
 
 let gridPageSize = 8;
 let clientName = "CRC";
@@ -140,14 +145,14 @@ const Requests = () => {
 	const toolbarClick = (args) => {
 		if (requestGridRef && args.item.id === "requestGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				toast.error("You do not have permission to export data.");
+				showWarningDialog("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
 				fileName: "worksideRequests.xlsx",
 			};
 			requestGridRef.excelExport(excelExportProperties);
-			toast.success("Request Data Exported...");
+			showSuccessDialogWithTimer("Request Data Exported...");
 		}
 	};
 
@@ -232,7 +237,7 @@ const Requests = () => {
 			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Record of ${args.rowData.projectname} ${args.rowData.requestname}`
+					? `Edit Request: ${args.rowData.projectname} ${args.rowData.requestname}`
 					: "Workside New Request";
 		}
 		if (args.requestType === "save") {
@@ -249,7 +254,6 @@ const Requests = () => {
 		setOpenUpdateModal(false);
 		if (insertFlag) {
 			// Insert Record
-			window.alert(`Insert Request: ${JSON.stringify(currentRecord)}`);
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/request/`,
 				{
@@ -262,9 +266,9 @@ const Requests = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				toast.success("Record Successfully Added...");
+				showSuccessDialogWithTimer("Record Successfully Added...");
 			} else {
-				toast.error("Record Add Failed...");
+				showErrorDialog(`Record Add Failed...${response.status}`);
 			}
 			setInsertFlag(false);
 		} else {
@@ -297,15 +301,14 @@ const Requests = () => {
 				const response = await fetch(fetchString, requestOptions);
 				const jsonData = await response.json();
 				if (response.status === 200) {
-					toast.success("Record Successfully Updated...");
+					showSuccessDialogWithTimer("Record Successfully Updated...");
 				} else {
-					toast.error("Record Update Failed...");
+					showErrorDialog(`Record Update Failed...${response.status}`);
 				}
 				setIsLoading(false);
 			} catch (error) {
 				setIsLoading(false);
-				window.alert(`Error: ${error}`);
-				console.error(error);
+				showErrorDialog(`Error: ${error}`);
 			}
 		}
 	};
