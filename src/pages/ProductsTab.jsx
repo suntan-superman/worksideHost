@@ -65,9 +65,7 @@ const ProductsTab = () => {
 	const settings = { mode: "Row" };
 
 	// Get the firms data
-	const {
-		data: productsData,
-	} = useQuery({
+	const { data: productsData, isLoading: productsLoading } = useQuery({
 		queryKey: ["products", "all"],
 		queryFn: () => GetProducts(),
 		refetchInterval: 1000 * 10, // 1 minute refetch
@@ -205,6 +203,16 @@ const ProductsTab = () => {
 			gridInstance.pageSettings.freeze = true;
 		}
 	};
+
+	if (productsLoading) {
+		return (
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div>

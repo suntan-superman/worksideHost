@@ -43,7 +43,7 @@ const showConfirmationDialog = async (message) => {
 			imageWidth: null,
 			imageHeight: null,
 			width: "400px",
-			height: "400px",
+			// height: "400px",
 			customClass: {
 				popup: "custom-dialog", // Adds custom border to the dialog box
 				confirmButton: "custom-confirm-button",
@@ -91,7 +91,7 @@ const showErrorDialog = async (message) => {
 			imageWidth: null,
 			imageHeight: null,
 			width: "400px",
-			height: "400px",
+			// height: "400px",
 			customClass: {
 				popup: "custom-dialog", // Adds custom border to the dialog box
 				confirmButton: "custom-cancel-button",
@@ -140,7 +140,7 @@ const showWarningDialog = async (message) => {
 			imageHeight: null,
 			reverseButtons: false,
 			width: "400px",
-			height: "400px",
+			// height: "400px",
 			customClass: {
 				popup: "custom-dialog", // Adds custom border to the dialog box
 				confirmButton: "custom-confirm-button",
@@ -187,7 +187,7 @@ const showSuccessDialog = async (message) => {
 			// imageWidth: 25,
 			// imageHeight: 25,
 			width: "400px",
-			height: "400px",
+			// height: "400px",
 			customClass: {
 				popup: "custom-dialog", // Adds custom border to the dialog box
 				confirmButton: "custom-confirm-button",
@@ -233,7 +233,7 @@ const showSuccessDialogWithTimer = async (message) => {
 			imageWidth: 100,
 			imageHeight: 100,
 			width: null,
-			height: null,
+			// height: null,
 			customClass: {
 				popup: "custom-dialog", // Adds custom border to the dialog box
 				confirmButton: "custom-confirm-button",

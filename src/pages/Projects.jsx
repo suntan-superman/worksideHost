@@ -30,7 +30,7 @@ const Projects = () => {
 			<Header category="Workside" title="Projects" />
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
-					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
 			{accessLevel > 2 && (

@@ -81,7 +81,7 @@ export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							showSuccessDialogWithTimer("Requests Completed This Month");
+							showSuccessDialogWithTimer("Requests Completed This Week");
 						}}
 					>
 						Details

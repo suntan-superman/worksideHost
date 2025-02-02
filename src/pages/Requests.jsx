@@ -47,7 +47,7 @@ const Requests = () => {
 	const [messageText, setMessageText] = useState("");
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
-	const [ companyName, setCompanyName ] = useState("");
+	const [companyName, setCompanyName] = useState("");
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -67,9 +67,7 @@ const Requests = () => {
 		clientName = companyName;
 		console.log(`Company Name: ${companyName}`);
 		setCompanyName(companyName);
-
 	}, []);
-
 
 	const editOptions = {
 		allowEditing: accessLevel > 2,
@@ -92,34 +90,35 @@ const Requests = () => {
 		delay: 1000,
 	};
 
-		// Get the requests data
-		const {
-			data: reqData,
-			isError: reqError,
-			isSuccess: isReqSuccess,
-		} = useQuery({
-			queryKey: ["requests"],
-			queryFn: async () => {
-				const res = await GetRequestsByCustomer({ clientName });
-				return res;
-			 },
-			refetchInterval: 1000 * 20, // 1 minute refetch
-			refetchOnReconnect: true,
-			refetchOnWindowFocus: true,
-			// staleTime: 1000 * 60 * 60 * 24, // 1 Day
-			retry: 3,
-		});
-	
+	// Get the requests data
+	const {
+		data: reqData,
+		isError: reqError,
+		isLoading: reqLoading,
+		isSuccess: isReqSuccess,
+	} = useQuery({
+		queryKey: ["requests"],
+		queryFn: async () => {
+			const res = await GetRequestsByCustomer({ clientName });
+			return res;
+		},
+		refetchInterval: 1000 * 10, // 10 second refetch
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 60 * 24, // 1 Day
+		retry: 3,
+	});
+
 	useEffect(() => {
 		queryClient.invalidateQueries("requests");
 	}, [companyName]);
-	
+
 	useEffect(() => {
 		if (reqData) {
 			// Now filter the data
 			// console.log(`UseEffect Request Data: ${JSON.stringify(reqData, null, 2)}`);
 			const data = reqData?.data;
-			if( data ) {
+			if (data) {
 				setRequestList(data);
 			}
 			// const requests = filterRequests(data);
@@ -133,7 +132,7 @@ const Requests = () => {
 	if (reqError) {
 		console.log(`Error: ${reqError}`);
 	}
-	
+
 	// if (reqData && isReqSuccess) {
 	// 	console.log(`Request Data: ${JSON.stringify(reqData, null, 2)}`);
 	// }
@@ -325,18 +324,28 @@ const Requests = () => {
 
 	const SaveRequestsData = async () => {};
 
+	if (reqLoading) {
+		return (
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
 			<Header category="Workside" title="Requests" />
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
-					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
 			<div className="absolute top-[75px] left-[20px] w-[100%] flex flex-row items-center justify-start">
 				<GridComponent
 					id="requestGridElement"
-					dataSource={requestList}
+					dataSource={reqData?.data} // requestList
 					allowSelection
 					allowFiltering
 					allowPaging

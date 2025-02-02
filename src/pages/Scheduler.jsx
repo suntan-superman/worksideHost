@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useReducer } from "react";
 import {
 	ScheduleComponent,
 	Day,
@@ -11,8 +11,11 @@ import {
 	Resize,
 	DragAndDrop,
 	ViewsDirective,
-	EventSettingsModel,
 } from "@syncfusion/ej2-react-schedule";
+import { GetAllProjects } from "../api/worksideAPI";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { showSuccessDialog } from "../utils/useSweetAlert";
 
 import {
 	Button,
@@ -20,7 +23,7 @@ import {
 	DialogTitle,
 	DialogContent,
 	DialogActions,
-	Stack,
+	setRef,
 } from "@mui/material";
 // import FormControl from "@mui/material/FormControl";
 import FormGroup from "@mui/material/FormGroup";
@@ -33,9 +36,7 @@ import Draggable from "react-draggable";
 import { MdFilterList } from "react-icons/md";
 
 import { Header } from "../components";
-import JsonDisplay from "./JsonDisplay";
 import { format } from "date-fns";
-import { set } from "lodash";
 
 // TODO: Implement Scheduler component
 // Add Project and Requests to the Scheduler
@@ -47,67 +48,151 @@ import { set } from "lodash";
 // Show by Project Creator
 
 const Scheduler = () => {
-	const [isLoading, setIsLoading] = useState(false);
+	const queryClient = useQueryClient();
+
 	const [projects, setProjects] = useState([]);
-	const [requests, setRequests] = useState([]);
+	const [filteredProjects, setFilteredProjects] = useState([]);
+	// const [requests, setRequests] = useState([]);
 	const [projectData, setProjectData] = useState([]);
 	const scheduleObj = useRef(null);
 	const [filterLabel, setFilterLabel] = useState("All");
 	const [showDialog, setShowDialog] = useState(false);
 	const [showFilter, setShowFilter] = useState(false);
 
+	let refreshFlag = false;
+
 	const [schedulerHeight, setSchedulerHeight] = useState(
 		window.innerHeight * 0.7,
 	);
 
-	const [filterData, setFilterData] = useState({
-		allProjects: true,
-		activeProjects: false,
-		pendingProjects: false,
-		canceledProjects: false,
-		postponedProjects: false,
+	const [reducerUpdate, forceReducerUpdate] = useReducer((x) => x + 1, 0);
+
+	const localFilterData = localStorage.getItem("schedulerFilter");
+	const [filterData, setFilterData] = useState(
+		localFilterData === null
+			? {
+					allProjects: true,
+					activeProjects: false,
+					pendingProjects: false,
+					canceledProjects: false,
+					postponedProjects: false,
+				}
+			: JSON.parse(localFilterData),
+	);
+
+	useEffect(() => {
+		const handleResize = () => {
+			setSchedulerHeight(window.innerHeight * 0.7);
+		};
+
+		window.addEventListener("resize", handleResize);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+		};
+	}, []);
+
+	// Get the project data
+	const {
+		data: projData,
+		isProjectsLoading,
+		refetch: refetchProjects,
+	} = useQuery({
+		queryKey: ["projects"],
+		queryFn: () => GetAllProjects(),
+		refetchInterval: 1000 * 60,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes+
+		retry: 3,
 	});
 
-	 useEffect(() => {
-			const handleResize = () => {
-				setSchedulerHeight(window.innerHeight * 0.7);
-			};
-
-			window.addEventListener("resize", handleResize);
-
-			return () => {
-				window.removeEventListener("resize", handleResize);
-			};
-		}, []);
-
-	const fetchProjects = async () => {
-		setIsLoading(true);
-		try {
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/project/`,
-			);
-			const jsonData = await response.json();
-			// window.alert(`Fetch Projects: ${JSON.stringify(jsonData)}`);
-			setProjects(jsonData);
-			setIsLoading(false);
-		} catch (error) {
-			setIsLoading(false);
-			window.alert(`Error: ${error}`);
-			console.error(error);
+	function filterProjects(filter, projects) {
+		console.log("Filter Object: ", filter);
+		// If allProjects is true, return the full dataset
+		if (filter.allProjects) {
+			console.log("Filter Includes All Projects: ", filter.allProjects);
+			refreshFlag = true;
+			return projects;
 		}
-		setIsLoading(false);
-	};
+		console.log("Filter Includes Active Projects: ", filter.activeProjects);
 
-	const fetchRequests = async () => {
-		setIsLoading(true);
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/request`,
+		// Build an array of statuses to include based on the filter object
+		const statusesToInclude = [];
+		if (filter.activeProjects) {
+			statusesToInclude.push("ACTIVE");
+		}
+		if (filter.pendingProjects) {
+			statusesToInclude.push("PENDING");
+		}
+		if (filter.canceledProjects) {
+			statusesToInclude.push("CANCELED");
+		}
+		if (filter.postponedProjects) {
+			statusesToInclude.push("POSTPONED");
+		}
+		refreshFlag = true;
+
+		// Filter the projects where the project's status matches one of the statusesToInclude
+		return projects.filter((project) =>
+			statusesToInclude.includes(project.status),
 		);
-		const json = await response.json();
+	}
 
-		setRequests(json);
-		setIsLoading(false);
-	};
+	function isJsonString(str) {
+		try {
+			JSON.parse(str);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	}
+
+	useEffect(() => {
+		if (projData) {
+			// const filterData = localStorage.getItem("schedulerFilter");
+			// if (filterData) {
+			// 	setFilterData(JSON.parse(filterData));
+			// }
+
+			// if (isJsonString(filterData) === false) {
+			// 	return;
+			// }
+			// refreshFlag = false;
+			// const parsedFilterData = JSON.parse(filterData);
+			// const filteredProjects = filterProjects(parsedFilterData, projData.data);
+
+			setProjectData(FormatProjectData(projData.data));
+		}
+	}, [projData]);
+
+	// useEffect(() => {
+	// 	if (projData) {
+	// 		const filterData = localStorage.getItem("schedulerFilter");
+	// 		if (filterData) {
+	// 			setFilterData(JSON.parse(filterData));
+	// 		}
+
+	// 		if (isJsonString(filterData) === false) {
+	// 			return;
+	// 		}
+	// 		refreshFlag = false;
+	// 		const parsedFilterData = JSON.parse(filterData);
+	// 		const filteredProjects = filterProjects(parsedFilterData, projData.data);
+
+	// 		setProjectData(FormatProjectData(filteredProjects));
+	// 	}
+	// }, [projData, refreshFlag]);
+
+	// useEffect(() => {
+	// 	// console.log("Reducer Updated");
+	// 	queryClient.invalidateQueries({ queryKey: "projects", fetchType: "all" });
+	// }, [reducerUpdate]);
+
+	// useEffect(() => {
+	// 	localStorage.setItem("schedulerFilter", JSON.stringify(filterData));
+	// 	refreshFlag = true;
+	// }, [filterData]);
 
 	const FormatProjectData = (projects) => {
 		const projectData = [];
@@ -171,23 +256,24 @@ const Scheduler = () => {
 		},
 	};
 
-	useEffect(() => {
-		const fetchData = async () => {
-			await fetchProjects().then(() => {
-				fetchRequests();
-				setProjectData(FormatProjectData(projects));
-				// window.alert(`Projects: ${JSON.stringify(projectData)}`);
-				// window.alert(`Requests: ${JSON.stringify(requests)}`);
-			});
-		};
-		fetchData();
-	}, []);
+	// useEffect(() => {
+	// 	const fetchData = async () => {
+	// 		await fetchProjects().then(() => {
+	// 			fetchRequests();
+	// 			setProjectData(FormatProjectData(projects));
+	// 		});
+	// 	};
+	// 	fetchData();
+	// }, []);
 
 	const applyCategoryColor = (args, currentView) => {
 		// const applyCategoryColor = (args) => {
 		let displayFlag = false;
 		const categoryColor = args.data.CategoryColor;
 
+		// console.log(
+		// 	`Before Display Flag: ${displayFlag} Status: ${args.data.Status}`,
+		// );
 		if (filterData.allProjects === true) {
 			displayFlag = true;
 		}
@@ -212,6 +298,7 @@ const Scheduler = () => {
 			} else {
 				displayFlag = false;
 			}
+			// console.log(`After Display Flag: ${displayFlag}`);
 			if (displayFlag === false) {
 				args.element.style.display = "none";
 				return;
@@ -226,27 +313,16 @@ const Scheduler = () => {
 		args.element.style.backgroundColor = categoryColor;
 		// }
 	};
-	const onEventRendered = (args) => {
-		// applyCategoryColor(args);
-		applyCategoryColor(args, scheduleObj.current?.currentView);
-	};
 
-	useEffect(() => {
-		// Get Filter Data from Local Storage
-		const filterData = localStorage.getItem("schedulerFilter");
-		if (filterData) {
-			setFilterData(JSON.parse(filterData));
-		}
-	}, []);
+	const onEventRendered = (args) => {
+		applyCategoryColor(args, scheduleObj.current?.currentView);
+		args.element.setAttribute("aria-readonly", "true");
+		args.element.classList.add("e-read-only-cells");
+	};
 
 	const dialogSave = () => {
 		setShowDialog(false);
 	};
-
-	useEffect(() => {
-		// Save Filter Data to Local Storage
-		localStorage.setItem("schedulerFilter", JSON.stringify(filterData));
-	}, [filterData]);
 
 	const dialogClose = () => {
 		setShowDialog(false);
@@ -274,14 +350,21 @@ const Scheduler = () => {
 		);
 	};
 
+	if (isProjectsLoading) {
+		// if (isProjectsLoading || isRequestsLoading) {
+		return (
+			<div className="flex-grow bg-white pl-2 relative h-full">
+				<Header category="Workside" title="Scheduler" />
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex-grow bg-white pl-2 relative h-full">
 			<Header category="Workside" title="Scheduler" />
-			{isLoading && (
-				<div className="absolute top-[50%] left-[50%]">
-					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-900" />
-				</div>
-			)}
 			<div className="flex flex-row justify-items-end justify-between gap-5 pr-2 pl-2 pt-1">
 				<div className="flex flex-row gap-2">
 					<p className="text-black text-sm font-bold">Filter Setting: </p>
@@ -290,17 +373,13 @@ const Scheduler = () => {
 				<div className="mr-4">
 					<button
 						type="button"
-						onClick={() => setShowDialog(!showDialog)}
-						// style={{ color: currentColor }}
-						// className="text-xl rounded-full p-3 hover:bg-light-gray mt-4 block md:hidden"
+						// onClick={() => setShowDialog(!showDialog)}
+						onClick={() => showSuccessDialog("Waiting for Implementation...")}
 					>
 						<MdFilterList size={20} />
 					</button>
 				</div>
 			</div>
-			{/* <div>
-				<JsonDisplay data={projectData} />
-			</div> */}
 			<ScheduleComponent
 				// eventSettings={{ eventSettings }}
 				ref={scheduleObj}
@@ -311,6 +390,7 @@ const Scheduler = () => {
 					dataSource: projectData,
 				}}
 				// selectedDate={new Date(2023, 6, 15)} // Set default date to July 15, 2023
+				readOnly={true}
 				currentView="Month"
 			>
 				<ViewsDirective>

@@ -28,7 +28,16 @@ import {
 
 const USER_ROLES = accessLevelOptions;
 const USER_STATUS = userStatusOptions;
-const COMPANIES = ["Company A", "Company B", "Chevron"]; // Replace with actual company data
+
+// TODO - Replace with actual company data
+const COMPANIES = [
+	"Baker Hughes",
+	"Berry Petroleum",
+	"CRC",
+	"Chevron",
+	"Halliburton",
+	"San Joaquin Bit",
+]; // Replace with actual company data
 
 /**
  * Validation rules

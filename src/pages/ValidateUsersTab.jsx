@@ -11,7 +11,7 @@ import {
 	Resize,
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
 	GetAllUsers,
@@ -29,8 +29,6 @@ import "../styles/syncfusionStyles.css";
 
 import {
 	showErrorDialog,
-	showWarningDialog,
-	showSuccessDialog,
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 ///////////////////////////////////////////////////////////////////
@@ -464,7 +462,13 @@ const ValidateUsersTab = () => {
 		"bg-green-200 text-black p-1 rounded-lg w-24 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 text-xs";
 
 	if (isUsersLoading) {
-		return <div>Loading...</div>;
+		return (
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
 	}
 
 	return (

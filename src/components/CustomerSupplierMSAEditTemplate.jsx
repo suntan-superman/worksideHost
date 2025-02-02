@@ -119,7 +119,7 @@ const CustomerSupplierMSAEditTemplate = (props) => {
 		<div className="flex justify-center items-center bg-white">
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
-					<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-900" />
+					<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
 			<div className="w-[300px] mx-[4px] space-y-2">
