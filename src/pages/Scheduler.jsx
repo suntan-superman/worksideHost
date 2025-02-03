@@ -390,7 +390,7 @@ const Scheduler = () => {
 					dataSource: projectData,
 				}}
 				// selectedDate={new Date(2023, 6, 15)} // Set default date to July 15, 2023
-				readOnly={true}
+				readonly={true}
 				currentView="Month"
 			>
 				<ViewsDirective>
