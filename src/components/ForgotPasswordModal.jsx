@@ -11,9 +11,8 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-import { toast } from "react-toastify";
 import axios from "axios";
-import { showErrorDialog } from "../utils/useSweetAlert";
+import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
 
 const ForgotPasswordModal = ({
 	open, 
@@ -68,7 +67,7 @@ const ForgotPasswordModal = ({
 		      showErrorDialog(`Error Status: ${JSON.stringify(err.status)}`);
 				});
 
-			// window.alert(`Data is valid. Email: ${email}`);
+			window.alert(`Data is valid. Email: ${email}`);
 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/forgotPassword`;
 	    const res = await axios.post(fetchString, {
 				email: email.replace(/"/g, ''),

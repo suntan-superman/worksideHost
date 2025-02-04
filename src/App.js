@@ -27,6 +27,7 @@ import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
 
 import { showConfirmationDialog } from "./utils/useSweetAlert";
+import VerifyEmail from "./pages/VerifyEmail";
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
@@ -172,6 +173,7 @@ const App = () => {
 					<Route path="/" element={<Navigate replace to="/login" />} />
 					<Route path="/login" element={<LoginDialog />} />
 					<Route path="/signup" element={<SignupDialog />} />
+					<Route path="/verify-email" element={<VerifyEmail />} />
 					<Route path="main/*" element={<MainApp />} />
 				</Routes>
 			</BrowserRouter>

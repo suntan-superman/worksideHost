@@ -1,74 +1,95 @@
+/* eslint-disable */
+
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Alert, CircularProgress } from "@mui/material";
-import { AuthContext } from "../context/AuthContext";
-import { baseUrl, postRequest } from "../utils/service";
+import axios from "axios";
+import {
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
+// import { AuthContext } from "../context/AuthContext";
+// import { baseUrl, postRequest } from "../utils/service";
 
 const VerifyEmail = () => {
-  const { user, updateUser } = useContext(AuthContext);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+	const [isLoading, setIsLoading] = useState(false);
+  const [ isUserVerified, setIsUserVerified ] = useState(false);
+	const [error, setError] = useState(false);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const navigate = useNavigate();
 
-  const emailToken = searchParams.get("emailToken");
+	const token = searchParams.get("token");
+	const email = searchParams.get("email");
 
-  console.log(user);
-
-  useEffect(() => {
+	useEffect(() => {
     (async () => {
-      if (user?.isVerified) {
-        setTimeout(() => {
-          return navigate("/");
-        }, 3000);
-      } else {
-        if (emailToken) {
+      setIsUserVerified(await isUserValidated(email));
+      if (isUserVerified === true) {
+				setTimeout(() => {
+					return navigate("/");
+				}, 3000);
+			} else {
+				if (token) {
           //post request
-          setIsLoading(true);
+    		const fetchString = `http://localhost:4000/api/verify-email/${token}`;
+    		// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/verify-email/${token}`;
+          const res = await axios.post(fetchString);
+          console.log("Response: " + res);
 
-          const response = await postRequest(
-            `${baseUrl}/users/verify-email`,
-            JSON.stringify({ emailToken })
-          );
+          showSuccessDialogWithTimer("Email successfully verified, redirecting...");
+					// const response = await postRequest(
+					//   `${baseUrl}/users/verify-email`,
+					//   JSON.stringify({ emailToken })
+					// );
 
-          setIsLoading(false);
-          console.log("res", response);
+          // setIsUserVerified(true); 
+					// console.log("res", response);
 
-          if (response.error) {
-            return setError(response);
-          }
+					// if (response.error) {
+					//   return setError(response);
+					// }
 
-          updateUser(response);
-        }
-      }
-    })();
-  }, [emailToken, user]);
+					// updateUser(response);
+				}
+			}
+		})();
+	}, [token]);
 
-  return (
-    <div>
-      {isLoading ? (
-        <div>
-          <CircularProgress />
-        </div>
-      ) : (
-        <div>
-          {user?.isVerified ? (
-            <div>
-              <Alert severity="success">
-                Email successfully verified, redirecting...
-              </Alert>
-            </div>
-          ) : (
-            <div>
-              {error.error ? (
-                <Alert severity="error">{error.message}</Alert>
-              ) : null}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
+	const isUserValidated = async (email) => {
+		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
+		const res = await axios.post(fetchString, {
+			email: email,
+    });
+		if (res.data.status === false) {
+			return false;
+		}
+		return true;
+	};
+
+	return (
+		<div>
+			{isLoading ? (
+				<div>
+					<CircularProgress />
+				</div>
+			) : (
+				<div>
+					{isUserVerified ? (
+						<div>
+							<Alert severity="success">
+								Email successfully verified, redirecting...
+							</Alert>
+						</div>
+					) : (
+						<div>
+							{error.error ? (
+								<Alert severity="error">{error.message}</Alert>
+							) : null}
+						</div>
+					)}
+				</div>
+			)}
+		</div>
+	);
 };
 
 export default VerifyEmail;
