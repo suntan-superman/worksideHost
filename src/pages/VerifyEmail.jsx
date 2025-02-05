@@ -34,22 +34,10 @@ const VerifyEmail = () => {
     		// const fetchString = `http://localhost:4000/api/user/verify-email/${token}`;
     		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
           const res = await axios.post(fetchString);
-          window.alert("Verify Email Response: " + JSON.stringify(res, null, 2));
 
           await showSuccessDialogWithTimer("Email successfully verified, redirecting...");
 
           return navigate("/");
-
-					// const response = await postRequest(
-					//   `${baseUrl}/users/verify-email`,
-					//   JSON.stringify({ emailToken })
-					// );
-
-          // setIsUserVerified(true); 
-					// console.log("res", response);
-
-
-					// updateUser(response);
 				}
 			}
 		})();
