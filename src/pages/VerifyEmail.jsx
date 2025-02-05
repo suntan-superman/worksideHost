@@ -20,6 +20,8 @@ const VerifyEmail = () => {
 	const token = searchParams.get("token");
 	const email = searchParams.get("email");
 
+  console.log(`Email: ${email} Token: ${token}`);
+
 	useEffect(() => {
     (async () => {
       setIsUserVerified(await isUserValidated(email));
@@ -30,7 +32,7 @@ const VerifyEmail = () => {
 			} else {
 				if (token) {
           //post request
-    		const fetchString = `http://localhost:4000/api/verify-email/${token}`;
+    		const fetchString = `http://localhost:4000/api/user/verify-email/${token}`;
     		// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/verify-email/${token}`;
           const res = await axios.post(fetchString);
           console.log("Response: " + res);

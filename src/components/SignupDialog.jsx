@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import Select from "react-select";
@@ -15,6 +15,8 @@ const SignupDialog = () => {
 		email: "",
 		password: "",
 	});
+	const emailRef = useRef(null);
+	const passwordRef = useRef(null);
 
 	const [options, setOptions] = useState([]);
 
@@ -53,6 +55,23 @@ const SignupDialog = () => {
 		fetchCompanyNames();
 	}, []);
 
+	useEffect(() => {
+		if (emailRef.current && emailRef.current.value) {
+      emailRef.current.value = '';
+    	}
+    if (passwordRef.current && passwordRef.current.value) {
+      passwordRef.current.value = '';
+		}
+		setData({
+			firstName: "",
+			lastName: "",
+			company: "",
+			phone: "",
+			email: "",
+			password: "",
+		});
+	}, []);
+
 	const containsWord = (inputString, word) => {
 		if (typeof inputString !== "string") {
 			console.error("Invalid input: expected a string");
@@ -88,6 +107,7 @@ const SignupDialog = () => {
 			return;
 		}
 		const response = await fetch(
+			// `http://localhost:4000/api/user/`,
 			`${process.env.REACT_APP_MONGO_URI}/api/user/`,
 			{
 				method: "POST",
@@ -103,10 +123,8 @@ const SignupDialog = () => {
 			await showSuccessDialog("Check Email to Validate...");
 			setTimeout(() => {
 				navigate("/login");
-			}, 3000);
+			}, 2000);
 		} else {
-			console.log(`Status: ${status}`);
-			console.log("Error Creating User. User Exists");
 			await showErrorDialog(`User Exists: ${data.email}`);
 		}
 	};
@@ -150,7 +168,9 @@ const SignupDialog = () => {
 								<form
 									className="flex flex-col items-center"
 									onSubmit={handleSubmit}
+									autoComplete="off"
 								>
+									<input type="text" name="dummy" style={{ display: 'none' }} />
 									<h2 className="text-2xl font-bold text-green-500 mb-2">
 										Create Account
 									</h2>
@@ -204,6 +224,8 @@ const SignupDialog = () => {
 										value={data.email}
 										required
 										className={styles.input}
+										// autoComplete="off"
+										ref={emailRef}
 									/>
 									<input
 										type="password"
@@ -213,6 +235,9 @@ const SignupDialog = () => {
 										value={data.password}
 										required
 										className={styles.input}
+										autoComplete="new-password"
+										// autoComplete="off"
+										ref={passwordRef}
 									/>
 									{error && <div className={styles.error_msg}>{error}</div>}
 									<button
