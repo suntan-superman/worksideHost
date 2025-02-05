@@ -31,13 +31,15 @@ const VerifyEmail = () => {
 				}, 3000);
 			} else {
 				if (token) {
-          //post request
     		// const fetchString = `http://localhost:4000/api/user/verify-email/${token}`;
     		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
           const res = await axios.post(fetchString);
-          console.log("Response: " + res);
+          window.alert("Verify Email Response: " + JSON.stringify(res, null, 2));
 
-          showSuccessDialogWithTimer("Email successfully verified, redirecting...");
+          await showSuccessDialogWithTimer("Email successfully verified, redirecting...");
+
+          return navigate("/");
+
 					// const response = await postRequest(
 					//   `${baseUrl}/users/verify-email`,
 					//   JSON.stringify({ emailToken })
@@ -46,9 +48,6 @@ const VerifyEmail = () => {
           // setIsUserVerified(true); 
 					// console.log("res", response);
 
-					// if (response.error) {
-					//   return setError(response);
-					// }
 
 					// updateUser(response);
 				}
