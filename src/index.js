@@ -3,11 +3,13 @@ import React from "react";
 import ReactDOM from 'react-dom/client';
 import "./index.css";
 import App from './App';
+import { BrowserRouter } from "react-router-dom";
 
 import {
 	ContextProvider,
 	UserContextProvider,
 } from "./contexts/ContextProvider";
+import { NotificationProvider } from "./contexts/NotificationContext";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -26,16 +28,20 @@ const queryClient = new QueryClient({
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<React.StrictMode>
-		<ContextProvider>
-			<UserContextProvider>
-				{/* <UseStateContext> */}
-				<QueryClientProvider client={queryClient}>
-					<App />
-					<ReactQueryDevtools initialIsOpen={false} />
-				</QueryClientProvider>
-				{/* </UseStateContext> */}
-			</UserContextProvider>
-		</ContextProvider>
+		<BrowserRouter>
+			<ContextProvider>
+				<NotificationProvider>
+					<UserContextProvider>
+						{/* <UseStateContext> */}
+						<QueryClientProvider client={queryClient}>
+							<App />
+							<ReactQueryDevtools initialIsOpen={false} />
+						</QueryClientProvider>
+						{/* </UseStateContext> */}
+					</UserContextProvider>
+				</NotificationProvider>
+			</ContextProvider>
+		</BrowserRouter>
 	</React.StrictMode>,
 );
 

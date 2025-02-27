@@ -1,6 +1,6 @@
 export { default as Admin } from './Admin';
 export { default as Scheduler } from "./Scheduler";
-export { default as DashboardXX } from "./DashboardXX";
+export { default as Dashboard } from "./Dashboard";
 export { default as Notifications } from './Notifications';
 export { default as Products } from './Products';
 export { default as Projects } from './Projects';

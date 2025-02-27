@@ -111,27 +111,10 @@ const SupplierProductEditTemplate = (props) => {
 			const cats = [...new Set(response.data.map((p) => p.categoryname))];
 			setCategoryOptions(cats);
 			if (data.isAdd === false) {
-				// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
 				const filteredProducts = getUniqueProductNames(data.category);
-				// window.alert(`New Filtered Products: ${filteredProducts}`);
 				setFilteredProducts(filteredProducts);
-				// SetFilteredProducts(data.category);
 			}
 		});
-		// const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/product`);
-		// const json = await response.json();
-		// // setProductOptions(json);
-		// productOptions = json;
-		// // console.log(`Product Options: ${JSON.stringify(json)}`);
-		// const cats = [...new Set(json.map((p) => p.categoryname))];
-		// setCategoryOptions(cats);
-		// if (data.isAdd === false) {
-		// 	// window.alert(`Edit Mode: ${data.category} Product: ${data.product}`);
-		// 	const filteredProducts = getUniqueProductNames(data.category);
-		// 	// window.alert(`New Filtered Products: ${filteredProducts}`);
-		// 	setFilteredProducts(filteredProducts);
-		// 	// SetFilteredProducts(data.category);
-		// }
 	};
 
 	useEffect(() => {

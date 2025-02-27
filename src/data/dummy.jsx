@@ -1,11 +1,11 @@
 import React from 'react';
 import { AiOutlineCalendar } from 'react-icons/ai';
-import { FiBarChart } from 'react-icons/fi';
+import { FiBarChart, FiHome } from "react-icons/fi";
 import { BsCurrencyDollar, BsShield } from "react-icons/bs";
 import {
 	MdSupervisorAccount,
-	MdDashboard,
-	MdNotifications,
+	// MdDashboard,
+	// MdNotifications,
 	MdAccountTree,
 	MdRequestPage,
 } from "react-icons/md";
@@ -20,7 +20,7 @@ export const links = [
 		links: [
 			{
 				name: "dashboard",
-				icon: <MdDashboard style={{ color: "green" }} size={24} />,
+				icon: <FiHome style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "projects",
@@ -31,8 +31,8 @@ export const links = [
 				icon: <MdRequestPage style={{ color: "green" }} size={24} />,
 			},
 			{
-				name: "notifications",
-				icon: <MdNotifications style={{ color: "green" }} size={24} />,
+				name: "tracker",
+				icon: <TbTruckDelivery style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "scheduler",

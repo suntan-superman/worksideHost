@@ -1,7 +1,6 @@
 /* eslint-disable */
 import React, { useEffect, useState, useRef } from "react";
 import { DataManager, Query } from "@syncfusion/ej2-data";
-import { closest } from "@syncfusion/ej2-base";
 import {
 	GridComponent,
 	ColumnsDirective,
@@ -33,13 +32,30 @@ import {
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { Chip, IconButton, Box } from "@mui/material";
+import RequestFilterDialog from "../components/RequestFilterDialog";
+
 let gridPageSize = 8;
 let clientName = "CRC";
 
-const Requests = () => {
-	let requestGridRef = useRef(null);
-	const queryClient = useQueryClient();
+const requestStatusOptions = [
+	"OPEN",
+	"NOT-AWARDED",
+	"AWARDED-WOA",
+	"AWARDED-A",
+	"AWARDED-P",
+	"IN-PROGRESS",
+	"CANCELED",
+	"POSTPONED",
+	"SSR-ACCEPTED",
+	"SSR-REQ",
+	"COMPLETED",
+];
 
+const Requests = () => {
+	const requestGridRef = useRef(null);
+	const queryClient = useQueryClient();
 	const [isLoading, setIsLoading] = useState(false);
 	const { currentColor } = UseStateContext();
 	const [requestList, setRequestList] = useState(null);
@@ -48,6 +64,30 @@ const Requests = () => {
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
 	const [companyName, setCompanyName] = useState("");
+	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+	const [activeFilters, setActiveFilters] = useState(() => {
+		const saved = localStorage.getItem('requestFilterSelections');
+		return saved ? JSON.parse(saved) : [];
+	});
+
+	// Move useQuery up here
+	const {
+		data: reqData,
+		isError: reqError,
+		isLoading: reqLoading,
+		isSuccess: isReqSuccess,
+	} = useQuery({
+		queryKey: ["requests"],
+		queryFn: async () => {
+			const res = await GetRequestsByCustomer({ clientName });
+			return res;
+		},
+		refetchInterval: 1000 * 10,
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 60 * 24,
+		retry: 3,
+	});
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -59,15 +99,83 @@ const Requests = () => {
 
 	const accessLevel = GetAccessLevel();
 
+	// Initial setup effect
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 
 		const companyName = localStorage.getItem("companyName");
 		clientName = companyName;
-		console.log(`Company Name: ${companyName}`);
 		setCompanyName(companyName);
+
+		// Load and apply filters after grid is initialized
+		const savedFilters = localStorage.getItem('requestFilterSelections');
+		if (savedFilters) {
+			const filters = JSON.parse(savedFilters);
+			setActiveFilters(filters);
+		}
 	}, []);
+
+	// Modify the grid load handler
+	const onRequestLoad = () => {
+		const gridElement = document.getElementById("requestGridElement");
+		if (gridElement?.ej2_instances[0]) {
+			const gridInstance = gridElement.ej2_instances[0];
+			gridInstance.pageSettings.pageSize = gridPageSize;
+		}
+	};
+
+	// Modify the filter application effect
+	useEffect(() => {
+		if (!requestGridRef.current || !reqData?.data) {
+			console.log('Grid or data not ready');
+			return;
+		}
+		
+		try {
+			const grid = requestGridRef.current;
+			
+			// Clear existing filters first
+			grid.clearFiltering();
+			
+			if (activeFilters.length > 0) {
+				// Create filter object
+				const filterObject = {
+					columns: [{
+						field: 'status',
+						matchCase: false,
+						operator: 'equal',
+						predicate: 'or',
+						value: activeFilters[0]  // Set initial value
+					}]
+				};
+
+				// Add additional values for OR condition
+				if (activeFilters.length > 1) {
+					for (const status of activeFilters.slice(1)) {
+						filterObject.columns.push({
+							field: 'status',
+							matchCase: false,
+							operator: 'equal',
+							predicate: 'or',
+							value: status
+						});
+					}
+				}
+
+				// Apply filters
+				grid.filterSettings = filterObject;
+				grid.dataBind();
+			}
+		} catch (error) {
+			console.error('Error applying filters:', error);
+		}
+	}, [activeFilters, reqData]);
+
+	// Query client effect
+	useEffect(() => {
+		queryClient.invalidateQueries("requests");
+	}, [queryClient]);
 
 	const editOptions = {
 		allowEditing: accessLevel > 2,
@@ -90,52 +198,19 @@ const Requests = () => {
 		delay: 1000,
 	};
 
-	// Get the requests data
-	const {
-		data: reqData,
-		isError: reqError,
-		isLoading: reqLoading,
-		isSuccess: isReqSuccess,
-	} = useQuery({
-		queryKey: ["requests"],
-		queryFn: async () => {
-			const res = await GetRequestsByCustomer({ clientName });
-			return res;
-		},
-		refetchInterval: 1000 * 10, // 10 second refetch
-		refetchOnReconnect: true,
-		refetchOnWindowFocus: true,
-		staleTime: 1000 * 60 * 60 * 24, // 1 Day
-		retry: 3,
-	});
-
-	useEffect(() => {
-		queryClient.invalidateQueries("requests");
-	}, [companyName]);
-
 	useEffect(() => {
 		if (reqData) {
 			// Now filter the data
-			// console.log(`UseEffect Request Data: ${JSON.stringify(reqData, null, 2)}`);
 			const data = reqData?.data;
 			if (data) {
 				setRequestList(data);
 			}
-			// const requests = filterRequests(data);
-
-			// console.log(`Request List: ${JSON.stringify(requests, null, 2)}`);
-
-			// setRequestList(requests);
 		}
 	}, [reqData]);
 
 	if (reqError) {
 		console.log(`Error: ${reqError}`);
 	}
-
-	// if (reqData && isReqSuccess) {
-	// 	console.log(`Request Data: ${JSON.stringify(reqData, null, 2)}`);
-	// }
 
 	const FilterOptions = {
 		type: "Menu",
@@ -150,7 +225,7 @@ const Requests = () => {
 			const excelExportProperties = {
 				fileName: "worksideRequests.xlsx",
 			};
-			requestGridRef.excelExport(excelExportProperties);
+			requestGridRef.current.excelExport(excelExportProperties);
 			showSuccessDialogWithTimer("Request Data Exported...");
 		}
 	};
@@ -182,21 +257,10 @@ const Requests = () => {
 		},
 	};
 
-	const onRequestLoad = () => {
-		const gridElement = document.getElementById("requestGridElement");
-		if (gridElement?.ej2_instances[0]) {
-			const gridInstance = gridElement.ej2_instances[0];
-			gridInstance.pageSettings.pageSize = gridPageSize;
-		}
-	};
-
-	const rowSelectedRequest = () => {
+	const rowSelectedRequest = (args) => {
 		if (requestGridRef) {
-			/** Get the selected row indexes */
-			const selectedrowindex = requestGridRef.getSelectedRowIndexes();
-			/** Get the selected records. */
-			setSelectedRecord(requestList[selectedrowindex]._id);
-			// setEmptyFields([]);
+			/** Get the selected row id */
+			setSelectedRecord(args.data._id);
 		}
 	};
 
@@ -205,18 +269,34 @@ const Requests = () => {
 			<button
 				type="button"
 				style={{
-					background: currentColor,
+					// background: currentColor,
+					background: "black",
 					color: "white",
 					padding: "5px",
 					borderRadius: "5%",
+					fontWeight: "bold",
+					fontSize: "14px",
 				}}
 				className="requestData"
+				onClick={() => {
+					setSelectedRecord(props._id);
+					setShowDialog(true);
+				}}
 			>
 				Details
 			</button>
 		</div>
 	);
 
+const rowDataBound = (args) => {
+	// For example, conditionally highlight rows where age is greater than 25.
+	if (args.data.status === "SSR-REQ") {
+		args.row.style.backgroundColor = "yellow";
+	}
+	if (args.data.status === "SSR-ACCEPTED") {
+		args.row.style.backgroundColor = "#22C55E";
+	}
+};
 	const actionBegin = (args) => {
 		if (args.requestType === "save" && args.form) {
 			/** cast string to integer value */
@@ -225,7 +305,6 @@ const Requests = () => {
 	};
 
 	const actionComplete = async (args) => {
-		// console.log(`Action Complete: ${args.requestType}`);
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
@@ -242,7 +321,6 @@ const Requests = () => {
 		if (args.requestType === "save") {
 			// Save or Update Data
 			const data = args.data;
-			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
 			setMessageText(`Update Request ${args.data.requestname} Details?`);
 			setCurrentRecord(data);
 			setOpenUpdateModal(true);
@@ -313,16 +391,25 @@ const Requests = () => {
 	};
 
 	const recordClick = (args) => {
-		if (args.target.classList.contains("requestData")) {
-			const rowObj = requestGridRef.getRowObjectFromUID(
-				closest(args.target, ".e-row").getAttribute("data-uid"),
-			);
-			setSelectedRecord(rowObj._id);
-			setShowDialog(true);
-		}
+		// if (args.target.classList.contains("requestData")) {
+		// 	const rowObj = requestGridRef.getRowObjectFromUID(
+		// 		closest(args.target, ".e-row").getAttribute("data-uid"),
+		// 	);
+			setSelectedRecord(args.rowData._id);
+			// setShowDialog(true);
+		// }
 	};
 
 	const SaveRequestsData = async () => {};
+
+	const handleFilterApply = (selectedFilters) => {
+		setActiveFilters(selectedFilters);
+	};
+
+	const handleRemoveFilter = (filterToRemove) => {
+		const newFilters = activeFilters.filter(filter => filter !== filterToRemove);
+		setActiveFilters(newFilters);
+	};
 
 	if (reqLoading) {
 		return (
@@ -342,10 +429,42 @@ const Requests = () => {
 					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
-			<div className="absolute top-[75px] left-[20px] w-[100%] flex flex-row items-center justify-start">
+			<div className="absolute top-[75px] left-[20px] w-[100%]">
+				<Box
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						mb: 0,
+						gap: 0,
+						pl: 2,
+					}}
+				>
+					<Box sx={{ display: "flex", gap: 1, flexGrow: 1 }}>
+						{activeFilters.map((filter) => (
+							<Chip
+								key={filter}
+								label={filter}
+								onDelete={() => handleRemoveFilter(filter)}
+								sx={{
+									backgroundColor: "green",
+									color: "white",
+									"& .MuiChip-deleteIcon": {
+										color: "white",
+									},
+								}}
+							/>
+						))}
+					</Box>
+					<IconButton
+						onClick={() => setFilterDialogOpen(true)}
+						sx={{ color: "green", marginRight: "60px" }}
+					>
+						<FilterListIcon />
+					</IconButton>
+				</Box>
 				<GridComponent
 					id="requestGridElement"
-					dataSource={reqData?.data} // requestList
+					dataSource={reqData?.data}
 					allowSelection
 					allowFiltering
 					allowPaging
@@ -354,7 +473,11 @@ const Requests = () => {
 					frozenColumns={2}
 					actionBegin={actionBegin}
 					actionComplete={actionComplete}
-					filterSettings={FilterOptions}
+					rowDataBound={rowDataBound}
+					filterSettings={{
+						type: "Menu",
+						mode: "Immediate",
+					}}
 					selectionSettings={settings}
 					toolbar={toolbarOptions}
 					toolbarClick={toolbarClick}
@@ -363,12 +486,8 @@ const Requests = () => {
 					editSettings={editOptions}
 					enablePersistence
 					load={onRequestLoad}
-					// width="auto"
 					width="95%"
-					// eslint-disable-next-line no-return-assign
-					ref={(g) => {
-						requestGridRef = g;
-					}}
+					ref={requestGridRef}
 				>
 					<ColumnsDirective>
 						<ColumnDirective
@@ -409,12 +528,12 @@ const Requests = () => {
 							width="100"
 							edit={companySelections}
 						/>
-						<ColumnDirective
+						{/* <ColumnDirective
 							field="customercontact"
 							headerText="Cust Contact"
 							textAlign="Left"
 							width="100"
-						/>
+						/> */}
 						<ColumnDirective
 							field="projectname"
 							headerText="Project"
@@ -427,13 +546,13 @@ const Requests = () => {
 							textAlign="left"
 							width="50"
 						/>
-						<ColumnDirective
+						{/* <ColumnDirective
 							field="rigcompanycontact"
-							headerText="RC Contact"
+							headerText="Rig Contact"
 							textAlign="left"
 							width="50"
-						/>
-						<ColumnDirective
+						/> */}
+						{/* <ColumnDirective
 							field="creationdate"
 							headerText="Date Created"
 							type="date"
@@ -441,7 +560,7 @@ const Requests = () => {
 							format="MM/dd/yyy"
 							textAlign="Right"
 							width="140"
-						/>
+						/> */}
 						<ColumnDirective
 							field="quantity"
 							headerText="Quantity"
@@ -485,6 +604,27 @@ const Requests = () => {
 							textAlign="Right"
 							width="140"
 						/>
+						<ColumnDirective
+							field="creationdate"
+							headerText="Date Created"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="customercontact"
+							headerText="Cust Contact"
+							textAlign="Left"
+							width="100"
+						/>
+						<ColumnDirective
+							field="rigcompanycontact"
+							headerText="Rig Contact"
+							textAlign="Left"
+							width="100"
+						/>
 					</ColumnsDirective>
 					<Inject
 						services={[
@@ -516,6 +656,12 @@ const Requests = () => {
 						onCancel={() => setOpenUpdateModal(false)}
 					/>
 				)}
+				<RequestFilterDialog
+					open={filterDialogOpen}
+					onClose={() => setFilterDialogOpen(false)}
+					onApply={handleFilterApply}
+					requestStatusOptions={requestStatusOptions}
+				/>
 			</div>
 		</div>
 	);

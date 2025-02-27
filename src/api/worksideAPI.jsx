@@ -405,6 +405,12 @@ const SaveNewRequest = async (reqData) =>
 const UpdateRequest = async (reqID, reqData) =>
 	apiRequest(`/api/request/${reqID}`, "PATCH", reqData);
 
+const SaveRequestBid = async (reqBidData) => 
+	apiRequest("/api/requestbid", "POST", reqBidData);
+
+const UpdateRequestBid = async (reqBidData) => 
+	apiRequest("/api/requestbid", "PATCH", reqBidData);
+
 const DoesRequestBidExist = async (reqID, supplierID) => {
 	const strAPI = `${apiURL}/api/requestbid/doesBidExist`;
 	const body = {
@@ -1276,6 +1282,8 @@ export {
 	GetAllRequestsByProject,
 	SaveNewRequest,
 	UpdateRequest,
+	UpdateRequestBid,
+	SaveRequestBid,
 	DoesRequestBidExist,
 	GetRequestBids,
 	UpdateRequestStatus,

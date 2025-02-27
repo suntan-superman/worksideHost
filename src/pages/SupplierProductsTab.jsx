@@ -14,6 +14,7 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
+import ConfirmationDialog from "../components/ConfirmationDialog";
 
 import {
 	showErrorDialog,
@@ -120,7 +121,7 @@ const SupplierProductsTab = () => {
 			// Save or Update Data
 			const data = args.data;
 			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
-			setMessageText(`Update Project ${args.data.projectname} Details?`);
+			setMessageText(`Update Supplier: ${data.supplier} Record?`);
 			setCurrentRecord(data);
 			setOpenUpdateModal(true);
 		}
@@ -152,6 +153,7 @@ const SupplierProductsTab = () => {
 	};
 
 	const SaveSupplierProductsData = async () => {
+		setOpenUpdateModal(false);
 		if (insertFlag === true) {
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,

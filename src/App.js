@@ -1,11 +1,11 @@
 /* eslint-disable */
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { UseStateContext } from "./contexts/ContextProvider";
 import {
-	DashboardXX,
+	Dashboard,
 	Projects,
 	Notifications,
 	Requests,
@@ -19,7 +19,7 @@ import {
 	LoginDialog,
 	SignupDialog,
 	Sidebar,
-	Navbar,
+	NavBar,
 	ThemeSettings,
 	Footer,
 } from "./components";
@@ -28,6 +28,10 @@ import { BsFillLockFill } from "react-icons/bs";
 
 import { showConfirmationDialog } from "./utils/useSweetAlert";
 import VerifyEmail from "./pages/VerifyEmail";
+import { DeliveryTracker } from "./components/delivery-tracker";
+import ErrorBoundary from "./components/delivery-tracker/components/ErrorBoundary";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
@@ -93,66 +97,73 @@ const SideBarComponent = () => {
 
 const NavBarComponent = () => {
   return (
-		<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
-			<Navbar />
-		</div>
-  );
+			<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+				<NavBar />
+			</div>
+		);
 }
 
 const MainApp = () => {
   const { currentMode, activeMenu, themeSettings } = UseStateContext();
-
+  
   return (
 			<div className={currentMode === "Dark" ? "dark" : ""}>
 				<div className="flex relative dark:bg-main-dark-bg w-full">
-					{/* Theme Setting Button */}
 					<ThemeSettingButton />
-					{/* Log Out Button */}
 					<LogOutButton />
-					{/* Sidebar */}
 					<SideBarComponent />
-					{/* Navbar */}
 					<div
 						className={
 							activeMenu
-								? "dark:bg-main-dark-bg  bg-main-bg min-h-screen md:ml-72 w-full"
-								: "bg-main-bg dark:bg-main-dark-bg  w-full min-h-screen flex-2"
+								? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full"
+								: "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2"
 						}
 					>
 						<div>
 							<NavBarComponent />
 						</div>
-						{/* Show Theme Settings */}
 						{themeSettings && <ThemeSettings />}
-						<div>
+						<div style={{ height: "calc(100vh - 64px)" }}>
 							<Routes>
-								<Route element={<PrivateRoutes />}>
-									<Route path="/dashboard" exact element={<DashboardXX />} />
-									{/* <Route path="/dashboard" exact element={<Dashboard />} /> */}
-									<Route path="/projects" exact element={<Projects />} />
-									<Route path="/requests" exact element={<Requests />} />
-									<Route
-										path="/notifications"
-										exact
-										element={<Notifications />}
-									/>
-									<Route
-										path="/admin"
-										// exact
-										element={<Admin />}
-									/>
-									<Route
-										path="/supplier"
-										// exact
-										element={<Supplier />}
-									/>
-									<Route path="/scheduler" exact element={<Scheduler />} />
-									<Route
-										path="/resetpassword"
-										exact
-										element={<ResetPasswordPage />}
-									/>
-								</Route>
+								<Route index element={<Navigate to="dashboard" replace />} />
+								<Route path="dashboard" element={<Dashboard />} />
+								<Route path="projects" element={<Projects />} />
+								<Route path="requests" element={<Requests />} />
+								<Route
+									path="tracker"
+									element={
+										<div style={{ height: "100%", position: "relative" }}>
+											<ErrorBoundary>
+												<DeliveryTracker
+													apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+													config={{
+														mapOptions: {
+															center: { lat: 35.3733, lng: -119.0187 },
+															zoom: 12,
+														},
+														updateInterval: 3000,
+													}}
+													onVehicleSelect={(vehicle) => {
+														console.log("Selected vehicle:", vehicle);
+													}}
+												/>
+											</ErrorBoundary>
+										</div>
+									}
+								/>
+								<Route path="admin" element={<Admin />} />
+								<Route path="supplier" element={<Supplier />} />
+								<Route path="scheduler" element={<Scheduler />} />
+								<Route
+									path="*"
+									element={
+										<div style={{ padding: "20px" }}>
+											<h1 style={{ color: "red" }}>Page Not Found</h1>
+											<p>The page you're looking for doesn't exist.</p>
+											<p>Current Path: {window.location.pathname}</p>
+										</div>
+									}
+								/>
 							</Routes>
 						</div>
 						<Footer />
@@ -162,23 +173,30 @@ const MainApp = () => {
 		);
 };
 
+const queryClient = new QueryClient();
+
 const App = () => {
- registerLicense(
-		"Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE=",
-	);
+  registerLicense(
+    "Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE="
+  );
 
   return (
-			<BrowserRouter>
-				<Routes>
-					<Route path="/" element={<Navigate replace to="/login" />} />
-					<Route path="/login" element={<LoginDialog />} />
-					<Route path="/signup" element={<SignupDialog />} />
-					<Route path="/verify-email" element={<VerifyEmail />} />
-					<Route path="main/*" element={<MainApp />} />
-				</Routes>
-			</BrowserRouter>
-		);
-}
+    <Routes>
+      <Route path="/" element={<Navigate replace to="/login" />} />
+      <Route path="/login" element={<LoginDialog />} />
+      <Route path="/signup" element={<SignupDialog />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route
+        path="/main/*"
+        element={
+          <PrivateRoutes>
+            <MainApp />
+          </PrivateRoutes>
+        }
+      />
+    </Routes>
+  );
+};
 
 export default App;
 

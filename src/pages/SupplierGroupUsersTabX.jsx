@@ -776,44 +776,90 @@ const SupplierGroupUsersTabX = () => {
 	const GetSupplierGroupData = async (supplierName) => {
 		GetSupplierId(supplierName).then((id) => {
 			if (id) {
-				const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+				// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+				const fetchString = `https://workside-software.wl.r.appspot.com/api/suppliergroup/${id}`;
+				// const fetchString = `http://localhost:4000/api/suppliergroup/${id}`;
 				const requestOptions = {
-					method: "GET",
 					headers: { "Content-Type": "application/json" },
 				};
 
 				try {
-					fetch(fetchString, requestOptions).then((response) => {
-						if (response.status === 200) {
-							response.json().then((data) => {
+					axios
+						.get(fetchString, requestOptions)
+						.then((response) => {
+							if (response.status === 200) {
+								const data = response.data;
 								if (data) {
 									SetGroupTreeDataFromDB(data);
 								} else {
 									InitializeGroupTreeData(supplierName, id);
 									console.log("Supplier Group Not Found");
 								}
-							});
-						} else if (response.status === 300) {
-							console.log("No Data Found");
-							InitializeGroupTreeData(supplierName, id);
-						} else {
-							console.log("Error: ", response.status);
-						}
-					});
+							} else if (response.status === 201) {
+								console.log("Supplier Data Found");
+								InitializeGroupTreeData(supplierName, id);
+							} else {
+								
+								console.log("Error: ", response.status);
+							}
+						})
+						.catch((error) => {
+							setIsLoading(false);
+							showErrorDialog(`Error: ${error}`);
+						});
 				} catch (error) {
+					console.log("Original Error: ");
 					setIsLoading(false);
 					showErrorDialog(`Error: ${error}`);
-					console.error(error);
 				}
 			}
 		});
 	};
+
+	// const GetSupplierGroupData = async (supplierName) => {
+	// 	console.log(`supplierName: ${supplierName}`);
+	// 	GetSupplierId(supplierName).then((id) => {
+	// 		console.log(`supplier id: ${id}`);
+	// 		if (id) {
+	// 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+	// 			const requestOptions = {
+	// 				method: "GET",
+	// 				headers: { "Content-Type": "application/json" },
+	// 			};
+
+	// 			try {
+	// 				fetch(fetchString, requestOptions).then((response) => {
+	// 					if (response.status === 200) {
+	// 						response.json().then((data) => {
+	// 							if (data) {
+	// 								SetGroupTreeDataFromDB(data);
+	// 							} else {
+	// 								InitializeGroupTreeData(supplierName, id);
+	// 								console.log("Supplier Group Not Found");
+	// 							}
+	// 						});
+	// 					} else if (response.status === 300) {
+	// 						console.log("No Data Found");
+	// 						InitializeGroupTreeData(supplierName, id);
+	// 					} else {
+	// 						console.log("Error: ", response.status);
+	// 					}
+	// 				});
+	// 			} catch (error) {
+	// 				setIsLoading(false);
+	// 				showErrorDialog(`Error: ${error}`);
+	// 				console.error(error);
+	// 			}
+	// 		}
+	// 	});
+	// };
 
 	const handleSupplierSelectionChange = (selected) => {
 		const index = _.findIndex(supplierOptions, {
 			label: selected.value,
 		});
 		setSupplierIndex(index);
+		console.log(`selected.value : ${selected.value}`);
 		GetSupplierGroupData(selected.value);
 	};
 
@@ -867,14 +913,16 @@ const SupplierGroupUsersTabX = () => {
 	};
 
 	const onSaveChanges = async () => {
+
+		console.log(`groupTreeData: ${JSON.stringify(groupTreeData[0], null, 2)}`);
 		const requestOptions = {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(groupTreeData),
+			body: JSON.stringify(groupTreeData[0]),
 		};
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/`,
+				`${process.env.REACT_APP_MONGO_URI}/api/suppliergroup`,
 				requestOptions,
 			);
 			const jsonData = await response.json();
@@ -956,7 +1004,6 @@ const SupplierGroupUsersTabX = () => {
 					// onExpandedItemsChange={handleExpandedItemsChange}
 					onItemSelectionToggle={handleItemSelectionToggle}
 					// onNodeToggle={handleNodeToggle}
-					onNodeToggle={handleNodeToggle}
 					classes={{ root: useStyles.root, selected: useStyles.selected }}
 					onItemClick={handleItemClicked}
 					onContextMenu={(event, itemId) => {

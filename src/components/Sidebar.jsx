@@ -61,23 +61,28 @@ const Sidebar = () => {
 								<p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
 									{item.title}
 								</p>
-								{item.links.map((link) => (
-									<NavLink
-										to={`/main/${link.name}`}
-										key={link.name}
-										// isDisabled={!signalIsUserLoggedIn.value}
-										onClick={handleCloseSideBar}
-										className={() =>
-											signalIsUserLoggedIn.value ? activeLink : normalLink
-										}
-									>
-										{link.icon}
-										<span className="capitalize text-bold text-xl text-white">
-											{link.name}
-										</span>
-										{/* <span className="capitalize ">{link.name}</span> */}
-									</NavLink>
-								))}
+								{item.links.map((link) => {
+									const to = `/main/${link.name}`;
+									return (
+										<NavLink
+											to={to}
+											key={link.name}
+											onClick={handleCloseSideBar}
+											className={({ isActive }) =>
+												signalIsUserLoggedIn.value
+													? isActive
+														? activeLink
+														: normalLink
+													: normalLink
+											}
+										>
+											{link.icon}
+											<span className="capitalize text-bold text-xl text-white">
+												{link.name}
+											</span>
+										</NavLink>
+									);
+								})}
 							</div>
 						))}
 					</div>

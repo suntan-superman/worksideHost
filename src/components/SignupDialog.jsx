@@ -1,132 +1,148 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import Select from "react-select";
 
 import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
 
+// Initial form state
+const INITIAL_FORM_STATE = {
+	firstName: "",
+	lastName: "",
+	company: "",
+	phone: "",
+	email: "",
+	password: "",
+};
+
+// Validation rules
+const VALIDATION_RULES = {
+	firstName: { min: 2, max: 20, message: "First Name must be between 2 and 20 characters" },
+	lastName: { min: 2, max: 20, message: "Last Name must be between 2 and 20 characters" },
+	company: { min: 2, max: 20, message: "Company must be between 2 and 20 characters" },
+	phone: { length: 10, message: "Phone number must be 10 characters" },
+	email: { min: 6, max: 50, message: "Email must be between 6 and 50 characters" },
+	password: { min: 6, max: 20, message: "Password must be between 6 and 20 characters" },
+};
+
+/**
+ * SignupDialog Component - Handles user registration
+ * @component
+ */
 const SignupDialog = () => {
-	const [data, setData] = useState({
-		firstName: "",
-		lastName: "",
-		company: "",
-		phone: "",
-		email: "",
-		password: "",
-	});
-	const emailRef = useRef(null);
-	const passwordRef = useRef(null);
-
+	const [data, setData] = useState(INITIAL_FORM_STATE);
 	const [options, setOptions] = useState([]);
-
 	const [selectedOption, setSelectedOption] = useState(null);
 	const [error, setError] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	
+	const emailRef = useRef(null);
+	const passwordRef = useRef(null);
 	const navigate = useNavigate();
 
-	const handleChange = ({ currentTarget: input }) => {
-		setData({ ...data, [input.name]: input.value });
-	};
-
-	const handleSelectionChange = (selected) => {
-		setSelectedOption(selected.value);
-		setData({ ...data, company: selected.value });
-	};
-
-	const GetCompanyNames = async () => {
-		const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
-		const json = await response.json();
-		if (response.ok) {
-			return json;
+	// Memoized company names fetcher
+	const getCompanyNames = useCallback(async () => {
+		try {
+			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch company names');
+			}
+			return await response.json();
+		} catch (error) {
+			console.error('Error fetching company names:', error);
+			showErrorDialog('Failed to load company list');
+			return [];
 		}
-		return;
-	};
+	}, []);
 
+	// Fetch company names on mount
 	useEffect(() => {
 		const fetchCompanyNames = async () => {
-			const companyNames = await GetCompanyNames();
-			if (companyNames) {
-				const options = companyNames.map((company) => {
-					return { value: company.name, label: company.name };
-				});
-				setOptions(options);
+			const companyNames = await getCompanyNames();
+			if (companyNames?.length) {
+				const formattedOptions = companyNames.map((company) => ({
+					value: company.name,
+					label: company.name,
+				}));
+				setOptions(formattedOptions);
 			}
 		};
 		fetchCompanyNames();
-	}, []);
+	}, [getCompanyNames]);
 
+	// Reset form on mount
 	useEffect(() => {
-		if (emailRef.current && emailRef.current.value) {
-      emailRef.current.value = '';
-    	}
-    if (passwordRef.current && passwordRef.current.value) {
-      passwordRef.current.value = '';
-		}
-		setData({
-			firstName: "",
-			lastName: "",
-			company: "",
-			phone: "",
-			email: "",
-			password: "",
-		});
+		if (emailRef.current) emailRef.current.value = '';
+		if (passwordRef.current) passwordRef.current.value = '';
+		setData(INITIAL_FORM_STATE);
 	}, []);
 
-	const containsWord = (inputString, word) => {
-		if (typeof inputString !== "string") {
-			console.error("Invalid input: expected a string");
-			return false;
-		}
-		return inputString.toLowerCase().includes(word.toLowerCase());
+	const handleChange = ({ currentTarget: input }) => {
+		setData((prev) => ({ ...prev, [input.name]: input.value }));
+		setError(''); // Clear error when user starts typing
 	};
-	
+
+	const handleSelectionChange = (selected) => {
+		setSelectedOption(selected);
+		setData((prev) => ({ ...prev, company: selected.value }));
+	};
+
+	const validateForm = () => {
+		for (const [field, value] of Object.entries(data)) {
+			const rule = VALIDATION_RULES[field];
+			if (!rule) continue;
+
+			if (rule.length && value.length !== rule.length) {
+				setError(rule.message);
+				return false;
+			}
+			if (rule.min && (value.length < rule.min || value.length > rule.max)) {
+				setError(rule.message);
+				return false;
+			}
+		}
+		return true;
+	};
+
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (data.firstName.length < 2 || data.firstName.length > 20) {
-			setError("First Name must be between 2 and 20 characters");
-			return;
+		setError('');
+		
+		if (!validateForm()) return;
+		
+		setIsLoading(true);
+		try {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/user/`,
+				{
+					method: "POST",
+					body: JSON.stringify(data),
+					headers: {
+						"Content-Type": "application/json",
+					},
+				}
+			);
+
+			const json = await response.json();
+			
+			if (response.ok) {
+				await showSuccessDialog("Check Email to Validate...");
+				setTimeout(() => navigate("/login"), 2000);
+			} else {
+				throw new Error(json.message || 'Registration failed');
+			}
+		} catch (error) {
+			await showErrorDialog(`Registration failed: ${error.message}`);
+		} finally {
+			setIsLoading(false);
 		}
-		if (data.lastName.length < 2 || data.lastName.length > 20) {
-			setError("Last Name must be between 2 and 20 characters");
-			return;
-		}
-		if (data.company.length < 2 || data.company.length > 20) {
-			setError("Company must be between 2 and 20 characters");
-			return;
-		}
-		if (data.phone.length < 10 || data.phone.length > 10) {
-			setError("Phone number must be 10 characters");
-			return;
-		}
-		if (data.email.length < 6 || data.email.length > 50) {
-			setError("Email must be between 6 and 50 characters");
-			return;
-		}
-		if (data.password.length < 6 || data.password.length > 20) {
-			setError("Password must be between 6 and 20 characters");
-			return;
-		}
-		const response = await fetch(
-			// `http://localhost:4000/api/user/`,
-			`${process.env.REACT_APP_MONGO_URI}/api/user/`,
-			{
-				method: "POST",
-				body: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json",
-				},
-			},
-		);
-		const json = await response.json();
-		const { status } = response;
-		if (status < 300) {
-			await showSuccessDialog("Check Email to Validate...");
-			setTimeout(() => {
-				navigate("/login");
-			}, 2000);
-		} else {
-			await showErrorDialog(`User Exists: ${data.email}`);
-		}
+	};
+
+	const handleClearForm = () => {
+		setData(INITIAL_FORM_STATE);
+		setSelectedOption(null);
+		setError("");
 	};
 
 	return (
@@ -196,15 +212,12 @@ const SignupDialog = () => {
 										<Select
 											className="basic-single"
 											classNamePrefix="select"
-											defaultValue={selectedOption}
-											isDisabled={false}
+											value={selectedOption}
+											isDisabled={isLoading}
 											onChange={handleSelectionChange}
-											// isLoading={isLoading}
-											// isClearable={isClearable}
-											// isRtl={isRtl}
-											// isSearchable={isSearchable}
 											name="company"
 											options={options}
+											isLoading={!options.length}
 										/>
 									</div>
 									<input
@@ -242,24 +255,17 @@ const SignupDialog = () => {
 									{error && <div className={styles.error_msg}>{error}</div>}
 									<button
 										type="submit"
-										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg"
+										disabled={isLoading}
+										className={`bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg ${
+											isLoading ? 'opacity-50 cursor-not-allowed' : ''
+										}`}
 									>
-										Sign Up
+										{isLoading ? 'Signing up...' : 'Sign Up'}
 									</button>
 									<button
 										type="button"
 										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
-										onClick={() => {
-											setData({
-												firstName: "",
-												lastName: "",
-												company: "",
-												phone: "",
-												email: "",
-												password: "",
-											});
-											setError("");
-										}}
+										onClick={handleClearForm}
 									>
 										Clear Form
 									</button>

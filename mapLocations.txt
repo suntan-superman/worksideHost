@@ -1,0 +1,9 @@
+Belridge, CA: 35.5464° N, 119.7895° W
+Cymric, CA: 35.3683° N, 119.6896° W
+Elk Hills, CA: 35.2816° N, 119.4440° W
+Kern River, CA: 35.4197° N, 119.0195° W
+Lost Hills, CA: 35.6163° N, 119.6943° W
+
+Halliburton, CA: 35.44248° N, 119.09050° W
+Baker-Hughes, CA: 35.40173° N, 119.05253° W
+

@@ -46,6 +46,7 @@ const requestStatusOptions = [
 	"IN-PROGRESS",
 	"CANCELED",
 	"POSTPONED",
+	"SSR-REQ",
 	"COMPLETED",
 ];
 

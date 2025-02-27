@@ -11,7 +11,6 @@ import { LatestRequests } from "./components/LatestRequests";
 import { TopRatedSuppliers } from "./components/TopRatedSuppliers";
 import { Header } from "../components";
 
-
 export default function DashboardXX() {
 	const supplierList = [
 		{
@@ -81,6 +80,7 @@ export default function DashboardXX() {
 
 	return (
 		<div className="ml-3">
+		{/* <div className="ml-3"> */}
 			<Header category="Workside" title="Dashboard" />
 			<Grid2 container spacing={2} sx={{ height: "100vh", width: "100vw" }}>
 				<Grid2 container sx={{ height: "25%" }} spacing={2}>

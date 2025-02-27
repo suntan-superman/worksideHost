@@ -42,10 +42,10 @@ const SideNavBar = () => {
 						<li>
 							<button
 								type="button"
-								onClick={() => setSelectedOption("Notifications")}
+								onClick={() => setSelectedOption("Tracker")}
 								className="w-full py-2 hover:bg-gray-700"
 							>
-								Notifications
+								Tracker
 							</button>
 						</li>
 						<li>
