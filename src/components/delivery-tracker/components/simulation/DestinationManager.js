@@ -28,49 +28,62 @@ const DestinationManager = ({
   const { destinations, addDestination, removeDestination, setDestinations } = useDeliveryStore();
   
   const [position, setPosition] = useState(() => {
-			const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-			if (savedPosition) {
-				return JSON.parse(savedPosition);
-			}
-			// Position dialog in the center-top of the screen
-			return {
-				x: Math.max(0, (window.innerWidth - 600) / 2),
-				y: 100,
-			};
-		});
+    const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
+    if (savedPosition) {
+      return JSON.parse(savedPosition);
+    }
+    // Position dialog in the center-top of the screen
+    return {
+      x: Math.max(0, (window.innerWidth - 600) / 2),
+      y: 100
+    };
+  });
 
-		const [newDestination, setNewDestination] = useState({
-			name: "",
-			coordinates: { lat: "", lng: "" },
-		});
+  const [newDestination, setNewDestination] = useState({
+    name: '',
+    coordinates: { lat: '', lng: '' },
+  });
 
   useEffect(() => {
-			if (open) {
-				const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-				if (savedPosition) {
-					setPosition(
-						savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 },
-					);
-				}
-			}
-		}, [open]);
+    if (open) {
+      const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
+      setPosition(savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 });
+    }
+  }, [open]);
 
-		const handleDragStop = (e, data) => {
-			const newPosition = { x: data.x, y: data.y };
-			setPosition(newPosition);
-			localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
-		};
+  const handleDragStop = (e, data) => {
+    const newPosition = { x: data.x, y: data.y };
+    setPosition(newPosition);
+    localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
+  };
+
+  const handleInputChange = (field) => (event) => {
+    const value = event.target.value;
+    
+    if (field === 'name') {
+      setNewDestination(prev => ({ ...prev, name: value }));
+    } else {
+      // Handle lat/lng coordinates
+      setNewDestination(prev => ({
+        ...prev,
+        coordinates: {
+          ...prev.coordinates,
+          [field]: value // Don't convert to number yet to allow typing
+        }
+      }));
+    }
+  };
 
   const handleAddDestination = () => {
-    if (!newDestination.coordinates.lat || !newDestination.coordinates.lng) return;
+    if (!newDestination.name || !newDestination.coordinates.lat || !newDestination.coordinates.lng) return;
 
     addDestination({
       id: `dest-${Date.now()}`,
-      name: newDestination.name || `Destination ${destinations.length + 1}`,
+      name: newDestination.name,
       coordinates: {
-        lat: Number(newDestination.coordinates.lat),
-        lng: Number(newDestination.coordinates.lng),
-      },
+        lat: Number(newDestination.coordinates.lat), // Convert to number when saving
+        lng: Number(newDestination.coordinates.lng)
+      }
     });
 
     setNewDestination({ name: '', coordinates: { lat: '', lng: '' } });
@@ -78,13 +91,6 @@ const DestinationManager = ({
 
   const handleDeleteDestination = (id) => {
     removeDestination(id);
-  };
-
-  const handleInputChange = (field) => (event) => {
-    setNewDestination((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
   };
 
   const handleResetDestinations = () => {
@@ -135,7 +141,6 @@ const DestinationManager = ({
           <DragIndicator sx={{ mr: 2, color: 'text.secondary' }} />
           <Typography variant="h6">Manage Destinations</Typography>
         </Box>
-
         <DialogContent sx={{ overflow: 'auto' }}>
           <Box sx={{ mb: 3, mt: 2 }}>
             <Typography variant="subtitle1" gutterBottom>Add New Destination</Typography>
@@ -149,19 +154,19 @@ const DestinationManager = ({
               />
               <TextField
                 label="Latitude"
-                type="number"
                 value={newDestination.coordinates.lat}
                 onChange={handleInputChange('lat')}
                 size="small"
                 sx={{ flex: 1 }}
+                type="text"
               />
               <TextField
                 label="Longitude"
-                type="number"
                 value={newDestination.coordinates.lng}
                 onChange={handleInputChange('lng')}
                 size="small"
                 sx={{ flex: 1 }}
+                type="text"
               />
               <Button
                 variant="contained"
