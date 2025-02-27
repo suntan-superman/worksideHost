@@ -28,34 +28,38 @@ const DestinationManager = ({
   const { destinations, addDestination, removeDestination, setDestinations } = useDeliveryStore();
   
   const [position, setPosition] = useState(() => {
-    const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-    if (savedPosition) {
-      return JSON.parse(savedPosition);
-    }
-    // Position dialog in the center-top of the screen
-    return {
-      x: Math.max(0, (window.innerWidth - 600) / 2),
-      y: 100
-    };
-  });
+			const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
+			if (savedPosition) {
+				return JSON.parse(savedPosition);
+			}
+			// Position dialog in the center-top of the screen
+			return {
+				x: Math.max(0, (window.innerWidth - 600) / 2),
+				y: 100,
+			};
+		});
 
-  const [newDestination, setNewDestination] = useState({
-    name: '',
-    coordinates: { lat: '', lng: '' },
-  });
+		const [newDestination, setNewDestination] = useState({
+			name: "",
+			coordinates: { lat: "", lng: "" },
+		});
 
   useEffect(() => {
-    if (open) {
-      const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-      setPosition(savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 });
-    }
-  }, [open]);
+			if (open) {
+				const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
+				if (savedPosition) {
+					setPosition(
+						savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 },
+					);
+				}
+			}
+		}, [open]);
 
-  const handleDragStop = (e, data) => {
-    const newPosition = { x: data.x, y: data.y };
-    setPosition(newPosition);
-    localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
-  };
+		const handleDragStop = (e, data) => {
+			const newPosition = { x: data.x, y: data.y };
+			setPosition(newPosition);
+			localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
+		};
 
   const handleAddDestination = () => {
     if (!newDestination.coordinates.lat || !newDestination.coordinates.lng) return;
