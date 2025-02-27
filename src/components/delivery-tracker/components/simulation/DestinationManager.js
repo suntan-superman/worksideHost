@@ -28,11 +28,19 @@ const DestinationManager = ({
   const { destinations, addDestination, removeDestination, setDestinations } = useDeliveryStore();
   
   const [position, setPosition] = useState(() => {
-    const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-    if (savedPosition) {
-      return JSON.parse(savedPosition);
+    try {
+      const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
+      if (savedPosition) {
+        const parsed = JSON.parse(savedPosition);
+        // Validate the parsed data
+        if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number') {
+          return parsed;
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to load dialog position:', error);
     }
-    // Position dialog in the center-top of the screen
+    // Fallback position
     return {
       x: Math.max(0, (window.innerWidth - 600) / 2),
       y: 100
@@ -54,7 +62,11 @@ const DestinationManager = ({
   const handleDragStop = (e, data) => {
     const newPosition = { x: data.x, y: data.y };
     setPosition(newPosition);
-    localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
+    try {
+      localStorage.setItem(DIALOG_POSITION_KEY, JSON.stringify(newPosition));
+    } catch (error) {
+      console.warn('Failed to save dialog position:', error);
+    }
   };
 
   const handleInputChange = (field) => (event) => {

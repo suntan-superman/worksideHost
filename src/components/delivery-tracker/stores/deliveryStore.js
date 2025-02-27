@@ -4,6 +4,7 @@ import { devtools } from "zustand/middleware"; // Remove persist temporarily
 import { DEFAULT_DIALOG_SETTINGS } from "../constants/dialogIds";
 import { calculateDistance } from "../utils/mapUtils";
 import useSimulationStateStore from './simulationStateStore';
+import { persist } from "zustand/middleware";
 
 // const DEFAULT_SPEED = 50; // Comment out if not used
 
@@ -127,7 +128,7 @@ const initialState = {
 // Remove totalVehicles if not used
 // Remove state if not used
 
-const useDeliveryStore = create(
+const useDeliveryStore = create(persist(
 	devtools((set, get) => ({
 		...initialState,
 
@@ -673,7 +674,34 @@ const useDeliveryStore = create(
 			return state.destinations.find((d) => d.id === vehicle.destinationId);
 		},
 	})),
-);
+	{
+		name: 'delivery-store',
+		getStorage: () => ({
+			getItem: (name) => {
+				try {
+					return localStorage.getItem(name);
+				} catch (err) {
+					console.warn('Failed to read from localStorage:', err);
+					return null;
+				}
+			},
+			setItem: (name, value) => {
+				try {
+					localStorage.setItem(name, value);
+				} catch (err) {
+					console.warn('Failed to write to localStorage:', err);
+				}
+			},
+			removeItem: (name) => {
+				try {
+					localStorage.removeItem(name);
+				} catch (err) {
+					console.warn('Failed to remove from localStorage:', err);
+				}
+			},
+		}),
+	}
+));
 
 export default useDeliveryStore;
 
