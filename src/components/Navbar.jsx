@@ -37,7 +37,7 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 	</TooltipComponent>
 );
 
-const Navbar = () => {
+const NavBar = () => {
 	const navigate = useNavigate();
 	const {
 		currentColor,
@@ -166,4 +166,4 @@ const Navbar = () => {
 	);
 };
 
-export default Navbar;
+export default NavBar;
