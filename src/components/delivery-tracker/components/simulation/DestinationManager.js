@@ -55,7 +55,11 @@ const DestinationManager = ({
   useEffect(() => {
     if (open) {
       const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-      setPosition(savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 });
+						if (savedPosition) {
+							setPosition(
+								savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 },
+							);
+						}
     }
   }, [open]);
 
