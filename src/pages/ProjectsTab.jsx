@@ -20,6 +20,10 @@ import {
 import "../index.css";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import ProjectEditTemplate from "../components/ProjectEditTemplate";
+import { UseStateContext } from "../contexts/ContextProvider";
+import { Box, Chip, IconButton } from "@mui/material";
+import FilterListIcon from '@mui/icons-material/FilterList';
+import ProjectFilterDialog from "../components/ProjectFilterDialog";
 
 let gridPageSize = 8;
 
@@ -37,8 +41,6 @@ import {
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 
-// let filteredProjects = null;
-
 const ProjectsTab = () => {
 	const [haveData, setHaveData] = useState(false);
 	const [insertFlag, setInsertFlag] = useState(false);
@@ -46,6 +48,12 @@ const ProjectsTab = () => {
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState(null);
 	const [projectData, setProjectData] = useState(null);
+	const { companyName } = UseStateContext();
+	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
+	const [selectedCompanies, setSelectedCompanies] = useState(() => {
+		const saved = localStorage.getItem('projectFilterSelections');
+		return saved ? JSON.parse(saved) : [companyName];
+	});
 
 	const queryClient = useQueryClient();
 
@@ -87,14 +95,23 @@ const ProjectsTab = () => {
 		refetchInterval: 10000,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: true,
-		staleTime: 1000 * 60 * 10, // 10 minutes
-		retry: 3,
 	});
 
 	useEffect(() => {
-		setProjectData(projData?.data);
-		setHaveData(true);
-	}, [projData]);
+		if (projData?.data) {
+			let filteredData = projData.data;
+			
+			// Apply company filters if any are selected
+			if (selectedCompanies.length > 0) {
+				filteredData = projData.data.filter(project => 
+					selectedCompanies.includes(project.customer)
+				);
+			}
+			
+			setProjectData(filteredData);
+			setHaveData(true);
+		}
+	}, [projData, selectedCompanies]);
 
 	// Define the mutation to delete the data
 	const deleteProjectMutation = useMutation({
@@ -239,6 +256,18 @@ const ProjectsTab = () => {
 		}
 	};
 
+	const handleFilterApply = (companies) => {
+		setSelectedCompanies(companies);
+		localStorage.setItem('projectFilterSelections', JSON.stringify(companies));
+		setFilterDialogOpen(false);
+	};
+
+	const handleFilterRemove = (company) => {
+		const newFilters = selectedCompanies.filter(c => c !== company);
+		setSelectedCompanies(newFilters);
+		localStorage.setItem('projectFilterSelections', JSON.stringify(newFilters));
+	};
+
 	if (isProjectsLoading) {
 		return (
 			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
@@ -250,7 +279,27 @@ const ProjectsTab = () => {
 	}
 
 	return (
-		<div className="flex-grow bg-white p-2 relative">
+		// <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+		<div className=" bg-white rounded-3xl">
+			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+				<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+					{selectedCompanies.map((company) => (
+						<Chip
+							key={company}
+							label={company}
+							onDelete={() => handleFilterRemove(company)}
+							sx={{ backgroundColor: 'green', color: 'white' }}
+						/>
+					))}
+				</Box>
+					<IconButton
+						onClick={() => setFilterDialogOpen(true)}
+						sx={{ color: "green", marginRight: "60px" }}
+					>
+					<FilterListIcon />
+				</IconButton>
+			</Box>
+
 			{!isProjectsLoading && haveData && (
 				<div className="div-container">
 					<GridComponent
@@ -403,6 +452,14 @@ const ProjectsTab = () => {
 					onCancel={() => setOpenUpdateModal(false)}
 				/>
 			)}
+
+			<ProjectFilterDialog
+				open={filterDialogOpen}
+				onClose={() => setFilterDialogOpen(false)}
+				onApply={handleFilterApply}
+				selectedCompanies={selectedCompanies}
+				allCompanies={projData?.data ? [...new Set(projData.data.map(project => project.customer))] : []}
+			/>
 		</div>
 	);
 };
