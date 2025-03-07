@@ -11,4 +11,4 @@ export { default as UserProfile } from "./UserProfile";
 export { default as Header } from './Header';
 export { default as LoginDialog } from './LoginDialog';
 export { default as SignupDialog } from './SignupDialog';
-export { default as Navbar } from "./Navbar";
+export { default as NavBar } from "./NavBar";

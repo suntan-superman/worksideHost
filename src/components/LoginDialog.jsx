@@ -59,7 +59,8 @@ const LoginDialog = () => {
 		try {
 			const response = await fetch(fetchString);
 			const jsonData = await response.json().then((data) => {
-				switch (data[0].accesslevel) {
+
+				switch (data.accesslevel) {
 					case "GUEST":
 						accessLevel = 0;
 						break;
@@ -97,37 +98,43 @@ const LoginDialog = () => {
 		try {
 			const response = await fetch(fetchString);
 			const jsonData = await response.json();
+
 			if (jsonData.status === true) {
+				// First check if user is validated
 				const validationFlag = await isUserValidated(userName);
-				if (validationFlag === true) {
-					await getUserAccessLevel(userName).then((data) => {
-						setUserAccessLevel(data);
-						localStorage.setItem("accessLevel", data);
-						setIsLoggedIn(true);
-						setUserLoggedIn(true);
-						localStorage.setItem("logInFlag", "true");
-						localStorage.setItem("token", jsonData.user.userToken);
-						setGlobalUserName(JSON.stringify(jsonData.user.user));
-						localStorage.setItem(
-							"userName",
-							JSON.stringify(jsonData.user.user),
-						);
-						localStorage.setItem(
-							"userID",
-							JSON.stringify(jsonData.user.userId),
-						);
-						const email = JSON.stringify(jsonData.user.email);
-						setUserEmail(email);
-						onSaveUserName(userName, email);
-						setCompanyName(jsonData.user.company);
-						localStorage.setItem(
-							"companyName",
-							JSON.stringify(jsonData.user.company),
-						);
-						// console.log("Company: ", jsonData.user.company);
-					});
-					window.location = "/main/dashboard";
+				
+				if (!validationFlag) {
+					await showErrorDialog("User is not validated. Please check your email for validation link.");
+					return;
 				}
+
+				// Only proceed with login if user is validated
+				await getUserAccessLevel(userName).then((data) => {
+					setUserAccessLevel(data);
+					localStorage.setItem("accessLevel", data);
+					setIsLoggedIn(true);
+					setUserLoggedIn(true);
+					localStorage.setItem("logInFlag", "true");
+					localStorage.setItem("token", jsonData.user.userToken);
+					setGlobalUserName(JSON.stringify(jsonData.user.user));
+					localStorage.setItem(
+						"userName",
+						JSON.stringify(jsonData.user.user),
+					);
+					localStorage.setItem(
+						"userID",
+						JSON.stringify(jsonData.user.userId),
+					);
+					const email = JSON.stringify(jsonData.user.email);
+					setUserEmail(email);
+					onSaveUserName(userName, email);
+					setCompanyName(jsonData.user.company);
+					localStorage.setItem(
+						"companyName",
+						JSON.stringify(jsonData.user.company),
+					);
+				});
+				window.location = "/main/dashboard";
 			} else {
 				await showErrorDialog("Invalid Username or Password");
 			}

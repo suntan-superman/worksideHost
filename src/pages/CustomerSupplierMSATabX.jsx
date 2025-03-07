@@ -37,6 +37,7 @@ const CustomerSupplierMSATabX = () => {
 
 	useEffect(() => {
 		// Set the current customer name and id
+		// TODO Need to get the current customer id and name from the context
 		setCurrentCustomerId("65423d5c240388c1594e7b76");
 		setCompanyID("65423d5c240388c1594e7b76");
 		setCompanyName("CRC");

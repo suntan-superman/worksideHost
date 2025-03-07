@@ -578,56 +578,21 @@ const GetSupplierInfoFromID = async (id) => {
 };
 
 /**
- * Fetches supplier ID from supplier name.
- * @param {string} name - The supplier name.
- * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and supplier ID.
- */
-const GetSupplierIDFromName = async (name) => {
-	if (!name || typeof name !== "string") {
-		console.error("Invalid Name provided to GetSupplierIDFromName.");
-		return [{ status: 400, data: [] }];
-	}
-	try {
-		const response = await fetch(`${apiURL}/api/firm/getSupplierIdByName/${name}`);
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch Supplier ID. Status: ${response.status}`,
-			);
-		}
-
-		const json = await response.json();
-		return [{ status: response.status, data: json }];
-	} catch (error) {
-		console.error("Error fetching supplier info:", error.message);
-		return [{ status: 500, data: [] }];
-	}
-};
-
-/**
  * Fetches requests by customer.
  * @param {string} customer - The customer name.
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and request data.
  */
 const GetRequestsByCustomer = async (customer) => {
-    console.log("API Call - Customer:", customer);
-    const cleanCustomer = cleanUpStr(customer);
-    console.log("API Call - Clean Customer:", cleanCustomer);
-    
-    if (!cleanCustomer || typeof cleanCustomer !== "string") {
+    if (!customer || typeof customer !== "string") {
         console.error("Invalid customer name provided.");
         return { status: 400, data: [] };
     }
-    
     try {
-        const response = await fetch(`${apiURL}/api/request/bycustomername/${cleanCustomer}`);
-        console.log("API Response Status:", response.status);
-        
+        const response = await fetch(`${apiURL}/api/request/bycustomer/${customer}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch customer requests. Status: ${response.status}`);
         }
-        
         const json = await response.json();
-        console.log("API Response Data:", json);
         return { status: response.status, data: json };
     } catch (error) {
         console.error("Error fetching customer requests:", error.message);
@@ -1093,17 +1058,22 @@ const GetProjectsByStatus = async (status, customer) => {
  * @param {string} customer - Customer name to filter projects.
  * @returns {Promise<{status: number | null, data: object[] | null}>} Response status and filtered project data.
  */
-const GetAllProjectsByCustomer = async (customerName) => {
-    // const apiURL = "https://keen-squid-lately.ngrok-free.app";
+const GetAllProjectsByCustomer = async (customer) => {
     try {
-        const response = await fetch(`${apiURL}/api/project/customer/${customerName}`);
+        const response = await fetch(`${apiURL}/api/project`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch projects. Status: ${response.status}`);
         }
 
-        const projects = await response.json();
-        
+        const json = await response.json();
+
+        if (!Array.isArray(json)) {
+            throw new Error("Unexpected response format. Expected an array.");
+        }
+
+        const projects = json.filter((project) => project.customer === customer);
+
         return { status: response.status, data: projects };
     } catch (error) {
         console.error("Error in GetAllProjectsByCustomer:", error.message);
@@ -1241,251 +1211,8 @@ const GetSupplierProductsByProduct = async (category, product) => {
     }
 };
 
-/**
- * Creates a new request template.
- * @param {Object} templateData - The template data to create
- * @param {string} templateData.name - Template name (required, unique)
- * @param {string} templateData.description - Template description
- * @param {string} templateData.category - Request category (required)
- * @param {string} templateData.product - Product name (required)
- * @param {string} templateData.comment - Additional comments
- * @param {number} templateData.quantity - Request quantity (min: 1)
- * @param {('MSA'|'OPEN'|'SSR')} templateData.preferredVendorType - Vendor type
- * @param {string} templateData.preferredVendor - Preferred vendor name
- * @param {string} templateData.createdBy - User ID who created the template
- * @returns {Promise<{status: number, data: Object|null, error: string|null}>}
- */
-const createRequestTemplate = async (templateData) => {
-	try {
-		// Validate required fields
-		const requiredFields = [
-			"name",
-			"category",
-			"product",
-			"preferredVendorType",
-			"createdBy",
-		];
-		const missingFields = requiredFields.filter(
-			(field) => !templateData[field],
-		);
-
-		if (missingFields.length > 0) {
-			throw new Error(`Missing required fields: ${missingFields.join(", ")}`);
-		}
-
-		// Validate vendor type
-		const validVendorTypes = ["MSA", "OPEN", "SSR"];
-		if (!validVendorTypes.includes(templateData.preferredVendorType)) {
-			throw new Error("Invalid preferredVendorType. Must be MSA, OPEN, or SSR");
-		}
-
-		// Validate quantity
-		if (
-			templateData.quantity &&
-			(templateData.quantity < 1 || !Number.isInteger(templateData.quantity))
-		) {
-			throw new Error("Quantity must be a positive integer");
-		}
-
-		// Validate SSR vendor
-		if (
-			templateData.preferredVendorType === "SSR" &&
-			!templateData.preferredVendor
-		) {
-			throw new Error("Preferred vendor is required for SSR type");
-		}
-
-		const response = await axios.post(`${apiURL}/api/requesttemplate`, templateData);
-		return {
-			status: response.status,
-			data: response.data,
-			error: null,
-		};
-	} catch (error) {
-		console.error("Error creating template:", error.message);
-		return {
-			status: error.response?.status || 500,
-			data: null,
-			error: error.message,
-		};
-	}
-};
-
-/**
- * Fetches all templates for a specific user.
- * @param {string} userId - The ID of the user whose templates to fetch
- * @returns {Promise<{status: number, data: Array<Object>|null, error: string|null}>}
- */
-const getRequestTemplates = async (userId) => {
-	try {
-		if (!userId || typeof userId !== "string") {
-			throw new Error("Valid userId is required");
-		}
-
-		const response = await axios.get(`${apiURL}/api/requesttemplate`, {
-			params: { createdBy: userId },
-		});
-
-		return {
-			status: response.status,
-			data: response.data.data,
-			error: null,
-		};
-	} catch (error) {
-		console.error("Error fetching templates:", error.message);
-		return {
-			status: error.response?.status || 500,
-			data: null,
-			error: error.message,
-		};
-	}
-};
-
-/**
- * Updates an existing request template.
- * @param {string} templateId - The ID of the template to update
- * @param {Object} updateData - The template data to update
- * @returns {Promise<{status: number, data: Object|null, error: string|null}>}
- */
-const updateRequestTemplate = async (templateId, updateData) => {
-	try {
-		if (!templateId || typeof templateId !== "string") {
-			throw new Error("Valid templateId is required");
-		}
-
-		// Validate vendor type if it's being updated
-		if (updateData.preferredVendorType) {
-			const validVendorTypes = ["MSA", "OPEN", "SSR"];
-			if (!validVendorTypes.includes(updateData.preferredVendorType)) {
-				throw new Error(
-					"Invalid preferredVendorType. Must be MSA, OPEN, or SSR",
-				);
-			}
-
-			// Validate SSR vendor
-			if (
-				updateData.preferredVendorType === "SSR" &&
-				!updateData.preferredVendor
-			) {
-				throw new Error("Preferred vendor is required for SSR type");
-			}
-		}
-
-		// Validate quantity if it's being updated
-		if (updateData.quantity !== undefined) {
-			if (updateData.quantity < 1 || !Number.isInteger(updateData.quantity)) {
-				throw new Error("Quantity must be a positive integer");
-			}
-		}
-
-		const response = await axios.put(
-			`${apiURL}/api/requesttemplate/${templateId}`,
-			updateData,
-		);
-		return {
-			status: response.status,
-			data: response.data.data,
-			error: null,
-		};
-	} catch (error) {
-		console.error("Error updating template:", error.message);
-		return {
-			status: error.response?.status || 500,
-			data: null,
-			error: error.message,
-		};
-	}
-};
-
-/**
- * Deletes a request template.
- * @param {string} templateId - The ID of the template to delete
- * @returns {Promise<{status: number, error: string|null}>}
- */
-const deleteRequestTemplate = async (templateId) => {
-	try {
-		if (!templateId || typeof templateId !== "string") {
-			throw new Error("Valid templateId is required");
-		}
-
-		const response = await axios.delete(
-			`${apiURL}/api/requesttemplate/${templateId}`,
-		);
-		return {
-			status: response.status,
-			error: null,
-		};
-	} catch (error) {
-		console.error("Error deleting template:", error.message);
-		return {
-			status: error.response?.status || 500,
-			error: error.message,
-		};
-	}
-};
-
-/**
- * Retrieves all supplier group data.
- *
- * @returns {Promise<{ status: number, data: object | null }>} - A promise resolving to status and supplier group data.
- */
-const GetAllSupplierGroupData = async () => {
-	try {
-		const response = await fetch(`${apiURL}/api/suppliergroup`);
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch supplier group data with status: ${response.status}`,
-			);
-		}
-
-		const json = await response.json();
-		return { status: response.status, data: json };
-	} catch (error) {
-		console.error("Error fetching supplier group data:", error.message);
-		return { status: 500, data: null };
-	}
-};
-
-const UpdateRequestBidListUsers = async (reqID, bidListUsers) => {
-    const strAPI = `${apiURL}/api/request/${reqID}/bid-list-users`;
-    const body = bidListUsers;
-    try {
-        const response = await axios.patch(strAPI, body);
-        if (response.status === 200) {
-            return { status: 200, data: response.data };
-        }
-        return { status: 400 };
-    } catch (error) {
-        return { status: 500 };
-    }
-};
-
-const UpdateRequestBidListCompanies = async (reqID, bidList) => {
-    const strAPI = `${apiURL}/api/request/${reqID}/bid-list-companies`;
-    const body = bidList;
-    try {
-        const response = await axios.patch(strAPI, body);
-        if (response.status === 200) {
-            return { status: 200, data: response.data };
-        }
-        return { status: 400 };
-    } catch (error) {
-        return { status: 500 };
-    }
-};
-
-
-const GetRequestBidListCompanies = async (bidListUsers) => {
-    // const apiURL = "https://keen-squid-lately.ngrok-free.app";
-    const strAPI = `${apiURL}/api/contact/companies-by-emails`;
-    const body = bidListUsers;
-    const response = await axios.post(strAPI, body);
-    return { status: response.status, data: response.data };
-};
-
 // Export all functions
 export {
-    fetchWithHandling,
     GetAllFirms,
     GetAllFirmsForSelection,
     GetAllSuppliers,
@@ -1516,7 +1243,6 @@ export {
     SetAwardedRequestBidStatus,
     GetDeliveryAssociates,
     GetSupplierInfoFromID,
-    GetSupplierIDFromName,
     GetRequestsByCustomer,
     GetRequestData,
     GetRequestOptions,
@@ -1547,12 +1273,4 @@ export {
     GetRigsByRigCompany,
     DeleteRig,
     GetSupplierProductsByProduct,
-    createRequestTemplate,
-    getRequestTemplates,
-    updateRequestTemplate,
-    deleteRequestTemplate,
-    GetAllSupplierGroupData,
-    UpdateRequestBidListUsers,
-    UpdateRequestBidListCompanies,
-    GetRequestBidListCompanies,
-};
+}; 
