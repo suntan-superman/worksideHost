@@ -19,10 +19,10 @@ import {
 	LoginDialog,
 	SignupDialog,
 	Sidebar,
-	NavBar,
 	ThemeSettings,
 	Footer,
 } from "./components";
+import NavBar from "./components/Navbar";
 import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
 
