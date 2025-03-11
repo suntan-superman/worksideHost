@@ -70,22 +70,18 @@ const Requests = () => {
 		return saved ? JSON.parse(saved) : [];
 	});
 
-	// Add debugging for clientName
-	const [debugClientName, setDebugClientName] = useState("");
-
-	// Modify the useQuery to properly handle clientName
+	// Move useQuery up here
 	const {
 		data: reqData,
 		isError: reqError,
 		isLoading: reqLoading,
 		isSuccess: isReqSuccess,
 	} = useQuery({
-		queryKey: ["requests", clientName], // Add clientName to query key
+		queryKey: ["requests"],
 		queryFn: async () => {
-			const res = await GetRequestsByCustomer(clientName); // Remove the object wrapper
+			const res = await GetRequestsByCustomer(clientName);
 			return res;
 		},
-		enabled: !!clientName, // Only run query when clientName is available
 		refetchInterval: 1000 * 10,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: true,
@@ -103,107 +99,79 @@ const Requests = () => {
 
 	const accessLevel = GetAccessLevel();
 
-	// Modify the initial setup effect
+	// Initial setup effect
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 
-		const storedCompanyName = localStorage.getItem("companyName");
-		
-		if (storedCompanyName) {
-			const parsedCompanyName = JSON.parse(storedCompanyName);
-			clientName = parsedCompanyName;
-			setCompanyName(parsedCompanyName);
-			setDebugClientName(parsedCompanyName);
-		}
+		const companyName = localStorage.getItem("companyName");
+		clientName = companyName;
+		setCompanyName(companyName);
 
 		// Load and apply filters after grid is initialized
-		const savedFilters = localStorage.getItem('requestFilterSelections');
+		const savedFilters = localStorage.getItem("requestFilterSelections");
 		if (savedFilters) {
 			const filters = JSON.parse(savedFilters);
 			setActiveFilters(filters);
 		}
 	}, []);
 
-	// Modify the data setting effect
-	useEffect(() => {
-		if (reqData?.data) {
-			// Ensure dates are properly formatted for the grid
-			const formattedData = reqData.data.map(request => ({
-				...request,
-				creationdate: new Date(request.creationdate),
-				datetimerequested: new Date(request.datetimerequested),
-				statusdate: new Date(request.statusdate)
-			}));
-			setRequestList(formattedData);
-		}
-	}, [reqData]);
-
 	// Modify the grid load handler
 	const onRequestLoad = () => {
 		const gridElement = document.getElementById("requestGridElement");
-		if (gridElement?.ej2_instances?.[0]) {
+		if (gridElement?.ej2_instances[0]) {
 			const gridInstance = gridElement.ej2_instances[0];
 			gridInstance.pageSettings.pageSize = gridPageSize;
-		} else {
-			console.warn("Grid instance not found");
 		}
 	};
 
 	// Modify the filter application effect
 	useEffect(() => {
-		// Add a small delay to ensure grid is mounted
-		const timer = setTimeout(() => {
-			if (!reqData?.data) {
-				return;
-			}
+		if (!requestGridRef.current || !reqData?.data) {
+			console.log("Grid or data not ready");
+			return;
+		}
 
-			const gridElement = document.getElementById("requestGridElement");
-			if (!gridElement?.ej2_instances?.[0]) {
-				return;
-			}
+		try {
+			const grid = requestGridRef.current;
 
-			try {
-				const grid = gridElement.ej2_instances[0];
-				
-				// Clear existing filters first
-				grid.clearFiltering();
-				
-				if (activeFilters.length > 0) {
-					// Create filter object
-					const filterObject = {
-						columns: [{
-							field: 'status',
+			// Clear existing filters first
+			grid.clearFiltering();
+
+			if (activeFilters.length > 0) {
+				// Create filter object
+				const filterObject = {
+					columns: [
+						{
+							field: "status",
 							matchCase: false,
-							operator: 'equal',
-							predicate: 'or',
-							value: activeFilters[0]  // Set initial value
-						}]
-					};
+							operator: "equal",
+							predicate: "or",
+							value: activeFilters[0], // Set initial value
+						},
+					],
+				};
 
-					// Add additional values for OR condition
-					if (activeFilters.length > 1) {
-						for (const status of activeFilters.slice(1)) {
-							filterObject.columns.push({
-								field: 'status',
-								matchCase: false,
-								operator: 'equal',
-								predicate: 'or',
-								value: status
-							});
-						}
+				// Add additional values for OR condition
+				if (activeFilters.length > 1) {
+					for (const status of activeFilters.slice(1)) {
+						filterObject.columns.push({
+							field: "status",
+							matchCase: false,
+							operator: "equal",
+							predicate: "or",
+							value: status,
+						});
 					}
-
-					// Apply filters
-					grid.filterSettings = filterObject;
-					grid.dataBind();
 				}
-			} catch (error) {
-				console.error('Error applying filters:', error);
-			}
-		}, 100); // Small delay to ensure grid is ready
 
-		return () => clearTimeout(timer);
+				// Apply filters
+				grid.filterSettings = filterObject;
+				grid.dataBind();
+			}
+		} catch (error) {
+			console.error("Error applying filters:", error);
+		}
 	}, [activeFilters, reqData]);
 
 	// Query client effect
@@ -231,6 +199,21 @@ const Requests = () => {
 		duration: 3000,
 		delay: 1000,
 	};
+
+	useEffect(() => {
+		if (reqData) {
+			// Now filter the data
+			const data = reqData?.data;
+			console.log("Request Data " + JSON.stringify(data, null, 2));
+			if (data) {
+				setRequestList(data);
+			}
+		}
+	}, [reqData]);
+
+	if (reqError) {
+		console.log(`Error: ${reqError}`);
+	}
 
 	const FilterOptions = {
 		type: "Menu",
@@ -431,13 +414,14 @@ const rowDataBound = (args) => {
 		setActiveFilters(newFilters);
 	};
 
-	// Add loading state handling
 	if (reqLoading) {
-		return <div>Loading requests...</div>;
-	}
-
-	if (reqError) {
-		return <div>Error loading requests</div>;
+		return (
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
 	}
 
 	return (
@@ -481,149 +465,190 @@ const rowDataBound = (args) => {
 						<FilterListIcon />
 					</IconButton>
 				</Box>
-				{requestList && requestList.length > 0 ? (
-					<GridComponent
-						id="requestGridElement"
-						dataSource={requestList}
-						allowSelection={true}
-						allowFiltering={true}
-						allowPaging={true}
-						allowResizing={true}
-						allowExcelExport={true}
-						frozenColumns={2}
-						actionBegin={actionBegin}
-						actionComplete={actionComplete}
-						rowDataBound={rowDataBound}
-						filterSettings={{
-							type: "Menu",
-							mode: "Immediate",
-						}}
-						selectionSettings={settings}
-						toolbar={toolbarOptions}
-						toolbarClick={toolbarClick}
-						rowSelected={rowSelectedRequest}
-						recordClick={recordClick}
-						editSettings={editOptions}
-						enablePersistence={true}
-						load={onRequestLoad}
-						width="95%"
-						height="100%"
-						ref={requestGridRef}
-					>
-						<ColumnsDirective>
-							<ColumnDirective
-								field="_id"
-								headerText="Id"
-								textAlign="Left"
-								width="50"
-								isPrimaryKey={true}
-								visible={false}
-							/>
-							<ColumnDirective
-								field="requestname"
-								headerText="Request"
-								textAlign="Left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="customername"
-								headerText="Customer"
-								textAlign="Left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="projectname"
-								headerText="Project"
-								textAlign="Left"
-								width="200"
-							/>
-							<ColumnDirective
-								field="status"
-								headerText="Status"
-								textAlign="Left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="datetimerequested"
-								headerText="Date Requested"
-								type="date"
-								format="MM/dd/yyyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="quantity"
-								headerText="Quantity"
-								textAlign="Right"
-								width="100"
-							/>
-							<ColumnDirective
-								field="vendortype"
-								headerText="Vendor Type"
-								editType="dropdownedit"
-								textAlign="Left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="comments"
-								headerText="Comments"
-								textAlign="left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="statusdate"
-								headerText="Status Date"
-								type="date"
-								editType="datepickeredit"
-								format="MM/dd/yyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="creationdate"
-								headerText="Date Created"
-								type="date"
-								editType="datepickeredit"
-								format="MM/dd/yyy"
-								textAlign="Right"
-								width="140"
-							/>
-							<ColumnDirective
-								field="customercontact"
-								headerText="Cust Contact"
-								textAlign="Left"
-								width="100"
-							/>
-							<ColumnDirective
-								field="rigcompanycontact"
-								headerText="Rig Contact"
-								textAlign="Left"
-								width="100"
-							/>
-						</ColumnsDirective>
-						<Inject
-							services={[
-								Selection,
-								Edit,
-								Filter,
-								Page,
-								Toolbar,
-								Resize,
-								Freeze,
-								ExcelExport,
-							]}
+				<GridComponent
+					id="requestGridElement"
+					dataSource={reqData?.data}
+					allowSelection
+					allowFiltering
+					allowPaging
+					allowResizing
+					allowExcelExport
+					frozenColumns={2}
+					actionBegin={actionBegin}
+					actionComplete={actionComplete}
+					rowDataBound={rowDataBound}
+					filterSettings={{
+						type: "Menu",
+						mode: "Immediate",
+					}}
+					selectionSettings={settings}
+					toolbar={toolbarOptions}
+					toolbarClick={toolbarClick}
+					rowSelected={rowSelectedRequest}
+					recordClick={recordClick}
+					editSettings={editOptions}
+					enablePersistence
+					load={onRequestLoad}
+					width="95%"
+					ref={requestGridRef}
+				>
+					<ColumnsDirective>
+						<ColumnDirective
+							field="_id"
+							headerText="Id"
+							textAlign="Left"
+							width="50"
+							isPrimaryKey="true"
+							allowEditing="false"
+							visible={false}
 						/>
-					</GridComponent>
-				) : (
-					<div>No requests found</div>
-				)}
+						<ColumnDirective
+							field="request_id"
+							headerText="Id"
+							textAlign="Left"
+							width="50"
+							allowEditing="false"
+							visible={false}
+						/>
+						<ColumnDirective
+							headerText="Details"
+							textAlign="Center"
+							width="80"
+							template={gridTemplate}
+							allowEditing="false"
+						/>
+						<ColumnDirective
+							field="requestname"
+							headerText="Request"
+							textAlign="Left"
+							width="100"
+						/>
+						<ColumnDirective
+							field="customername"
+							headerText="Customer"
+							editType="dropdownedit"
+							textAlign="Left"
+							width="100"
+							edit={companySelections}
+						/>
+						{/* <ColumnDirective
+							field="customercontact"
+							headerText="Cust Contact"
+							textAlign="Left"
+							width="100"
+						/> */}
+						<ColumnDirective
+							field="projectname"
+							headerText="Project"
+							textAlign="Left"
+							width="200"
+						/>
+						<ColumnDirective
+							field="rigcompany"
+							headerText="Rig Company"
+							textAlign="left"
+							width="50"
+						/>
+						{/* <ColumnDirective
+							field="rigcompanycontact"
+							headerText="Rig Contact"
+							textAlign="left"
+							width="50"
+						/> */}
+						{/* <ColumnDirective
+							field="creationdate"
+							headerText="Date Created"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/> */}
+						<ColumnDirective
+							field="quantity"
+							headerText="Quantity"
+							textAlign="Right"
+							width="100"
+						/>
+						<ColumnDirective
+							field="vendortype"
+							headerText="Vendor Type"
+							editType="dropdownedit"
+							textAlign="Left"
+							width="100"
+						/>
+						<ColumnDirective
+							field="datetimerequested"
+							headerText="Date Requested"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyyy-hh:mm"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="comments"
+							headerText="Comments"
+							textAlign="left"
+							width="100"
+						/>
+						<ColumnDirective
+							field="status"
+							headerText="Status"
+							editType="dropdownedit"
+							width="100"
+						/>
+						<ColumnDirective
+							field="statusdate"
+							headerText="Status Date"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="creationdate"
+							headerText="Date Created"
+							type="date"
+							editType="datepickeredit"
+							format="MM/dd/yyy"
+							textAlign="Right"
+							width="140"
+						/>
+						<ColumnDirective
+							field="customercontact"
+							headerText="Cust Contact"
+							textAlign="Left"
+							width="100"
+						/>
+						<ColumnDirective
+							field="rigcompanycontact"
+							headerText="Rig Contact"
+							textAlign="Left"
+							width="100"
+						/>
+					</ColumnsDirective>
+					<Inject
+						services={[
+							Selection,
+							Edit,
+							Filter,
+							Page,
+							Toolbar,
+							Resize,
+							Freeze,
+							ExcelExport,
+						]}
+					/>
+				</GridComponent>
 			</div>
 			<div>
 				{showDialog && (
 					<RequestInfoModal
 						recordID={selectedRecord}
-						open={dialogOpen}
-						onClose={dialogClose}
+						open={showDialog}
+						onClose={() => setShowDialog(false)}
 					/>
 				)}
 				{openUpdateModal && (

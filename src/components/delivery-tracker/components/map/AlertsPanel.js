@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  Switch,
-  FormControlLabel,
-  Paper
-} from '@mui/material';
+	Box,
+	List,
+	ListItem,
+	ListItemText,
+	Switch,
+	FormControlLabel,
+} from "@mui/material";
 import useDeliveryStore from '../../stores/deliveryStore';
 import DraggableDialog from '../common/DraggableDialog';
 

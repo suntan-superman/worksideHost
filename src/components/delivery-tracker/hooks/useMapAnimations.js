@@ -1,15 +1,6 @@
 /* eslint-disable */
 import { useCallback, useRef, useEffect, useState } from 'react';
-import useDeliveryStore from '../stores/deliveryStore';
-// eslint-disable-next-line no-unused-vars
-import { calculateSpeed, calculateDistance, interpolatePosition } from '../utils/mapUtils';
-// eslint-disable-next-line no-unused-vars
-import useSimulationStateStore from '../stores/simulationStateStore';
-
-// eslint-disable-next-line no-unused-vars
-const DESTINATION_THRESHOLD_FEET = 300;
-// eslint-disable-next-line no-unused-vars
-const FEET_PER_MILE = 5280;
+import useDeliveryStore from "../stores/deliveryStore";
 
 const easeInOutCubic = (t) => {
     return t < 0.5 

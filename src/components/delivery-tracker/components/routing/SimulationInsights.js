@@ -1,20 +1,11 @@
 import React from 'react';
+import { Paper, Typography, Box, Grid, LinearProgress } from "@mui/material";
 import {
-  Paper,
-  Typography,
-  Box,
-  Grid,
-  LinearProgress,
-  Tooltip,
-  Chip,
-} from '@mui/material';
-import {
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  Schedule as TimeIcon,
-  Route as RouteIcon,
-  Cloud as WeatherIcon,
-} from '@mui/icons-material';
+	TrendingUp as TrendingUpIcon,
+	TrendingDown as TrendingDownIcon,
+	Schedule as TimeIcon,
+	Cloud as WeatherIcon,
+} from "@mui/icons-material";
 
 const InsightCard = ({ title, value, trend, description, icon, color }) => (
   <Box sx={{ p: 2, border: 1, borderColor: 'divider', borderRadius: 1 }}>

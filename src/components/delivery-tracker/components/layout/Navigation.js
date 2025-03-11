@@ -14,8 +14,6 @@ import {
 	ListItemText,
 	Divider,
 	Drawer,
-	List,
-	ListItem,
 } from "@mui/material";
 import {
 	Menu as MenuIcon,
@@ -30,8 +28,7 @@ import SimulationSetupDialog from "../simulation/SimulationSetupDialog";
 import MapSettingsDialog from "../settings/MapSettingsDialog";
 import { useMapSettings } from "../../hooks/useMapSettings";
 import useMapStore from "../../stores/mapStore";
-import DistributionCenterDialog from '../settings/DistributionCenterDialog';
-import { useLocation } from "react-router-dom";
+import DistributionCenterDialog from "../settings/DistributionCenterDialog";
 
 const Navigation = ({ onError, simulationStatus }) => {
 	const mapInstance = useMapStore((state) => state.mapInstance);
@@ -43,12 +40,6 @@ const Navigation = ({ onError, simulationStatus }) => {
 	const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 	const { setSimulationRunning } = useDeliveryStore();
 	const { toggleMapType } = useMapSettings();
-	const { isSimulationRunning: useDeliveryStoreIsSimulationRunning } = useDeliveryStore();
-	const location = useLocation();
-
-	const handleMenuClick = (event) => {
-		setAnchorEl(event.currentTarget);
-	};
 
 	const handleClose = () => {
 		setAnchorEl(null);

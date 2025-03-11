@@ -10,10 +10,9 @@ import React, {
 import {
 	GoogleMap,
 	useLoadScript,
-	Marker,
 	MarkerF,
 	InfoWindow,
-	InfoWindowF
+	InfoWindowF,
 } from "@react-google-maps/api";
 import { Box } from "@mui/material";
 import useDeliveryStore from "../../stores/deliveryStore";
@@ -46,25 +45,6 @@ const defaultMapOptions = {
 	streetViewControl: false,
 	rotateControl: false,
 	fullscreenControl: true,
-};
-
-// Add this constant at the top of the file
-const DESTINATION_ICON_PATH = "M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z";
-
-// Update the origin marker to use a custom SVG path too
-const ORIGIN_ICON_PATH = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z";
-
-// Add this debug function at the top of the component
-const logDestinationData = (destination) => {
-	console.log('Destination marker debug:', {
-		id: destination.id,
-		hasCoordinates: Boolean(destination?.coordinates),
-		lat: destination?.coordinates?.lat,
-		lng: destination?.coordinates?.lng,
-		parsedLat: Number(destination?.coordinates?.lat),
-		parsedLng: Number(destination?.coordinates?.lng),
-		rawData: destination
-	});
 };
 
 // Update the icon constants at the top
@@ -109,9 +89,6 @@ const DeliveryMap = forwardRef(({
 
 	// Add animation hook
 	const { startAnimation, cancelAllAnimations } = useMapAnimations();
-
-	// Add state for tracking active animations
-	const [activeAnimations, setActiveAnimations] = useState(new Map());
 
 	// Add animation cleanup effect
 	useEffect(() => {

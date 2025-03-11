@@ -5,15 +5,6 @@ import {
   UserLogin,
 } from './worksideAPI';
 
-const API_URL = process.env.REACT_APP_API_URL;
-
-// Mock data for testing
-const mockDeliveryLocation = {
-  latitude: 37.7749,
-  longitude: -122.4194,
-  timestamp: new Date().toISOString(),
-};
-
 export const api = {
   login: async (username, password) => {
     try {

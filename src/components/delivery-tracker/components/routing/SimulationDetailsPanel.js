@@ -6,20 +6,11 @@ import {
 	Grid,
 	LinearProgress,
 	Chip,
-	List,
-	ListItem,
-	ListItemIcon,
-	ListItemText,
 	Divider,
 } from "@mui/material";
 import {
 	Timeline as TimelineIcon,
 	TrendingUp,
-	TrendingDown,
-	Warning as WarningIcon,
-	CheckCircle as CheckIcon,
-	Schedule as TimeIcon,
-	Route as RouteIcon,
 	Speed as SpeedIcon,
 	LocalShipping as TruckIcon,
 } from "@mui/icons-material";
@@ -28,25 +19,7 @@ const SimulationDetailsPanel = ({ results }) => {
 	if (!results) return null;
 
 	const { metrics, analysis, segments } = results;
-	const { summary, recommendations, riskAnalysis } = analysis;
-
-	const formatDuration = (seconds) => {
-		const hours = Math.floor(seconds / 3600);
-		const minutes = Math.floor((seconds % 3600) / 60);
-		return `${hours}h ${minutes}m`;
-	};
-
-	const getConfidenceColor = (confidence) => {
-		switch (confidence) {
-			case "high":
-				return "success";
-			case "medium":
-				return "warning";
-			default:
-				return "error";
-		}
-	};
-
+	
 	const formatMetric = (value, unit = "") => {
 		return `${typeof value === "number" ? value.toFixed(1) : value}${unit}`;
 	};

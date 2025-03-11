@@ -28,8 +28,7 @@ import { useMapPerformance } from "../../hooks/useMapPerformance";
 const PerformanceOptimizationPanel = () => {
 	const [expanded, setExpanded] = useState(true);
 	const { vehicles, settings } = useDeliveryStore();
-	const { fps, memoryUsage, renderTime, optimizationSuggestions } =
-		useMapPerformance();
+	const { fps, memoryUsage, optimizationSuggestions } = useMapPerformance();
 
 	const getPerformanceLevel = (value, thresholds) => {
 		const { warning, critical } = thresholds;

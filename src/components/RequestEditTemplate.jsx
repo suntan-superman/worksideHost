@@ -47,8 +47,7 @@ import { showErrorDialog } from "../utils/useSweetAlert";
 import { requestStatusOptions } from "../data/worksideOptions";
 
 const RequestEditTemplate = (props) => {
-	const [data, setData] = useState({ ...props });
-
+	const data = props.rowData || {};
 	const [customerChangeFlag, setCustomerChangeFlag] = useState(false);
 
 	// Handle input changes
@@ -80,6 +79,7 @@ const RequestEditTemplate = (props) => {
 	const [msaVendorOptions, setMSAVendorOptions] = useState([]);
 	const [allCategories, setAllCategories] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
+	const [products, setProducts] = useState([]);
 	
 	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
 
@@ -174,10 +174,27 @@ const RequestEditTemplate = (props) => {
 			FilterProducts(data.requestcategory);
 	}, [productsData]);
 
-	const FilterProducts = (selectedItem) => {
-		const products = productsData?.data?.filter((p) => p.categoryname === selectedItem);
-		const productList = [...new Set(products.map((p) => p.productname))];
-		setFilteredProducts(productList);
+	const FilterProducts = async () => {
+		try {
+			if (!data || !data.requestcategory) {
+				setProducts([]);
+				return;
+			}
+
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/product/category/${data.requestcategory}`,
+			);
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const jsonData = await response.json();
+			setProducts(jsonData || []); // Ensure we always set an array
+		} catch (error) {
+			console.error("Error filtering products:", error);
+			setProducts([]); // Set empty array on error
+		}
 	};
 
 	const filterContactsByFirm = (contacts, firm) => {
@@ -254,7 +271,7 @@ const RequestEditTemplate = (props) => {
 		} else {
 			setReadOnlyFlag(true);
 			GetProducts();
-			FilterProducts(data.requestcategory);
+			FilterProducts();
 		}
 	}, [data.isAdd]);
 

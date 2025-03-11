@@ -3,7 +3,6 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware"; // Remove persist temporarily
 import { DEFAULT_DIALOG_SETTINGS } from "../constants/dialogIds";
 import { calculateDistance } from "../utils/mapUtils";
-import useSimulationStateStore from './simulationStateStore';
 import { persist } from "zustand/middleware";
 
 // const DEFAULT_SPEED = 50; // Comment out if not used

@@ -1,4 +1,3 @@
-import { calculateDistance } from './mapUtils';
 
 /**
  * Clusters vehicles that are within a certain distance of each other
@@ -14,13 +13,13 @@ export const clusterVehicles = (vehicles) => {
   const validVehicles = vehicles.filter(vehicle => {
     if (!vehicle) return false;
     
-    const isValid = 
-      vehicle.id && 
-      vehicle.location &&
-      typeof vehicle.location.lat === 'number' && 
-      typeof vehicle.location.lng === 'number' &&
-      !isNaN(vehicle.location.lat) && 
-      !isNaN(vehicle.location.lng);
+    const isValid =
+					vehicle.id &&
+					vehicle.location &&
+					typeof vehicle.location.lat === "number" &&
+					typeof vehicle.location.lng === "number" &&
+					!Number.isNaN(vehicle.location.lat) &&
+					!Number.isNaN(vehicle.location.lng);
     
     if (!isValid) {
       console.debug('Skipping invalid vehicle:', {
@@ -46,13 +45,14 @@ export const clusterVehicles = (vehicles) => {
 
 const calculateClusterCenter = (vehicles) => {
   // Filter out vehicles without valid locations first
-  const validVehicles = vehicles.filter(v => 
-    v?.location && 
-    typeof v.location.lat === 'number' && 
-    typeof v.location.lng === 'number' &&
-    !isNaN(v.location.lat) && 
-    !isNaN(v.location.lng)
-  );
+		const validVehicles = vehicles.filter(
+			(v) =>
+				v?.location &&
+				typeof v.location.lat === "number" &&
+				typeof v.location.lng === "number" &&
+				!Number.isNaN(v.location.lat) &&
+				!Number.isNaN(v.location.lng),
+		);
   
   if (validVehicles.length === 0) {
     console.warn('No valid vehicles for cluster center calculation', {

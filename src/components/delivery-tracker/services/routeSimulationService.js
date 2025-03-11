@@ -1,4 +1,3 @@
-import { deliveryApi } from './deliveryApi';
 
 class RouteSimulationService {
   constructor() {

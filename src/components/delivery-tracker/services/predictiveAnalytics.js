@@ -1,5 +1,4 @@
-import * as tf from '@tensorflow/tfjs';
-import { deliveryApi } from './deliveryApi';
+import * as tf from "@tensorflow/tfjs";
 
 class PredictiveAnalytics {
   constructor() {

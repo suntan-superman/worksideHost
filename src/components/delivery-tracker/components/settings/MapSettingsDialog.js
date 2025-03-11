@@ -11,10 +11,10 @@ import {
 	InputLabel,
 	Select,
 	MenuItem,
-	Grid,
-	Typography,
 	Box,
 } from "@mui/material";
+import Grid2 from "@mui/material/Grid2";
+
 import useDeliveryStore from "../../stores/deliveryStore";
 import useMapStore from "../../stores/mapStore";
 
@@ -172,8 +172,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 				Map Settings
 			</DialogTitle>
 			<DialogContent sx={{ mt: 2 }}>
-				<Grid container spacing={3}>
-					<Grid item xs={6}>
+				<Grid2 container spacing={3}>
+					<Grid2 item xs={6}>
 						<TextField
 							label="Latitude"
 							type="number"
@@ -200,8 +200,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 								marginTop: "10px",
 							}}
 						/>
-					</Grid>
-					<Grid item xs={6}>
+					</Grid2>
+					<Grid2 item xs={6}>
 						<TextField
 							label="Longitude"
 							type="number"
@@ -228,8 +228,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 								marginTop: "10px",
 							}}
 						/>
-					</Grid>
-					<Grid item xs={6}>
+					</Grid2>
+					<Grid2 item xs={6}>
 						<TextField
 							label="Zoom Level"
 							type="number"
@@ -253,8 +253,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 								},
 							}}
 						/>
-					</Grid>
-					<Grid item xs={6}>
+					</Grid2>
+					<Grid2 item xs={6}>
 						<FormControl fullWidth>
 							<InputLabel sx={{ "&.Mui-focused": { color: "green" } }}>
 								Unit
@@ -280,8 +280,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 								<MenuItem value="kilometers">Kilometers</MenuItem>
 							</Select>
 						</FormControl>
-					</Grid>
-					<Grid item xs={12}>
+					</Grid2>
+					<Grid2 item xs={12}>
 						<Box sx={{ mt: 2 }}>
 							<Button
 								variant="contained"
@@ -298,8 +298,8 @@ const MapSettingsDialog = ({ open, onClose }) => {
 								Fit Map to Show All Markers
 							</Button>
 						</Box>
-					</Grid>
-				</Grid>
+					</Grid2>
+				</Grid2>
 			</DialogContent>
 			<DialogActions sx={{ p: 2, gap: 1 }}>
 				<Button

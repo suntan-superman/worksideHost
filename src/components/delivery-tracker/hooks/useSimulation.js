@@ -2,13 +2,8 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import useDeliveryStore from "../stores/deliveryStore";
 // eslint-disable-next-line no-unused-vars
-import { calculateDistance, interpolatePosition } from "../utils/mapUtils";
+import { interpolatePosition } from "../utils/mapUtils";
 import { useMapAnimations } from './useMapAnimations';
-
-// eslint-disable-next-line no-unused-vars
-const DEFAULT_SPEED = 50; // miles per hour
-// eslint-disable-next-line no-unused-vars
-const DEFAULT_UPDATE_INTERVAL = 5000; // 5 seconds
 
 function useSimulation() {
 	const [isSimulationRunning, setIsSimulationRunning] = useState(false);
@@ -19,17 +14,11 @@ function useSimulation() {
 	const {
 		vehicles,
 		// eslint-disable-next-line no-unused-vars
-		destinations,
 		updateVehicleLocation,
 		startVehicleAnimation,
 		updateVehicleAnimation,
 		stopVehicleAnimation,
 		setSimulationRunning,
-		// eslint-disable-next-line no-unused-vars
-		simulationSpeed,
-		// eslint-disable-next-line no-unused-vars
-		activeAnimations,
-		animationState
 	} = useDeliveryStore();
 
 	const { startAnimation, stopAnimation } = useMapAnimations();

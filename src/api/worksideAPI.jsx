@@ -608,31 +608,31 @@ const GetSupplierIDFromName = async (name) => {
  * @param {string} customer - The customer name.
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and request data.
  */
-const GetRequestsByCustomer = async (customer) => {
-    console.log("API Call - Customer:", customer);
-    const cleanCustomer = cleanUpStr(customer);
-    console.log("API Call - Clean Customer:", cleanCustomer);
-    
-    if (!cleanCustomer || typeof cleanCustomer !== "string") {
-        console.error("Invalid customer name provided.");
-        return { status: 400, data: [] };
-    }
-    
-    try {
-        const response = await fetch(`${apiURL}/api/request/bycustomername/${cleanCustomer}`);
-        console.log("API Response Status:", response.status);
-        
-        if (!response.ok) {
-            throw new Error(`Failed to fetch customer requests. Status: ${response.status}`);
-        }
-        
-        const json = await response.json();
-        console.log("API Response Data:", json);
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching customer requests:", error.message);
-        return { status: 500, data: [] };
-    }
+const GetRequestsByCustomer = async (clientName) => {
+	const cleanCustomer = cleanUpStr(clientName);
+
+	if (!cleanCustomer || typeof cleanCustomer !== "string") {
+		console.error("Invalid customer name provided.");
+		return { status: 400, data: [] };
+	}
+
+	try {
+		const response = await fetch(
+			`${apiURL}/api/request/bycustomername/${cleanCustomer}`,
+		);
+
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch customer requests. Status: ${response.status}`,
+			);
+		}
+
+		const json = await response.json();
+		return { status: response.status, data: json };
+	} catch (error) {
+		console.error("Error fetching customer requests:", error.message);
+		return { status: 500, data: [] };
+	}
 };
 
 /**

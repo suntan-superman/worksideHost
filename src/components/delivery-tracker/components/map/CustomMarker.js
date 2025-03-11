@@ -1,6 +1,5 @@
 import React from 'react';
-import { MarkerF } from '@react-google-maps/api';
-import { LocalShipping, Construction, Warehouse } from '@mui/icons-material';
+import { MarkerF } from "@react-google-maps/api";
 
 const CustomMarker = ({ position, type, onClick }) => {
   if (!position?.lat || !position?.lng) {

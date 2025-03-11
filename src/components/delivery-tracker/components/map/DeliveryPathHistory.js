@@ -28,7 +28,9 @@ const DeliveryPathHistory = () => {
 			.filter(Boolean);
 
 		return () => {
-			paths.forEach((path) => path.setMap(null));
+			for (const path of paths) {
+				path.setMap(null);
+			}
 		};
 	}, [map, mapsLibrary, vehicles]);
 

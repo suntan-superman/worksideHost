@@ -1,16 +1,15 @@
 import React from 'react';
 import {
-  Paper,
-  Typography,
-  Box,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Chip,
-} from '@mui/material';
+	Paper,
+	Typography,
+	Box,
+	Grid,
+	Table,
+	TableBody,
+	TableCell,
+	TableRow,
+	Chip,
+} from "@mui/material";
 import {
   TrendingUp as TrendingUpIcon,
   TrendingDown as TrendingDownIcon,

@@ -21,13 +21,13 @@ export const useVehicleAssignment = () => {
     let bestDestination = null;
     let shortestDistance = Number.MAX_VALUE;
 
-    availableDestinations.forEach(dest => {
-      const distance = calculateDistance(currentLocation, dest.coordinates);
-      if (distance < shortestDistance) {
-        shortestDistance = distance;
-        bestDestination = dest;
-      }
-    });
+    for (const dest of availableDestinations) {
+					const distance = calculateDistance(currentLocation, dest.coordinates);
+					if (distance < shortestDistance) {
+						shortestDistance = distance;
+						bestDestination = dest;
+					}
+				}
 
     return bestDestination;
   }, []);

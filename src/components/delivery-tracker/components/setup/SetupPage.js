@@ -15,7 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import useDeliveryStore, { useDestinations } from '../../stores/deliveryStore';
+import { useDestinations } from "../../stores/deliveryStore";
 import { calculateDistance } from '../../utils/mapUtils';
 
 const RADIUS_LIMIT = 100; // 100 mile radius

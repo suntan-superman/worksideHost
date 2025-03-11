@@ -9,9 +9,9 @@ export const useMapAnimation = ({ onUpdateLocation, onError }) => {
 	const { simulationSpeed, vehicles } = useDeliveryStore();
 
 	const cancelAnimations = useCallback(() => {
-		Object.values(animationFramesRef.current).forEach((frame) => {
+		for (const frame of Object.values(animationFramesRef.current)) {
 			if (frame) cancelAnimationFrame(frame);
-		});
+		}
 		animationFramesRef.current = {};
 	}, []);
 

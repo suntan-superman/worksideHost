@@ -1,11 +1,5 @@
 import React from 'react';
-import {
-  Paper,
-  Typography,
-  Box,
-  Tooltip,
-  IconButton,
-} from '@mui/material';
+import { Paper, Typography, Box, Tooltip } from "@mui/material";
 import {
   Timeline,
   TimelineItem,

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Paper, IconButton, Box, CircularProgress } from '@mui/material';
+import { Paper, IconButton, Box } from "@mui/material";
 import { Close as CloseIcon, DragIndicator as DragIcon } from '@mui/icons-material';
 import { Rnd } from 'react-rnd';
 import useDeliveryStore from '../../stores/deliveryStore';

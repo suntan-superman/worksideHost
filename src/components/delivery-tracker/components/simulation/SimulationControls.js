@@ -7,25 +7,17 @@ import {
 	IconButton,
 	Tooltip,
 	Box,
-	Slider,
-	Typography,
 	Menu,
 	MenuItem,
 	ListItemIcon,
 	ListItemText,
-	Divider,
 } from "@mui/material";
 import {
-	PlayArrow as PlayIcon,
-	Pause as PauseIcon,
-	Stop as StopIcon,
 	Speed as SpeedIcon,
 	Settings as SettingsIcon,
 	LocationOn,
 	Route as RouteIcon,
 	Timeline as TimelineIcon,
-	Refresh as ResetIcon,
-	RestartAlt as RestartAltIcon,
 } from "@mui/icons-material";
 import useDeliveryStore from "../../stores/deliveryStore";
 import useSimulation from "../../hooks/useSimulation";

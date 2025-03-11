@@ -3,7 +3,6 @@ import useDeliveryStore from '../stores/deliveryStore';
 
 export const useDeliveryTimeWindows = () => {
   const [timeWindows, setTimeWindows] = useState(new Map());
-  const { destinations } = useDeliveryStore();
 
   const addTimeWindow = useCallback((destinationId, window) => {
     setTimeWindows(current => new Map(current).set(destinationId, window));

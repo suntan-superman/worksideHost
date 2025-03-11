@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Paper,
-  Typography,
-  Box,
-  Grid,
-  Chip,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Paper, Typography, Box, Grid, Chip, Tooltip } from "@mui/material";
 import {
   CompareArrows as CompareIcon,
   Star as StarIcon,

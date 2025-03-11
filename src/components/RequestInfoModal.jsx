@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
 	Button,
 	Dialog,
@@ -93,6 +93,12 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	const [requestData, setRequestData] = useState(null);
 	let staticSupplierID = null;
 
+	// New state for route tracking
+	const [routeData, setRouteData] = useState([]);
+	const [lastLocation, setLastLocation] = useState(null);
+	const [lastUpdate, setLastUpdate] = useState(null);
+	const mapRef = useRef(null);
+
 	const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 	const reqLocation = {
@@ -105,50 +111,125 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		lng: -118.9,
 	};
 
+	// Add state for modal dimensions
+	const [modalDimensions, setModalDimensions] = useState(() => {
+		const saved = localStorage.getItem("requestInfoModalDimensions");
+		return saved ? JSON.parse(saved) : { width: 800, height: 800 };
+	});
+
+	// Save dimensions when they change
+	useEffect(() => {
+		localStorage.setItem(
+			"requestInfoModalDimensions",
+			JSON.stringify(modalDimensions),
+		);
+	}, [modalDimensions]);
+
+	// Handle resize end
+	const handleResize = (event, direction, ref) => {
+		setModalDimensions({
+			width: ref.style.width,
+			height: ref.style.height,
+		});
+	};
+
+	const apiUrl = process.env.REACT_APP_MONGO_URI;
+
 	useEffect(() => {
 		const fetchRequest = async () => {
-			const apiUrl = process.env.REACT_APP_MONGO_URI;
+			const fetchString = `${apiUrl}/api/request/${recordID}`;
+			const response = await fetch(fetchString);
+			const json = await response.json();
 
-			try {
-				const fetchString = `${apiUrl}/api/request/${recordID}`;
-				const response = await fetch(fetchString);
-				const json = await response.json();
-				
-				// Store the complete request data
-				setRequestData(json);
-				
-				// Set individual fields
-				setCustomerName(
-					JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
-				);
-				setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
-				setRequestName(
-					JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
-				);
-				setRequestCategory(
-					JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, "$1"),
-				);
-				const formattedDate = format(
-					new Date(json.datetimerequested),
-					"MMMM do yyyy, h:mm",
-				);
-				setDateTimeRequested(formattedDate);
-				setRequestStatus(JSON.stringify(json.status).replace(/^"(.*)"$/, "$1"));
-				setSupplierID(json.ssrVendorId);
-				staticSupplierID = json.ssrVendorId;
-				if(json.status === "SSR-ACCEPTED") {
-					setDisableAcceptButton(true);
-				}
-			} catch (error) {
-				console.error("Error fetching request data:", error);
-				showErrorDialog("Failed to fetch request details");
+			// Store the complete request data
+			setRequestData(json);
+
+			// Set individual fields
+			setCustomerName(
+				JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
+			);
+			setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
+			setRequestName(
+				JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
+			);
+			setRequestCategory(
+				JSON.stringify(json.requestcategory).replace(/^"(.*)"$/, "$1"),
+			);
+			const formattedDate = format(
+				new Date(json.datetimerequested),
+				"MMMM do yyyy, h:mm",
+			);
+			setDateTimeRequested(formattedDate);
+			setRequestStatus(JSON.stringify(json.status).replace(/^"(.*)"$/, "$1"));
+			setSupplierID(json.ssrVendorId);
+			staticSupplierID = json.ssrVendorId;
+			if (json.status === "SSR-ACCEPTED") {
+				setDisableAcceptButton(true);
 			}
 		};
-		
+
 		if (recordID) {
 			fetchRequest();
 		}
 	}, [recordID]);
+
+	// Fetch route data from the backend
+	const fetchRouteData = useCallback(async () => {
+		if (!requestData?._id || !requestData?.ssrVendorId) return;
+		// TODO Let's get fake data for now
+		const reqID = "65f123abc456def789012345";
+		const supplierID = "65f123abc456def789012346";
+		try {
+			const response = await axios.post(
+				`${process.env.REACT_APP_MONGO_URI}/api/mapping/coordinates`,
+				{
+					requestid: reqID,
+					supplierid: supplierID,
+					// requestid: requestData._id,
+					// supplierid: requestData.ssrVendorId,
+				},
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+
+			if (response.data && response.data.length > 0) {
+				const formattedRoute = response.data.map((point) => ({
+					lat: point.lat,
+					lng: point.lng,
+					timestamp: new Date(point.date),
+				}));
+
+				setRouteData(formattedRoute);
+				setLastLocation(formattedRoute[formattedRoute.length - 1]);
+				setLastUpdate(
+					new Date(
+						response.data[response.data.length - 1].date,
+					).toLocaleTimeString(),
+				);
+			}
+		} catch (error) {
+			console.error("Error fetching route data:", error);
+			showErrorDialog(`Failed to fetch route data: ${error.message}`);
+		}
+	}, [requestData]);
+
+	// Set up polling interval for route updates
+	useEffect(() => {
+		if (open && requestData) {
+			fetchRouteData();
+			const interval = setInterval(fetchRouteData, 30000); // Update every 30 seconds
+			return () => clearInterval(interval);
+		}
+	}, [fetchRouteData, open, requestData]);
+
+	// Function to format coordinates for display
+	const formatCoordinates = (coords) => {
+		if (!coords) return "Unknown";
+		return `${coords.lat.toFixed(6)}, ${coords.lng.toFixed(6)}`;
+	};
 
 	// Define the mutation to save request bid
 	const saveRequestBidMutation = useMutation({
@@ -236,11 +317,90 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			<Draggable
 				handle="#requestDetailsDialog"
 				cancel={'[class*="MuiDialogContent-root"]'}
+				bounds="parent"
+				position={(() => {
+					const saved = localStorage.getItem("requestInfoModalPosition");
+					return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+				})()}
+				onStop={(e, data) => {
+					localStorage.setItem(
+						"requestInfoModalPosition",
+						JSON.stringify({ x: data.x, y: data.y }),
+					);
+				}}
 			>
 				<Paper {...props} />
 			</Draggable>
 		);
 	}
+
+	// Modify the existing map section in the return statement
+	const renderMap = () => (
+		<div
+			className="map_box"
+			style={{
+				width: "100%",
+				height: "calc(100% - 200px)", // Adjust for header and buttons
+				position: "relative",
+				marginTop: "10px",
+				marginBottom: "10px",
+			}}
+		>
+			<APIProvider apiKey={apiKey}>
+				<GoogleMap
+					ref={mapRef}
+					mapId={"DEMO_ID"}
+					style={{
+						width: "100%",
+						height: "100%",
+						borderRadius: "8px",
+					}}
+					defaultCenter={reqLocation}
+					defaultZoom={8}
+					gestureHandling={"greedy"}
+				>
+					{/* Destination Marker */}
+					<AdvancedMarker
+						position={reqLocation}
+						gestureHandling={"greedy"}
+						title="Rig Location"
+					>
+						<div style={{ fontSize: "24px" }}>🛢️</div>
+					</AdvancedMarker>
+
+					{/* Current Location Marker */}
+					{lastLocation && (
+						<AdvancedMarker position={lastLocation} title="Current Location">
+							<div style={{ fontSize: "24px" }}>🚛</div>
+						</AdvancedMarker>
+					)}
+
+					{/* Route Path */}
+					{routeData.length > 1 && (
+						<polyline
+							path={routeData}
+							options={{
+								strokeColor: "#22C55E",
+								strokeOpacity: 1.0,
+								strokeWeight: 3,
+							}}
+						/>
+					)}
+				</GoogleMap>
+			</APIProvider>
+
+			{/* Location Update Information */}
+			{lastLocation && (
+				<div className="absolute bottom-4 left-4 bg-white p-2 rounded shadow">
+					<p className="text-sm font-bold">Last Known Position:</p>
+					<p className="text-sm">{formatCoordinates(lastLocation)}</p>
+					{lastUpdate && (
+						<p className="text-xs text-gray-600">Last Update: {lastUpdate}</p>
+					)}
+				</div>
+			)}
+		</div>
+	);
 
 	return (
 		<>
@@ -255,7 +415,23 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					open
 					aria-labelledby="requestDetailsDialog"
 					PaperComponent={PaperComponent}
-					sx={{ height: "800px" }}
+					sx={{
+						"& .MuiDialog-paper": {
+							width: modalDimensions.width,
+							height: modalDimensions.height,
+							maxWidth: "none",
+							maxHeight: "none",
+							resize: "both",
+							overflow: "auto",
+						},
+						"& .MuiDialogContent-root": {
+							display: "flex",
+							flexDirection: "column",
+							padding: "20px",
+							height: "calc(100% - 120px)", // Adjust for header and buttons
+							overflow: "hidden",
+						},
+					}}
 					disableEnforceFocus
 					disableAutoFocus
 				>
@@ -266,7 +442,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						<p className="text-bold text-black text-xl">Request Details</p>
 					</DialogTitle>
 					<DialogContent>
-						<Stack spacing={2}>
+						<Stack spacing={2} sx={{ flex: "none" }}>
 							<div className="flex space-x-4">
 								{/* Column 1 */}
 								<div className="flex-1 ml-2.5 mr-2.5 text-left">
@@ -289,46 +465,14 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 									<p>{requestStatus}</p>
 								</div>
 							</div>
-							<div className="mb-3" />
 						</Stack>
-						<div className="map_box">
-							<APIProvider apiKey={apiKey}>
-								<GoogleMap
-									mapId={"DEMO_ID"}
-									style={{ width: "500px", height: "500px" }}
-									defaultCenter={reqLocation}
-									defaultZoom={8}
-									gestureHandling={"greedy"}
-								>
-									<AdvancedMarker
-										position={reqLocation}
-										gestureHandling={"greedy"}
-										icon={MyLocation}
-										title="Rig"
-									/>
-									<AdvancedMarker
-										position={delLocation}
-										icon={<LocationOnIcon />}
-										title="Delivery"
-									/>
-								</GoogleMap>
-							</APIProvider>
-							{/* <LoadScript
-								id="script-loader"
-								googleMapsApiKey={apiKey}
-								language="en"
-								region="EN"
-								version="weekly"
-							>
-								<CustomMap reqLocation={reqLocation} delLocation={delLocation} />
-							</LoadScript> */}
-						</div>
+						{renderMap()}
 					</DialogContent>
 					<DialogActions>
 						{requestStatus === "SSR-REQ" && (
 							<>
-								<Button 
-									variant="contained" 
+								<Button
+									variant="contained"
 									onClick={handleAcceptRequest}
 									disabled={disableAcceptButton}
 									sx={{
@@ -342,8 +486,8 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 								>
 									Accept Req
 								</Button>
-								<Button 
-									variant="contained" 
+								<Button
+									variant="contained"
 									onClick={handleAssignDA}
 									sx={{
 										backgroundColor: "green",
@@ -371,6 +515,25 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			/>
 		</>
 	);
+};
+
+// Add some styles
+const styles = {
+	mapContainer: {
+		position: "relative",
+		width: "100%",
+		height: "500px",
+	},
+	locationInfo: {
+		position: "absolute",
+		bottom: "1rem",
+		left: "1rem",
+		backgroundColor: "white",
+		padding: "0.5rem",
+		borderRadius: "0.375rem",
+		boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+		zIndex: 1000,
+	},
 };
 
 export default RequestInfoModal;
