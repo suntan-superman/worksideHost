@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { MdOutlineCancel } from 'react-icons/md';
 import { BsCheck } from 'react-icons/bs';
 import { TooltipComponent } from '@syncfusion/ej2-react-popups';
+import axios from "axios";
 
 import { themeColors } from '../data/dummy';
 import { UseStateContext } from "../contexts/ContextProvider";
@@ -15,6 +16,8 @@ const ThemeSettings = () => {
 	const [resetPasswordFlag, setResetPasswordFlag] = React.useState(false);	
 	const [selectedOption, setSelectedOption] = React.useState(0);
 	const [numGridRowsIndex, setNumGridRowsIndex] = React.useState(0);
+	const [avatar, setAvatar] = React.useState(null);
+		const [avatarPreview, setAvatarPreview] = React.useState(null);
 
 	const numRowsOptions = [
 		{ value: 8, label: "8" },
@@ -49,6 +52,42 @@ const ThemeSettings = () => {
 		// window.alert(`Selected Rows: ${selectedOption} Index: ${index}`);
 		localStorage.setItem("numGridRows", selected.value);
 	};
+
+	const handleAvatarChange = async (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onloadend = () => {
+					setAvatarPreview(reader.result);
+					setAvatar(reader.result);
+				};
+				reader.readAsDataURL(file);
+			}
+		};
+
+		const handleAvatarUpload = async () => {
+			if (!avatar) return;
+
+			try {
+				const contactId = localStorage.getItem("contactID")?.replace(/"/g, "");
+				if (!contactId) {
+					console.error("No user ID found");
+					return;
+				}
+				const url = `${process.env.REACT_APP_MONGO_URI}/api/contact/${contactId}/avatar`;
+				console.log("url ", url);
+				const response = await axios.patch(url, { avatar });
+
+				if (response.status === 200) {
+					// Update local storage with new avatar
+					localStorage.setItem("userAvatar", avatar);
+					// Force a page reload to update the navbar
+					window.location.reload();
+				}
+			} catch (error) {
+				console.error("Error uploading avatar:", error);
+			}
+		};
 
   return (
 			<div className="bg-half-transparent w-screen fixed nav-item top-0 right-0">
@@ -134,22 +173,56 @@ const ThemeSettings = () => {
 						</>
 					)}
 					{resetPasswordFlag === false && (
-						<>
-							<div className="p-4 border-t-1 border-color ml-4">
-								<div style={{ width: "200px" }}>
-									<p className="font-semibold text-xl ">Number of Grid Rows</p>
-									<Select
-										className="basic-single"
-										classNamePrefix="select"
-										value={numRowsOptions[numGridRowsIndex]}
-										onChange={handleSelectionChange}
-										name="numrows"
-										options={numRowsOptions}
-									/>
-								</div>
+						<div className="p-4 border-t-1 border-color ml-4">
+							<div style={{ width: "200px" }}>
+								<p className="font-semibold text-xl ">Number of Grid Rows</p>
+								<Select
+									className="basic-single"
+									classNamePrefix="select"
+									value={numRowsOptions[numGridRowsIndex]}
+									onChange={handleSelectionChange}
+									name="numrows"
+									options={numRowsOptions}
+								/>
 							</div>
-						</>
+						</div>
 					)}
+					<div className="p-4 border-t-1 border-color ml-4">
+						<div style={{ width: "200px" }}>
+							<p className="font-semibold text-xl">Profile Avatar</p>
+							<div className="flex items-center gap-2 mt-2">
+								{avatarPreview && (
+									<img
+										src={avatarPreview}
+										alt="Avatar preview"
+										className="w-8 h-8 rounded-full"
+									/>
+								)}
+								<input
+									type="file"
+									accept="image/*"
+									onChange={handleAvatarChange}
+									className="hidden"
+									id="avatar-input"
+								/>
+								<label
+									htmlFor="avatar-input"
+									className="bg-gray-300 hover:bg-gray-500 text-black font-bold py-1 px-4 rounded cursor-pointer"
+								>
+									Choose Image
+								</label>
+								{avatar && (
+									<button
+										type="button"
+										className="bg-gray-300 hover:bg-gray-500 text-black font-bold py-1 px-4 rounded"
+										onClick={handleAvatarUpload}
+									>
+										Upload
+									</button>
+								)}
+							</div>
+						</div>
+					</div>
 					<div className="p-4 border-t-1 border-color ml-4">
 						<div style={{ width: "200px" }}>
 							<p className="font-semibold text-xl ">Reset Password</p>

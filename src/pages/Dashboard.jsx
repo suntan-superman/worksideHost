@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-import Grid2 from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import dayjs from "dayjs";
 
 import { RequestsAwardedThisWeek } from "./components/RequestsAwardedThisWeek";
@@ -81,74 +81,69 @@ export default function Dashboard() {
 	return (
 		<div className="ml-3">
 			<Header category="Workside" title="Dashboard" />
-			<Grid2 container spacing={2} sx={{ height: "100vh", width: "80vw" }}>
-				<Grid2 container sx={{ height: "25%" }} spacing={2}>
+			<Grid container spacing={2} sx={{ height: "100vh", width: "80vw" }}>
+				<Grid container sx={{ height: "25%" }} spacing={2}>
 					{/* Requests Awarded This Week Card */}
-					<Grid2 xs={3}>
+					<Grid item xs={12} sm={6} md={4}>
 						<RequestsAwardedThisWeek
 							diff={12}
 							trend="up"
 							sx={{ height: "100%" }}
 							value="37"
 						/>
-					</Grid2>
+					</Grid>
 
 					{/* Total Requests Awarded This Month Card */}
-					<Grid2 xs={3}>
+					<Grid item xs={12} sm={6} md={4}>
 						<RequestsAwardedThisMonth
 							diff={16}
 							trend="down"
 							sx={{ height: "100%" }}
 							value="87"
 						/>
-					</Grid2>
+					</Grid>
 
 					{/* Requests Completed This Week Card */}
-					<Grid2 xs={3}>
-						{/* <Grid2 lg={3} sm={6} xs={12}> */}
+					<Grid item xs={12} sm={6} md={4}>
 						<RequestsCompletedThisWeek
 							diff={18}
 							trend="up"
 							sx={{ height: "100%" }}
 							value="42"
 						/>
-					</Grid2>
+					</Grid>
 
 					{/* Total Requests Completed This Month Card */}
-					<Grid2 xs={3}>
-						{/* <Grid2 lg={3} sm={6} xs={12}> */}
+					<Grid item xs={12} sm={6} md={4}>
 						<RequestsCompletedThisMonth
 							diff={19}
 							trend="down"
 							sx={{ height: "100%" }}
 							value="128"
 						/>
-					</Grid2>
-				</Grid2>
+					</Grid>
+				</Grid>
 				<br />
 				<br />
 				{/* Second Row - 2 Items */}
-				{/* First Item - 1/3 Width */}
-				<Grid2 container sx={{ height: "75%", width: "100%" }} spacing={2}>
-					{/* <Grid2 container spacing={3}> */}
+				<Grid container sx={{ height: "75%", width: "100%" }} spacing={2}>
 					{/* Top-Rated Suppliers */}
-					<Grid2 xs={4}>
+					<Grid item xs={12} sm={6} md={4}>
 						<TopRatedSuppliers
 							suppliers={supplierList}
 							sx={{ height: "100%", width: "100%" }}
 						/>
-					</Grid2>
+					</Grid>
 
 					{/* Latest Requests */}
-					<Grid2 xs={8}>
+					<Grid item xs={12} sm={6} md={8}>
 						<LatestRequests
 							requests={requestList}
 							sx={{ height: "100%", width: "100%" }}
 						/>
-					</Grid2>
-				</Grid2>
-				{/* </Grid2> */}
-			</Grid2>
+					</Grid>
+				</Grid>
+			</Grid>
 		</div>
 	);
 }

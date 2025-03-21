@@ -12,6 +12,7 @@ import avatar from "../data/avatar.jpg";
 // eslint-disable-next-line import/no-cycle
 import { Chat, Notification, UserProfile } from ".";
 import { UseStateContext } from "../contexts/ContextProvider";
+import axios from "axios";
 
 // Create a styled div for consistent width
 const NavBarContainer = styled("div")({
@@ -38,23 +39,20 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 );
 
 const NavBar = () => {
-	const navigate = useNavigate();
 	const {
-		currentColor,
 		activeMenu,
 		setActiveMenu,
 		handleClick,
 		isClicked,
 		setScreenSize,
 		screenSize,
-		globalUserName,
-		accessLevel,
 	} = UseStateContext();
 	const [welcomePhrase, setWelcomePhrase] = React.useState("");
 	// const accessLevel = useUserStore((state) => state.accessLevel);
 	const [accessLabel, setAccessLabel] = React.useState("UNKNOWN");
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [menuWidth, setMenuWidth] = useState(0);
+	const [userAvatar, setUserAvatar] = useState(null);
 
 	useEffect(() => {
 		const handleResize = () => setScreenSize(window.innerWidth);
@@ -94,6 +92,26 @@ const NavBar = () => {
 			setActiveMenu(true);
 		}
 	}, [screenSize, setActiveMenu]);
+
+	useEffect(() => {
+		const fetchUserAvatar = async () => {
+			try {
+				const contactId = localStorage.getItem("contactID")?.replace(/"/g, "");
+				if (!contactId) return;
+
+				const response = await axios.get(
+					`${process.env.REACT_APP_MONGO_URI}/api/contact/${contactId}`,
+				);
+				if (response.data && response.data.avatar) {
+					setUserAvatar(response.data.avatar);
+				}
+			} catch (error) {
+				console.error("Error fetching user avatar: ", error);
+			}
+		};
+
+		fetchUserAvatar();
+	}, []);
 
 	const handleActiveMenu = () => setActiveMenu(!activeMenu);
 
@@ -138,7 +156,7 @@ const NavBar = () => {
 							>
 								<img
 									className="rounded-full w-8 h-8"
-									src={avatar}
+									src={userAvatar || avatar}
 									alt="user-profile"
 								/>
 								<p>

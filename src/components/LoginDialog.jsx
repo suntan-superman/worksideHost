@@ -51,6 +51,10 @@ const LoginDialog = () => {
 		}
 		return true;
 	};
+	
+	const SaveContactID = (contactId) => {
+		localStorage.setItem("contactID", contactId);
+	};
 
 	const getUserAccessLevel = async (userName) => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${userName}`;
@@ -58,7 +62,7 @@ const LoginDialog = () => {
 		
 		try {
 			const response = await axios.get(fetchString);
-
+			SaveContactID(response.data._id);
 			if (response.data) {
 				switch (response.data.accesslevel) {
 					case "GUEST":
