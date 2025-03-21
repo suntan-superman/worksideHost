@@ -55,12 +55,12 @@ const LoginDialog = () => {
 	const getUserAccessLevel = async (userName) => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${userName}`;
 		let accessLevel = -1;
-
+		
 		try {
-			const response = await fetch(fetchString);
-			const jsonData = await response.json().then((data) => {
+			const response = await axios.get(fetchString);
 
-				switch (data.accesslevel) {
+			if (response.data) {
+				switch (response.data.accesslevel) {
 					case "GUEST":
 						accessLevel = 0;
 						break;
@@ -77,9 +77,9 @@ const LoginDialog = () => {
 						accessLevel = -1;
 						break;
 				}
-			});
+			}
 		} catch (error) {
-			console.error(error);
+			console.error("Error fetching access level:", error);
 			return -1;
 		}
 		return accessLevel;

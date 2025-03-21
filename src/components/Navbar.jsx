@@ -68,7 +68,6 @@ const NavBar = () => {
 	useEffect(() => {
 		const userName = localStorage.getItem("userName");
 		setWelcomePhrase(`Welcome, ${userName}`);
-		console.log(" Welcome Phrase: ", welcomePhrase);
 		const accessLevel = Number(localStorage.getItem("accessLevel"));
 		switch (accessLevel) {
 			case 0:

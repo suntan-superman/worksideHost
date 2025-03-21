@@ -1,7 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef, useMemo } from "react";
-import Skeleton, { SkeletonText } from "react-loading-skeleton";
-import Button from "./Button";
+import React, { useState } from "react";
 
 const UserValidationModal = ({ recordID, open, onOK, onClose }) => {
 	if (!open || !recordID) return null;

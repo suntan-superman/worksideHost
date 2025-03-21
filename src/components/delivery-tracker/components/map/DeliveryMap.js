@@ -68,10 +68,10 @@ const DeliveryMap = forwardRef(({
 	onResetSimulation,
 	onError
 }, ref) => {
-	const { isLoaded, loadError } = useLoadScript({
-		googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
-		libraries: LIBRARIES
-	});
+  const { isLoaded, loadError } = useLoadScript({
+			googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY,
+			libraries: LIBRARIES,
+		});
 
 	const mapRef = useRef(null);
 	const [setupDialogOpen, setSetupDialogOpen] = useState(false);
@@ -79,13 +79,13 @@ const DeliveryMap = forwardRef(({
 	const [selectedDestination, setSelectedDestination] = useState(null);
 	const [showOriginInfo, setShowOriginInfo] = useState(false);
 
-	const {
-		vehicles,
-		destinations,
-		distributionCenters,
-		isSimulationRunning,
-		updateVehiclePosition
-	} = useDeliveryStore();
+  const {
+			vehicles,
+			destinations,
+			distributionCenters,
+			isSimulationRunning,
+			updateVehiclePosition,
+		} = useDeliveryStore();
 
 	// Add animation hook
 	const { startAnimation, cancelAllAnimations } = useMapAnimations();
@@ -112,27 +112,27 @@ const DeliveryMap = forwardRef(({
 	}, [vehicles, destinations, distributionCenters, isLoaded, loadError]);
 
 	// Debug logs for markers
-	useEffect(() => {
-		if (isLoaded && window.google) {
-			console.log('Map is loaded with data:', {
-				distributionCentersCount: distributionCenters?.length,
-				vehiclesCount: vehicles?.length,
-				google: Boolean(window.google)
-			});
-		}
-	}, [isLoaded, distributionCenters, vehicles]);
+		useEffect(() => {
+			if (isLoaded && window.google) {
+				console.log("Map is loaded with data:", {
+					distributionCentersCount: distributionCenters?.length,
+					vehiclesCount: vehicles?.length,
+					google: Boolean(window.google),
+				});
+			}
+		}, [isLoaded, distributionCenters, vehicles]);
 
 	// Add debug logs for origin and destination data
-	useEffect(() => {
-		if (isLoaded && window.google) {
-			console.log('Distribution Center Data:', {
-				distributionCenters: distributionCenters?.map(d => ({
-					id: d.id,
-					coordinates: d.coordinates
-				}))
-			});
-		}
-	}, [isLoaded, distributionCenters]);
+		useEffect(() => {
+			if (isLoaded && window.google) {
+				console.log("Distribution Center Data:", {
+					distributionCenters: distributionCenters?.map((d) => ({
+						id: d.id,
+						coordinates: d.coordinates,
+					})),
+				});
+			}
+		}, [isLoaded, distributionCenters]);
 
 	// Add this debug effect
 	useEffect(() => {
@@ -281,39 +281,39 @@ const DeliveryMap = forwardRef(({
 	// Update handleSimulationStart
 	const handleSimulationStart = useCallback(async (assignments) => {
 		try {
-			console.log('DeliveryMap: handleSimulationStart called');
-			
+			console.log("DeliveryMap: handleSimulationStart called");
+
 			// Set simulation running state before starting animations
 			useDeliveryStore.getState().setSimulationRunning(true);
-			
+
 			// Update vehicle statuses and destinations
-			const updatedVehicles = vehicles.map(vehicle => {
+			const updatedVehicles = vehicles.map((vehicle) => {
 				const destinationId = assignments[vehicle.id];
 				if (destinationId) {
 					return {
 						...vehicle,
-						status: 'delivering',
-						destinationId
+						status: "delivering",
+						destinationId,
 					};
 				}
 				return vehicle;
 			});
-			
+
 			// Update vehicles in store
 			useDeliveryStore.getState().setVehicles(updatedVehicles);
-			
+
 			// Start animations
 			for (const [vehicleId, destinationId] of Object.entries(assignments)) {
-				const vehicle = updatedVehicles.find(v => v.id === vehicleId);
-				const destination = destinations.find(d => d.id === destinationId);
-				
+				const vehicle = updatedVehicles.find((v) => v.id === vehicleId);
+				const destination = destinations.find((d) => d.id === destinationId);
+
 				if (vehicle && destination) {
 					startAnimation(
 						vehicleId,
 						vehicle.location,
 						destination.coordinates,
 						calculateDistance(vehicle.location, destination.coordinates) * 1000,
-						(position) => updateVehiclePosition(vehicleId, position)
+						(position) => updateVehiclePosition(vehicleId, position),
 					);
 				}
 			}
@@ -322,10 +322,10 @@ const DeliveryMap = forwardRef(({
 				await onStartSimulation(assignments);
 			}
 		} catch (error) {
-			console.error('Error starting simulation:', error);
+			console.error("Error starting simulation:", error);
 			useDeliveryStore.getState().setSimulationRunning(false);
 			if (onError) {
-				onError('Failed to start simulation');
+				onError("Failed to start simulation");
 			}
 		}
 	}, [vehicles, destinations, startAnimation, onStartSimulation, onError, updateVehiclePosition]);
@@ -353,17 +353,17 @@ const DeliveryMap = forwardRef(({
 					key={vehicle.id}
 					position={{
 						lat: Number(vehicle.location.lat),
-						lng: Number(vehicle.location.lng)
+						lng: Number(vehicle.location.lng),
 					}}
 					icon={{
 						path: ICON_PATHS.vehicle,
 						fillColor,
 						fillOpacity: 1,
 						strokeWeight: 1,
-						strokeColor: '#000000',
+						strokeColor: "#000000",
 						scale: 1.5,
 						rotation: 0,
-						anchor: getAnchorPoint(isLoaded)
+						anchor: getAnchorPoint(isLoaded),
 					}}
 					onClick={() => setSelectedVehicle(vehicle)}
 				/>
@@ -379,127 +379,141 @@ const DeliveryMap = forwardRef(({
 		});
 	}, [isSimulationRunning, vehicles]);
 
-	if (loadError) {
-		return <div>Error loading maps</div>;
-	}
+  if (loadError) {
+			return <div>Error loading maps</div>;
+		}
 
-	return (
-		<Box sx={{ width: "100%", height: "100%", position: "relative" }}>
-			{loadError && <div>Error loading maps</div>}
-			
-			{!isLoaded ? (
-				<div>Loading map...</div>
-			) : (
-				<GoogleMap
-					mapContainerStyle={mapContainerStyle}
-					center={defaultCenter}
-					zoom={defaultZoom}
-					onLoad={handleMapLoad}
-					options={defaultMapOptions}
-				>
-					{isLoaded && (
-						<>
-							{renderDistributionCenters()}
-							{/* Destination Markers */}
-							{destinations?.map((destination) => (
-								<MarkerF
-									key={destination.id}
-									position={destination.coordinates}
-									onClick={() => setSelectedDestination(destination)}
-									icon={{
-										path: ICON_PATHS.destination,
-										fillColor: '#f44336',
-										fillOpacity: 1,
-										strokeWeight: 1,
-										strokeColor: '#000000',
-										scale: 1.5,
-										anchor: new window.google.maps.Point(12, 12)
-									}}
-								>
-									{selectedDestination?.id === destination.id && (
-										<InfoWindowF
-											position={destination.coordinates}
-											onCloseClick={() => setSelectedDestination(null)}
-										>
-											<div>
-												<h3>{destination.name}</h3>
-												<p>Location: {destination.coordinates.lat.toFixed(4)}, {destination.coordinates.lng.toFixed(4)}</p>
-											</div>
-										</InfoWindowF>
-									)}
-								</MarkerF>
-							))}
+  return (
+			<Box sx={{ width: "100%", height: "100%", position: "relative" }}>
+				{loadError && <div>Error loading maps</div>}
 
-							{/* Vehicle Markers */}
-							{vehicleMarkers}
-
-							{showOriginInfo && (
-								<InfoWindow
-									position={defaultCenter}
-									onCloseClick={() => setShowOriginInfo(false)}
-								>
-									<div>
-										<h3>Distribution Center</h3>
-										<p>Location: {defaultCenter.lat.toFixed(4)}, {defaultCenter.lng.toFixed(4)}</p>
-										<p>Active Vehicles: {vehicles?.filter(v => v.status === 'active').length || 0}</p>
-										<p>Total Vehicles: {vehicles?.length || 0}</p>
-									</div>
-								</InfoWindow>
-							)}
-
-							{selectedVehicle && (
-								<InfoWindow
-									position={{
-										lat: Number(selectedVehicle.location.lat),
-										lng: Number(selectedVehicle.location.lng)
-									}}
-									onCloseClick={() => setSelectedVehicle(null)}
-								>
-									<div>
-										<h3>Vehicle {selectedVehicle.id}</h3>
-										<p>Status: {selectedVehicle.status}</p>
-										{selectedVehicle.metrics && (
-											<>
-												<p>Progress: {selectedVehicle.metrics.progress}%</p>
-												<p>Speed: {Math.round(selectedVehicle.metrics.currentSpeed)} mph</p>
-											</>
+				{!isLoaded ? (
+					<div>Loading map...</div>
+				) : (
+					<GoogleMap
+						mapContainerStyle={mapContainerStyle}
+						center={defaultCenter}
+						zoom={defaultZoom}
+						onLoad={handleMapLoad}
+						options={defaultMapOptions}
+					>
+						{isLoaded && (
+							<>
+								{renderDistributionCenters()}
+								{/* Destination Markers */}
+								{destinations?.map((destination) => (
+									<MarkerF
+										key={destination.id}
+										position={destination.coordinates}
+										onClick={() => setSelectedDestination(destination)}
+										icon={{
+											path: ICON_PATHS.destination,
+											fillColor: "#f44336",
+											fillOpacity: 1,
+											strokeWeight: 1,
+											strokeColor: "#000000",
+											scale: 1.5,
+											anchor: new window.google.maps.Point(12, 12),
+										}}
+									>
+										{selectedDestination?.id === destination.id && (
+											<InfoWindowF
+												position={destination.coordinates}
+												onCloseClick={() => setSelectedDestination(null)}
+											>
+												<div>
+													<h3>{destination.name}</h3>
+													<p>
+														Location: {destination.coordinates.lat.toFixed(4)},{" "}
+														{destination.coordinates.lng.toFixed(4)}
+													</p>
+												</div>
+											</InfoWindowF>
 										)}
-									</div>
-								</InfoWindow>
-							)}
-						</>
-					)}
-				</GoogleMap>
-			)}
+									</MarkerF>
+								))}
 
-			<SimulationSetupDialog
-				open={setupDialogOpen}
-				onClose={() => setSetupDialogOpen(false)}
-				onStart={handleSimulationStart}
-			/>
+								{/* Vehicle Markers */}
+								{vehicleMarkers}
 
-			<SimulationControls
-				onStart={() => {
-					console.log('Opening setup dialog');
-					setSetupDialogOpen(true);
-				}}
-				onPause={() => {
-					console.log('Pausing simulation');
-					useDeliveryStore.getState().setSimulationRunning(false);
-					cancelAllAnimations();
-					onPauseSimulation?.();
-				}}
-				onReset={() => {
-					console.log('Resetting simulation');
-					useDeliveryStore.getState().resetSimulation();
-					cancelAllAnimations();
-					onResetSimulation?.();
-					setSelectedVehicle(null);
-				}}
-				onError={onError}
-			/>
-		</Box>
-	);
+								{showOriginInfo && (
+									<InfoWindow
+										position={defaultCenter}
+										onCloseClick={() => setShowOriginInfo(false)}
+									>
+										<div>
+											<h3>Distribution Center</h3>
+											<p>
+												Location: {defaultCenter.lat.toFixed(4)},{" "}
+												{defaultCenter.lng.toFixed(4)}
+											</p>
+											<p>
+												Active Vehicles:{" "}
+												{vehicles?.filter((v) => v.status === "active")
+													.length || 0}
+											</p>
+											<p>Total Vehicles: {vehicles?.length || 0}</p>
+										</div>
+									</InfoWindow>
+								)}
+
+								{selectedVehicle && (
+									<InfoWindow
+										position={{
+											lat: Number(selectedVehicle.location.lat),
+											lng: Number(selectedVehicle.location.lng),
+										}}
+										onCloseClick={() => setSelectedVehicle(null)}
+									>
+										<div>
+											<h3>Vehicle {selectedVehicle.id}</h3>
+											<p>Status: {selectedVehicle.status}</p>
+											{selectedVehicle.metrics && (
+												<>
+													<p>Progress: {selectedVehicle.metrics.progress}%</p>
+													<p>
+														Speed:{" "}
+														{Math.round(selectedVehicle.metrics.currentSpeed)}{" "}
+														mph
+													</p>
+												</>
+											)}
+										</div>
+									</InfoWindow>
+								)}
+							</>
+						)}
+					</GoogleMap>
+				)}
+
+				<SimulationSetupDialog
+					open={setupDialogOpen}
+					onClose={() => setSetupDialogOpen(false)}
+					onStart={handleSimulationStart}
+				/>
+
+				<SimulationControls
+					onStart={() => {
+						console.log("Opening setup dialog");
+						setSetupDialogOpen(true);
+					}}
+					onPause={() => {
+						console.log("Pausing simulation");
+						useDeliveryStore.getState().setSimulationRunning(false);
+						cancelAllAnimations();
+						onPauseSimulation?.();
+					}}
+					onReset={() => {
+						console.log("Resetting simulation");
+						useDeliveryStore.getState().resetSimulation();
+						cancelAllAnimations();
+						onResetSimulation?.();
+						setSelectedVehicle(null);
+					}}
+					onError={onError}
+				/>
+			</Box>
+		);
 });
 
 DeliveryMap.displayName = "DeliveryMap";

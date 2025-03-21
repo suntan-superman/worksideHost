@@ -5,27 +5,19 @@ import {
 	Dialog,
 	DialogTitle,
 	DialogContent,
-	// DialogContentText,
 	DialogActions,
 	Stack,
 	Modal,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-// import {
-// 	LoadScript,
-// } from "@react-google-maps/api";
-// import mapStyles from "./MapStyles";
 import { format } from "date-fns";
-// import CustomMap from "./Map";
 import {
 	APIProvider,
 	Map as GoogleMap,
 	// Marker,
 	AdvancedMarker,
 } from "@vis.gl/react-google-maps";
-import { MyLocation, LocalShipping } from "@mui/icons-material";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import DeliveryAssociateDialog from "./DeliveryAssociateDialog";
 import axios from "axios";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -80,11 +72,13 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	if (!open || !recordID) return null;
 
 	const [customerName, setCustomerName] = useState(null);
+	const [projectName, setProjectName] = useState(null);
 	const [rigCompany, setRigCompany] = useState(null);
 	const [requestName, setRequestName] = useState(null);
 	const [requestCategory, setRequestCategory] = useState(null);
 	const [dateTimeRequested, setDateTimeRequested] = useState(null);
 	const [supplierID, setSupplierID] = useState(null);
+	const [supplierName, setSupplierName] = useState(null);
 	const [requestStatus, setRequestStatus] = useState(null);
 	const [mapContainer, setMapContainer] = useState(null);
 	const [showDADialog, setShowDADialog] = useState(false);
@@ -143,11 +137,11 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 
 			// Store the complete request data
 			setRequestData(json);
-
 			// Set individual fields
 			setCustomerName(
 				JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
 			);
+			setProjectName(JSON.stringify(json.projectname).replace(/^"(.*)"$/, "$1"));
 			setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
 			setRequestName(
 				JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
@@ -162,6 +156,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			setDateTimeRequested(formattedDate);
 			setRequestStatus(JSON.stringify(json.status).replace(/^"(.*)"$/, "$1"));
 			setSupplierID(json.ssrVendorId);
+			setSupplierName(json.vendorName);
 			staticSupplierID = json.ssrVendorId;
 			if (json.status === "SSR-ACCEPTED") {
 				setDisableAcceptButton(true);
@@ -447,22 +442,28 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 								{/* Column 1 */}
 								<div className="flex-1 ml-2.5 mr-2.5 text-left">
 									{/* <h2 className="text-lg font-bold mb-2">Column 1</h2> */}
-									<p>Customer</p>
+									<p>Project</p>
 									<p>Rig Company</p>
 									<p>Request Category</p>
 									<p>Request</p>
 									<p>Date and Time Requested</p>
 									<p>Request Status</p>
+									{/* Add SSR Supplier label if status is SSR-REQ or SSR-ACCEPTED */}
+									{(requestStatus === "SSR-REQ" ||
+										requestStatus === "SSR-ACCEPTED") && <p>SSR Supplier</p>}
 								</div>
 
 								{/* Column 2 */}
 								<div className="flex-1 ml-2.5 mr-2.5 text-left font-bold">
-									<p>{customerName}</p>
+									<p>{projectName}</p>
 									<p>{rigCompany}</p>
 									<p>{requestCategory}</p>
 									<p>{requestName}</p>
 									<p>{dateTimeRequested}</p>
 									<p>{requestStatus}</p>
+									{/* Add supplierName if status is SSR-REQ or SSR-ACCEPTED */}
+									{(requestStatus === "SSR-REQ" ||
+										requestStatus === "SSR-ACCEPTED") && <p>{supplierName}</p>}
 								</div>
 							</div>
 						</Stack>

@@ -63,7 +63,6 @@ const loadSavedDistributionCenters = () => {
 const loadSavedVehicles = () => {
 	try {
 		const saved = localStorage.getItem("delivery-vehicles");
-		console.log('Loading saved vehicles from storage:', saved);
 		
 		if (!saved) {
 			console.log('No saved vehicles found');

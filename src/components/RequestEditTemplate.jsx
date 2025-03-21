@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import {
 	DatePickerComponent,
@@ -15,10 +15,16 @@ import {
 	GetProducts,
 	GetAllContacts,
 	GetSupplierProductsByProduct,
+	getRequestTemplates,
+	createRequestTemplate,
 } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
-import { showErrorDialog } from "../utils/useSweetAlert";
+import {
+	showErrorDialog,
+	showSuccessDialogWithTimer,
+} from "../utils/useSweetAlert";
+import useUserStore from "../stores/UserStore";
 
 // Set Selection Options
 // const categoryOptions = [
@@ -48,24 +54,146 @@ import { requestStatusOptions } from "../data/worksideOptions";
 
 const RequestEditTemplate = (props) => {
 	const data = props.rowData || {};
+	const userId = useUserStore((state) => state.userID);
 	const [customerChangeFlag, setCustomerChangeFlag] = useState(false);
+
+	// Function to get default date/time
+	const getDefaultDateTime = () => {
+		const now = new Date();
+		const nextHour = new Date(now);
+		nextHour.setHours(now.getHours() + 1);
+		nextHour.setMinutes(0);
+		nextHour.setSeconds(0);
+		nextHour.setMilliseconds(0);
+		return nextHour;
+	};
+
+	// Function to get stored preferences
+	const getStoredPreferences = useCallback(() => {
+		const defaults = {
+			customername: localStorage.getItem("lastCustomer") || "",
+			customercontact: localStorage.getItem("lastCustomerContact") || "",
+			projectname: localStorage.getItem("lastProject") || "",
+			rigcompany: localStorage.getItem("lastRigCompany") || "",
+			rigcompanycontact: localStorage.getItem("lastRigCompanyContact") || "",
+			status: localStorage.getItem("lastStatus") || "OPEN",
+		};
+		return defaults;
+	}, []);
+
+	// Function to save preferences
+	const savePreferences = (formData) => {
+		localStorage.setItem("lastCustomer", formData.customername || "");
+		localStorage.setItem("lastCustomerContact", formData.customercontact || "");
+		localStorage.setItem("lastProject", formData.projectname || "");
+		localStorage.setItem("lastRigCompany", formData.rigcompany || "");
+		localStorage.setItem(
+			"lastRigCompanyContact",
+			formData.rigcompanycontact || "",
+		);
+		localStorage.setItem("lastStatus", formData.status || "OPEN");
+	};
+
+	const [formData, setFormData] = useState(() => {
+		const storedPrefs = getStoredPreferences();
+		const isNewRequest = !data._id;
+		const now = new Date();
+
+		// console.log("Initializing form data:", {
+		// 	isNewRequest,
+		// 	storedPrefs,
+		// 	data,
+		// 	props,
+		// });
+
+		return {
+			...data,
+			requestcategory: "",
+			requestname: "",
+			quantity: 1,
+			comments: "",
+			vendortype: "MSA",
+			vendorName: "",
+			status: isNewRequest ? storedPrefs.status || "NOT-AWARDED" : data.status,
+			statusdate: now,
+			datetimerequested: getDefaultDateTime(),
+			creationdate: now,
+			customername: isNewRequest ? storedPrefs.customername : data.customername,
+			customercontact: isNewRequest
+				? storedPrefs.customercontact
+				: data.customercontact,
+			projectname: isNewRequest ? storedPrefs.projectname : data.projectname,
+			rigcompany: isNewRequest ? storedPrefs.rigcompany : data.rigcompany,
+			rigcompanycontact: isNewRequest
+				? storedPrefs.rigcompanycontact
+				: data.rigcompanycontact,
+		};
+	});
+
+	// Add useEffect to handle initial data loading
+	useEffect(() => {
+		const isNewRequest = !data._id;
+		if (isNewRequest) {
+			const storedPrefs = getStoredPreferences();
+			// console.log("Loading stored preferences for new request:", storedPrefs);
+
+			setFormData((prev) => ({
+				...prev,
+				customername: storedPrefs.customername || "",
+				customercontact: storedPrefs.customercontact || "",
+				projectname: storedPrefs.projectname || "",
+				rigcompany: storedPrefs.rigcompany || "",
+				rigcompanycontact: storedPrefs.rigcompanycontact || "",
+				status: storedPrefs.status || "NOT-AWARDED",
+			}));
+		}
+	}, [data._id, getStoredPreferences]);
+
+	// Template state
+	const [templates, setTemplates] = useState([]);
+	const [isLoadingTemplates, setIsLoadingTemplates] = useState(false);
+	const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+	const [showSaveTemplateDialog, setShowSaveTemplateDialog] = useState(false);
+	const [newTemplateName, setNewTemplateName] = useState("");
+	const [templateError, setTemplateError] = useState("");
 
 	// Handle input changes
 	const onChange = (args) => {
-		// Only for debugging purposes
-		setData({ ...data, [args.target.name]: args.target.value });
-		if (args.target.name === "requestcategory") {
-			GetProducts().then(() => {
-				FilterProducts(args.target.value);
+		if (args.value !== undefined) {
+			const name = args.element?.id || args.target?.name;
+			const value = args.itemData?.value || args.value;
+
+			setFormData((prev) => {
+				const newData = { ...prev, [name]: value };
+				// Save preferences when relevant fields change
+				if (
+					[
+						"customername",
+						"customercontact",
+						"projectname",
+						"rigcompany",
+						"rigcompanycontact",
+						"status",
+					].includes(name)
+				) {
+					savePreferences(newData);
+				}
+				return newData;
 			});
-		}
-		if (args.target.name === "vendortype") {
-			if (args.target.value === "SSR") {
+
+			if (name === "requestcategory") {
+				FilterProducts(value);
+			}
+			if (name === "vendortype" && value === "SSR") {
 				GetSSRVendors();
 			}
-		}
-		if (args.target.name === "customername") {
-			setCustomerChangeFlag(true);
+			if (name === "customername") {
+				setCustomerChangeFlag(true);
+				setFormData((prev) => ({ ...prev, customercontact: "" }));
+			}
+			if (name === "rigcompany") {
+				setFormData((prev) => ({ ...prev, rigcompanycontact: "" }));
+			}
 		}
 	};
 
@@ -80,6 +208,7 @@ const RequestEditTemplate = (props) => {
 	const [allCategories, setAllCategories] = useState([]);
 	const [filteredProducts, setFilteredProducts] = useState([]);
 	const [products, setProducts] = useState([]);
+	const [allProducts, setAllProducts] = useState([]);
 	
 	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
 
@@ -107,7 +236,7 @@ const RequestEditTemplate = (props) => {
 	});
 
 	// Get the products data
-	const { data: productsData } = useQuery({
+	const { data: productsData, isLoading: isLoadingProducts } = useQuery({
 		queryKey: ["products"],
 		queryFn: () => GetProducts(),
 		refetchInterval: 10000 * 60 * 10, // 10 minutes
@@ -128,161 +257,493 @@ const RequestEditTemplate = (props) => {
 		retry: 3,
 	});
 
+	// Update useEffect for initial product loading
 	useEffect(() => {
-		GetProducts().then(() => {
-			if (data.requestcategory !== undefined)
-				FilterProducts(data.requestcategory);
-		});
-	}, []);
+		if (productsData?.data) {
+			// Extract unique categories and sort them alphabetically
+			const uniqueCategories = [
+				...new Set(productsData.data.map((p) => p.categoryname)),
+			]
+				.filter(Boolean)
+				.sort();
+			// Format categories for dropdown
+			const formattedCategories = uniqueCategories.map((category) => ({
+				text: category,
+				value: category,
+			}));
+			// Set all products and categories
+			setAllProducts(productsData.data);
+			setAllCategories(formattedCategories);
+		}
+	}, [productsData]);
 
-	const getCustomers = (firms) => {
+	// Separate useEffect for filtered products
+	useEffect(() => {
+		if (allProducts.length > 0 && formData.requestcategory) {
+			const filteredProducts = allProducts
+				.filter((p) => p.categoryname === formData.requestcategory)
+				.map((p) => ({
+					text: p.productname,
+					value: p.productname,
+				}));
+			setFilteredProducts([...new Set(filteredProducts)]);
+		} else {
+			setFilteredProducts([]);
+		}
+	}, [allProducts, formData.requestcategory]);
+
+	// Update FilterProducts function to be memoized
+	const FilterProducts = useCallback(
+		(selectedCategory) => {
+			try {
+				if (!selectedCategory || !allProducts?.length) {
+					console.log("No category selected or no products available");
+					setFilteredProducts([]);
+					return;
+				}
+
+				const filtered = allProducts
+					.filter((p) => p.categoryname === selectedCategory)
+					.map((p) => ({
+						text: p.productname,
+						value: p.productname,
+					}));
+				const uniqueFiltered = [...new Set(filtered.map(JSON.stringify))].map(
+					JSON.parse,
+				);
+				setFilteredProducts(uniqueFiltered);
+			} catch (error) {
+				console.error("Error filtering products:", error);
+				setFilteredProducts([]);
+			}
+		},
+		[allProducts],
+	);
+
+	const getCustomers = useCallback((firms) => {
 		if (firms === undefined || firms === null) return [];
 		return firms.data.filter((firm) => firm.type === "CUSTOMER");
-	};
+	}, []);
 
-	const getRigCompanies = (firms) => {
+	const getRigCompanies = useCallback((firms) => {
 		if (firms === undefined || firms === null) return [];
 		return firms.data.filter((firm) => firm.type === "RIGCOMPANY");
-	};
+	}, []);
 
 	useEffect(() => {
-		if (firmData === undefined || firmData === undefined) return;
+		if (firmData === undefined || firmData === null) return;
 
+		// Get Customers
 		const customerResult = getCustomers(firmData);
-		// Extract names into an array
-		const customers = customerResult?.map((r) => r.name);
+		const customers = customerResult?.map((r) => ({
+			text: r.name,
+			value: r.name,
+		}));
 		setCustomerOptions(customers);
 
 		// Get Rig Companies
 		const rigResult = getRigCompanies(firmData);
-		// Extract names into an array
-		const rigCompanies = rigResult?.map((r) => r.name);
+		const rigCompanies = rigResult?.map((r) => ({
+			text: r.name,
+			value: r.name,
+		}));
 		setRigCompanyOptions(rigCompanies);
 
 		// Get Projects
-		if (projData !== undefined && projData !== null) {
-			const projects = projData.data.map((p) => p.projectname);
+		if (projData?.data) {
+			const projects = projData.data.map((p) => ({
+				text: p.projectname,
+				value: p.projectname,
+			}));
 			setProjectOptions(projects);
 		}
-	}, [projData, firmData]);
+	}, [firmData, projData, getCustomers, getRigCompanies]);
 
-	useEffect(() => {
-		if (productsData === undefined || productsData === null) return;
-		const cats = [...new Set(productsData.data.map((p) => p.categoryname))];
-		setAllCategories(cats);
-		if (data.requestcategory !== undefined)
-			FilterProducts(data.requestcategory);
-	}, [productsData]);
-
-	const FilterProducts = async () => {
-		try {
-			if (!data || !data.requestcategory) {
-				setProducts([]);
-				return;
-			}
-
-			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product/category/${data.requestcategory}`,
-			);
-
-			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
-			}
-
-			const jsonData = await response.json();
-			setProducts(jsonData || []); // Ensure we always set an array
-		} catch (error) {
-			console.error("Error filtering products:", error);
-			setProducts([]); // Set empty array on error
-		}
-	};
-
-	const filterContactsByFirm = (contacts, firm) => {
-  return contacts?.filter((contact) => contact?.firm === firm);
-};
+	// Memoize filterContactsByFirm
+	const filterContactsByFirm = useCallback((contacts, firm) => {
+		return contacts?.filter((contact) => contact?.firm === firm);
+	}, []);
 
 	// Get Customer Contacts
 	useEffect(() => {
 		if (contactsData === undefined || contactsData === null) return;
 
 		const contacts = contactsData.data;
-		const result = filterContactsByFirm(contacts, data.customername);
-		const contactsList = result.map((r) => r.username);
+		const result = filterContactsByFirm(contacts, formData.customername);
+		const contactsList = result.map((r) => ({
+			text: r.username,
+			value: r.username,
+		}));
 		setContactOptions(contactsList);
 		setCustomerChangeFlag(false);
-	}, [contactsData, data.customername, customerChangeFlag]);
+	}, [contactsData, formData.customername, filterContactsByFirm]);
 
-		// Get Rig Company Contacts
+	// Get Rig Company Contacts
 	useEffect(() => {
-		// Get Customer Contact Options from Contact Collection
 		if (contactsData === undefined || contactsData === null) return;
 		const result = contactsData.data.filter(
-			(contact) => contact.firm === data.rigcompany,
+			(contact) => contact.firm === formData.rigcompany,
 		);
-		// Extract names into an array
-		const contacts = result.map((r) => r.username);
+		// Format contacts for dropdown
+		const contacts = result.map((r) => ({
+			text: r.username,
+			value: r.username,
+		}));
 		setRigCompanyContactOptions(contacts);
-	}, [contactsData, data.rigcompany]);
+	}, [contactsData, formData.rigcompany]);
 
 	const extractProducts = (response) => {
-		// Check if status is 200 and extract the data array
-		if (response.length > 0 && response[0].status === 200) {
-			return response[0].data;
+		if (Array.isArray(response) && response.length > 0) {
+			// Check if response is an array and has data
+			// Check if the first item has status and data
+			if (response[0].status === 200 && response[0].data) {
+				return response[0].data;
+			}
+		}
+		if (response?.data) {
+			// If response is directly an object with data
+			return response.data;
 		}
 		return [];
 	};
+
 	const GetSSRVendors = async () => {
-		if (data.requestcategory === undefined || data.requestname === undefined) {
-			await showErrorDialog("Please select a Request Category and Request Name!");
-			return;
-		}
-		GetSupplierProductsByProduct().then((response) => {
+		try {
+			if (
+				formData.requestcategory === undefined ||
+				formData.requestname === undefined ||
+				!formData.requestcategory ||
+				!formData.requestname
+			) {
+				await showErrorDialog(
+					"Please select a Request Category and Request Name!",
+				);
+				return;
+			}
+
+			const response = await GetSupplierProductsByProduct(
+				formData.requestcategory,
+				formData.requestname,
+			);
+
 			const suppliers = extractProducts(response);
+
 			const filteredSuppliers = suppliers.filter((s) => {
-				if (
-					s.category === data.requestcategory &&
-					s.product === data.requestname
-				) {
-					return true;
-				}
-				return false;
+				const matches =
+					s.category === formData.requestcategory &&
+					s.product === formData.requestname;
+				return matches;
 			});
+
 			if (filteredSuppliers.length === 0) {
 				showErrorDialog("No Sole Source Vendors/Suppliers Found!");
 			} else {
-				const suppliers = [
+				const uniqueSuppliers = [
 					...new Set(filteredSuppliers.map((s) => s.supplier)),
 				];
-				setMSAVendorOptions(suppliers);
+				setMSAVendorOptions(uniqueSuppliers);
 			}
-		});
+		} catch (error) {
+			console.error("Error in GetSSRVendors:", error);
+			showErrorDialog(`Error fetching suppliers: ${error.message}`);
+		}
 	};
 
-
-	useEffect(() => {
-		// ReadOnly flag
-		if (data.isAdd) {
-			data.datetimerequested = new Date();
-			data.creationdate = new Date();
-			data.status = "OPEN";
-			data.statusdate = new Date();
-
-			setReadOnlyFlag(false);
-		} else {
-			setReadOnlyFlag(true);
-			GetProducts();
-			FilterProducts();
+	// Template handling functions
+	const fetchTemplates = useCallback(async () => {
+		// if (!userId) return;
+		// TODO: Remove this once we have a user ID
+		const userId = "679d76fde33b65f7d45013e4";
+		setIsLoadingTemplates(true);
+		try {
+			const response = await getRequestTemplates(userId);
+			if (!response?.data) {
+				throw new Error("No templates data received");
+			}
+			setTemplates(response.data);
+		} catch (error) {
+			console.error("Error fetching templates:", error);
+			setTemplateError("Failed to load templates");
+		} finally {
+			setIsLoadingTemplates(false);
 		}
-	}, [data.isAdd]);
+	}, []); // Remove userId from dependencies since it's hardcoded for now
+
+	const handleTemplateSelection = useCallback(
+		async (template) => {
+			try {
+				if (!template?.category || !template?.product) {
+					throw new Error("Invalid template data");
+				}
+
+				// Update form data first
+				setFormData((prev) => ({
+					...prev,
+					requestcategory: template.category,
+					requestname: template.product,
+					quantity: Number.isInteger(template.quantity) ? template.quantity : 1,
+					comments: template.comment || "",
+					vendortype: template.preferredVendorType || "MSA",
+					vendorName: template.preferredVendor || "",
+				}));
+
+				// Filter products for the selected category
+				FilterProducts(template.category);
+
+				// Handle vendor type
+				const vendorTypeDropdown =
+					document.getElementById("vendortype")?.ej2_instances?.[0];
+				if (vendorTypeDropdown) {
+					switch (template.preferredVendorType) {
+						case "SSR":
+							if (template.preferredVendor) {
+								const response = await GetSupplierProductsByProduct(
+									template.category,
+									template.product,
+								);
+								const suppliers = response?.data?.filter(
+									(s) =>
+										s.category === template.category &&
+										s.product === template.product,
+								);
+
+								if (suppliers?.length > 0) {
+									const suppliersList = suppliers.map((s) => s.supplier);
+									setMSAVendorOptions(suppliersList);
+									vendorTypeDropdown.value = "SSR";
+
+									setTimeout(() => {
+										const vendorNameDropdown =
+											document.getElementById("vendorName")?.ej2_instances?.[0];
+										if (vendorNameDropdown) {
+											vendorNameDropdown.value = template.preferredVendor;
+										}
+									}, 100);
+								}
+							}
+							break;
+						case "OPEN":
+							vendorTypeDropdown.value = "OPEN";
+							break;
+						default:
+							vendorTypeDropdown.value = "MSA";
+					}
+				}
+
+				// Update the comments input field directly
+				const commentsInput = document.getElementById("comments");
+				if (commentsInput) {
+					commentsInput.value = template.comment || "";
+				}
+
+				setShowTemplateDialog(false);
+				await showSuccessDialogWithTimer("Template applied successfully");
+			} catch (error) {
+				console.error("Error applying template:", error);
+				await showErrorDialog(`Failed to apply template: ${error.message}`);
+			}
+		},
+		[FilterProducts],
+	);
+
+	const handleSaveTemplate = async () => {
+		try {
+			if (!newTemplateName.trim()) {
+				throw new Error("Template name is required");
+			}
+
+			const existingTemplate = templates.find(
+				(t) => t.name.toLowerCase() === newTemplateName.toLowerCase(),
+			);
+
+			if (existingTemplate) {
+				throw new Error("Template name already exists");
+			}
+
+			const templateData = {
+				name: newTemplateName,
+				description: `${data.requestcategory} - ${data.requestname} template`,
+				category: data.requestcategory,
+				product: data.requestname,
+				comment: data.comment,
+				quantity: data.quantity,
+				preferredVendorType: data.vendortype,
+				preferredVendor: data.vendortype === "SSR" ? data.vendorName : null,
+				createdBy: userId,
+			};
+
+			const response = await createRequestTemplate(templateData);
+			if (!response?.data) {
+				throw new Error("Failed to create template");
+			}
+
+			setShowSaveTemplateDialog(false);
+			setNewTemplateName("");
+			setTemplateError("");
+			await showSuccessDialogWithTimer("Template saved successfully");
+			await fetchTemplates();
+		} catch (error) {
+			console.error("Save template error:", error);
+			setTemplateError(error.message);
+			await showErrorDialog(error.message);
+		}
+	};
+
+	// Update the template dialog to ensure it shows templates
+	const renderTemplateDialog = () =>
+		showTemplateDialog && (
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+				<div className="bg-white p-6 rounded-lg w-96">
+					<div className="flex justify-between items-center mb-4">
+						<h2 className="text-xl font-bold">Select Template</h2>
+						<button
+							type="button"
+							className="bg-gray-200 hover:bg-gray-300 text-black px-3 py-1 rounded"
+							onClick={() => setShowTemplateDialog(false)}
+						>
+							×
+						</button>
+					</div>
+					{isLoadingTemplates ? (
+						<div className="text-center">Loading templates...</div>
+					) : templateError ? (
+						<div className="text-red-500">{templateError}</div>
+					) : templates.length === 0 ? (
+						<div className="text-center text-gray-600">
+							No templates available
+						</div>
+					) : (
+						<div className="max-h-60 overflow-y-auto">
+							{templates.map((template) => (
+								<button
+									type="button"
+									key={template._id}
+									className="w-full text-left p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
+									onClick={() => handleTemplateSelection(template)}
+								>
+									<h3 className="font-bold">{template.name}</h3>
+									<p className="text-sm text-gray-600">
+										{template.description}
+									</p>
+								</button>
+							))}
+						</div>
+					)}
+				</div>
+			</div>
+		);
+
+	const renderSaveTemplateDialog = () =>
+		showSaveTemplateDialog && (
+			<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+				<div className="bg-white p-6 rounded-lg w-96">
+					<div className="flex justify-between items-center mb-4">
+						<h2 className="text-xl font-bold">Save as Template</h2>
+						<button
+							type="button"
+							className="bg-gray-200 hover:bg-gray-300 text-black px-3 py-1 rounded"
+							onClick={() => setShowSaveTemplateDialog(false)}
+						>
+							×
+						</button>
+					</div>
+					<input
+						type="text"
+						className="w-full p-2 border rounded mb-4"
+						placeholder="Template Name"
+						value={newTemplateName}
+						onChange={(e) => setNewTemplateName(e.target.value)}
+					/>
+					{templateError && (
+						<div className="text-red-500 mb-4">{templateError}</div>
+					)}
+					<div className="flex justify-end gap-4">
+						<button
+							type="button"
+							className="bg-gray-500 text-white px-4 py-2 rounded"
+							onClick={() => setShowSaveTemplateDialog(false)}
+						>
+							Cancel
+						</button>
+						<button
+							type="button"
+							className="bg-green-500 text-white px-4 py-2 rounded"
+							onClick={handleSaveTemplate}
+						>
+							Save
+						</button>
+					</div>
+				</div>
+			</div>
+		);
+
+	// Load templates on initial render
+	useEffect(() => {
+		fetchTemplates();
+	}, [fetchTemplates]);
 
 	return (
 		<div className="flex justify-center items-center bg-white">
+			<style>
+				{`
+					.e-custom {
+						width: 100%;
+						min-height: 40px;
+						background-color: white;
+						border: 1px solid #ddd;
+						border-radius: 4px;
+						padding: 8px;
+					}
+					.e-custom .e-input {
+						height: 100%;
+						padding: 8px;
+					}
+					.e-custom .e-input-group {
+						border: none;
+					}
+					.e-custom .e-input-group-icon {
+						background-color: transparent;
+					}
+					.e-custom .e-input-group-icon.e-ddl-icon {
+						background-color: transparent;
+					}
+					.e-custom .e-input-group-icon.e-ddl-icon:hover {
+						background-color: #f5f5f5;
+					}
+					.e-custom .e-input-group-icon.e-ddl-icon:active {
+						background-color: #e0e0e0;
+					}
+				`}
+			</style>
 			{isLoading && (
 				<div className="absolute top-[50%] left-[50%]">
 					<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
+			{renderTemplateDialog()}
+			{renderSaveTemplateDialog()}
 			<div className="w-[600px] mx-[4px] space-y-2">
+				{/* Template buttons at the top */}
+				<div className="flex justify-end gap-2 mb-4">
+					<button
+						type="button"
+						className="bg-green-500 hover:drop-shadow-xl hover:bg-light-gray p-2 rounded-lg items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 font-bold"
+						onClick={async () => {
+							await fetchTemplates();
+							setShowTemplateDialog(true);
+						}}
+					>
+						Load Template
+					</button>
+					<button
+						type="button"
+						className="bg-green-500 hover:drop-shadow-xl hover:bg-light-gray p-2 rounded-lg items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 font-bold"
+						onClick={() => setShowSaveTemplateDialog(true)}
+					>
+						Save as Template
+					</button>
+				</div>
+
 				{/* Row 1 */}
 				<div className="flex gap-4">
 					{/* Input 1 */}
@@ -295,13 +756,24 @@ const RequestEditTemplate = (props) => {
 						</label>
 						<DropDownListComponent
 							id="requestcategory"
-							dataSource={allCategories}
 							name="requestcategory"
-							value={data.requestcategory}
-							placeholder="Select Category"
-							required={true}
+							dataSource={allCategories}
+							fields={{ text: "text", value: "value" }}
+							value={formData.requestcategory}
+							// placeholder="Select Category"
+							popupHeight="300px"
+							enabled={true}
 							onChange={onChange}
-							readonly={readOnlyFlag}
+							allowFiltering={true}
+							filterType="Contains"
+							showSelectAll={false}
+							showDropDownIcon={true}
+							showClearButton={true}
+							floatLabelType="Auto"
+							cssClass="e-custom"
+							index={allCategories.findIndex(
+								(cat) => cat.value === formData.requestcategory,
+							)}
 						/>
 					</div>
 					{/* Input 2 */}
@@ -314,13 +786,16 @@ const RequestEditTemplate = (props) => {
 						</label>
 						<DropDownListComponent
 							id="requestname"
-							dataSource={filteredProducts}
 							name="requestname"
-							value={data.requestname}
+							dataSource={filteredProducts}
+							fields={{ text: "text", value: "value" }}
+							value={formData.requestname}
 							placeholder="Select Request"
-							required={true}
+							popupHeight="300px"
+							enabled={true}
 							onChange={onChange}
-							readonly={readOnlyFlag}
+							allowFiltering={true}
+							filterType="Contains"
 						/>
 					</div>
 				</div>
@@ -338,11 +813,13 @@ const RequestEditTemplate = (props) => {
 							id="customername"
 							name="customername"
 							dataSource={customerOptions}
-							value={data.customername}
+							fields={{ text: "text", value: "value" }}
+							value={formData.customername}
 							placeholder="Select Customer"
-							required={true}
-							onChange={onChange}
-							readonly={readOnlyFlag}
+							onChange={(args) => {
+								onChange(args);
+							}}
+							cssClass="e-custom"
 						/>
 					</div>
 					{/* Input 4 */}
@@ -354,7 +831,8 @@ const RequestEditTemplate = (props) => {
 							id="customercontact"
 							name="customercontact"
 							dataSource={contactOptions}
-							value={data.customercontact}
+							fields={{ text: "text", value: "value" }}
+							value={formData.customercontact}
 							placeholder="Select Customer Contact"
 							required={true}
 							onChange={onChange}
@@ -375,11 +853,13 @@ const RequestEditTemplate = (props) => {
 							id="projectname"
 							name="projectname"
 							dataSource={projectOptions}
-							value={data.projectname}
+							fields={{ text: "text", value: "value" }}
+							value={formData.projectname}
 							placeholder="Select Project"
-							required={true}
-							onChange={onChange}
-							readonly={readOnlyFlag}
+							onChange={(args) => {
+								onChange(args);
+							}}
+							cssClass="e-custom"
 						/>
 					</div>
 				</div>
@@ -397,11 +877,13 @@ const RequestEditTemplate = (props) => {
 							id="rigcompany"
 							name="rigcompany"
 							dataSource={rigCompanyOptions}
-							value={data.rigcompany}
+							fields={{ text: "text", value: "value" }}
+							value={formData.rigcompany}
 							placeholder="Select Rig Company"
-							required={true}
-							onChange={onChange}
-							readonly={readOnlyFlag}
+							onChange={(args) => {
+								onChange(args);
+							}}
+							cssClass="e-custom"
 						/>
 					</div>
 					{/* Input 7 */}
@@ -413,7 +895,8 @@ const RequestEditTemplate = (props) => {
 							id="rigcompanycontact"
 							name="rigcompanycontact"
 							dataSource={rigCompanyContactOptions}
-							value={data.rigcompanycontact}
+							fields={{ text: "text", value: "value" }}
+							value={formData.rigcompanycontact}
 							placeholder="Select Rig Company Contact"
 							required={true}
 							onChange={onChange}
@@ -433,7 +916,7 @@ const RequestEditTemplate = (props) => {
 						<DatePickerComponent
 							id="creationdate"
 							name="creationdate"
-							value={data.creationdate}
+							value={formData.creationdate}
 							placeholder="Select Request Date"
 							required={true}
 							onChange={onChange}
@@ -451,7 +934,7 @@ const RequestEditTemplate = (props) => {
 						<DateTimePickerComponent
 							id="datetimerequested"
 							name="datetimerequested"
-							value={data.datetimerequested}
+							value={formData.datetimerequested}
 							placeholder="Select Date/Time Requested"
 							disabled={false}
 							onChange={onChange}
@@ -467,12 +950,16 @@ const RequestEditTemplate = (props) => {
 						</label>
 						<NumericTextBoxComponent
 							id="quantity"
-							value={data.quantity}
+							name="quantity"
+							value={formData.quantity}
+							min={1}
+							defaultValue={1}
 							placeholder="Enter Quantity"
 							showSpinButton={false}
 							decimals={2}
 							format="n2"
 							required={true}
+							onChange={onChange}
 						/>
 					</div>
 				</div>
@@ -487,7 +974,7 @@ const RequestEditTemplate = (props) => {
 							id="vendortype"
 							name="vendortype"
 							dataSource={vendorTypeOptions}
-							value={data.vendortype}
+							value={formData.vendortype}
 							placeholder="Select Vendor Type"
 							required={true}
 							onChange={onChange}
@@ -505,10 +992,9 @@ const RequestEditTemplate = (props) => {
 							id="vendorName"
 							name="vendorName"
 							dataSource={msaVendorOptions}
-							value={data.vendorName}
+							value={formData.vendorName}
 							placeholder="Select Sole Source Vendor"
 							required={false}
-							// readonly={data.vendorType !== "SSR"}
 							onChange={onChange}
 						/>
 					</div>
@@ -542,10 +1028,14 @@ const RequestEditTemplate = (props) => {
 							id="status"
 							name="status"
 							dataSource={requestStatusOptions}
-							value={data.status}
-							placeholder="Select Status"
+							value={formData.status}
+							// placeholder="Select Status"
 							required={true}
 							onChange={onChange}
+							showDropDownIcon={true}
+							showClearButton={true}
+							floatLabelType="Auto"
+							cssClass="e-custom"
 						/>
 					</div>
 					{/* Input 12 */}
@@ -559,7 +1049,7 @@ const RequestEditTemplate = (props) => {
 						<DatePickerComponent
 							id="statusdate"
 							name="statusdate"
-							value={data.statusdate}
+							value={formData.statusdate}
 							placeholder="Select Status Date"
 							required={true}
 							onChange={onChange}
@@ -567,6 +1057,11 @@ const RequestEditTemplate = (props) => {
 					</div>
 				</div>
 				{/* End of Input Fields */}
+
+				{/* Bottom button container */}
+				<div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+					{/* Remove the template buttons from here */}
+				</div>
 			</div>
 		</div>
 	);

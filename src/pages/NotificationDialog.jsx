@@ -45,22 +45,27 @@ async function sendBidNotification(userToken, bidData) {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
-			const response = await fetch("http://localhost:4000/api/notifications/realtime", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					recipients: formData.recipients
-						.split(",")
-						.map((email) => email.trim()),
-					title: formData.title,
-					message: formData.message,
-					data: {
-						additionalInfo: formData.additionalData,
+			// const response = await fetch("http://localhost:4000/api/notifications/realtime", {
+
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/notifications/realtime`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
 					},
-				}),
-			});
+					body: JSON.stringify({
+						recipients: formData.recipients
+							.split(",")
+							.map((email) => email.trim()),
+						title: formData.title,
+						message: formData.message,
+						data: {
+							additionalInfo: formData.additionalData,
+						},
+					}),
+				},
+			);
 
 			if (!response.ok) {
 				throw new Error("Failed to send notification");

@@ -1134,6 +1134,48 @@ const SaveProject = async (data) => apiRequest("/api/project/", "POST", data);
 const UpdateProject = async (id, body) =>
     apiRequest(`/api/project/${id}`, "PATCH", body);
 
+/**
+ * Retrieves project ID using project name and customer name.
+ * @param {string} projectName - The name of the project
+ * @param {string} customer - The name of the customer
+ * @returns {Promise<{status: number, data: {projectId: string, projectname: string, customer: string} | null, error: string | null}>}
+ */
+const GetProjectIDByNameAndCustomer = async (projectName, customer) => {
+	const cleanCustomer = cleanUpStr(customer);
+	try {
+		if (!projectName || !customer) {
+			throw new Error("Project name and customer are required");
+		}
+
+		const response = await axios.get(
+			`${apiURL}/api/project/id-by-name-customer`,
+			{
+				params: {
+					projectname: projectName,
+					customer: cleanCustomer,
+				},
+			},
+		);
+
+		if (response.status === 200) {
+			return {
+				status: 200,
+				data: response.data.data,
+				error: null,
+			};
+		}
+
+		throw new Error("Failed to retrieve project ID");
+	} catch (error) {
+		console.error("Error retrieving project ID:", error.message);
+		return {
+			status: error.response?.status || 500,
+			data: null,
+			error: error.message,
+		};
+	}
+};
+
 /******************************************************************************
  * Rig-related Functions
  ******************************************************************************/
@@ -1474,85 +1516,128 @@ const UpdateRequestBidListCompanies = async (reqID, bidList) => {
     }
 };
 
-
 const GetRequestBidListCompanies = async (bidListUsers) => {
-    // const apiURL = "https://keen-squid-lately.ngrok-free.app";
-    const strAPI = `${apiURL}/api/contact/companies-by-emails`;
-    const body = bidListUsers;
-    const response = await axios.post(strAPI, body);
-    return { status: response.status, data: response.data };
+	const strAPI = `${apiURL}/api/contact/companies-by-emails`;
+	const body = { bidListUsers };
+	console.log(`StrAPI: ${strAPI}`);
+	console.log(`Body: ${JSON.stringify(body)}`);
+	try {
+		const response = await axios.post(strAPI, body);
+		return { status: response.status, data: response.data };
+	} catch (error) {
+		console.error("Error getting bid list companies:", error);
+		return { status: error.response?.status || 500, data: null };
+	}
+};
+
+/**
+ * Retrieves vendor ID using vendor name.
+ * @param {string} vendorName - The name of the vendor
+ * @returns {Promise<{status: number, data: {vendorId: string, name: string} | null, error: string | null}>}
+ */
+const GetVendorIDByName = async (vendorName) => {
+	try {
+		if (!vendorName) {
+			throw new Error("Vendor name is required");
+		}
+
+		const response = await axios.get(`${apiURL}/api/firm/id-by-name`, {
+			params: {
+				name: vendorName,
+			},
+		});
+
+		if (response.status === 200) {
+			return {
+				status: 200,
+				data: response.data.data,
+				error: null,
+			};
+		}
+
+		throw new Error("Failed to retrieve vendor ID");
+	} catch (error) {
+		console.error("Error retrieving vendor ID:", error.message);
+		return {
+			status: error.response?.status || 500,
+			data: null,
+			error: error.message,
+		};
+	}
 };
 
 // Export all functions
 export {
-    fetchWithHandling,
-    GetAllFirms,
-    GetAllFirmsForSelection,
-    GetAllSuppliers,
-    GetAllRigCompanies,
-    GetAllCustomers,
-    GetAllContacts,
-    GetContactIDByEmail,
-    GetContactsByFirm,
-    GetFirmOptions,
-    GetCustomerOptions,
-    GetSupplierOptions,
-    GetContactOptions,
-    GetFirmID,
-    GetFirmType,
-    GetContactID,
-    GetCustomerSupplierMSAData,
-    GetSupplierGroupData,
-    GetAllRequests,
-    GetAllRequestsByProject,
-    SaveNewRequest,
-    UpdateRequest,
-    SaveRequestBid,
-    UpdateRequestBid,
-    DoesRequestBidExist,
-    GetRequestBids,
-    UpdateRequestStatus,
-    SetRequestBidsStatus,
-    SetAwardedRequestBidStatus,
-    GetDeliveryAssociates,
-    GetSupplierInfoFromID,
-    GetSupplierIDFromName,
-    GetRequestsByCustomer,
-    GetRequestData,
-    GetRequestOptions,
-    GetRequestID,
-    GetRequestCategoryOptions,
-    GetRequestCategoryID,
-    GetRequestStatusOptions,
-    GetAllUsers,
-    UserForgotPassword,
-    UserDoesExist,
-    UserResetPassword,
-    UserChangePassword,
-    UserLogin,
-    UserRegister,
-    UserLogout,
-    UserIsAuthenticated,
-    GetProducts,
-    DeleteProduct,
-    GetProductByID,
-    GetProductOptions,
-    GetAllProjects,
-    GetProjectsByStatus,
-    GetAllProjectsByCustomer,
-    DeleteProject,
-    SaveProject,
-    UpdateProject,
-    GetRigs,
-    GetRigsByRigCompany,
-    DeleteRig,
-    GetSupplierProductsByProduct,
-    createRequestTemplate,
-    getRequestTemplates,
-    updateRequestTemplate,
-    deleteRequestTemplate,
-    GetAllSupplierGroupData,
-    UpdateRequestBidListUsers,
-    UpdateRequestBidListCompanies,
-    GetRequestBidListCompanies,
+	fetchWithHandling,
+	GetAllFirms,
+	GetAllFirmsForSelection,
+	GetAllSuppliers,
+	GetAllRigCompanies,
+	GetAllCustomers,
+	GetAllContacts,
+	GetContactIDByEmail,
+	GetContactsByFirm,
+	GetFirmOptions,
+	GetCustomerOptions,
+	GetSupplierOptions,
+	GetContactOptions,
+	GetFirmID,
+	GetFirmType,
+	GetContactID,
+	GetCustomerSupplierMSAData,
+	GetSupplierGroupData,
+	GetAllRequests,
+	GetAllRequestsByProject,
+	SaveNewRequest,
+	UpdateRequest,
+	SaveRequestBid,
+	UpdateRequestBid,
+	DoesRequestBidExist,
+	GetRequestBids,
+	UpdateRequestStatus,
+	SetRequestBidsStatus,
+	SetAwardedRequestBidStatus,
+	GetDeliveryAssociates,
+	GetSupplierInfoFromID,
+	GetSupplierIDFromName,
+	GetRequestsByCustomer,
+	GetRequestData,
+	GetRequestOptions,
+	GetRequestID,
+	GetRequestCategoryOptions,
+	GetRequestCategoryID,
+	GetRequestStatusOptions,
+	GetAllUsers,
+	UserForgotPassword,
+	UserDoesExist,
+	UserResetPassword,
+	UserChangePassword,
+	UserLogin,
+	UserRegister,
+	UserLogout,
+	UserIsAuthenticated,
+	GetProducts,
+	DeleteProduct,
+	GetProductByID,
+	GetProductOptions,
+	GetAllProjects,
+	GetProjectsByStatus,
+	GetAllProjectsByCustomer,
+	DeleteProject,
+	SaveProject,
+	UpdateProject,
+	GetRigs,
+	GetRigsByRigCompany,
+	DeleteRig,
+	GetSupplierProductsByProduct,
+	createRequestTemplate,
+	getRequestTemplates,
+	updateRequestTemplate,
+	deleteRequestTemplate,
+	GetAllSupplierGroupData,
+	UpdateRequestBidListUsers,
+	UpdateRequestBidListCompanies,
+	GetRequestBidListCompanies,
+	GetProjectIDByNameAndCustomer,
+	GetVendorIDByName,
 };

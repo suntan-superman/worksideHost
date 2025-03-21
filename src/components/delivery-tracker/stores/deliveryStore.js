@@ -64,7 +64,6 @@ const loadSavedDistributionCenters = () => {
 const loadSavedVehicles = () => {
 	try {
 		const saved = localStorage.getItem("delivery-vehicles");
-		console.log('Loading saved vehicles from storage:', saved);
 		
 		if (!saved) {
 			console.log('No saved vehicles found');
@@ -85,15 +84,13 @@ const loadSavedVehicles = () => {
 				name: vehicle.name,
 				distributionCenterId: vehicle.distributionCenterId || null,
 				distributionCenterName: vehicle.distributionCenterName || null,
-				status: vehicle.status || 'idle',
+				status: vehicle.status || "idle",
 				location: vehicle.location || null,
-				metrics: vehicle.metrics || { progress: 0, currentSpeed: 0 }
+				metrics: vehicle.metrics || { progress: 0, currentSpeed: 0 },
 			};
-			console.log('Processed vehicle:', processed);
 			return processed;
 		});
 
-		console.log('Final processed vehicles:', processedVehicles);
 		return processedVehicles;
 	} catch (e) {
 		console.error("Failed to load vehicles:", e);

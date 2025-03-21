@@ -20,12 +20,13 @@ const Admin = () => {
 
 	useEffect(() => {
 		const GetAccessLevel = () => {
-			const value = localStorage.getItem("accessLevel");
-			if (value) {
-				if (value > 2) setShowValidateUsersTab(true);
-				return value;
-			}
-			return 0;
+		const value = Number(localStorage.getItem("accessLevel"));
+		console.log("Access Level: ", value);
+		if (value) {
+			if (value > 2) setShowValidateUsersTab(true);
+			return value;
+		}
+		return 0;
 		};
 		GetAccessLevel();
 	}, []);

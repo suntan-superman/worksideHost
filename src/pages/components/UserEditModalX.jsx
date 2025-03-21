@@ -133,6 +133,7 @@ const UserEditModalX = ({ isOpen, onClose, onSubmit, userData }) => {
 	 */
 	const handleSubmit = useCallback(async () => {
 		if (!validateForm()) {
+			console.log("Form validation failed");
 			return;
 		}
 

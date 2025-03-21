@@ -12,8 +12,14 @@ import {
 
 const ConfirmationDialog = ({ open, message, onConfirm, onCancel }) => {
 	return (
-		<Dialog open={open} onClose={onCancel}>
-			<DialogTitle id="requestDetailsDialog">
+		<Dialog
+			open={open}
+			onClose={onCancel}
+			aria-labelledby="confirmation-dialog-title"
+			disableEnforceFocus
+			disableRestoreFocus
+		>
+			<DialogTitle id="confirmation-dialog-title">
 				<span className="text-bold text-green-300 text-xl">WORK</span>
 				<span className="text-bold text-black text-xl">SIDE</span>
 			</DialogTitle>

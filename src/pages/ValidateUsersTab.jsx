@@ -70,7 +70,7 @@ const ValidateUsersTab = () => {
 	const { currentColor } = UseStateContext();
 	const [contactData, setContactData] = useState(null);
 	const [contactID, setContactID] = useState(null);
-	const [newUser, setNewUser] = useState(false);
+	const [newUser, setNewUser] = useState(true);
 	// let newUser = false;
 
 	const [formData, setFormData] = useState({
@@ -234,7 +234,7 @@ const ValidateUsersTab = () => {
 		});
 	};
 
-	const recordClick = (args) => {
+	const recordClick = async (args) => {
 		if (args.target.classList.contains("userData")) {
 			if (args.rowData.isEmailValid === false) {
 				showErrorDialog("Email is not Validated...");
@@ -250,7 +250,7 @@ const ValidateUsersTab = () => {
 			resetFormData();
 
 			// Get Contact Info by Email
-			GetContactInfoByEmail(args.rowData.email).then(() => {
+			await GetContactInfoByEmail(args.rowData.email).then(() => {
 				if (newUser === true) {
 					setFormData({
 						firstname: args.rowData?.firstName,
@@ -316,12 +316,12 @@ const ValidateUsersTab = () => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${email}`;
 		setContactData(null);
 		setContactID(null);
-		setNewUser(false);
+		setNewUser(true);
 
 		try {
 			const response = await fetch(fetchString);
-			const jsonData = await response.json().then((data) => {
-				if (data.length === 0) {
+			await response.json().then((data) => {
+				if (data.newUser === true) {
 					setNewUser(true);
 					setContactData(null);
 					setContactID(null);
@@ -379,7 +379,7 @@ const ValidateUsersTab = () => {
 			body: JSON.stringify({
 				contactclass: firmType,
 				firm: formData.company,
-				accesslevel: formData.accesslevel,
+				accesslevel: updatedContactData.accesslevel,
 				username: selectedRecordData.email,
 				firstname: formData.firstname,
 				lastname: formData.lastname,
@@ -402,8 +402,6 @@ const ValidateUsersTab = () => {
 	};
 
 	const SendEmailValidation = async (email) => {
-		console.log(`SendEmailValidation: ${email}`);
-
 		const requestOptions = {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -418,7 +416,6 @@ const ValidateUsersTab = () => {
 			"/api/email",
 			requestOptions,
 		);
-		console.log(`SendEmailValidation: ${status}`);
 		return status;
 	};
 

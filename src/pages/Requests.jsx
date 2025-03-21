@@ -16,7 +16,15 @@ import {
 	Freeze,
 } from "@syncfusion/ej2-react-grids";
 
-import { GetRequestsByCustomer } from "../api/worksideAPI";
+import {
+	GetRequestsByCustomer,
+	GetProjectIDByNameAndCustomer,
+	GetVendorIDByName,
+	GetAllSupplierGroupData,
+	GetRequestBidListCompanies,
+	UpdateRequestBidListUsers,
+	UpdateRequestBidListCompanies,
+} from "../api/worksideAPI";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import RequestInfoModal from "../components/RequestInfoModal";
@@ -32,9 +40,12 @@ import {
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 
-import FilterListIcon from '@mui/icons-material/FilterList';
+import FilterListIcon from "@mui/icons-material/FilterList";
 import { Chip, IconButton, Box } from "@mui/material";
 import RequestFilterDialog from "../components/RequestFilterDialog";
+
+import axios from "axios";
+// import { Toast } from "@syncfusion/ej2-react-notifications";
 
 let gridPageSize = 8;
 let clientName = "CRC";
@@ -53,6 +64,97 @@ const requestStatusOptions = [
 	"COMPLETED",
 ];
 
+function getNextWholeHour() {
+	const now = new Date();
+	const nextHour = new Date(now);
+	nextHour.setHours(now.getHours() + 1);
+	nextHour.setMinutes(0);
+	nextHour.setSeconds(0);
+	nextHour.setMilliseconds(0);
+	return nextHour;
+}
+
+function getEmailAddresses(data) {
+	return data
+		.map((item) => {
+			const match = item.label.match(/\(([^)]+)\)/);
+			return match ? match[1] : null;
+		})
+		.filter(Boolean);
+}
+
+function formatEmailList(emailList) {
+	return { bidListUsers: emailList };
+}
+
+function getUsersByCategory(category, dataset) {
+	let users = [];
+	for (const supplier of dataset) {
+		if (supplier.children && Array.isArray(supplier.children)) {
+			for (const group of supplier.children) {
+				if (group.children && Array.isArray(group.children)) {
+					const hasMatchingCategory = group.children.some((child) => {
+						if (
+							child.type === "group-category" &&
+							child.children &&
+							Array.isArray(child.children)
+						) {
+							return child.children.some(
+								(cat) => cat.type === "category" && cat.label === category,
+							);
+						}
+						return false;
+					});
+
+					if (hasMatchingCategory) {
+						const userNode = group.children.find(
+							(child) =>
+								child.type === "group-user" &&
+								child.children &&
+								Array.isArray(child.children),
+						);
+						if (userNode) {
+							const matchedUsers = userNode.children.filter(
+								(user) => user.type === "user",
+							);
+							users = users.concat(matchedUsers);
+						}
+					}
+				}
+			}
+		}
+	}
+	return users;
+}
+
+function getUsersBySupplierAndCategory(supplierId, categoryLabel, dataset) {
+	const supplier = dataset.find((item) => item.id === supplierId);
+	if (!supplier || !supplier.children) return [];
+
+	for (const group of supplier.children) {
+		if (!group.children) continue;
+
+		const hasMatchingCategory = group.children.some((child) => {
+			if (child.type === "group-category" && Array.isArray(child.children)) {
+				return child.children.some(
+					(cat) => cat.type === "category" && cat.label === categoryLabel,
+				);
+			}
+			return false;
+		});
+
+		if (hasMatchingCategory) {
+			const groupUser = group.children.find(
+				(child) => child.type === "group-user" && Array.isArray(child.children),
+			);
+			if (groupUser) {
+				return groupUser.children.filter((user) => user.type === "user");
+			}
+		}
+	}
+	return [];
+}
+
 const Requests = () => {
 	const requestGridRef = useRef(null);
 	const queryClient = useQueryClient();
@@ -66,7 +168,7 @@ const Requests = () => {
 	const [companyName, setCompanyName] = useState("");
 	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
 	const [activeFilters, setActiveFilters] = useState(() => {
-		const saved = localStorage.getItem('requestFilterSelections');
+		const saved = localStorage.getItem("requestFilterSelections");
 		return saved ? JSON.parse(saved) : [];
 	});
 
@@ -90,7 +192,7 @@ const Requests = () => {
 	});
 
 	const GetAccessLevel = () => {
-		const value = localStorage.getItem("accessLevel");
+		const value = Number(localStorage.getItem("accessLevel"));
 		if (value) {
 			return value;
 		}
@@ -98,6 +200,22 @@ const Requests = () => {
 	};
 
 	const accessLevel = GetAccessLevel();
+
+	function removeQuotes(str) {
+		// Remove all double quotes from the string
+		return str.replace(/"/g, "");
+	}
+
+	const GetUserId = () => {
+		const value = localStorage.getItem("userID");
+		if (value) {
+			const userId = removeQuotes(value);
+			return userId;
+		}
+		return "";
+	};
+
+	const userId = GetUserId();
 
 	// Initial setup effect
 	useEffect(() => {
@@ -204,7 +322,6 @@ const Requests = () => {
 		if (reqData) {
 			// Now filter the data
 			const data = reqData?.data;
-			console.log("Request Data " + JSON.stringify(data, null, 2));
 			if (data) {
 				setRequestList(data);
 			}
@@ -291,15 +408,15 @@ const Requests = () => {
 		</div>
 	);
 
-const rowDataBound = (args) => {
-	// For example, conditionally highlight rows where age is greater than 25.
-	if (args.data.status === "SSR-REQ") {
-		args.row.style.backgroundColor = "yellow";
-	}
-	if (args.data.status === "SSR-ACCEPTED") {
-		args.row.style.backgroundColor = "#22C55E";
-	}
-};
+	const rowDataBound = (args) => {
+		// For example, conditionally highlight rows where age is greater than 25.
+		if (args.data.status === "SSR-REQ") {
+			args.row.style.backgroundColor = "yellow";
+		}
+		if (args.data.status === "SSR-ACCEPTED") {
+			args.row.style.backgroundColor = "#22C55E";
+		}
+	};
 	const actionBegin = (args) => {
 		if (args.requestType === "save" && args.form) {
 			/** cast string to integer value */
@@ -307,89 +424,179 @@ const rowDataBound = (args) => {
 		}
 	};
 
+	const GetProjectID = async (projectName) => {
+		const projectID = await GetProjectIDByNameAndCustomer(
+			projectName,
+			clientName,
+		);
+		return projectID?.data?.projectId ? projectID.data.projectId : "";
+	};
+
+	const GetVendorID = async (vendorName) => {
+		const vendorID = await GetVendorIDByName(vendorName);
+		return vendorID?.data?.vendorId ? vendorID.data.vendorId : "";
+	};
+
+	const SendRequestEmail = async (emailList) => {
+		// Check if emailList is empty or not provided
+		if (!emailList || emailList.length === 0) {
+			await showWarningDialog("No email addresses provided");
+			return;
+		}
+
+		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/email/`;
+
+		try {
+			// Send email for each email address concurrently
+			await Promise.all(
+				emailList.map((emailAddress) =>
+					axios.post(strAPI, {
+						emailAddress: emailAddress,
+						emailSubject: "Workside Request Notification",
+						emailReqDateTime: new Date(),
+						emailMessage:
+							"Please review the Workside request and respond accordingly!",
+					}),
+				),
+			);
+
+			await showSuccessDialogWithTimer("Suppliers Notified Via Email");
+		} catch (error) {
+			console.error("Error sending emails:", error);
+			await showErrorDialog(`Error Sending Email: ${error.message}`);
+		}
+	};
+
 	const actionComplete = async (args) => {
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
-			// dialog.height = 600;
-			// dialog.width = 600;
-			// Set Insert Flag
 			setInsertFlag(args.requestType === "add");
-			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit Request: ${args.rowData.projectname} ${args.rowData.requestname}`
 					: "Workside New Request";
 		}
 		if (args.requestType === "save") {
-			// Save or Update Data
-			const data = args.data;
-			setMessageText(`Update Request ${args.data.requestname} Details?`);
-			setCurrentRecord(data);
+			// Prepare the data with all required fields
+			const requestData = {
+				...args.data,
+				requestorid: userId || "",
+				categoryname: args.data.requestcategory,
+				comments: args.data.comments || args.data.comment || "",
+				customercontact: args.data.customercontact || "",
+				rigcompanycontact: args.data.rigcompanycontact || "",
+				project_id: await GetProjectID(args.data.projectname),
+				ssrVendorName:
+					args.data.vendorType === "SSR" ? args.data.vendorName : "",
+				ssrVendorId:
+					args.data.vendorType === "SSR"
+						? await GetVendorID(args.data.vendorName)
+						: "",
+				creationdate: args.data.creationdate || new Date(),
+				datetimerequested: args.data.datetimerequested || getNextWholeHour(),
+				statusdate: args.data.statusdate || new Date(),
+				status: args.data.status || "OPEN",
+				vendortype: args.data.vendortype || "MSA",
+				quantity: args.data.quantity || 1,
+			};
+
+			setMessageText(`Update Request ${requestData.requestname} Details?`);
+			setCurrentRecord(requestData);
 			setOpenUpdateModal(true);
 		}
 	};
 
-	const SaveRequestData = async () => {
-		setOpenUpdateModal(false);
-		if (insertFlag) {
-			// Insert Record
+	const SaveRequestData = async (requestData) => {
+		try {
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/request/`,
 				{
 					method: "POST",
-					body: JSON.stringify(currentRecord),
 					headers: {
 						"Content-Type": "application/json",
 					},
+					body: JSON.stringify(requestData),
 				},
 			);
-			const jsonData = await response.json();
-			if (response.status === 200) {
-				showSuccessDialogWithTimer("Record Successfully Added...");
-			} else {
-				showErrorDialog(`Record Add Failed...${response.status}`);
-			}
-			setInsertFlag(false);
-		} else {
-			const requestOptions = {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					requestorid: currentRecord?.requestorid,
-					requestcategory: currentRecord?.requestcategory,
-					requestname: currentRecord?.requestname,
-					customername: currentRecord?.customername,
-					customercontact: currentRecord?.customercontact,
-					projectname: currentRecord?.projectname,
-					rigcompany: currentRecord?.rigcompany,
-					rigcompanycontact: currentRecord?.rigcompanycontact,
-					creationdate: currentRecord?.creationdate,
-					quantity: currentRecord?.quantity,
-					vendortype: currentRecord?.vendortype,
-					ssrVendorId: currentRecord?.ssrVendorId,
-					datetimerequested: currentRecord?.datetimerequested,
-					status: currentRecord?.status,
-					statusdate: currentRecord?.statusdate,
-					comment: currentRecord?.comment,
-					project_id: currentRecord?.project_id,
-				}),
-			};
 
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/request/${currentRecord._id}`;
-			try {
-				const response = await fetch(fetchString, requestOptions);
-				const jsonData = await response.json();
-				if (response.status === 200) {
-					showSuccessDialogWithTimer("Record Successfully Updated...");
-				} else {
-					showErrorDialog(`Record Update Failed...${response.status}`);
-				}
-				setIsLoading(false);
-			} catch (error) {
-				setIsLoading(false);
-				showErrorDialog(`Error: ${error}`);
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
 			}
+
+			const result = await response.json();
+
+			// After successful save, update user distribution list and company list
+			if (result.data) {
+				try {
+					const supplierGroupData = await GetAllSupplierGroupData();
+					let userDistList = [];
+
+					// Get users based on vendor type
+					if (requestData.vendortype !== "SSR") {
+						userDistList = getUsersByCategory(
+							requestData.requestcategory,
+							supplierGroupData?.data,
+						);
+					} else {
+						userDistList = getUsersBySupplierAndCategory(
+							requestData.vendorName,
+							requestData.requestcategory,
+							supplierGroupData?.data,
+						);
+					}
+					const emailAddresses = getEmailAddresses(userDistList);
+					const emailList = formatEmailList(emailAddresses);
+
+					// Update bid list users using the API function
+					await UpdateRequestBidListUsers(result.data._id, emailList);
+
+					// Get and update bid list companies
+					if (emailAddresses.length > 0) {
+						const bidListCompaniesResponse =
+							await GetRequestBidListCompanies(emailAddresses);
+
+						if (
+							bidListCompaniesResponse?.data &&
+							Array.isArray(bidListCompaniesResponse.data)
+						) {
+							// Format the bid list companies data
+							const bidList = {
+								bidList: bidListCompaniesResponse.data.map((company) => ({
+									companyId: company.companyId,
+									companyName: company.companyName,
+								})),
+							};
+
+							// Update bid list companies
+							const updateCompaniesResponse =
+								await UpdateRequestBidListCompanies(result.data._id, bidList);
+
+							if (updateCompaniesResponse.status !== 200) {
+								console.warn(
+									"Failed to update bid list companies:",
+									updateCompaniesResponse,
+								);
+							}
+						}
+
+						// Send emails to the distribution list
+						await SendRequestEmail(emailAddresses);
+					}
+
+					await showSuccessDialogWithTimer("Request saved successfully");
+					setOpenUpdateModal(false);
+					queryClient.invalidateQueries(["requests"]);
+				} catch (error) {
+					console.error("Error updating bid lists:", error);
+					await showErrorDialog(`Error updating bid lists: ${error.message}`);
+					setOpenUpdateModal(false);
+				}
+			}
+		} catch (error) {
+			console.error("Error saving request:", error);
+			await showErrorDialog(`Error saving request: ${error.message}`);
+			setOpenUpdateModal(false);
 		}
 	};
 
@@ -398,8 +605,8 @@ const rowDataBound = (args) => {
 		// 	const rowObj = requestGridRef.getRowObjectFromUID(
 		// 		closest(args.target, ".e-row").getAttribute("data-uid"),
 		// 	);
-			setSelectedRecord(args.rowData._id);
-			// setShowDialog(true);
+		setSelectedRecord(args.rowData._id);
+		// setShowDialog(true);
 		// }
 	};
 
@@ -410,7 +617,7 @@ const rowDataBound = (args) => {
 	};
 
 	const handleRemoveFilter = (filterToRemove) => {
-		const newFilters = activeFilters.filter(filter => filter !== filterToRemove);
+		const newFilters = activeFilters.filter((filter) => filter !== filterToRemove);
 		setActiveFilters(newFilters);
 	};
 
@@ -655,7 +862,7 @@ const rowDataBound = (args) => {
 					<ConfirmationDialog
 						open={openUpdateModal}
 						message={messageText}
-						onConfirm={() => SaveRequestData()}
+						onConfirm={() => SaveRequestData(currentRecord)}
 						onCancel={() => setOpenUpdateModal(false)}
 					/>
 				)}

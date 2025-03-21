@@ -13,15 +13,15 @@ let gridPageSize = 8;
 
 const Projects = () => {
 	const [isLoading, setIsLoading] = useState(false);
-  let accessLevel = 0; 
+  const [accessLevel, setAccessLevel] = useState(-1); 
 
 	
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
-		const value = localStorage.getItem("accessLevel");
+		const value = Number(localStorage.getItem("accessLevel"));
 		if (value) {
-			accessLevel = value;
+			setAccessLevel(value);
 		}
 	}, []);
 
