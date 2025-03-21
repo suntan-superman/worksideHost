@@ -3,7 +3,7 @@
 // TODO Update
 // TODO Create
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
 	GridComponent,
 	ColumnsDirective,
@@ -54,6 +54,7 @@ const ProjectsTab = () => {
 		const saved = localStorage.getItem('projectFilterSelections');
 		return saved ? JSON.parse(saved) : [companyName];
 	});
+	const projectsGridRef = useRef(null);
 
 	const queryClient = useQueryClient();
 
@@ -81,7 +82,6 @@ const ProjectsTab = () => {
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
-	const projectsGrid = null;
 
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
@@ -234,12 +234,9 @@ const ProjectsTab = () => {
 		}
 	};
 
-	const rowSelectedProject = () => {
-		if (projectsGrid) {
-			/** Get the selected row indexes */
-			const selectedrowindex = projectsGrid.getSelectedRowIndexes();
-			/** Get the selected records. */
-			setSelectedRecord(projectData[selectedrowindex]._id);
+	const rowSelectedProject = (args) => {
+		if (args.data) {
+			setSelectedRecord(args.data._id);
 		}
 	};
 
@@ -263,9 +260,28 @@ const ProjectsTab = () => {
 	};
 
 	const handleFilterRemove = (company) => {
-		const newFilters = selectedCompanies.filter(c => c !== company);
+		const newFilters = selectedCompanies.filter((c) => c !== company);
 		setSelectedCompanies(newFilters);
-		localStorage.setItem('projectFilterSelections', JSON.stringify(newFilters));
+		localStorage.setItem("projectFilterSelections", JSON.stringify(newFilters));
+
+		// Update grid data immediately
+		if (projData?.data) {
+			let filteredData = projData.data;
+			if (newFilters.length > 0) {
+				filteredData = projData.data.filter((project) =>
+					newFilters.includes(project.customer),
+				);
+			}
+			setProjectData(filteredData);
+		}
+	};
+
+	const handleFilterDialogOpen = () => {
+		setFilterDialogOpen(true);
+	};
+
+	const handleFilterDialogClose = () => {
+		setFilterDialogOpen(false);
 	};
 
 	if (isProjectsLoading) {
@@ -281,21 +297,35 @@ const ProjectsTab = () => {
 	return (
 		// <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
 		<div className=" bg-white rounded-3xl">
-			<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-				<Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
+			<Box
+				sx={{
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "center",
+					mb: 2,
+				}}
+			>
+				<Box
+					sx={{
+						display: "flex",
+						gap: 1,
+						flexWrap: "wrap",
+						alignItems: "center",
+					}}
+				>
 					{selectedCompanies.map((company) => (
 						<Chip
 							key={company}
 							label={company}
 							onDelete={() => handleFilterRemove(company)}
-							sx={{ backgroundColor: 'green', color: 'white' }}
+							sx={{ backgroundColor: "green", color: "white" }}
 						/>
 					))}
 				</Box>
-					<IconButton
-						onClick={() => setFilterDialogOpen(true)}
-						sx={{ color: "green", marginRight: "60px" }}
-					>
+				<IconButton
+					onClick={handleFilterDialogOpen}
+					sx={{ color: "green", marginRight: "60px" }}
+				>
 					<FilterListIcon />
 				</IconButton>
 			</Box>
@@ -320,7 +350,7 @@ const ProjectsTab = () => {
 						enablePersistence
 						load={onProjectLoad}
 						width="98%"
-						ref={projectsGrid}
+						ref={projectsGridRef}
 					>
 						<ColumnsDirective>
 							<ColumnDirective
@@ -455,10 +485,14 @@ const ProjectsTab = () => {
 
 			<ProjectFilterDialog
 				open={filterDialogOpen}
-				onClose={() => setFilterDialogOpen(false)}
+				onClose={handleFilterDialogClose}
 				onApply={handleFilterApply}
 				selectedCompanies={selectedCompanies}
-				allCompanies={projData?.data ? [...new Set(projData.data.map(project => project.customer))] : []}
+				allCompanies={
+					projData?.data
+						? [...new Set(projData.data.map((project) => project.customer))]
+						: []
+				}
 			/>
 		</div>
 	);

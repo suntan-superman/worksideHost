@@ -41,7 +41,15 @@ import {
 } from "../utils/useSweetAlert";
 
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Chip, IconButton, Box } from "@mui/material";
+import {
+	Chip,
+	IconButton,
+	Box,
+	Select,
+	MenuItem,
+	FormControl,
+	InputLabel,
+} from "@mui/material";
 import RequestFilterDialog from "../components/RequestFilterDialog";
 
 import axios from "axios";
@@ -171,6 +179,8 @@ const Requests = () => {
 		const saved = localStorage.getItem("requestFilterSelections");
 		return saved ? JSON.parse(saved) : [];
 	});
+	const [dateRangeFilter, setDateRangeFilter] = useState("all");
+	const [filteredRequestList, setFilteredRequestList] = useState(null);
 
 	// Move useQuery up here
 	const {
@@ -318,15 +328,65 @@ const Requests = () => {
 		delay: 1000,
 	};
 
+	// Add date range filter options
+	const dateRangeOptions = [
+		{ value: "all", label: "All Time" },
+		{ value: "today", label: "Today" },
+		{ value: "tomorrow", label: "Tomorrow" },
+		{ value: "thisWeek", label: "This Week" },
+		{ value: "thisMonth", label: "This Month" },
+	];
+
+	// Add date filtering function
+	const filterRequestsByDateRange = (requests, range) => {
+		if (!requests) return [];
+
+		const today = new Date();
+		today.setHours(0, 0, 0, 0);
+
+		const tomorrow = new Date(today);
+		tomorrow.setDate(tomorrow.getDate() + 1);
+
+		const startOfWeek = new Date(today);
+		startOfWeek.setDate(today.getDate() - today.getDay());
+
+		const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+		return requests.filter((request) => {
+			const requestDate = new Date(request.datetimerequested);
+			requestDate.setHours(0, 0, 0, 0);
+
+			switch (range) {
+				case "today":
+					return requestDate.getTime() === today.getTime();
+				case "tomorrow":
+					return requestDate.getTime() === tomorrow.getTime();
+				case "thisWeek":
+					return requestDate >= startOfWeek && requestDate <= today;
+				case "thisMonth":
+					return requestDate >= startOfMonth && requestDate <= today;
+				default:
+					return true;
+			}
+		});
+	};
+
+	// Update useEffect for request data to include date filtering
 	useEffect(() => {
 		if (reqData) {
-			// Now filter the data
 			const data = reqData?.data;
 			if (data) {
 				setRequestList(data);
+				const filteredData = filterRequestsByDateRange(data, dateRangeFilter);
+				setFilteredRequestList(filteredData);
 			}
 		}
-	}, [reqData]);
+	}, [reqData, dateRangeFilter]);
+
+	// Add date range filter handler
+	const handleDateRangeChange = (event) => {
+		setDateRangeFilter(event.target.value);
+	};
 
 	if (reqError) {
 		console.log(`Error: ${reqError}`);
@@ -645,7 +705,7 @@ const Requests = () => {
 						display: "flex",
 						alignItems: "center",
 						mb: 0,
-						gap: 0,
+						gap: 2,
 						pl: 2,
 					}}
 				>
@@ -665,6 +725,47 @@ const Requests = () => {
 							/>
 						))}
 					</Box>
+					<FormControl sx={{ minWidth: 150, mr: 2 }}>
+						<InputLabel
+							sx={{
+								color: "#2f8842",
+								"&.Mui-focused": {
+									color: "#2f8842",
+								},
+								"&.MuiInputLabel-shrink": {
+									color: "#2f8842",
+								},
+							}}
+						>
+							Date Range
+						</InputLabel>
+						<Select
+							value={dateRangeFilter}
+							label="Date Range"
+							onChange={handleDateRangeChange}
+							sx={{
+								height: 40,
+								"& .MuiOutlinedInput-notchedOutline": {
+									borderColor: "#2f8842",
+								},
+								"&:hover .MuiOutlinedInput-notchedOutline": {
+									borderColor: "#2f8842",
+								},
+								"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+									borderColor: "#2f8842",
+								},
+								"& .MuiSelect-icon": {
+									color: "#2f8842",
+								},
+							}}
+						>
+							{dateRangeOptions.map((option) => (
+								<MenuItem key={option.value} value={option.value}>
+									{option.label}
+								</MenuItem>
+							))}
+						</Select>
+					</FormControl>
 					<IconButton
 						onClick={() => setFilterDialogOpen(true)}
 						sx={{ color: "green", marginRight: "60px" }}
@@ -674,7 +775,7 @@ const Requests = () => {
 				</Box>
 				<GridComponent
 					id="requestGridElement"
-					dataSource={reqData?.data}
+					dataSource={filteredRequestList || reqData?.data}
 					allowSelection
 					allowFiltering
 					allowPaging

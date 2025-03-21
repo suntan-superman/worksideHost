@@ -13,8 +13,7 @@ let gridPageSize = 8;
 
 const Projects = () => {
 	const [isLoading, setIsLoading] = useState(false);
-  const [accessLevel, setAccessLevel] = useState(-1); 
-
+	const [accessLevel, setAccessLevel] = useState(-1);
 	
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
