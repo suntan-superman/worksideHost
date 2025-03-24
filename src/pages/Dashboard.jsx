@@ -1,6 +1,6 @@
 /* eslint-disable */
 import React from "react";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid2";
 import dayjs from "dayjs";
 
 import { RequestsAwardedThisWeek } from "./components/RequestsAwardedThisWeek";
@@ -84,7 +84,7 @@ export default function Dashboard() {
 			<Grid container spacing={2} sx={{ height: "100vh", width: "80vw" }}>
 				<Grid container sx={{ height: "25%" }} spacing={2}>
 					{/* Requests Awarded This Week Card */}
-					<Grid item xs={12} sm={6} md={4}>
+					<Grid xs={12} sm={6} md={4}>
 						<RequestsAwardedThisWeek
 							diff={12}
 							trend="up"
@@ -94,7 +94,7 @@ export default function Dashboard() {
 					</Grid>
 
 					{/* Total Requests Awarded This Month Card */}
-					<Grid item xs={12} sm={6} md={4}>
+					<Grid xs={12} sm={6} md={4}>
 						<RequestsAwardedThisMonth
 							diff={16}
 							trend="down"
@@ -104,7 +104,7 @@ export default function Dashboard() {
 					</Grid>
 
 					{/* Requests Completed This Week Card */}
-					<Grid item xs={12} sm={6} md={4}>
+					<Grid xs={12} sm={6} md={4}>
 						<RequestsCompletedThisWeek
 							diff={18}
 							trend="up"
@@ -114,7 +114,7 @@ export default function Dashboard() {
 					</Grid>
 
 					{/* Total Requests Completed This Month Card */}
-					<Grid item xs={12} sm={6} md={4}>
+					<Grid xs={12} sm={6} md={4}>
 						<RequestsCompletedThisMonth
 							diff={19}
 							trend="down"
@@ -128,7 +128,7 @@ export default function Dashboard() {
 				{/* Second Row - 2 Items */}
 				<Grid container sx={{ height: "75%", width: "100%" }} spacing={2}>
 					{/* Top-Rated Suppliers */}
-					<Grid item xs={12} sm={6} md={4}>
+					<Grid xs={12} sm={6} md={4}>
 						<TopRatedSuppliers
 							suppliers={supplierList}
 							sx={{ height: "100%", width: "100%" }}
@@ -136,7 +136,7 @@ export default function Dashboard() {
 					</Grid>
 
 					{/* Latest Requests */}
-					<Grid item xs={12} sm={6} md={8}>
+					<Grid xs={12} sm={6} md={8}>
 						<LatestRequests
 							requests={requestList}
 							sx={{ height: "100%", width: "100%" }}
