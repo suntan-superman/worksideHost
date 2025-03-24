@@ -67,17 +67,44 @@ const HelpDialog = ({ open, onClose }) => {
 						>
 							<FormControlLabel
 								value="idea"
-								control={<Radio sx={{ color: green[800] }} />}
+								control={
+									<Radio
+										sx={{
+											color: green[800],
+											"&.Mui-checked": {
+												color: green[800],
+											},
+										}}
+									/>
+								}
 								label="Idea"
 							/>
 							<FormControlLabel
 								value="small-bug"
-								control={<Radio sx={{ color: green[800] }} />}
+								control={
+									<Radio
+										sx={{
+											color: green[800],
+											"&.Mui-checked": {
+												color: green[800],
+											},
+										}}
+									/>
+								}
 								label="Small Bug"
 							/>
 							<FormControlLabel
 								value="urgent-bug"
-								control={<Radio sx={{ color: green[800] }} />}
+								control={
+									<Radio
+										sx={{
+											color: green[800],
+											"&.Mui-checked": {
+												color: green[800],
+											},
+										}}
+									/>
+								}
 								label="Urgent Bug"
 							/>
 						</RadioGroup>
