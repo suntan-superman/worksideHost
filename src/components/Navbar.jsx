@@ -5,14 +5,18 @@ import { AiOutlineMenu } from "react-icons/ai";
 import { BsChatLeft } from "react-icons/bs";
 import { RiNotification3Line } from "react-icons/ri";
 import { MdKeyboardArrowDown } from "react-icons/md";
+import { FaQuestionCircle } from "react-icons/fa";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { styled } from "@mui/material/styles";
 import NotificationDialog from "../pages/NotificationDialog";
+import HelpDialog from "./HelpDialog";
+import AboutDialog from "./AboutDialog";
 import avatar from "../data/avatar.jpg";
 // eslint-disable-next-line import/no-cycle
 import { Chat, Notification, UserProfile } from ".";
 import { UseStateContext } from "../contexts/ContextProvider";
 import axios from "axios";
+import { Box, IconButton, Menu, MenuItem } from "@mui/material";
 
 // Create a styled div for consistent width
 const NavBarContainer = styled("div")({
@@ -53,6 +57,10 @@ const NavBar = () => {
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [menuWidth, setMenuWidth] = useState(0);
 	const [userAvatar, setUserAvatar] = useState(null);
+	const [helpMenuOpen, setHelpMenuOpen] = useState(false);
+	const [helpAnchorEl, setHelpAnchorEl] = useState(null);
+	const [helpDialogOpen, setHelpDialogOpen] = useState(false);
+	const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
 
 	useEffect(() => {
 		const handleResize = () => setScreenSize(window.innerWidth);
@@ -119,6 +127,24 @@ const NavBar = () => {
 		setDialogOpen(true);
 	};
 
+	const handleHelpClick = (event) => {
+		setHelpAnchorEl(event.currentTarget);
+	};
+
+	const handleHelpClose = () => {
+		setHelpAnchorEl(null);
+	};
+
+	const handleReportIssue = () => {
+		handleHelpClose();
+		setHelpDialogOpen(true);
+	};
+
+	const handleAbout = () => {
+		handleHelpClose();
+		setAboutDialogOpen(true);
+	};
+
 	return (
 		<>
 			<NavBarContainer>
@@ -148,6 +174,28 @@ const NavBar = () => {
 							color="white"
 							icon={<RiNotification3Line />}
 						/>
+						<div className="relative">
+							<IconButton
+								onClick={handleHelpClick}
+								sx={{
+									color: "white",
+									"&:hover": {
+										backgroundColor: "rgba(255, 255, 255, 0.1)",
+									},
+								}}
+								aria-label="help"
+							>
+								<FaQuestionCircle size={24} />
+							</IconButton>
+							<Menu
+								anchorEl={helpAnchorEl}
+								open={Boolean(helpAnchorEl)}
+								onClose={handleHelpClose}
+							>
+								<MenuItem onClick={handleReportIssue}>Report Issue</MenuItem>
+								<MenuItem onClick={handleAbout}>About</MenuItem>
+							</Menu>
+						</div>
 						<TooltipComponent content="Profile" position="BottomCenter">
 							<div
 								className="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-800 rounded-lg"
@@ -178,6 +226,14 @@ const NavBar = () => {
 			<NotificationDialog
 				open={dialogOpen}
 				onClose={() => setDialogOpen(false)}
+			/>
+			<HelpDialog
+				open={helpDialogOpen}
+				onClose={() => setHelpDialogOpen(false)}
+			/>
+			<AboutDialog
+				open={aboutDialogOpen}
+				onClose={() => setAboutDialogOpen(false)}
 			/>
 		</>
 	);
