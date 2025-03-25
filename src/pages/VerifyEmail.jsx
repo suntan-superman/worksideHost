@@ -23,17 +23,25 @@ const VerifyEmail = () => {
 	useEffect(() => {
 		const verifyEmail = async () => {
 			try {
+				console.log("Frontend verification started");
+				console.log("Token:", token);
+				console.log("Email:", email);
+
 				if (!token || !email) {
+					console.log("Missing token or email");
 					setError({ error: true, message: "Missing token or email" });
 					setIsLoading(false);
 					return;
 				}
 
 				// First check if user is already verified
+				console.log("Checking if user is already verified");
 				const checkVerifiedUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
 				const checkResponse = await axios.post(checkVerifiedUrl, { email });
+				console.log("Check verification response:", checkResponse.data);
 
 				if (checkResponse.data.status === true) {
+					console.log("User already verified");
 					setIsUserVerified(true);
 					setIsLoading(false);
 					await showSuccessDialogWithTimer(
@@ -44,22 +52,29 @@ const VerifyEmail = () => {
 				}
 
 				// If not verified, proceed with verification
+				console.log("Proceeding with email verification");
 				const verifyUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
-				const verifyResponse = await axios.post(verifyUrl);
+				console.log("Verification URL:", verifyUrl);
 
-				if (verifyResponse.data && verifyResponse.data.success) {
+				const verifyResponse = await axios.post(verifyUrl);
+				console.log("Verification response:", verifyResponse.data);
+
+				if (verifyResponse?.data?.success) {
+					console.log("Verification successful");
 					setIsUserVerified(true);
 					await showSuccessDialogWithTimer(
 						"Email successfully verified, redirecting...",
 					);
 					setTimeout(() => navigate("/login"), 3000);
 				} else {
+					console.log("Verification failed:", verifyResponse?.data?.message);
 					throw new Error(
-						verifyResponse.data?.message || "Verification failed",
+						verifyResponse?.data?.message || "Verification failed",
 					);
 				}
 			} catch (err) {
 				console.error("Verification error:", err);
+				console.error("Error response:", err.response?.data);
 				setError({
 					error: true,
 					message:
