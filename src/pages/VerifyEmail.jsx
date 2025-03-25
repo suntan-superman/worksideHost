@@ -53,6 +53,7 @@ const VerifyEmail = () => {
 
 				// If not verified, proceed with verification
 				console.log("Proceeding with email verification");
+				// Handle both frontend and API endpoint formats
 				const verifyUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
 				console.log("Verification URL:", verifyUrl);
 
