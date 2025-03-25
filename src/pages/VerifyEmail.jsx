@@ -36,7 +36,14 @@ const VerifyEmail = () => {
 
 				// First check if user is already verified
 				console.log("Checking if user is already verified");
-				const checkVerifiedUrl = `${process.env.REACT_APP_MONGO_URI.replace("https://", "http://")}/api/user/is-user-validated`;
+				console.log("MONGO_URI:", process.env.REACT_APP_MONGO_URI);
+
+				const apiUrl =
+					process.env.REACT_APP_MONGO_URI || "http://localhost:8081";
+				console.log("Using API URL:", apiUrl);
+
+				const checkVerifiedUrl = `${apiUrl}/api/user/is-user-validated`;
+				console.log("Check verification URL:", checkVerifiedUrl);
 				const checkResponse = await axios.post(checkVerifiedUrl, { email });
 				console.log("Check verification response:", checkResponse.data);
 
@@ -54,7 +61,7 @@ const VerifyEmail = () => {
 				// If not verified, proceed with verification
 				console.log("Proceeding with email verification");
 				// Handle both frontend and API endpoint formats
-				const verifyUrl = `${process.env.REACT_APP_MONGO_URI.replace("https://", "http://")}/api/user/verify-email/${token}`;
+				const verifyUrl = `${apiUrl}/api/user/verify-email/${token}`;
 				console.log("Verification URL:", verifyUrl);
 
 				const verifyResponse = await axios.get(verifyUrl);
