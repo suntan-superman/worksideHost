@@ -20,17 +20,6 @@ const VerifyEmail = () => {
 	const token = searchParams.get("token");
 	const email = searchParams.get("email");
 
-	const isUserValidated = async (email) => {
-		try {
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
-			const res = await axios.post(fetchString, { email });
-			return res.data.status !== false;
-		} catch (err) {
-			console.error("Error checking user validation:", err);
-			return false;
-		}
-	};
-
 	useEffect(() => {
 		const verifyEmail = async () => {
 			try {
@@ -41,8 +30,10 @@ const VerifyEmail = () => {
 				}
 
 				// First check if user is already verified
-				const validated = await isUserValidated(email);
-				if (validated) {
+				const checkVerifiedUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
+				const checkResponse = await axios.post(checkVerifiedUrl, { email });
+
+				if (checkResponse.data.status === true) {
 					setIsUserVerified(true);
 					setIsLoading(false);
 					await showSuccessDialogWithTimer(
@@ -54,22 +45,27 @@ const VerifyEmail = () => {
 
 				// If not verified, proceed with verification
 				const verifyUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
-				const response = await axios.post(verifyUrl);
+				const verifyResponse = await axios.post(verifyUrl);
 
-				if (response.status === 200) {
+				if (verifyResponse.data && verifyResponse.data.success) {
 					setIsUserVerified(true);
 					await showSuccessDialogWithTimer(
 						"Email successfully verified, redirecting...",
 					);
 					setTimeout(() => navigate("/login"), 3000);
 				} else {
-					setError({ error: true, message: "Verification failed" });
+					throw new Error(
+						verifyResponse.data?.message || "Verification failed",
+					);
 				}
 			} catch (err) {
 				console.error("Verification error:", err);
 				setError({
 					error: true,
-					message: err.response?.data?.message || "Error verifying email",
+					message:
+						err.response?.data?.message ||
+						err.message ||
+						"Error verifying email",
 				});
 			} finally {
 				setIsLoading(false);
