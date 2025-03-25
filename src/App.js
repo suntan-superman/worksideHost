@@ -7,7 +7,6 @@ import { UseStateContext } from "./contexts/ContextProvider";
 import {
 	Dashboard,
 	Projects,
-	Notifications,
 	Requests,
 	Admin,
 	Supplier,
@@ -30,8 +29,8 @@ import { showConfirmationDialog } from "./utils/useSweetAlert";
 import VerifyEmail from "./pages/VerifyEmail";
 import { DeliveryTracker } from "./components/delivery-tracker";
 import ErrorBoundary from "./components/delivery-tracker/components/ErrorBoundary";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
+import { QueryClient } from "@tanstack/react-query";
+
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
@@ -181,21 +180,22 @@ const App = () => {
   );
 
   return (
-    <Routes>
-      <Route path="/" element={<Navigate replace to="/login" />} />
-      <Route path="/login" element={<LoginDialog />} />
-      <Route path="/signup" element={<SignupDialog />} />
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route
-        path="/main/*"
-        element={
-          <PrivateRoutes>
-            <MainApp />
-          </PrivateRoutes>
-        }
-      />
-    </Routes>
-  );
+			<Routes>
+				<Route path="/" element={<Navigate replace to="/login" />} />
+				<Route path="/login" element={<LoginDialog />} />
+				<Route path="/signup" element={<SignupDialog />} />
+				<Route path="/verify-email" element={<VerifyEmail />} />
+				<Route
+					path="/main/*"
+					element={
+						<PrivateRoutes>
+							<MainApp />
+						</PrivateRoutes>
+					}
+				/>
+				<Route path="*" element={<Navigate replace to="/login" />} />
+			</Routes>
+		);
 };
 
 export default App;

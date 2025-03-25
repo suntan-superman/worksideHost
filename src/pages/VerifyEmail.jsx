@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Alert, CircularProgress } from "@mui/material";
+import { Alert, CircularProgress, Box } from "@mui/material";
 import axios from "axios";
 import {
 	showSuccessDialogWithTimer,
@@ -11,73 +11,104 @@ import {
 // import { baseUrl, postRequest } from "../utils/service";
 
 const VerifyEmail = () => {
-	const [isLoading, setIsLoading] = useState(false);
-  const [ isUserVerified, setIsUserVerified ] = useState(false);
-	const [error, setError] = useState(false);
-	const [searchParams, setSearchParams] = useSearchParams();
+	const [isLoading, setIsLoading] = useState(true);
+	const [isUserVerified, setIsUserVerified] = useState(false);
+	const [error, setError] = useState({ error: false, message: "" });
+	const [searchParams] = useSearchParams();
 	const navigate = useNavigate();
 
 	const token = searchParams.get("token");
 	const email = searchParams.get("email");
 
-  window.alert(`Email: ${email} Token: ${token}`);
-
-	useEffect(() => {
-    (async () => {
-      setIsUserVerified(await isUserValidated(email));
-      if (isUserVerified === true) {
-				setTimeout(() => {
-					return navigate("/");
-				}, 3000);
-			} else {
-				if (token) {
-    		// const fetchString = `http://localhost:4000/api/user/verify-email/${token}`;
-    		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
-          const res = await axios.post(fetchString);
-
-          await showSuccessDialogWithTimer("Email successfully verified, redirecting...");
-
-          return navigate("/");
-				}
-			}
-		})();
-	}, [token]);
-
 	const isUserValidated = async (email) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
-		const res = await axios.post(fetchString, {
-			email: email,
-    });
-		if (res.data.status === false) {
+		try {
+			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
+			const res = await axios.post(fetchString, { email });
+			return res.data.status !== false;
+		} catch (err) {
+			console.error("Error checking user validation:", err);
 			return false;
 		}
-		return true;
 	};
 
+	useEffect(() => {
+		const verifyEmail = async () => {
+			try {
+				if (!token || !email) {
+					setError({ error: true, message: "Missing token or email" });
+					setIsLoading(false);
+					return;
+				}
+
+				// First check if user is already verified
+				const validated = await isUserValidated(email);
+				if (validated) {
+					setIsUserVerified(true);
+					setIsLoading(false);
+					await showSuccessDialogWithTimer(
+						"Email already verified, redirecting...",
+					);
+					setTimeout(() => navigate("/login"), 3000);
+					return;
+				}
+
+				// If not verified, proceed with verification
+				const verifyUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
+				const response = await axios.post(verifyUrl);
+
+				if (response.status === 200) {
+					setIsUserVerified(true);
+					await showSuccessDialogWithTimer(
+						"Email successfully verified, redirecting...",
+					);
+					setTimeout(() => navigate("/login"), 3000);
+				} else {
+					setError({ error: true, message: "Verification failed" });
+				}
+			} catch (err) {
+				console.error("Verification error:", err);
+				setError({
+					error: true,
+					message: err.response?.data?.message || "Error verifying email",
+				});
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		verifyEmail();
+	}, [token, email, navigate]);
+
 	return (
-		<div>
-			{isLoading ? (
-				<div>
+		<Box
+			display="flex"
+			justifyContent="center"
+			alignItems="center"
+			minHeight="100vh"
+			bgcolor="#f5f5f5"
+		>
+			<Box
+				bgcolor="white"
+				p={4}
+				borderRadius={2}
+				boxShadow={3}
+				minWidth={300}
+				textAlign="center"
+			>
+				{isLoading ? (
 					<CircularProgress />
-				</div>
-			) : (
-				<div>
-					{isUserVerified ? (
-						<div>
+				) : (
+					<>
+						{isUserVerified && (
 							<Alert severity="success">
 								Email successfully verified, redirecting...
 							</Alert>
-						</div>
-					) : (
-						<div>
-							{error.error ? (
-								<Alert severity="error">{error.message}</Alert>
-							) : null}
-						</div>
-					)}
-				</div>
-			)}
-		</div>
+						)}
+						{error.error && <Alert severity="error">{error.message}</Alert>}
+					</>
+				)}
+			</Box>
+		</Box>
 	);
 };
 
