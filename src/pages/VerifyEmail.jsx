@@ -71,9 +71,10 @@ const VerifyEmail = () => {
 					console.log("Verification successful");
 					setIsUserVerified(true);
 					await showSuccessDialogWithTimer(
-						"Email successfully verified, redirecting...",
+						"Email successfully verified! Your account is now pending administrator validation. You will receive an email once your account is fully validated.",
+						5000,
 					);
-					setTimeout(() => navigate("/login"), 3000);
+					setTimeout(() => navigate("/login"), 5000);
 				} else {
 					console.log("Verification failed:", verifyResponse?.data?.message);
 					throw new Error(
