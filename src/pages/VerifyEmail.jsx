@@ -57,7 +57,7 @@ const VerifyEmail = () => {
 				const verifyUrl = `${process.env.REACT_APP_MONGO_URI}/api/user/verify-email/${token}`;
 				console.log("Verification URL:", verifyUrl);
 
-				const verifyResponse = await axios.post(verifyUrl);
+				const verifyResponse = await axios.get(verifyUrl);
 				console.log("Verification response:", verifyResponse.data);
 
 				if (verifyResponse?.data?.success) {
