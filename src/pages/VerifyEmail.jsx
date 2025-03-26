@@ -2,7 +2,7 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Alert, CircularProgress, Box } from "@mui/material";
+import { Alert, CircularProgress, Box, Typography } from "@mui/material";
 import axios from "axios";
 import {
 	showSuccessDialogWithTimer,
@@ -23,32 +23,20 @@ const VerifyEmail = () => {
 	useEffect(() => {
 		const verifyEmail = async () => {
 			try {
-				console.log("Frontend verification started");
-				console.log("Token:", token);
-				console.log("Email:", email);
-
 				if (!token || !email) {
-					console.log("Missing token or email");
 					setError({ error: true, message: "Missing token or email" });
 					setIsLoading(false);
 					return;
 				}
 
-				// First check if user is already verified
-				console.log("Checking if user is already verified");
-				console.log("MONGO_URI:", process.env.REACT_APP_MONGO_URI);
-
 				const apiUrl =
 					process.env.REACT_APP_MONGO_URI || "http://localhost:8081";
-				console.log("Using API URL:", apiUrl);
 
+				// First check if user is already verified
 				const checkVerifiedUrl = `${apiUrl}/api/user/is-user-validated`;
-				console.log("Check verification URL:", checkVerifiedUrl);
 				const checkResponse = await axios.post(checkVerifiedUrl, { email });
-				console.log("Check verification response:", checkResponse.data);
 
 				if (checkResponse.data.status === true) {
-					console.log("User already verified");
 					setIsUserVerified(true);
 					setIsLoading(false);
 					await showSuccessDialogWithTimer(
@@ -59,16 +47,10 @@ const VerifyEmail = () => {
 				}
 
 				// If not verified, proceed with verification
-				console.log("Proceeding with email verification");
-				// Handle both frontend and API endpoint formats
 				const verifyUrl = `${apiUrl}/api/user/verify-email/${token}`;
-				console.log("Verification URL:", verifyUrl);
-
 				const verifyResponse = await axios.get(verifyUrl);
-				console.log("Verification response:", verifyResponse.data);
 
 				if (verifyResponse?.data?.success) {
-					console.log("Verification successful");
 					setIsUserVerified(true);
 					await showSuccessDialogWithTimer(
 						"Email successfully verified! Your account is now pending administrator validation. You will receive an email once your account is fully validated.",
@@ -76,14 +58,11 @@ const VerifyEmail = () => {
 					);
 					setTimeout(() => navigate("/login"), 5000);
 				} else {
-					console.log("Verification failed:", verifyResponse?.data?.message);
 					throw new Error(
 						verifyResponse?.data?.message || "Verification failed",
 					);
 				}
 			} catch (err) {
-				console.error("Verification error:", err);
-				console.error("Error response:", err.response?.data);
 				setError({
 					error: true,
 					message:
@@ -112,7 +91,7 @@ const VerifyEmail = () => {
 				p={4}
 				borderRadius={2}
 				boxShadow={3}
-				minWidth={300}
+				minWidth={400}
 				textAlign="center"
 			>
 				{isLoading ? (
@@ -124,13 +103,21 @@ const VerifyEmail = () => {
 								<Alert severity="success" sx={{ mb: 2 }}>
 									Email successfully verified!
 								</Alert>
-								<Box sx={{ mt: 2, color: "text.secondary" }}>
-									<p>From Workside Software:</p>
-									<p>
-										Please check your email for further instructions regarding
-										your account validation.
-									</p>
-									<p>You will be redirected to the login page shortly...</p>
+								<Box sx={{ mt: 2 }}>
+									<Typography variant="h6" gutterBottom color="primary">
+										From Workside Software
+									</Typography>
+									<Typography variant="body1" paragraph>
+										Your email has been successfully verified. Your account is
+										now pending administrator validation.
+									</Typography>
+									<Typography variant="body1" paragraph>
+										You will receive an email once your account is fully
+										validated.
+									</Typography>
+									<Typography variant="body2" color="text.secondary">
+										You will be redirected to the login page shortly...
+									</Typography>
 								</Box>
 							</Box>
 						)}
@@ -139,10 +126,16 @@ const VerifyEmail = () => {
 								<Alert severity="error" sx={{ mb: 2 }}>
 									Verification Error
 								</Alert>
-								<Box sx={{ mt: 2, color: "text.secondary" }}>
-									<p>From Workside Software:</p>
-									<p>{error.message}</p>
-									<p>Please contact support if this issue persists.</p>
+								<Box sx={{ mt: 2 }}>
+									<Typography variant="h6" gutterBottom color="primary">
+										From Workside Software
+									</Typography>
+									<Typography variant="body1" paragraph>
+										{error.message}
+									</Typography>
+									<Typography variant="body2" color="text.secondary">
+										Please contact support if this issue persists.
+									</Typography>
 								</Box>
 							</Box>
 						)}
