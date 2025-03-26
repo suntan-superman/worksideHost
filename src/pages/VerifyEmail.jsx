@@ -52,6 +52,7 @@ const VerifyEmail = () => {
 
 				if (verifyResponse?.data?.success) {
 					setIsUserVerified(true);
+					setIsLoading(false);
 					await showSuccessDialogWithTimer(
 						"Email successfully verified! Your account is now pending administrator validation. You will receive an email once your account is fully validated.",
 						5000,
@@ -70,13 +71,26 @@ const VerifyEmail = () => {
 						err.message ||
 						"Error verifying email",
 				});
-			} finally {
 				setIsLoading(false);
 			}
 		};
 
 		verifyEmail();
 	}, [token, email, navigate]);
+
+	if (isLoading) {
+		return (
+			<Box
+				display="flex"
+				justifyContent="center"
+				alignItems="center"
+				minHeight="100vh"
+				bgcolor="#f5f5f5"
+			>
+				<CircularProgress />
+			</Box>
+		);
+	}
 
 	return (
 		<Box
@@ -94,53 +108,45 @@ const VerifyEmail = () => {
 				minWidth={400}
 				textAlign="center"
 			>
-				{isLoading ? (
-					<CircularProgress />
-				) : (
-					<>
-						{isUserVerified && (
-							<Box>
-								<Alert severity="success" sx={{ mb: 2 }}>
-									Email successfully verified!
-								</Alert>
-								<Box sx={{ mt: 2 }}>
-									<Typography variant="h6" gutterBottom color="primary">
-										From Workside Software
-									</Typography>
-									<Typography variant="body1" paragraph>
-										Your email has been successfully verified. Your account is
-										now pending administrator validation.
-									</Typography>
-									<Typography variant="body1" paragraph>
-										You will receive an email once your account is fully
-										validated.
-									</Typography>
-									<Typography variant="body2" color="text.secondary">
-										You will be redirected to the login page shortly...
-									</Typography>
-								</Box>
-							</Box>
-						)}
-						{error.error && (
-							<Box>
-								<Alert severity="error" sx={{ mb: 2 }}>
-									Verification Error
-								</Alert>
-								<Box sx={{ mt: 2 }}>
-									<Typography variant="h6" gutterBottom color="primary">
-										From Workside Software
-									</Typography>
-									<Typography variant="body1" paragraph>
-										{error.message}
-									</Typography>
-									<Typography variant="body2" color="text.secondary">
-										Please contact support if this issue persists.
-									</Typography>
-								</Box>
-							</Box>
-						)}
-					</>
-				)}
+				{isUserVerified ? (
+					<Box>
+						<Alert severity="success" sx={{ mb: 2 }}>
+							Email successfully verified!
+						</Alert>
+						<Box sx={{ mt: 2 }}>
+							<Typography variant="h6" gutterBottom color="primary">
+								From Workside Software
+							</Typography>
+							<Typography variant="body1" paragraph>
+								Your email has been successfully verified. Your account is now
+								pending administrator validation.
+							</Typography>
+							<Typography variant="body1" paragraph>
+								You will receive an email once your account is fully validated.
+							</Typography>
+							<Typography variant="body2" color="text.secondary">
+								You will be redirected to the login page shortly...
+							</Typography>
+						</Box>
+					</Box>
+				) : error.error ? (
+					<Box>
+						<Alert severity="error" sx={{ mb: 2 }}>
+							Verification Error
+						</Alert>
+						<Box sx={{ mt: 2 }}>
+							<Typography variant="h6" gutterBottom color="primary">
+								From Workside Software
+							</Typography>
+							<Typography variant="body1" paragraph>
+								{error.message}
+							</Typography>
+							<Typography variant="body2" color="text.secondary">
+								Please contact support if this issue persists.
+							</Typography>
+						</Box>
+					</Box>
+				) : null}
 			</Box>
 		</Box>
 	);
