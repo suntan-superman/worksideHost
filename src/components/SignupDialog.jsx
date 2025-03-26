@@ -112,7 +112,6 @@ const SignupDialog = () => {
 		if (!validateForm()) return;
 		
 		setIsLoading(true);
-		console.log(`Data: ${JSON.stringify(data, null, 2)}`);
 		try {
 			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/user/`, {
 				method: "POST",

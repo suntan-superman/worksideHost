@@ -120,11 +120,32 @@ const VerifyEmail = () => {
 				) : (
 					<>
 						{isUserVerified && (
-							<Alert severity="success">
-								Email successfully verified, redirecting...
-							</Alert>
+							<Box>
+								<Alert severity="success" sx={{ mb: 2 }}>
+									Email successfully verified!
+								</Alert>
+								<Box sx={{ mt: 2, color: "text.secondary" }}>
+									<p>From Workside Software:</p>
+									<p>
+										Please check your email for further instructions regarding
+										your account validation.
+									</p>
+									<p>You will be redirected to the login page shortly...</p>
+								</Box>
+							</Box>
 						)}
-						{error.error && <Alert severity="error">{error.message}</Alert>}
+						{error.error && (
+							<Box>
+								<Alert severity="error" sx={{ mb: 2 }}>
+									Verification Error
+								</Alert>
+								<Box sx={{ mt: 2, color: "text.secondary" }}>
+									<p>From Workside Software:</p>
+									<p>{error.message}</p>
+									<p>Please contact support if this issue persists.</p>
+								</Box>
+							</Box>
+						)}
 					</>
 				)}
 			</Box>
