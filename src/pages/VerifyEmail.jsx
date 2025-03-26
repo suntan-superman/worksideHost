@@ -2,7 +2,13 @@
 
 import { useContext, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { Alert, CircularProgress, Box, Typography } from "@mui/material";
+import {
+	Alert,
+	CircularProgress,
+	Box,
+	Typography,
+	Button,
+} from "@mui/material";
 import axios from "axios";
 import {
 	showSuccessDialogWithTimer,
@@ -145,9 +151,17 @@ const VerifyEmail = () => {
 							<Typography variant="body1" paragraph>
 								You will receive an email once your account is fully validated.
 							</Typography>
-							<Typography variant="body2" color="text.secondary">
+							<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
 								You will be redirected to the login page shortly...
 							</Typography>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={() => navigate("/login")}
+								sx={{ mt: 2 }}
+							>
+								Go to Login
+							</Button>
 						</Box>
 					</Box>
 				) : error.error ? (
@@ -162,12 +176,35 @@ const VerifyEmail = () => {
 							<Typography variant="body1" paragraph>
 								{error.message}
 							</Typography>
-							<Typography variant="body2" color="text.secondary">
+							<Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
 								Please contact support if this issue persists.
 							</Typography>
+							<Button
+								variant="contained"
+								color="primary"
+								onClick={() => navigate("/login")}
+								sx={{ mt: 2 }}
+							>
+								Return to Login
+							</Button>
 						</Box>
 					</Box>
-				) : null}
+				) : (
+					<Box>
+						<Alert severity="info" sx={{ mb: 2 }}>
+							Verifying your email...
+						</Alert>
+						<Box sx={{ mt: 2 }}>
+							<Typography variant="h6" gutterBottom color="primary">
+								From Workside Software
+							</Typography>
+							<Typography variant="body1" paragraph>
+								Please wait while we verify your email address.
+							</Typography>
+							<CircularProgress size={24} />
+						</Box>
+					</Box>
+				)}
 			</Box>
 		</Box>
 	);
