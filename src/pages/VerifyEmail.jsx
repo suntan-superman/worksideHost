@@ -20,10 +20,14 @@ const VerifyEmail = () => {
 	const token = searchParams.get("token");
 	const email = searchParams.get("email");
 
+	console.log("Component mounted with:", { token, email });
+	console.log("Initial state:", { isLoading, isUserVerified, error });
+
 	useEffect(() => {
 		const verifyEmail = async () => {
 			try {
 				if (!token || !email) {
+					console.log("Missing token or email");
 					setError({ error: true, message: "Missing token or email" });
 					setIsLoading(false);
 					return;
@@ -31,12 +35,16 @@ const VerifyEmail = () => {
 
 				const apiUrl =
 					process.env.REACT_APP_MONGO_URI || "http://localhost:8081";
+				console.log("Using API URL:", apiUrl);
 
 				// First check if user is already verified
 				const checkVerifiedUrl = `${apiUrl}/api/user/is-user-validated`;
+				console.log("Checking verification status at:", checkVerifiedUrl);
 				const checkResponse = await axios.post(checkVerifiedUrl, { email });
+				console.log("Check verification response:", checkResponse.data);
 
 				if (checkResponse.data.status === true) {
+					console.log("User already verified");
 					setIsUserVerified(true);
 					setIsLoading(false);
 					await showSuccessDialogWithTimer(
@@ -48,9 +56,12 @@ const VerifyEmail = () => {
 
 				// If not verified, proceed with verification
 				const verifyUrl = `${apiUrl}/api/user/verify-email/${token}`;
+				console.log("Proceeding with verification at:", verifyUrl);
 				const verifyResponse = await axios.get(verifyUrl);
+				console.log("Verification response:", verifyResponse.data);
 
 				if (verifyResponse?.data?.success) {
+					console.log("Verification successful, updating state");
 					setIsUserVerified(true);
 					setIsLoading(false);
 					await showSuccessDialogWithTimer(
@@ -59,11 +70,14 @@ const VerifyEmail = () => {
 					);
 					setTimeout(() => navigate("/login"), 5000);
 				} else {
+					console.log("Verification failed:", verifyResponse?.data?.message);
 					throw new Error(
 						verifyResponse?.data?.message || "Verification failed",
 					);
 				}
 			} catch (err) {
+				console.error("Error in verifyEmail:", err);
+				console.error("Error response:", err.response?.data);
 				setError({
 					error: true,
 					message:
@@ -78,7 +92,13 @@ const VerifyEmail = () => {
 		verifyEmail();
 	}, [token, email, navigate]);
 
+	// Log state changes
+	useEffect(() => {
+		console.log("State updated:", { isLoading, isUserVerified, error });
+	}, [isLoading, isUserVerified, error]);
+
 	if (isLoading) {
+		console.log("Rendering loading state");
 		return (
 			<Box
 				display="flex"
@@ -92,6 +112,7 @@ const VerifyEmail = () => {
 		);
 	}
 
+	console.log("Rendering main content with state:", { isUserVerified, error });
 	return (
 		<Box
 			display="flex"
