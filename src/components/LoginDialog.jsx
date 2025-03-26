@@ -77,6 +77,9 @@ const LoginDialog = () => {
 					case "ADMIN":
 						accessLevel = 3;
 						break;
+					case "SUPERADMIN":
+						accessLevel = 4;
+						break;
 					default:
 						accessLevel = -1;
 						break;
@@ -125,11 +128,9 @@ const LoginDialog = () => {
 						"userName",
 						JSON.stringify(jsonData.user.user),
 					);
-					localStorage.setItem(
-						"userID",
-						JSON.stringify(jsonData.user.userId),
-					);
 					const email = JSON.stringify(jsonData.user.email);
+					localStorage.setItem("userEmail", email);
+					localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
 					setUserEmail(email);
 					onSaveUserName(userName, email);
 					setCompanyName(jsonData.user.company);

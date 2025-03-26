@@ -65,6 +65,7 @@
 		"selectedrowindex",
 		"startdate",
 		"statusdate",
+		"SUPERADMIN",
 		"suppliergroup",
 		"supplierid",
 		"suppliername",

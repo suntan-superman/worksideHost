@@ -11,6 +11,7 @@ import { styled } from "@mui/material/styles";
 import NotificationDialog from "../pages/NotificationDialog";
 import HelpDialog from "./HelpDialog";
 import AboutDialog from "./AboutDialog";
+import UserProfileDialog from "./UserProfileDialog";
 import avatar from "../data/avatar.jpg";
 // eslint-disable-next-line import/no-cycle
 import { Chat, Notification, UserProfile } from ".";
@@ -61,6 +62,7 @@ const NavBar = () => {
 	const [helpAnchorEl, setHelpAnchorEl] = useState(null);
 	const [helpDialogOpen, setHelpDialogOpen] = useState(false);
 	const [aboutDialogOpen, setAboutDialogOpen] = useState(false);
+	const [userProfileDialogOpen, setUserProfileDialogOpen] = useState(false);
 
 	useEffect(() => {
 		const handleResize = () => setScreenSize(window.innerWidth);
@@ -87,6 +89,9 @@ const NavBar = () => {
 				break;
 			case 3:
 				setAccessLabel("ADMIN");
+				break;
+			case 4:
+				setAccessLabel("SUPERADMIN");
 				break;
 			default:
 				setAccessLabel("GUEST");
@@ -145,6 +150,10 @@ const NavBar = () => {
 		setAboutDialogOpen(true);
 	};
 
+	const handleUserProfileClick = () => {
+		setUserProfileDialogOpen(true);
+	};
+
 	return (
 		<>
 			<NavBarContainer>
@@ -199,8 +208,8 @@ const NavBar = () => {
 						<TooltipComponent content="Profile" position="BottomCenter">
 							<div
 								className="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-800 rounded-lg"
-								onClick={() => handleClick("userProfile")}
-								onKeyUp={() => handleClick("userProfile")}
+								onClick={handleUserProfileClick}
+								onKeyUp={handleUserProfileClick}
 							>
 								<img
 									className="rounded-full w-8 h-8"
@@ -208,7 +217,6 @@ const NavBar = () => {
 									alt="user-profile"
 								/>
 								<p>
-									{/* <span className="text-white text-14">Hi,</span>{" "} */}
 									<span className="text-white font-bold ml-1 text-14">
 										{welcomePhrase}
 									</span>
@@ -234,6 +242,10 @@ const NavBar = () => {
 			<AboutDialog
 				open={aboutDialogOpen}
 				onClose={() => setAboutDialogOpen(false)}
+			/>
+			<UserProfileDialog
+				open={userProfileDialogOpen}
+				onClose={() => setUserProfileDialogOpen(false)}
 			/>
 		</>
 	);
