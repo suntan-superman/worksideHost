@@ -41,6 +41,66 @@ import {
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 
+/**
+ * ProjectsTab Component
+ *
+ * This component renders a tab for managing projects, including functionalities
+ * for viewing, filtering, adding, editing, and deleting project data. It uses
+ * React hooks, React Query for data fetching and mutations, and Syncfusion's
+ * GridComponent for displaying project data in a tabular format.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered ProjectsTab component.
+ *
+ * @description
+ * - Fetches project data using `useQuery` and displays it in a grid.
+ * - Allows filtering projects by selected companies.
+ * - Supports adding, editing, and deleting projects based on user access level.
+ * - Provides a confirmation dialog for saving or updating project data.
+ * - Uses local storage to persist filter selections and grid settings.
+ * - Includes a loading spinner while fetching project data.
+ *
+ * @dependencies
+ * - React hooks: `useState`, `useEffect`, `useRef`
+ * - React Query: `useQuery`, `useMutation`, `useQueryClient`
+ * - Syncfusion Grid: `GridComponent`, `ColumnsDirective`, `ColumnDirective`, `Inject`
+ * - Material-UI: `Box`, `Chip`, `IconButton`
+ * - Custom components: `ProjectEditTemplate`, `ConfirmationDialog`, `ProjectFilterDialog`
+ * - Utility functions: `GetAllProjects`, `DeleteProject`, `SaveProject`, `UpdateProject`
+ *
+ * @state
+ * - `haveData` (boolean): Indicates if project data is available.
+ * - `insertFlag` (boolean): Tracks whether a new project is being added.
+ * - `openUpdateModal` (boolean): Controls the visibility of the update confirmation dialog.
+ * - `messageText` (string): Message displayed in the confirmation dialog.
+ * - `currentRecord` (object|null): The currently selected project record.
+ * - `projectData` (array|null): Filtered project data to display in the grid.
+ * - `filterDialogOpen` (boolean): Controls the visibility of the filter dialog.
+ * - `selectedCompanies` (array): List of selected companies for filtering projects.
+ * - `selectedRecord` (string|null): ID of the currently selected project record.
+ *
+ * @functions
+ * - `GetAccessLevel`: Retrieves the user's access level from local storage.
+ * - `handleDelete`: Deletes the selected project after confirmation.
+ * - `SaveProjectData`: Saves or updates project data based on the current operation.
+ * - `handleFilterApply`: Applies selected company filters to the project data.
+ * - `handleFilterRemove`: Removes a company filter and updates the project data.
+ * - `handleFilterDialogOpen`: Opens the filter dialog.
+ * - `handleFilterDialogClose`: Closes the filter dialog.
+ * - `onProjectLoad`: Configures grid settings on load.
+ * - `actionBegin`: Handles actions at the beginning of grid operations.
+ * - `actionComplete`: Handles actions after grid operations are completed.
+ * - `rowSelectedProject`: Sets the selected project record when a row is selected.
+ *
+ * @hooks
+ * - `useQuery`: Fetches project data from the server.
+ * - `useMutation`: Handles mutations for saving, updating, and deleting projects.
+ * - `useEffect`: Updates project data when dependencies change.
+ *
+ * @example
+ * <ProjectsTab />
+ */
 const ProjectsTab = () => {
 	const [haveData, setHaveData] = useState(false);
 	const [insertFlag, setInsertFlag] = useState(false);
@@ -51,7 +111,7 @@ const ProjectsTab = () => {
 	const { companyName } = UseStateContext();
 	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
 	const [selectedCompanies, setSelectedCompanies] = useState(() => {
-		const saved = localStorage.getItem('projectFilterSelections');
+		const saved = localStorage.getItem("projectFilterSelections");
 		return saved ? JSON.parse(saved) : [companyName];
 	});
 	const projectsGridRef = useRef(null);
@@ -100,14 +160,14 @@ const ProjectsTab = () => {
 	useEffect(() => {
 		if (projData?.data) {
 			let filteredData = projData.data;
-			
+
 			// Apply company filters if any are selected
 			if (selectedCompanies.length > 0) {
-				filteredData = projData.data.filter(project => 
-					selectedCompanies.includes(project.customer)
+				filteredData = projData.data.filter((project) =>
+					selectedCompanies.includes(project.customer),
 				);
 			}
-			
+
 			setProjectData(filteredData);
 			setHaveData(true);
 		}
@@ -255,7 +315,7 @@ const ProjectsTab = () => {
 
 	const handleFilterApply = (companies) => {
 		setSelectedCompanies(companies);
-		localStorage.setItem('projectFilterSelections', JSON.stringify(companies));
+		localStorage.setItem("projectFilterSelections", JSON.stringify(companies));
 		setFilterDialogOpen(false);
 	};
 

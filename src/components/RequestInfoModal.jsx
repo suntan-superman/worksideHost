@@ -26,15 +26,53 @@ import {
 	UpdateRequestStatus,
 } from "../api/worksideAPI";
 
+
 import {
 	showErrorDialog,
 	showSuccessDialogWithTimer,
 } from "../utils/useSweetAlert";
 
+/**
+ * RequestInfoModal Component
+ *
+ * This component renders a modal dialog displaying detailed information about a request.
+ * It includes features such as draggable and resizable modal, Google Maps integration for route tracking,
+ * and actions for accepting requests or assigning delivery associates.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {string} props.recordID - The unique identifier of the request record.
+ * @param {boolean} props.open - Determines whether the modal is open or closed.
+ * @param {Function} props.onClose - Callback function to handle closing the modal.
+ *
+ * @returns {JSX.Element|null} The rendered modal component or null if the modal is closed and no recordID is provided.
+ *
+ * @example
+ * <RequestInfoModal
+ *   recordID="12345"
+ *   open={true}
+ *   onClose={() => console.log('Modal closed')}
+ * />
+ *
+ * @remarks
+ * - The modal fetches request details and route data from the backend using the provided `recordID`.
+ * - It supports draggable and resizable functionality, with dimensions and position saved in localStorage.
+ * - Google Maps is used to display the route and current location of the delivery.
+ * - Includes actions for accepting requests and assigning delivery associates.
+ *
+ * @dependencies
+ * - React hooks: `useState`, `useEffect`, `useCallback`, `useRef`
+ * - External libraries: `axios`, `react-query`, `react-draggable`, `date-fns`
+ * - Environment variables: `REACT_APP_GOOGLE_MAPS_API_KEY`, `REACT_APP_MONGO_URI`
+ *
+ * @todo
+ * - Replace hardcoded request and supplier IDs in `fetchRouteData` with dynamic values.
+ * - Improve error handling and user feedback for API calls.
+ */
 const RequestInfoModal = ({ recordID, open, onClose }) => {
 	// Add early return if recordID is null/undefined AND dialog is open
 	if (open && !recordID) {
-		console.warn('RequestInfoModal opened without a valid recordID');
+		console.warn("RequestInfoModal opened without a valid recordID");
 		return (
 			<Modal
 				open={open}
@@ -141,7 +179,9 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			setCustomerName(
 				JSON.stringify(json.customername).replace(/^"(.*)"$/, "$1"),
 			);
-			setProjectName(JSON.stringify(json.projectname).replace(/^"(.*)"$/, "$1"));
+			setProjectName(
+				JSON.stringify(json.projectname).replace(/^"(.*)"$/, "$1"),
+			);
 			setRigCompany(JSON.stringify(json.rigcompany).replace(/^"(.*)"$/, "$1"));
 			setRequestName(
 				JSON.stringify(json.requestname).replace(/^"(.*)"$/, "$1"),
@@ -234,7 +274,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		onSuccess: () => {
 			showSuccessDialogWithTimer("Request Bid Saved Successfully");
 			queryClient.invalidateQueries("requests");
-			},
+		},
 		onError: (error) => {
 			// Toast.show({
 			// 	type: "error",
@@ -261,7 +301,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					status: "ASSIGNED",
 				},
 			);
-			
+
 			if (response.status === 200) {
 				showSuccessDialogWithTimer("Delivery Associate Assigned Successfully");
 				queryClient.invalidateQueries(["requests"]);
@@ -278,7 +318,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		{
 			const response = await UpdateRequestStatus({
 				reqID: requestData._id,
-				status: "SSR-ACCEPTED"
+				status: "SSR-ACCEPTED",
 			});
 			if (response.status === 200) {
 				setDisableAcceptButton(true);

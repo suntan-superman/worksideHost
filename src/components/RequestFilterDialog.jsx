@@ -32,7 +32,37 @@ const PaperComponent = (props) => {
 	);
 };
 
-const RequestFilterDialog = ({ open, onClose, onApply, requestStatusOptions }) => {
+/**
+ * RequestFilterDialog Component
+ *
+ * A dialog component that allows users to filter requests based on their status.
+ * The selected filters are saved to localStorage and can be applied or cleared.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open or closed.
+ * @param {Function} props.onClose - Callback function to handle closing the dialog.
+ * @param {Function} props.onApply - Callback function to handle applying the selected filters.
+ * @param {string[]} props.requestStatusOptions - Array of request status options to display as filter checkboxes.
+ *
+ * @example
+ * const requestStatusOptions = ['Pending', 'Approved', 'Rejected'];
+ * const handleApply = (filters) => console.log(filters);
+ * const handleClose = () => console.log('Dialog closed');
+ *
+ * <RequestFilterDialog
+ *   open={true}
+ *   onClose={handleClose}
+ *   onApply={handleApply}
+ *   requestStatusOptions={requestStatusOptions}
+ * />
+ */
+const RequestFilterDialog = ({
+	open,
+	onClose,
+	onApply,
+	requestStatusOptions,
+}) => {
 	const [selectedFilters, setSelectedFilters] = useState(() => {
 		const saved = localStorage.getItem(STORAGE_KEY);
 		return saved ? JSON.parse(saved) : [];
@@ -50,7 +80,7 @@ const RequestFilterDialog = ({ open, onClose, onApply, requestStatusOptions }) =
 		setSelectedFilters((prev) =>
 			prev.includes(status)
 				? prev.filter((item) => item !== status)
-				: [...prev, status]
+				: [...prev, status],
 		);
 	};
 
@@ -84,9 +114,9 @@ const RequestFilterDialog = ({ open, onClose, onApply, requestStatusOptions }) =
 										checked={selectedFilters.includes(status)}
 										onChange={() => handleToggle(status)}
 										sx={{
-											color: 'green',
-											'&.Mui-checked': {
-												color: 'green',
+											color: "green",
+											"&.Mui-checked": {
+												color: "green",
 											},
 										}}
 									/>
@@ -98,8 +128,8 @@ const RequestFilterDialog = ({ open, onClose, onApply, requestStatusOptions }) =
 				</Stack>
 			</DialogContent>
 			<DialogActions>
-				<Button 
-					variant="contained" 
+				<Button
+					variant="contained"
 					onClick={handleApply}
 					sx={{
 						backgroundColor: "green",

@@ -18,7 +18,6 @@ import Dialog from "@mui/material/Dialog";
 import { DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import dayjs from "dayjs";
-// import LatestRequestsModal from "./LatestRequestsModal";
 
 // Status Map for the Chip Component
 const statusMap = {
@@ -104,6 +103,30 @@ export function LatestRequests({ requests = [], sx }) {
 	);
 }
 
+/**
+ * LatestRequestsModal is a React component that displays a modal dialog
+ * containing a table of the latest requests. The modal can be dragged
+ * and includes a close button to dismiss it.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the modal is open or closed.
+ * @param {Function} props.onClose - Callback function to handle closing the modal.
+ * @returns {JSX.Element} The rendered LatestRequestsModal component.
+ */
+/**
+ * LatestRequestsModal Component
+ *
+ * This component renders a modal dialog displaying a list of the latest requests.
+ * It includes a draggable dialog with a table showcasing project details, request types,
+ * creation dates, and statuses. The modal can be closed using the provided `onClose` handler.
+ *
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the modal is open or closed.
+ * @param {Function} props.onClose - Callback function to handle closing the modal.
+ *
+ * @returns {JSX.Element} The rendered LatestRequestsModal component.
+ */
 const LatestRequestsModal = ({ open, onClose }) => {
 	const requestList = [
 		{

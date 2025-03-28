@@ -9,23 +9,43 @@ const change = (args) => {
 
 const CustomColorPicker = ({ id, mode }) => <ColorPickerComponent id={id} mode={mode} modeSwitcher={false} inline showButtons={false} change={change} />;
 
+/**
+ * ColorPicker component renders a color selection interface with two modes:
+ * an inline palette and an inline picker. It includes a header and a preview
+ * section for displaying the selected color.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered ColorPicker component.
+ *
+ * @example
+ * // Usage in a React application
+ * import ColorPicker from './ColorPicker';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <ColorPicker />
+ *     </div>
+ *   );
+ * }
+ */
 const ColorPicker = () => (
-  <div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
-    <Header category="App" title="Color Picker" />
-    <div className="text-center">
-      <div id="preview" />
-      <div className="flex justify-center items-center gap-20 flex-wrap">
-        <div>
-          <p className="text-2xl font-semibold mt-2 mb-4">Inline Pallete</p>
-          <CustomColorPicker id="inline-palette" mode="Palette" />
-        </div>
-        <div>
-          <p className="text-2xl font-semibold mt-2 mb-4">Inline Picker</p>
-          <CustomColorPicker id="inline-picker" mode="Picker" />
-        </div>
-      </div>
-    </div>
-  </div>
+	<div className="m-2 md:m-10 mt-24 p-2 md:p-10 bg-white rounded-3xl">
+		<Header category="App" title="Color Picker" />
+		<div className="text-center">
+			<div id="preview" />
+			<div className="flex justify-center items-center gap-20 flex-wrap">
+				<div>
+					<p className="text-2xl font-semibold mt-2 mb-4">Inline Pallete</p>
+					<CustomColorPicker id="inline-palette" mode="Palette" />
+				</div>
+				<div>
+					<p className="text-2xl font-semibold mt-2 mb-4">Inline Picker</p>
+					<CustomColorPicker id="inline-picker" mode="Picker" />
+				</div>
+			</div>
+		</div>
+	</div>
 );
 
 export default ColorPicker;

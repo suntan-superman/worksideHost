@@ -163,6 +163,58 @@ function getUsersBySupplierAndCategory(supplierId, categoryLabel, dataset) {
 	return [];
 }
 
+/**
+ * The `Requests` component is a React functional component that renders a grid-based interface
+ * for managing and viewing requests. It includes features such as filtering, sorting, editing,
+ * and exporting data. The component integrates with a backend API to fetch and update request data
+ * and uses various React hooks and third-party libraries for state management and UI rendering.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered `Requests` component.
+ *
+ * @description
+ * - Fetches request data using the `useQuery` hook from `react-query`.
+ * - Allows filtering requests by status and date range.
+ * - Provides CRUD operations for requests, including adding, editing, and deleting.
+ * - Supports exporting request data to Excel.
+ * - Displays a modal dialog for detailed request information and confirmation dialogs for updates.
+ * - Includes customizable toolbar options and grid settings.
+ *
+ * @dependencies
+ * - `react-query` for data fetching and caching.
+ * - `@syncfusion/ej2-react-grids` for grid rendering and interaction.
+ * - `@mui/material` for UI components like `Box`, `Chip`, `FormControl`, and `Select`.
+ * - `axios` for making HTTP requests.
+ *
+ * @state
+ * - `isLoading` {boolean} - Indicates whether the component is in a loading state.
+ * - `requestList` {Array|null} - Stores the list of requests fetched from the API.
+ * - `filteredRequestList` {Array|null} - Stores the filtered list of requests based on active filters.
+ * - `activeFilters` {Array} - Stores the currently applied status filters.
+ * - `dateRangeFilter` {string} - Stores the selected date range filter.
+ * - `selectedRecord` {string|null} - Stores the ID of the currently selected request.
+ * - `showDialog` {boolean} - Controls the visibility of the request details modal.
+ * - `openUpdateModal` {boolean} - Controls the visibility of the update confirmation dialog.
+ * - `messageText` {string} - Stores the message text for the confirmation dialog.
+ * - `currentRecord` {Object|null} - Stores the data of the request being edited or updated.
+ *
+ * @methods
+ * - `GetAccessLevel` - Retrieves the user's access level from local storage.
+ * - `GetUserId` - Retrieves the user's ID from local storage.
+ * - `filterRequestsByDateRange` - Filters requests based on the selected date range.
+ * - `handleDateRangeChange` - Updates the date range filter state.
+ * - `handleFilterApply` - Applies selected status filters.
+ * - `handleRemoveFilter` - Removes a specific status filter.
+ * - `SaveRequestData` - Saves or updates request data to the backend.
+ * - `SendRequestEmail` - Sends email notifications to suppliers.
+ * - `toolbarClick` - Handles toolbar actions like exporting data.
+ * - `rowSelectedRequest` - Handles row selection in the grid.
+ * - `actionComplete` - Handles actions like saving or editing requests.
+ *
+ * @example
+ * <Requests />
+ */
 const Requests = () => {
 	const requestGridRef = useRef(null);
 	const queryClient = useQueryClient();
@@ -677,7 +729,9 @@ const Requests = () => {
 	};
 
 	const handleRemoveFilter = (filterToRemove) => {
-		const newFilters = activeFilters.filter((filter) => filter !== filterToRemove);
+		const newFilters = activeFilters.filter(
+			(filter) => filter !== filterToRemove,
+		);
 		setActiveFilters(newFilters);
 	};
 

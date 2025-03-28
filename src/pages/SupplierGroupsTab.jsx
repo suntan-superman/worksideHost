@@ -1,13 +1,8 @@
 /* eslint-disable */
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { TreeViewComponent } from "@syncfusion/ej2-react-navigations";
-import Box from "@mui/material/Box";
-import Modal from "@mui/material/Modal";
-import Select from "react-select";
-import axios from "axios";
 import "../index.css";
-import { toast } from "react-toastify";
 import useUserStore from "../stores/UserStore";
 
 // SupplierGroup Data
@@ -19,6 +14,38 @@ import useUserStore from "../stores/UserStore";
 // Supplier Group Status
 // Supplier Product Category
 
+/**
+ * SupplierGroupsTab Component
+ *
+ * This component renders a tab for managing supplier groups. It includes a tree view
+ * to display hierarchical data of supplier groups and their categories, along with a
+ * refresh button to trigger data updates.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered SupplierGroupsTab component.
+ *
+ * @example
+ * <SupplierGroupsTab />
+ *
+ * @description
+ * - The component uses a `TreeViewComponent` to display supplier groups and their categories.
+ * - A refresh button is provided to trigger a refresh action, which sets a `refreshFlag` state.
+ * - The tree data is defined statically within the component and passed to the `TreeViewComponent`.
+ * - The `needRefreshFlag` state determines the button's background color.
+ *
+ * @state {boolean} refreshFlag - A flag to indicate if a refresh action is triggered.
+ * @state {boolean} needRefreshFlag - A flag to indicate if a refresh is needed, affecting the button's style.
+ *
+ * @hooks
+ * - `useState` - To manage the `refreshFlag` and `needRefreshFlag` states.
+ * - `useRef` - To create a reference for the `TreeViewComponent`.
+ * - `useUserStore` - To retrieve the user's access level from the global store.
+ *
+ * @dependencies
+ * - `TreeViewComponent` - A component used to render the tree structure.
+ * - `useUserStore` - A custom hook to access user-related data.
+ */
 const SupplierGroupsTab = () => {
 	const [refreshFlag, setRefreshFlag] = useState(false);
 	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);

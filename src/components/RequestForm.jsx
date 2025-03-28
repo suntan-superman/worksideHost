@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
 	DropDownListComponent,
@@ -6,7 +6,7 @@ import {
 	DateTimePickerComponent,
 	NumericTextBoxComponent,
 } from "@syncfusion/ej2-react-dropdowns";
-import { Button, CircularProgress, Alert } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import {
 	showErrorDialog,
 	showSuccessDialogWithTimer,
@@ -14,11 +14,26 @@ import {
 import {
 	GetProducts,
 	GetAllSupplierGroupData,
-	GetSupplierIDFromName,
 	SaveNewRequest,
 	UpdateRequest,
 } from "../api/worksideAPI";
 
+/**
+ * RequestForm Component
+ *
+ * A form component for creating or editing requests. It supports both creation and edit modes,
+ * and allows users to input various details such as request category, name, customer information,
+ * project details, and more. The component also handles form validation, localStorage preferences,
+ * and integrates with React Query for data fetching and mutations.
+ *
+ * @param {Object} props - Component properties.
+ * @param {Object|null} [props.initialData=null] - Initial data for the form, used in edit mode.
+ * @param {Function} props.onSuccess - Callback function triggered on successful form submission.
+ * @param {Function} props.onCancel - Callback function triggered when the form is canceled.
+ * @param {boolean} [props.isEditMode=false] - Flag indicating whether the form is in edit mode.
+ *
+ * @returns {JSX.Element} The rendered RequestForm component.
+ */
 const RequestForm = ({
 	initialData = null,
 	onSuccess,

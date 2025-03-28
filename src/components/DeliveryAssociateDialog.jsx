@@ -28,6 +28,30 @@ const PaperComponent = (props) => {
 	);
 };
 
+/**
+ * DeliveryAssociateDialog Component
+ *
+ * A modal dialog for assigning a delivery associate to a supplier.
+ * It fetches and displays a list of delivery associates based on the provided supplier ID.
+ *
+ * @component
+ *
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open or closed.
+ * @param {Function} props.onClose - Callback function to close the dialog.
+ * @param {Function} props.onAssign - Callback function to handle the assignment of a delivery associate.
+ * @param {string} props.supplierID - The ID of the supplier for which delivery associates are fetched.
+ *
+ * @returns {JSX.Element} The rendered DeliveryAssociateDialog component.
+ *
+ * @example
+ * <DeliveryAssociateDialog
+ *   open={true}
+ *   onClose={handleClose}
+ *   onAssign={handleAssign}
+ *   supplierID="12345"
+ * />
+ */
 const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 	const [deliveryAssocData, setDeliveryAssocData] = useState([]);
 	const [selectedDA, setSelectedDA] = useState("");
@@ -41,16 +65,18 @@ const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 				setDeliveryAssocData([]);
 				return;
 			}
-			
+
 			try {
 				const strAPI = `${apiURL}/api/deliveryassociate`;
 				const response = await axios.get(strAPI);
 				const filteredDA = response.data.filter(
 					(da) => da.supplierid === supplierID,
 				);
-				
+
 				if (filteredDA.length === 0) {
-					setErrorMessage("No Delivery Associates Available for Selected Supplier");
+					setErrorMessage(
+						"No Delivery Associates Available for Selected Supplier",
+					);
 					setDeliveryAssocData([]);
 				} else {
 					setErrorMessage("");
@@ -77,12 +103,7 @@ const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 	};
 
 	return (
-		<Modal
-			open={open}
-			onClose={onClose}
-			disableEnforceFocus
-			disableAutoFocus
-		>
+		<Modal open={open} onClose={onClose} disableEnforceFocus disableAutoFocus>
 			<Dialog
 				open
 				PaperComponent={PaperComponent}
@@ -94,7 +115,9 @@ const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 					<span className="text-bold text-green-500 text-xl">WORK</span>
 					<span className="text-bold text-black text-xl">SIDE</span>
 					<br />
-					<p className="text-bold text-black text-xl">Assign Delivery Associate</p>
+					<p className="text-bold text-black text-xl">
+						Assign Delivery Associate
+					</p>
 				</DialogTitle>
 				<DialogContent>
 					<Box sx={{ mt: 2, minWidth: 300 }}>
@@ -102,11 +125,11 @@ const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 							<p className="text-red-500 text-bold mb-4">{errorMessage}</p>
 						) : (
 							<FormControl fullWidth>
-								<InputLabel 
-									sx={{ 
-										'&.Mui-focused': { 
-											color: 'green' 
-										} 
+								<InputLabel
+									sx={{
+										"&.Mui-focused": {
+											color: "green",
+										},
 									}}
 								>
 									Select Delivery Associate
@@ -116,14 +139,14 @@ const DeliveryAssociateDialog = ({ open, onClose, onAssign, supplierID }) => {
 									onChange={(e) => setSelectedDA(e.target.value)}
 									label="Select Delivery Associate"
 									sx={{
-										'&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-											borderColor: 'green',
+										"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+											borderColor: "green",
 										},
-										'&:hover .MuiOutlinedInput-notchedOutline': {
-											borderColor: 'green',
+										"&:hover .MuiOutlinedInput-notchedOutline": {
+											borderColor: "green",
 										},
-										'.MuiSvgIcon-root': {
-											color: 'green',
+										".MuiSvgIcon-root": {
+											color: "green",
 										},
 									}}
 								>

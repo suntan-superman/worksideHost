@@ -11,6 +11,33 @@ import { LatestRequests } from "./components/LatestRequests";
 import { TopRatedSuppliers } from "./components/TopRatedSuppliers";
 import { Header } from "../components";
 
+/**
+ * Dashboard component that displays an overview of the Workside application.
+ *
+ * This component renders a dashboard with the following sections:
+ * - Summary cards for requests awarded and completed this week/month.
+ * - A list of top-rated suppliers.
+ * - A list of the latest requests.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Dashboard component.
+ *
+ * @example
+ * <Dashboard />
+ *
+ * @description
+ * The component uses the following data:
+ * - `supplierList`: An array of supplier objects with `id`, `name`, and `rating`.
+ * - `requestList`: An array of request objects with `id`, `project`, `request`, `status`, and `createdAt`.
+ *
+ * The layout is structured using Material-UI's Grid system:
+ * - The first row contains summary cards for requests awarded and completed.
+ * - The second row contains a list of top-rated suppliers and the latest requests.
+ *
+ * Props passed to child components:
+ * - `TopRatedSuppliers`: Receives `supplierList` as the `suppliers` prop.
+ * - `LatestRequests`: Receives `requestList` as the `requests` prop.
+ */
 export default function Dashboard() {
 	const supplierList = [
 		{

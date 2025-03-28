@@ -1,6 +1,25 @@
 /* eslint-disable */
 import React, { useState } from "react";
 
+/**
+ * SideNavBar Component
+ *
+ * This component renders a vertical side navigation bar with multiple options.
+ * It allows users to select different sections of the application and provides
+ * a logout button at the bottom.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered SideNavBar component.
+ *
+ * @example
+ * // Usage
+ * <SideNavBar />
+ *
+ * @description
+ * - The navigation bar includes options such as Dashboard, Projects, Requests, Tracker, Admin, and Scheduler.
+ * - Clicking on an option updates the `selectedOption` state to reflect the current selection.
+ * - The Logout button triggers a state change to show a logout confirmation dialog.
+ */
 const SideNavBar = () => {
 	const [selectedOption, setSelectedOption] = useState("Dashboard");
 

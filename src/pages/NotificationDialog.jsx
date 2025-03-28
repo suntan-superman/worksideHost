@@ -1,19 +1,24 @@
 /* eslint-disable */
 
 import React, { useState } from "react";
-import {
-	Dialog,
-	TextField,
-	DialogTitle,
-	DialogContent,
-	DialogActions,
-	Button,
-	Box,
-	Typography,
-} from "@mui/material";
+import { Dialog, TextField, DialogTitle, Button, Box } from "@mui/material";
 import { showErrorDialog } from "../utils/useSweetAlert";
 import NotificationService from "../services/notification-service";	
 
+/**
+ * NotificationDialog component allows users to send notifications to specified recipients.
+ * It provides a form for entering recipient emails, a title, a message, and optional additional data.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open or closed.
+ * @param {Function} props.onClose - Callback function to close the dialog.
+ *
+ * @example
+ * <NotificationDialog open={true} onClose={handleClose} />
+ *
+ * @returns {JSX.Element} The rendered NotificationDialog component.
+ */
 const NotificationDialog = ({ open, onClose }) => {
 	const [formData, setFormData] = useState({
 		recipients: "",
@@ -23,24 +28,24 @@ const NotificationDialog = ({ open, onClose }) => {
 	});
 
 	// Example function to send a bid notification
-async function sendBidNotification(userToken, bidData) {
-	try {
-		await NotificationService.sendPushNotification(
-			userToken,
-			"New Bid Received", // title
-			`New bid of $${bidData.amount} received`, // body
-			{
-				type: "New Bid",
-				bidId: bidData.id,
-				amount: bidData.amount,
-				listingId: bidData.listingId,
-				timestamp: new Date().toISOString(),
-			},
-		);
-	} catch (error) {
-		console.error("Failed to send bid notification:", error);
+	async function sendBidNotification(userToken, bidData) {
+		try {
+			await NotificationService.sendPushNotification(
+				userToken,
+				"New Bid Received", // title
+				`New bid of $${bidData.amount} received`, // body
+				{
+					type: "New Bid",
+					bidId: bidData.id,
+					amount: bidData.amount,
+					listingId: bidData.listingId,
+					timestamp: new Date().toISOString(),
+				},
+			);
+		} catch (error) {
+			console.error("Failed to send bid notification:", error);
+		}
 	}
-}
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();

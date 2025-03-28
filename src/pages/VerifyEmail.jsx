@@ -16,6 +16,55 @@ import {
 // import { AuthContext } from "../context/AuthContext";
 // import { baseUrl, postRequest } from "../utils/service";
 
+/**
+ * VerifyEmail Component
+ *
+ * This component handles the email verification process for users. It retrieves
+ * the verification token and email from the URL query parameters and performs
+ * the following steps:
+ * - Checks if the user is already verified.
+ * - If not verified, attempts to verify the user's email using the provided token.
+ * - Displays appropriate messages based on the verification status.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered component.
+ *
+ * @example
+ * // Usage in a React Router setup
+ * <Route path="/verify-email" element={<VerifyEmail />} />
+ *
+ * @dependencies
+ * - React hooks: useState, useEffect
+ * - React Router hooks: useSearchParams, useNavigate
+ * - Axios for HTTP requests
+ * - Material-UI components: Box, CircularProgress, Alert, Typography, Button
+ *
+ * @state
+ * - `isLoading` (boolean): Indicates whether the verification process is ongoing.
+ * - `isUserVerified` (boolean): Indicates whether the user's email is verified.
+ * - `error` (object): Contains error state and message if verification fails.
+ *
+ * @hooks
+ * - `useEffect`: Triggers the email verification process on component mount.
+ * - `useSearchParams`: Retrieves query parameters from the URL.
+ * - `useNavigate`: Navigates to different routes after verification.
+ *
+ * @functions
+ * - `verifyEmail`: An asynchronous function that performs the email verification process.
+ *
+ * @errorHandling
+ * - Displays an error message if the verification fails or if required parameters are missing.
+ *
+ * @loadingState
+ * - Displays a loading spinner while the verification process is ongoing.
+ *
+ * @successState
+ * - Displays a success message if the email is successfully verified.
+ *
+ * @redirects
+ * - Redirects the user to the login page after a successful verification or error.
+ */
 const VerifyEmail = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUserVerified, setIsUserVerified] = useState(false);

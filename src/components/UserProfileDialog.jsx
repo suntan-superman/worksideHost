@@ -15,6 +15,28 @@ import { green } from "@mui/material/colors";
 import { useNavigate } from "react-router-dom";
 import avatar from "../data/avatar.jpg";
 
+/**
+ * UserProfileDialog Component
+ *
+ * This component renders a user profile dialog that displays user information
+ * such as name, email, company, access level, and avatar. It also provides
+ * functionality for logging out with a confirmation dialog.
+ *
+ * Props:
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open.
+ * @param {Function} props.onClose - Callback function to handle dialog close action.
+ *
+ * Features:
+ * - Displays user information retrieved from localStorage.
+ * - Shows a logout confirmation dialog before clearing user data and navigating to the login page.
+ * - Provides a close button to dismiss the dialog.
+ *
+ * Dependencies:
+ * - React hooks: useState, useNavigate
+ * - Material-UI components: Dialog, DialogTitle, DialogContent, DialogActions, Avatar, Typography, Box, Divider, Button
+ * - Material-UI styles: green color palette
+ */
 const UserProfileDialog = ({ open, onClose }) => {
 	const navigate = useNavigate();
 	const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);

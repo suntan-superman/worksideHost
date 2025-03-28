@@ -1,3 +1,51 @@
+/**
+ * LoginDialog Component
+ *
+ * This component renders a login dialog for users to sign in to their accounts.
+ * It includes functionality for user authentication, saving user credentials,
+ * and handling forgotten passwords.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered LoginDialog component.
+ *
+ * @dependencies
+ * - React: For building the component.
+ * - react-icons: For rendering icons.
+ * - react-router-dom: For navigation links.
+ * - axios: For making HTTP requests.
+ * - UseStateContext: Custom context provider for global state management.
+ * - useUserStore: Custom store for managing user-related state.
+ * - showErrorDialog: Utility function to display error dialogs.
+ * - showSuccessDialogWithTimer: Utility function to display success dialogs with a timer.
+ * - ForgotPasswordModal: Component for handling forgotten password functionality.
+ *
+ * @state
+ * - userName {string}: Stores the entered username/email.
+ * - password {string}: Stores the entered password.
+ * - saveUserChecked {boolean}: Tracks whether the "Remember me" checkbox is checked.
+ * - forgotPasswordChecked {boolean}: Tracks whether the "Forgot Password?" checkbox is checked.
+ * - forgotPasswordFlag {boolean}: Controls the visibility of the ForgotPasswordModal.
+ * - errorMsg {string}: Stores error messages to display to the user.
+ *
+ * @methods
+ * - isFormValid: Checks if the form inputs are valid.
+ * - onSaveUserName(user, email): Saves the username and email to localStorage.
+ * - dialogClose(): Closes the ForgotPasswordModal.
+ * - isUserValidated(userName): Validates if the user is verified via an API call.
+ * - SaveContactID(contactId): Saves the contact ID to localStorage.
+ * - getUserAccessLevel(userName): Fetches the user's access level from the server.
+ * - onSignIn(e): Handles the sign-in process, including validation and API calls.
+ * - checkSaveUserHandler(): Toggles the "Remember me" checkbox state.
+ * - checkForgotPasswordHandler(): Toggles the "Forgot Password?" checkbox state.
+ *
+ * @effects
+ * - useEffect: Retrieves the saved username from localStorage on component mount.
+ *
+ * @styles
+ * - enabledButtonStyle: CSS class for the enabled sign-in button.
+ * - disabledButtonStyle: CSS class for the disabled sign-in button.
+ */
 /* eslint-disable */
 
 import React, { useState, useEffect } from "react";

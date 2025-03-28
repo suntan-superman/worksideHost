@@ -30,6 +30,52 @@ import { Box, Chip } from "@mui/material";
 // Show Pending Projects
 // Show by Project Creator
 
+/**
+ * Scheduler component that displays a calendar view of projects with filtering options.
+ *
+ * This component uses the `react-query` library to fetch project data and the Syncfusion
+ * Scheduler component to render the calendar. Users can filter projects by status and company,
+ * and the filters are persisted in localStorage.
+ *
+ * @component
+ * @returns {JSX.Element} The Scheduler component.
+ *
+ * @example
+ * <Scheduler />
+ *
+ * @description
+ * - Fetches project data using `useQuery` and formats it for the Scheduler.
+ * - Allows filtering of projects by status and company.
+ * - Displays a loading spinner while project data is being fetched.
+ * - Automatically adjusts the Scheduler height on window resize.
+ *
+ * @state {Array} projects - The list of all projects.
+ * @state {Array} filteredProjects - The list of filtered projects.
+ * @state {Array} projectData - The formatted project data for the Scheduler.
+ * @state {boolean} showFilter - Whether the filter dialog is visible.
+ * @state {Array} selectedStatuses - The selected project statuses for filtering.
+ * @state {Array} selectedCompanies - The selected companies for filtering.
+ * @state {number} schedulerHeight - The height of the Scheduler component.
+ * @state {number} reducerUpdate - A state value to force component updates.
+ *
+ * @dependencies
+ * - `useQuery` from `react-query` for fetching project data.
+ * - `ScheduleComponent` from Syncfusion for rendering the calendar.
+ * - `localStorage` for persisting filter settings.
+ *
+ * @functions
+ * - `FormatProjectData`: Formats raw project data into a structure suitable for the Scheduler.
+ * - `applyCategoryColor`: Applies category colors to events based on their status.
+ * - `onEventRendered`: Handles the rendering of events in the Scheduler.
+ * - `handleFilterApply`: Applies the selected filters and updates the state.
+ * - `handleRemoveFilter`: Removes a specific filter and updates the state.
+ *
+ * @hooks
+ * - `useState` for managing component state.
+ * - `useEffect` for handling side effects like window resize and data updates.
+ * - `useReducer` for forcing component updates.
+ * - `useQueryClient` for managing query cache.
+ */
 const Scheduler = () => {
 	const queryClient = useQueryClient();
 	const [projects, setProjects] = useState([]);
@@ -93,7 +139,10 @@ const Scheduler = () => {
 		let projectDetails = "";
 
 		for (const project of projects) {
-			if (selectedStatuses.length > 0 && !selectedStatuses.includes(project.status)) {
+			if (
+				selectedStatuses.length > 0 &&
+				!selectedStatuses.includes(project.status)
+			) {
 				continue;
 			}
 			if (

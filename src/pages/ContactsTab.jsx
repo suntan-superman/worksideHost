@@ -26,6 +26,50 @@ import "../App.css";
 
 let gridPageSize = 10;
 
+/**
+ * ContactsTab Component
+ *
+ * This component renders a grid-based interface for managing contact information.
+ * It provides functionalities such as adding, editing, exporting, and filtering contacts.
+ *
+ * Features:
+ * - Fetches contact data from a backend API and displays it in a grid.
+ * - Allows editing and adding new contacts through a dialog interface.
+ * - Supports Excel export with custom headers.
+ * - Applies conditional styling to grid cells based on contact class.
+ * - Handles user access levels to restrict certain actions.
+ * - Includes confirmation dialogs for saving or updating contact data.
+ *
+ * Hooks:
+ * - `useRef`: Used to reference the grid component for programmatic interactions.
+ * - `useState`: Manages state for contact list, modals, messages, and current record.
+ * - `useEffect`: Fetches contact data on component mount and initializes grid settings.
+ *
+ * Props: None
+ *
+ * State Variables:
+ * - `contactList`: Stores the list of contacts fetched from the API.
+ * - `insertFlag`: Indicates whether the current operation is an insert.
+ * - `openUpdateModal`: Controls the visibility of the update confirmation dialog.
+ * - `messageText`: Stores the message text for the confirmation dialog.
+ * - `currentRecord`: Holds the data of the currently edited or added record.
+ * - `selectedRecord`: Stores the ID of the currently selected contact.
+ *
+ * Functions:
+ * - `GetAccessLevel`: Retrieves the user's access level from localStorage.
+ * - `toolbarClick`: Handles toolbar actions such as Excel export.
+ * - `excelQueryCellInfo` & `queryCellInfo`: Apply conditional styling to grid cells.
+ * - `actionComplete`: Handles actions like editing, adding, and saving data.
+ * - `rowSelectedContact`: Updates the selected record based on grid selection.
+ * - `SaveContactsData`: Sends POST or PUT requests to save or update contact data.
+ * - `onContactLoad`: Configures grid settings on load.
+ *
+ * Dependencies:
+ * - Syncfusion GridComponent and related services (Selection, Edit, Filter, etc.).
+ * - Environment variable `REACT_APP_MONGO_URI` for API endpoint.
+ *
+ * @component
+ */
 const ContactsTab = () => {
 	let contactsGridRef = useRef(null);
 

@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AiOutlineMenu } from "react-icons/ai";
 import { BsChatLeft } from "react-icons/bs";
 import { RiNotification3Line } from "react-icons/ri";
@@ -17,7 +16,7 @@ import avatar from "../data/avatar.jpg";
 import { Chat, Notification, UserProfile } from ".";
 import { UseStateContext } from "../contexts/ContextProvider";
 import axios from "axios";
-import { Box, IconButton, Menu, MenuItem } from "@mui/material";
+import { IconButton, Menu, MenuItem } from "@mui/material";
 
 // Create a styled div for consistent width
 const NavBarContainer = styled("div")({
@@ -43,6 +42,47 @@ const NavButton = ({ title, customFunc, icon, color, dotColor }) => (
 	</TooltipComponent>
 );
 
+/**
+ * NavBar Component
+ *
+ * This component renders a navigation bar with various interactive elements such as menu buttons,
+ * notifications, help options, and user profile access. It dynamically adjusts its behavior and
+ * appearance based on the screen size and user data.
+ *
+ * Hooks:
+ * - `UseStateContext`: Provides context values for managing state such as active menu, screen size, and click events.
+ * - `useState`: Manages local state for welcome phrase, access label, dialog visibility, menu width, user avatar, and help menu states.
+ * - `useEffect`: Handles side effects such as window resize events, fetching user data, and setting initial states.
+ *
+ * State Variables:
+ * - `welcomePhrase` (string): Displays a personalized welcome message for the user.
+ * - `accessLabel` (string): Represents the user's access level (e.g., GUEST, ADMIN).
+ * - `dialogOpen` (boolean): Controls the visibility of the notifications dialog.
+ * - `menuWidth` (number): Tracks the width of the menu.
+ * - `userAvatar` (string | null): Stores the URL of the user's avatar image.
+ * - `helpMenuOpen` (boolean): Indicates whether the help menu is open.
+ * - `helpAnchorEl` (HTMLElement | null): Stores the anchor element for the help menu.
+ * - `helpDialogOpen` (boolean): Controls the visibility of the help dialog.
+ * - `aboutDialogOpen` (boolean): Controls the visibility of the about dialog.
+ * - `userProfileDialogOpen` (boolean): Controls the visibility of the user profile dialog.
+ *
+ * Effects:
+ * - Adjusts the active menu state based on screen size.
+ * - Fetches and sets the user's avatar from an API.
+ * - Retrieves and sets the user's name and access level from local storage.
+ *
+ * Event Handlers:
+ * - `handleActiveMenu`: Toggles the active menu state.
+ * - `handleNotificationClick`: Opens the notifications dialog.
+ * - `handleHelpClick`: Opens the help menu.
+ * - `handleHelpClose`: Closes the help menu.
+ * - `handleReportIssue`: Opens the help dialog for reporting issues.
+ * - `handleAbout`: Opens the about dialog.
+ * - `handleUserProfileClick`: Opens the user profile dialog.
+ *
+ * Returns:
+ * - JSX structure for the navigation bar, including buttons, menus, dialogs, and user profile elements.
+ */
 const NavBar = () => {
 	const {
 		activeMenu,

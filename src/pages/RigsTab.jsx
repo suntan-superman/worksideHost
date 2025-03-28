@@ -22,6 +22,65 @@ import {
 // TODO Need to Add FIlter Options for Rigs
 // TODO FIlter by Area, Company
 
+/**
+ * RigsTab Component
+ *
+ * This component is responsible for managing and displaying a hierarchical tree structure
+ * of rig companies and their associated rigs. It allows users to add or delete rigs
+ * within a selected rig company and provides a modal dialog for user interactions.
+ *
+ * Features:
+ * - Fetches rig companies and rigs data using React Query.
+ * - Merges rig companies and rigs into a hierarchical tree structure.
+ * - Allows adding new rigs to a selected rig company.
+ * - Allows deleting existing rigs from the tree structure.
+ * - Displays a modal dialog for adding or deleting rigs.
+ * - Provides a refresh button to reload and merge tree data.
+ *
+ * State Variables:
+ * - `isLoading` (boolean): Indicates whether a request is in progress.
+ * - `refreshFlag` (boolean): Used to trigger data refresh.
+ * - `rigCompanyList` (array): List of rig companies fetched from the API.
+ * - `rigList` (array): List of rigs fetched from the API.
+ * - `selectedOption` (string): Selected rig classification option.
+ * - `treeData` (array): Hierarchical tree data structure for display.
+ * - `addButtonEnabled` (boolean): Indicates whether the "Add Rig" button is enabled.
+ * - `rigName` (string): Name of the rig to be added or deleted.
+ * - `rigDescription` (string): Description of the rig to be added.
+ * - `errorMsg` (string): Error message for validation or API errors.
+ * - `hasData` (boolean): Indicates whether data has been successfully fetched.
+ * - `accessLevel` (number): User's access level for enabling/disabling actions.
+ * - `showPopup` (boolean): Controls the visibility of the popup.
+ * - `selectedNodeData` (object): Data of the currently selected tree node.
+ * - `open` (boolean): Controls the visibility of the modal dialog.
+ *
+ * Refs:
+ * - `treeObj` (ref): Reference to the TreeViewComponent instance for programmatic manipulation.
+ *
+ * Functions:
+ * - `MergeTreeData`: Merges rig companies and rigs into a hierarchical tree structure.
+ * - `handleOpen`: Opens the modal dialog.
+ * - `handleAddRig`: Handles adding a new rig to the selected rig company.
+ * - `DeleteRig`: Deletes a rig from the API and updates the tree structure.
+ * - `handleDeleteRig`: Validates and deletes a rig based on user input.
+ * - `handleClose`: Closes the modal dialog.
+ * - `validateData`: Validates the input fields for adding a rig.
+ * - `handleSelectionChange`: Handles changes in the rig classification dropdown.
+ * - `onPostData`: Sends a POST request to add a new rig to the API.
+ * - `RefreshData`: Refreshes and merges the tree data.
+ * - `handleNodeSelect`: Handles the selection of a tree node and opens the modal dialog.
+ *
+ * Props:
+ * None
+ *
+ * Dependencies:
+ * - React Query for data fetching.
+ * - TreeViewComponent for displaying the hierarchical tree structure.
+ * - Modal and Box from Material-UI for the modal dialog.
+ * - Select from react-select for dropdown selection.
+ *
+ * @component
+ */
 const RigsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);

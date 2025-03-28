@@ -1,6 +1,22 @@
 /* eslint-disable */
 import React, { useState } from "react";
 
+/**
+ * UserValidationModal Component
+ *
+ * This component renders a modal for user validation, allowing users to input and view details such as
+ * first name, last name, nickname, company, access level, email, cell number, status, and comments.
+ * It also provides "Save" and "Cancel" buttons for user interaction.
+ *
+ * @component
+ * @param {Object} props - The props object.
+ * @param {string} props.recordID - The unique identifier for the record being validated.
+ * @param {boolean} props.open - A boolean indicating whether the modal is open or closed.
+ * @param {Function} props.onOK - Callback function to handle the "OK" action.
+ * @param {Function} props.onClose - Callback function to handle the "Close" action.
+ *
+ * @returns {JSX.Element|null} The rendered modal component or null if the modal is not open or no recordID is provided.
+ */
 const UserValidationModal = ({ recordID, open, onOK, onClose }) => {
 	if (!open || !recordID) return null;
 

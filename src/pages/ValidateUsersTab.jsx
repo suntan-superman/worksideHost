@@ -36,6 +36,64 @@ import {
 let gridPageSize = 10;
 let updatedContactData = null;
 
+/**
+ * ValidateUsersTab Component
+ *
+ * This component is responsible for managing and validating user data within a grid interface.
+ * It provides functionality for adding, updating, deleting, and validating users, as well as
+ * interacting with a backend API for user and contact data management.
+ *
+ * Features:
+ * - Displays a grid of users with options to validate, edit, or delete user records.
+ * - Fetches pending user data using React Query and refreshes data periodically.
+ * - Handles user validation, including email validation and status updates.
+ * - Supports adding or updating contact data associated with users.
+ * - Sends email notifications upon successful user validation.
+ * - Provides a modal dialog for editing user details.
+ *
+ * Hooks:
+ * - `useQueryClient`: React Query client for managing query cache.
+ * - `useQuery`: Fetches pending user data from the backend.
+ * - `useState`: Manages component state, including form data, dialog visibility, and flags.
+ * - `useEffect`: Handles side effects, such as setting grid page size and processing user modifications.
+ *
+ * Props: None
+ *
+ * State Variables:
+ * - `showDialog`: Boolean to control the visibility of the user edit modal.
+ * - `insertFlag`: Boolean to track whether a new user is being added.
+ * - `modifyFlag`: Boolean to track whether a user record is being modified.
+ * - `selectedRecord`: Stores the ID of the currently selected user record.
+ * - `selectedRecordData`: Stores the data of the currently selected user record.
+ * - `contactData`: Stores contact information fetched from the backend.
+ * - `contactID`: Stores the ID of the contact associated with the selected user.
+ * - `newUser`: Boolean to indicate whether the selected user is new.
+ * - `formData`: Object containing form data for user details.
+ *
+ * Functions:
+ * - `GetAccessLevel`: Retrieves the user's access level from local storage.
+ * - `usersActionComplete`: Handles grid actions such as adding, updating, saving, or deleting users.
+ * - `rowSelectedUser`: Retrieves the selected row's user ID from the grid.
+ * - `onUserLoad`: Configures grid settings on load.
+ * - `resetFormData`: Resets the form data to its initial state.
+ * - `recordClick`: Handles clicks on grid records and opens the user edit modal.
+ * - `dialogClose`: Closes the user edit modal.
+ * - `SaveUserValidation`: Saves user validation data to the backend.
+ * - `GetContactInfoByEmail`: Fetches contact information by email from the backend.
+ * - `UpdateContactData`: Updates contact data in the backend.
+ * - `AddContactData`: Adds new contact data to the backend.
+ * - `SendEmailValidation`: Sends an email notification for user validation.
+ * - `dialogSave`: Saves updated contact data and triggers user validation.
+ * - `dialogOpen`: Opens the user edit modal.
+ *
+ * Dependencies:
+ * - React Query for data fetching and caching.
+ * - Syncfusion Grid for displaying and managing user data.
+ * - Custom hooks and utility functions for API interactions and error handling.
+ *
+ * Returns:
+ * - A JSX element containing the user grid and modal dialog for editing user details.
+ */
 const ValidateUsersTab = () => {
 	const queryClient = useQueryClient();
 	const [showDialog, setShowDialog] = useState(false);

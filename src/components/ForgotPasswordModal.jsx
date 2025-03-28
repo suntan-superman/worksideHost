@@ -14,12 +14,29 @@ import Draggable from "react-draggable";
 import axios from "axios";
 import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
 
-const ForgotPasswordModal = ({
-	open, 
-	onOK,
-	onClose,
-}) => {
-	if (!open ) return null;
+/**
+ * ForgotPasswordModal Component
+ *
+ * This component renders a modal dialog for users to request a password reset.
+ * It validates the email input, checks if the user exists, and sends a password reset request.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the modal is open or not.
+ * @param {Function} props.onOK - Callback function triggered when the "OK" button is clicked.
+ * @param {Function} props.onClose - Callback function triggered when the "Close" button is clicked.
+ *
+ * @returns {JSX.Element|null} The rendered ForgotPasswordModal component or null if `open` is false.
+ *
+ * @example
+ * <ForgotPasswordModal
+ *   open={true}
+ *   onOK={() => console.log("Password reset initiated")}
+ *   onClose={() => console.log("Modal closed")}
+ * />
+ */
+const ForgotPasswordModal = ({ open, onOK, onClose }) => {
+	if (!open) return null;
 
 	const [email, setEmail] = useState("");
 
@@ -58,26 +75,30 @@ const ForgotPasswordModal = ({
 			// Check if User exists
 			const userEmail = email.replace(/"/g, "");
 			const getUserFetchString = `${process.env.REACT_APP_MONGO_URI}api/user/does-user-exist/${userEmail}`;
-	    await axios.post(getUserFetchString).then((res) => {
-				if( res.status !== 200 ) {
-		      showErrorDialog(`User Does Not Exist: ${userEmail}`).then(() => {
-									return;
-								});
-				}}).catch((err) => {
-		      showErrorDialog(`Error Status: ${JSON.stringify(err.status)}`);
+			await axios
+				.post(getUserFetchString)
+				.then((res) => {
+					if (res.status !== 200) {
+						showErrorDialog(`User Does Not Exist: ${userEmail}`).then(() => {
+							return;
+						});
+					}
+				})
+				.catch((err) => {
+					showErrorDialog(`Error Status: ${JSON.stringify(err.status)}`);
 				});
 
 			window.alert(`Data is valid. Email: ${email}`);
 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/forgotPassword`;
-	    const res = await axios.post(fetchString, {
-				email: email.replace(/"/g, ''),
+			const res = await axios.post(fetchString, {
+				email: email.replace(/"/g, ""),
 			});
-			
-	    if (res.data.status === false) {
+
+			if (res.data.status === false) {
 				await showErrorDialog(res.data.message);
-	    } else {
+			} else {
 				await showSuccessDialog(res.data.message);
-	    }
+			}
 			onOK();
 		}
 	};
@@ -89,30 +110,30 @@ const ForgotPasswordModal = ({
 			PaperComponent={PaperComponent}
 		>
 			<DialogTitle id="forgotPasswordDialog">
-				<span className="text-bold text-green-300">WORK</span>SIDE Forgot Password</DialogTitle>
+				<span className="text-bold text-green-300">WORK</span>SIDE Forgot
+				Password
+			</DialogTitle>
 			<DialogContent>
-        <Box component="form"
-           onSubmit={handleSubmit} 
-           sx={{ mt: 1 }}>
-          <TextField
-            margin="normal"
+				<Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+					<TextField
+						margin="normal"
 						size="small"
-            required
-            fullWidth
-            type="email"
-            name="email"
-            id="email"
+						required
+						fullWidth
+						type="email"
+						name="email"
+						id="email"
 						label="Email"
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
-            autoFocus
-          />
-				<div className="text-center">
-					<p className="text-black text-sm font-bold pt-2 pb-2">
-						Link will be sent your email to reset your password
-					</p>
+						autoFocus
+					/>
+					<div className="text-center">
+						<p className="text-black text-sm font-bold pt-2 pb-2">
+							Link will be sent your email to reset your password
+						</p>
 					</div>
-					</Box>
+				</Box>
 				{/* </Stack> */}
 			</DialogContent>
 			<DialogActions>

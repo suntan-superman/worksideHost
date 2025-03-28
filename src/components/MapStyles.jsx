@@ -1,5 +1,21 @@
 /* eslint-disable */
 
+/**
+ * An array of style objects used to customize the appearance of a map.
+ * Each style object targets specific map features and elements, applying
+ * various visual properties such as color, lightness, and visibility.
+ *
+ * @constant
+ * @type {Array<Object>}
+ * @property {string} featureType - The type of map feature to style (e.g., "water", "road.highway").
+ * @property {string} elementType - The specific element of the feature to style (e.g., "geometry", "labels.text.fill").
+ * @property {Array<Object>} stylers - An array of style rules to apply to the specified feature and element.
+ * @property {string} [stylers[].color] - The color to apply to the feature/element.
+ * @property {number} [stylers[].lightness] - The lightness adjustment to apply.
+ * @property {number} [stylers[].weight] - The weight (thickness) adjustment to apply.
+ * @property {string} [stylers[].visibility] - The visibility setting (e.g., "on", "off").
+ * @property {number} [stylers[].saturation] - The saturation adjustment to apply.
+ */
 const mapStyles = [
 	{
 		featureType: "water",

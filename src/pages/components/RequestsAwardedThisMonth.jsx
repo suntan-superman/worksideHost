@@ -14,6 +14,16 @@ import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 
 import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
+/**
+ * Component to display the number of requests awarded this month along with a trend indicator.
+ *
+ * @param {Object} props - The props for the component.
+ * @param {number} props.diff - The percentage difference compared to the previous month.
+ * @param {"up" | "down"} props.trend - The trend direction, either "up" or "down".
+ * @param {Object} props.sx - The custom styles to apply to the root Card component.
+ * @param {number} props.value - The total number of requests awarded this month.
+ * @returns {JSX.Element} The rendered component.
+ */
 export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 	// Determine the Trend icon and color based on 'trend' prop
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;

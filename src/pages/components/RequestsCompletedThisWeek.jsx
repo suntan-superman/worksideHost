@@ -14,6 +14,16 @@ import { CurrencyDollar as CurrencyDollarIcon } from "@phosphor-icons/react/dist
 
 import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
+/**
+ * Component to display the number of requests completed this week along with a trend indicator.
+ *
+ * @param {Object} props - The component props.
+ * @param {number} props.diff - The percentage difference in completed requests compared to last week.
+ * @param {"up" | "down"} props.trend - The trend direction, either "up" for an increase or "down" for a decrease.
+ * @param {Object} props.sx - The custom styles to apply to the root Card component.
+ * @param {number} props.value - The total number of requests completed this week.
+ * @returns {JSX.Element} The rendered component.
+ */
 export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
 	const trendColor =

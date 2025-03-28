@@ -16,6 +16,46 @@ import {
 } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
+/**
+ * ContactEditTemplate is a React functional component that renders a form for editing contact details.
+ * It supports both read-only and editable modes based on the `isAdd` property in the `props`.
+ * The component uses React hooks for state management and data fetching.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {boolean} props.isAdd - Determines if the form is in "add" mode or "edit" mode.
+ * @param {string} [props.firstname] - The first name of the contact.
+ * @param {string} [props.lastname] - The last name of the contact.
+ * @param {string} [props.firm] - The firm associated with the contact.
+ * @param {string} [props.contactclass] - The contact class of the contact.
+ * @param {string} [props.accesslevel] - The access level of the contact.
+ * @param {string} [props.userpassword] - The password for the contact (read-only).
+ * @param {string} [props.primaryemail] - The primary email of the contact.
+ * @param {string} [props.secondaryemail] - The secondary email of the contact.
+ * @param {string} [props.primaryphone] - The primary phone number of the contact.
+ * @param {string} [props.secondaryphone] - The secondary phone number of the contact.
+ * @param {string} [props.status] - The status of the contact.
+ * @param {Date} [props.statusdate] - The date associated with the contact's status.
+ *
+ * @returns {JSX.Element} A JSX element that renders the contact edit form.
+ *
+ * @example
+ * <ContactEditTemplate
+ *   isAdd={true}
+ *   firstname="John"
+ *   lastname="Doe"
+ *   firm="Example Firm"
+ *   contactclass="VIP"
+ *   accesslevel="Admin"
+ *   userpassword="password123"
+ *   primaryemail="john.doe@example.com"
+ *   secondaryemail="j.doe@example.com"
+ *   primaryphone="123-456-7890"
+ *   secondaryphone="098-765-4321"
+ *   status="ACTIVE"
+ *   statusdate={new Date()}
+ * />
+ */
 const ContactEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 
@@ -30,7 +70,6 @@ const ContactEditTemplate = (props) => {
 	const [firmOptions, setFirmOptions] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
 	const [modifyFlag, setModifyFlag] = useState(true);
-
 
 	useEffect(() => {
 		// ReadOnly flag
@@ -54,20 +93,20 @@ const ContactEditTemplate = (props) => {
 		retry: 3,
 	});
 
-			// Get Firms
+	// Get Firms
 	const getFirmOptions = (firms) => {
 		if (firms === undefined || firms === null) return [];
 		const firmList = firms.data?.map((f) => f.name);
 		return firmList;
 	};
 
-		useEffect(() => {
-			if (firmData) {
-				setFirmOptions(getFirmOptions(firmData));
-				setModifyFlag(false);
-			}
-		}, [firmData, modifyFlag]);
-	
+	useEffect(() => {
+		if (firmData) {
+			setFirmOptions(getFirmOptions(firmData));
+			setModifyFlag(false);
+		}
+	}, [firmData, modifyFlag]);
+
 	return (
 		<div className="flex justify-center items-center bg-white">
 			{isLoading && (

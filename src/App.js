@@ -12,7 +12,6 @@ import {
 	Supplier,
 	Scheduler,
 } from "./pages";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import {
 	LoginDialog,
@@ -102,74 +101,93 @@ const NavBarComponent = () => {
 		);
 }
 
+/**
+ * MainApp component serves as the root component of the application.
+ * It manages the layout and routing of the application, including theme settings,
+ * sidebar visibility, and navigation between different pages.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered MainApp component.
+ *
+ * @example
+ * <MainApp />
+ *
+ * @description
+ * - Applies a dark mode class based on the `currentMode` context value.
+ * - Renders a sidebar, navbar, and footer along with the main content area.
+ * - Handles routing for various application pages such as Dashboard, Projects, Requests, Tracker, Admin, Supplier, Scheduler, and a fallback for unknown routes.
+ * - Includes a `ThemeSettings` component when `themeSettings` is enabled.
+ * - Integrates a `DeliveryTracker` component with Google Maps API for the "tracker" route.
+ */
 const MainApp = () => {
-  const { currentMode, activeMenu, themeSettings } = UseStateContext();
-  
-  return (
-			<div className={currentMode === "Dark" ? "dark" : ""}>
-				<div className="flex relative dark:bg-main-dark-bg w-full">
-					<ThemeSettingButton />
-					<LogOutButton />
-					<SideBarComponent />
-					<div
-						className={
-							activeMenu
-								? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full"
-								: "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2"
-						}
-					>
-						<div>
-							<NavBarComponent />
-						</div>
-						{themeSettings && <ThemeSettings />}
-						<div style={{ height: "calc(100vh - 64px)" }}>
-							<Routes>
-								<Route index element={<Navigate to="dashboard" replace />} />
-								<Route path="dashboard" element={<Dashboard />} />
-								<Route path="projects" element={<Projects />} />
-								<Route path="requests" element={<Requests />} />
-								<Route
-									path="tracker"
-									element={
-										<div style={{ height: "100%", position: "relative" }}>
-											<ErrorBoundary>
-												<DeliveryTracker
-													apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
-													config={{
-														mapOptions: {
-															center: { lat: 35.3733, lng: -119.0187 },
-															zoom: 12,
-														},
-														updateInterval: 3000,
-													}}
-													onVehicleSelect={(vehicle) => {
-														console.log("Selected vehicle:", vehicle);
-													}}
-												/>
-											</ErrorBoundary>
-										</div>
-									}
-								/>
-								<Route path="admin" element={<Admin />} />
-								<Route path="supplier" element={<Supplier />} />
-								<Route path="scheduler" element={<Scheduler />} />
-								<Route
-									path="*"
-									element={
-										<div style={{ padding: "20px" }}>
-											<h1 style={{ color: "red" }}>Page Not Found</h1>
-											<p>The page you're looking for doesn't exist.</p>
-											<p>Current Path: {window.location.pathname}</p>
-										</div>
-									}
-								/>
-							</Routes>
-						</div>
-						<Footer />
+	const { currentMode, activeMenu, themeSettings } = UseStateContext();
+
+	return (
+		<div className={currentMode === "Dark" ? "dark" : ""}>
+			<div className="flex relative dark:bg-main-dark-bg w-full">
+				<ThemeSettingButton />
+				<LogOutButton />
+				<SideBarComponent />
+				<div
+					className={
+						activeMenu
+							? "dark:bg-main-dark-bg bg-main-bg min-h-screen md:ml-72 w-full"
+							: "bg-main-bg dark:bg-main-dark-bg w-full min-h-screen flex-2"
+					}
+				>
+					<div>
+						<NavBarComponent />
 					</div>
+					{themeSettings && <ThemeSettings />}
+					<div style={{ height: "calc(100vh - 64px)" }}>
+						<Routes>
+							<Route index element={<Navigate to="dashboard" replace />} />
+							<Route path="dashboard" element={<Dashboard />} />
+							<Route path="projects" element={<Projects />} />
+							<Route path="requests" element={<Requests />} />
+							<Route
+								path="tracker"
+								element={
+									<div style={{ height: "100%", position: "relative" }}>
+										<ErrorBoundary>
+											<DeliveryTracker
+												apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}
+												config={{
+													mapOptions: {
+														center: { lat: 35.3733, lng: -119.0187 },
+														zoom: 12,
+													},
+													updateInterval: 3000,
+												}}
+												onVehicleSelect={(vehicle) => {
+													console.log("Selected vehicle:", vehicle);
+												}}
+											/>
+										</ErrorBoundary>
+									</div>
+								}
+							/>
+							<Route path="admin" element={<Admin />} />
+							<Route path="supplier" element={<Supplier />} />
+							<Route path="scheduler" element={<Scheduler />} />
+							<Route
+								path="*"
+								element={
+									<div style={{ padding: "20px" }}>
+										<h1 style={{ color: "red" }}>Page Not Found</h1>
+										<p>The page you're looking for doesn't exist.</p>
+										<p>Current Path: {window.location.pathname}</p>
+									</div>
+								}
+							/>
+						</Routes>
+					</div>
+					<Footer />
 				</div>
 			</div>
-		);
+		</div>
+	);
 };
 
 const queryClient = new QueryClient();

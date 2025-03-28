@@ -1,70 +1,100 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+GitHub Copilot: This project appears to be a React-based web application with a backend API. It uses several libraries and frameworks to provide functionality for managing requests, mapping, and user interactions. Here's a breakdown of the key components:
 
-## Available Scripts
+### Frontend
+1. **React Framework**: The frontend is built using React, a popular JavaScript library for building user interfaces.
+2. **Material-UI (MUI)**: The project uses Material-UI components for styling and layout, such as `Dialog`, `Button`, and `Stack`.
+3. **React Query**: The `@tanstack/react-query` library is used for managing server state and performing API calls.
+4. **Google Maps Integration**: The project integrates Google Maps using the `@vis.gl/react-google-maps` library to display maps, markers, and routes.
+5. **Draggable Dialogs**: The `react-draggable` library is used to make dialogs draggable within the UI.
+6. **Dynamic Sidebar**: The `Sidebar` component dynamically renders navigation links based on user permissions and application state.
+7. **State Management**: Context API and custom hooks (e.g., `UseStateContext`) are used for managing global state, such as the active menu and user login status.
 
-In the project directory, you can run:
+### Backend
+1. **Node.js and Express**: The backend is likely built using Node.js and Express, as indicated by the `contactController.js` file.
+2. **MongoDB**: The backend interacts with a MongoDB database, as seen in the use of `process.env.REACT_APP_MONGO_URI` for API calls.
+3. **REST API**: The backend exposes RESTful endpoints for managing requests, contacts, and mapping data.
+4. **Axios**: The frontend uses Axios for making HTTP requests to the backend.
 
-### `npm start`
+### Features
+1. **Request Management**: The `RequestInfoModal` component displays detailed information about a request, including project details, request status, and supplier information.
+2. **Mapping and Tracking**: The application displays a map with markers for locations and tracks routes in real-time.
+3. **Delivery Associate Assignment**: Users can assign delivery associates to requests and update their statuses.
+4. **Sidebar Navigation**: The `Sidebar` component provides a dynamic navigation menu based on user roles and permissions.
+5. **Responsive Design**: The application adapts to different screen sizes, with features like collapsible sidebars for smaller screens.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### Libraries and Tools
+- **React Icons**: Used for rendering icons in the UI.
+- **Syncfusion Tooltip**: Provides tooltips for better user experience.
+- **Date-fns**: Used for formatting dates.
+- **Environment Variables**: Sensitive data like API keys and database URIs are stored in environment variables.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### Purpose
+The project seems to be a logistics or operations management platform, possibly for managing supply chain requests, tracking deliveries, and assigning tasks to delivery associates. It combines real-time data visualization (maps and routes) with robust request management features.
 
-### `npm test`
+### DEPENDENCIES
+Here are the dependencies required to run this project based on the provided files and context:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Frontend Dependencies
+1. **React**: Core library for building the user interface.
+   - `react`
+   - `react-dom`
+   - `react-router-dom` (for routing)
 
-### `npm run build`
+2. **Material-UI (MUI)**: For UI components and styling.
+   - `@mui/material`
+   - `@mui/icons-material`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+3. **React Query**: For managing server state and API calls.
+   - `@tanstack/react-query`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4. **Google Maps Integration**: For embedding and interacting with Google Maps.
+   - `@vis.gl/react-google-maps`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+5. **Draggable Dialogs**: For making dialogs draggable.
+   - `react-draggable`
 
-### `npm run eject`
+6. **Date Formatting**: For formatting dates.
+   - `date-fns`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+7. **Icons**: For rendering icons in the UI.
+   - `react-icons`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+8. **Syncfusion Tooltip**: For tooltips in the sidebar.
+   - `@syncfusion/ej2-react-popups`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+9. **Axios**: For making HTTP requests.
+   - `axios`
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+10. **Environment Variables**: To manage sensitive data like API keys.
+   - `dotenv` (for local development)
 
-## Learn More
+### Backend Dependencies
+1. **Node.js and Express**: For building the backend API.
+   - `express`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+2. **MongoDB**: For database interactions.
+   - `mongoose`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+3. **CORS**: To handle cross-origin requests.
+   - `cors`
 
-### Code Splitting
+4. **Body Parser**: For parsing incoming request bodies.
+   - `body-parser`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+5. **Dotenv**: For managing environment variables.
+   - `dotenv`
 
-### Analyzing the Bundle Size
+### Development Dependencies
+1. **ESLint**: For linting and maintaining code quality.
+   - `eslint`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+2. **Prettier**: For code formatting.
+   - `prettier`
 
-### Making a Progressive Web App
+3. **React Scripts**: For running and building the React app.
+   - `react-scripts`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Notes
+- Ensure you have a `.env` file with the required environment variables, such as `REACT_APP_GOOGLE_MAPS_API_KEY` and `REACT_APP_MONGO_URI`.
+- Install dependencies using `npm install` or `yarn` in both the frontend and backend directories if they are separated.

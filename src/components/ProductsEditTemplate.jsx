@@ -41,6 +41,33 @@ import { GetProducts } from "../api/worksideAPI";
 // "status"
 // "statusdate"
 
+/**
+ * ProductsEditTemplate is a React functional component used for editing or adding product details.
+ * It provides a form interface with fields for category name, product/service name, description,
+ * status, and status date. The component supports both read-only and editable modes based on the
+ * `isAdd` property in the `props`.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {boolean} props.isAdd - Determines if the form is in "add" mode or "edit" mode.
+ * @param {string} [props.categoryname] - The initial category name of the product.
+ * @param {string} [props.productname] - The initial name of the product or service.
+ * @param {string} [props.description] - The initial description of the product or service.
+ * @param {string} [props.status] - The initial status of the product or service.
+ * @param {Date} [props.statusdate] - The initial status date of the product or service.
+ *
+ * @returns {JSX.Element} A form interface for editing or adding product details.
+ *
+ * @example
+ * <ProductsEditTemplate
+ *   isAdd={true}
+ *   categoryname="Electronics"
+ *   productname="Smartphone"
+ *   description="A high-end smartphone"
+ *   status="ACTIVE"
+ *   statusdate={new Date()}
+ * />
+ */
 const ProductsEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);

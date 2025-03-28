@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import {
 	DatePickerComponent,
@@ -52,6 +52,64 @@ import useUserStore from "../stores/UserStore";
 
 import { requestStatusOptions } from "../data/worksideOptions";
 
+/**
+ * RequestEditTemplate Component
+ *
+ * This component is used to create or edit a request template. It provides a form
+ * with various input fields for capturing request details such as category, name,
+ * customer, project, rig company, vendor type, and more. It also supports loading
+ * and saving templates for reuse.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.rowData - The data for the current request being edited.
+ *
+ * @returns {JSX.Element} The rendered RequestEditTemplate component.
+ *
+ * @example
+ * <RequestEditTemplate rowData={rowData} />
+ *
+ * @description
+ * - Initializes form data based on the provided `rowData` or stored preferences.
+ * - Allows users to load predefined templates or save the current form as a template.
+ * - Dynamically updates dropdown options based on selected values (e.g., filtering products by category).
+ * - Uses `useQuery` hooks to fetch data for projects, firms, products, and contacts.
+ * - Handles input changes and updates the form state accordingly.
+ * - Provides dialogs for selecting and saving templates.
+ *
+ * @dependencies
+ * - React hooks: `useState`, `useEffect`, `useCallback`
+ * - External libraries: `DropDownListComponent`, `DatePickerComponent`, `DateTimePickerComponent`, `NumericTextBoxComponent`
+ * - Data fetching: `useQuery` from React Query
+ *
+ * @state
+ * - `formData` (Object): The state for the form data.
+ * - `templates` (Array): The list of available templates.
+ * - `isLoadingTemplates` (boolean): Indicates if templates are being loaded.
+ * - `showTemplateDialog` (boolean): Controls the visibility of the template selection dialog.
+ * - `showSaveTemplateDialog` (boolean): Controls the visibility of the save template dialog.
+ * - `newTemplateName` (string): The name of the new template being saved.
+ * - `templateError` (string): Error message for template-related operations.
+ * - Various dropdown options and filtered data states.
+ *
+ * @methods
+ * - `getDefaultDateTime`: Returns the default date/time for the form.
+ * - `getStoredPreferences`: Retrieves stored preferences from localStorage.
+ * - `savePreferences`: Saves form data to localStorage as preferences.
+ * - `FilterProducts`: Filters products based on the selected category.
+ * - `GetSSRVendors`: Fetches Sole Source Vendors based on the selected category and product.
+ * - `fetchTemplates`: Fetches the list of templates for the user.
+ * - `handleTemplateSelection`: Applies a selected template to the form.
+ * - `handleSaveTemplate`: Saves the current form data as a new template.
+ *
+ * @hooks
+ * - `useEffect`: Used for initial data loading and updating dependent states.
+ * - `useCallback`: Memoizes functions to prevent unnecessary re-renders.
+ *
+ * @notes
+ * - The component uses hardcoded user ID for template operations (to be replaced with actual user ID).
+ * - Includes loading indicators and error handling for data fetching and template operations.
+ */
 const RequestEditTemplate = (props) => {
 	const data = props.rowData || {};
 	const userId = useUserStore((state) => state.userID);
@@ -209,7 +267,7 @@ const RequestEditTemplate = (props) => {
 	const [filteredProducts, setFilteredProducts] = useState([]);
 	const [products, setProducts] = useState([]);
 	const [allProducts, setAllProducts] = useState([]);
-	
+
 	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
 
 	// Get the project data

@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
@@ -7,6 +7,43 @@ import { links } from '../data/dummy';
 import { UseStateContext } from "../contexts/ContextProvider";
 import { signalIsUserLoggedIn } from "../stores/SignalStores";
 
+/**
+ * Sidebar component that renders a collapsible sidebar with navigation links.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Sidebar component.
+ *
+ * @description
+ * The Sidebar component is responsible for displaying a navigation menu that can
+ * be toggled open or closed. It adapts its style based on the `activeMenu` state
+ * and the screen size. The component uses context to manage state and styling.
+ *
+ * @example
+ * <Sidebar />
+ *
+ * @dependencies
+ * - `UseStateContext`: Custom context hook for managing state.
+ * - `Link`: React Router's Link component for navigation.
+ * - `TooltipComponent`: Component for displaying tooltips.
+ * - `MdOutlineCancel`: Icon for the close button.
+ * - `NavLink`: React Router's NavLink component for active link styling.
+ *
+ * @state
+ * - `currentColor`: The current theme color.
+ * - `activeMenu`: Boolean indicating whether the sidebar is open.
+ * - `setActiveMenu`: Function to toggle the sidebar's open/closed state.
+ * - `screenSize`: The current screen size.
+ *
+ * @styles
+ * - `activeLink`: CSS classes for active navigation links.
+ * - `normalLink`: CSS classes for inactive navigation links.
+ * - `activeMenuStyle`: CSS classes for the sidebar when active.
+ * - `inActiveMenuStyle`: CSS classes for the sidebar when inactive.
+ *
+ * @events
+ * - `handleCloseSideBar`: Closes the sidebar when the screen size is small.
+ * - `onClick`: Toggles the sidebar state or navigates to a link.
+ */
 const Sidebar = () => {
 	const { currentColor, activeMenu, setActiveMenu, screenSize } =
 		UseStateContext();
@@ -26,8 +63,10 @@ const Sidebar = () => {
 	const normalLink =
 		"flex items-center gap-5 pl-4 pt-3 pb-2.5 rounded-lg text-md text-gray-700 font-bold dark:text-gray-200 dark:hover:text-black hover:bg-light-gray m-2";
 
-	const activeMenuStyle = "ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 bg-black";
-	const inActiveMenuStyle = "ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 bg-white";
+	const activeMenuStyle =
+		"ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 bg-black";
+	const inActiveMenuStyle =
+		"ml-3 h-screen md:overflow-hidden overflow-auto md:hover:overflow-auto pb-10 bg-white";
 
 	return (
 		<div className={activeMenu ? activeMenuStyle : inActiveMenuStyle}>

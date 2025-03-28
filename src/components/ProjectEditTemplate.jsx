@@ -14,6 +14,48 @@ import { useQuery } from "@tanstack/react-query";
 
 import { areaOptions, projectStatusOptions } from "../data/worksideOptions";
 
+/**
+ * ProjectEditTemplate is a React functional component that provides a form for editing or adding project details.
+ * It includes various input fields such as dropdowns, text inputs, date pickers, and numeric text boxes.
+ * The component also handles data fetching, state management, and geolocation functionality.
+ *
+ * @component
+ * @param {Object} props - The props passed to the component.
+ * @param {boolean} props.isAdd - Determines if the form is in "add" mode or "edit" mode.
+ * @param {string} props.area - The area associated with the project.
+ * @param {string} props.customer - The customer associated with the project.
+ * @param {string} props.projectname - The name of the project.
+ * @param {string} props.description - The description of the project.
+ * @param {string} props.status - The status of the project.
+ * @param {Date} props.statusdate - The date when the project status was last updated.
+ * @param {Date} props.projectedstartdate - The projected start date of the project.
+ * @param {number} props.expectedduration - The expected duration of the project in days.
+ * @param {number} props.latdec - The latitude of the project location.
+ * @param {number} props.longdec - The longitude of the project location.
+ * @param {string} props.customercontact - The contact person for the customer.
+ * @param {string} props.rigcompany - The rig company associated with the project.
+ * @param {Date} [props.actualstartdate] - The actual start date of the project (optional).
+ * @param {number} [props.actualduration] - The actual duration of the project in days (optional).
+ *
+ * @returns {JSX.Element} A form for editing or adding project details.
+ *
+ * @example
+ * <ProjectEditTemplate
+ *   isAdd={true}
+ *   area="WEST COAST"
+ *   customer="Customer A"
+ *   projectname="Project X"
+ *   description="Description of Project X"
+ *   status="PENDING"
+ *   statusdate={new Date()}
+ *   projectedstartdate={new Date()}
+ *   expectedduration={30}
+ *   latdec={34.052235}
+ *   longdec={-118.243683}
+ *   customercontact="John Doe"
+ *   rigcompany="Rig Company A"
+ * />
+ */
 const ProjectEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +68,7 @@ const ProjectEditTemplate = (props) => {
 	const [userLongitude, setUserLongitude] = useState(0);
 	const [modifyFlag, setModifyFlag] = useState(true);
 
-// Handle input changes
+	// Handle input changes
 	const onChange = (args) => {
 		// Only for debugging purposes
 		if (args.target.name === "longdec" && validateLocationFlag) {
@@ -45,7 +87,11 @@ const ProjectEditTemplate = (props) => {
 	};
 
 	// Get the firms data
-	const { data: firmData, isSuccess: isFirmSuccess, isError: isFirmError } = useQuery({
+	const {
+		data: firmData,
+		isSuccess: isFirmSuccess,
+		isError: isFirmError,
+	} = useQuery({
 		queryKey: ["firms"],
 		queryFn: () => GetAllFirms(),
 		refetchInterval: 10000,
@@ -55,30 +101,30 @@ const ProjectEditTemplate = (props) => {
 		retry: 3,
 	});
 
-		// Get the contacts data
-		const { data: contactsData } = useQuery({
-			queryKey: ["contacts"],
-			queryFn: () => GetAllContacts(),
-			refetchInterval: 10000 * 60 * 10, // 10 minutes
-			refetchOnReconnect: true,
-			refetchOnWindowFocus: true,
-			staleTime: 1000 * 60 * 10, // 10 minutes
-			retry: 3,
-		});
-	
-		// Get Customers
+	// Get the contacts data
+	const { data: contactsData } = useQuery({
+		queryKey: ["contacts"],
+		queryFn: () => GetAllContacts(),
+		refetchInterval: 10000 * 60 * 10, // 10 minutes
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		staleTime: 1000 * 60 * 10, // 10 minutes
+		retry: 3,
+	});
+
+	// Get Customers
 	const getCustomerOptions = (firms) => {
 		if (firms === undefined || firms === null) return [];
-		const customerResult = firms.filter((json) => json.type === "CUSTOMER");	
+		const customerResult = firms.filter((json) => json.type === "CUSTOMER");
 		const customers = customerResult?.map((r) => r.name);
 		return customers;
 	};
 
-		// Get Rig Companies
+	// Get Rig Companies
 	const getRigCompanyOptions = (firms) => {
 		if (firms === undefined || firms === null) return [];
 
-		const rigResult = firms.filter((json) => json.type === "RIGCOMPANY");	
+		const rigResult = firms.filter((json) => json.type === "RIGCOMPANY");
 		const rigCompanies = rigResult?.map((r) => r.name);
 		return rigCompanies;
 	};
@@ -91,17 +137,16 @@ const ProjectEditTemplate = (props) => {
 		}
 	}, [firmData, modifyFlag]);
 
-		// Get Contacts
+	// Get Contacts
 	const getContactOptions = (contacts) => {
 		if (contacts === undefined || contacts === null) return [];
 		const contactResult = contacts.filter((c) => c.firm === data.customer);
 		const contactList = contactResult?.map((r) => r.username);
 		return contactList;
 	};
-	
+
 	useEffect(() => {
-		if (contactsData)
-			setContactOptions(getContactOptions(contactsData.data));
+		if (contactsData) setContactOptions(getContactOptions(contactsData.data));
 	}, [data.customer]);
 
 	const GetCurrentLocation = () => {

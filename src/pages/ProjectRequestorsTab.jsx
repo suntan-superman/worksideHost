@@ -17,6 +17,68 @@ import {
 // TODO FIlter by Date, By Status
 // TODO Allow primary to assign other requestors to projects
 
+/**
+ * Component: ProjectRequestorsTab
+ *
+ * This component manages the assignment and removal of requestors to/from projects.
+ * It provides a tree view of projects and their associated requestors, allowing users
+ * to add or delete requestors dynamically. The component interacts with a backend API
+ * to fetch, add, and delete data, and updates the UI accordingly.
+ *
+ * State Variables:
+ * - `isLoading` (boolean): Indicates whether data is being loaded.
+ * - `refreshFlag` (boolean): Triggers data refresh when set to true.
+ * - `needRefreshFlag` (boolean): Indicates if the data needs to be refreshed.
+ * - `projectList` (array): Stores the list of projects fetched from the API.
+ * - `requestorList` (array): Stores the list of available requestors.
+ * - `assignedRequestorList` (array): Stores the list of requestors assigned to projects.
+ * - `selectList` (array): Stores the list of requestors formatted for selection dropdown.
+ * - `selectedOption` (string|null): Stores the ID of the selected requestor.
+ * - `treeData` (array): Stores the hierarchical data for the tree view.
+ * - `addButtonEnabled` (boolean): Enables/disables the "Add Requestor" button.
+ * - `requestorName` (string): Stores the name of the requestor for validation during deletion.
+ * - `errorMsg` (string): Stores error messages for user feedback.
+ * - `hasData` (boolean): Indicates if the component has fetched and processed data.
+ * - `showPopup` (boolean): Controls the visibility of the modal popup.
+ * - `selectedNodeData` (object|null): Stores data of the currently selected tree node.
+ * - `open` (boolean): Controls the visibility of the modal dialog.
+ *
+ * Refs:
+ * - `treeObj` (ref): Reference to the TreeViewComponent instance for programmatic manipulation.
+ *
+ * Functions:
+ * - `handleOpen`: Opens the modal dialog.
+ * - `handleAddRequestor`: Adds a requestor to a project and refreshes the tree view.
+ * - `DeleteRequestor`: Deletes a requestor from a project and updates the tree view.
+ * - `handleDeleteRequestor`: Validates and deletes a requestor based on user input.
+ * - `handleClose`: Closes the modal dialog.
+ * - `fetchProjects`: Fetches the list of projects from the API.
+ * - `fetchAvailableRequestors`: Fetches the list of available requestors from the API.
+ * - `fetchAssignedRequestors`: Fetches the list of assigned requestors from the API.
+ * - `MergeTreeData`: Merges project and requestor data into a hierarchical structure for the tree view.
+ * - `handleNodeSelect`: Handles the selection of a tree node and opens the modal dialog.
+ * - `findById`: Finds a requestor by ID from the requestor list.
+ * - `handleSelectionChange`: Handles the selection of a requestor from the dropdown.
+ * - `onPostData`: Sends a POST request to add a requestor to a project.
+ * - `RefreshData`: Triggers a refresh of the component's data.
+ *
+ * Effects:
+ * - `useEffect` (1): Fetches initial data when the component mounts.
+ * - `useEffect` (2): Updates the tree view when the `refreshFlag` changes.
+ *
+ * UI Components:
+ * - `TreeViewComponent`: Displays the hierarchical tree of projects and requestors.
+ * - `Modal`: Displays a modal dialog for adding or deleting requestors.
+ * - `Select`: Dropdown for selecting a requestor to add.
+ *
+ * Dependencies:
+ * - `axios`: For making API requests.
+ * - `fetch`: For making API requests.
+ * - `useState`, `useEffect`, `useRef`: React hooks for state management and DOM manipulation.
+ *
+ * Environment Variables:
+ * - `REACT_APP_MONGO_URI`: Base URL for the backend API.
+ */
 const ProjectRequestorsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);

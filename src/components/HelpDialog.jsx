@@ -15,6 +15,20 @@ import {
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 
+/**
+ * HelpDialog component provides a modal dialog for submitting user feedback.
+ * It allows users to select a feedback type and provide a description.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open.
+ * @param {Function} props.onClose - Callback function to close the dialog.
+ *
+ * @returns {JSX.Element} The rendered HelpDialog component.
+ *
+ * @example
+ * <HelpDialog open={isDialogOpen} onClose={handleDialogClose} />
+ */
 const HelpDialog = ({ open, onClose }) => {
 	const [feedbackType, setFeedbackType] = useState("idea");
 	const [description, setDescription] = useState("");

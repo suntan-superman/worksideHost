@@ -11,10 +11,21 @@ import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/Arr
 import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/ArrowDown";
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
-import { toast } from "react-toastify";
 
 import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
+/**
+ * A React component that displays the number of requests completed this month,
+ * along with a trend indicator and additional details.
+ *
+ * @param {Object} props - The props object.
+ * @param {number} props.diff - The percentage difference in completed requests compared to last month.
+ * @param {"up"|"down"} props.trend - The trend direction, either "up" or "down".
+ * @param {Object} props.sx - The custom styles to apply to the Card component.
+ * @param {number} props.value - The total number of requests completed this month.
+ *
+ * @returns {JSX.Element} A card component displaying the completed requests, trend, and additional details.
+ */
 export function RequestsCompletedThisMonth({ diff, trend, sx, value }) {
 	// Determine the Trend icon and color based on 'trend' prop
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;

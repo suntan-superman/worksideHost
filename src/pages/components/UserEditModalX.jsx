@@ -52,6 +52,30 @@ const VALIDATION_RULES = {
  * @component
  * Modal for editing user information using Material-UI
  */
+/**
+ * UserEditModalX Component
+ *
+ * A modal dialog for editing user details. It provides a form with fields for
+ * user information such as first name, last name, email, access level, company,
+ * status, and comments. The component handles form validation, state management,
+ * and submission.
+ *
+ * @component
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Determines whether the modal is open.
+ * @param {Function} props.onClose - Callback function to close the modal.
+ * @param {Function} props.onSubmit - Callback function to handle form submission.
+ * @param {Object} props.userData - User data to prefill the form fields.
+ * @param {string} props.userData.firstname - User's first name.
+ * @param {string} props.userData.lastname - User's last name.
+ * @param {string} props.userData.email - User's email address.
+ * @param {string} props.userData.accesslevel - User's access level (e.g., "GUEST").
+ * @param {string} props.userData.company - User's associated company.
+ * @param {string} props.userData.status - User's status.
+ * @param {string} props.userData.comment - Additional comments about the user.
+ *
+ * @returns {JSX.Element} The rendered UserEditModalX component.
+ */
 const UserEditModalX = ({ isOpen, onClose, onSubmit, userData }) => {
 	// Form State
 	const [formData, setFormData] = useState({

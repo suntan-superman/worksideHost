@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
-import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
@@ -104,6 +103,18 @@ export function TopRatedSuppliers({ suppliers = [], sx }) {
 	);
 }
 
+/**
+ * SupplierRatingsModal Component
+ *
+ * This component renders a modal dialog displaying a list of suppliers and their ratings.
+ * It includes a draggable header, a styled title, and a scrollable list of suppliers with ratings.
+ *
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the modal is open or closed.
+ * @param {Function} props.onClose - Callback function to handle the closing of the modal.
+ *
+ * @returns {JSX.Element} The rendered SupplierRatingsModal component.
+ */
 const SupplierRatingsModal = ({ open, onClose }) => {
 	const supplierList = [
 		{

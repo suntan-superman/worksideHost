@@ -32,6 +32,53 @@ let gridPageSize = 10;
 // TODO Update
 // TODO Create
 
+/**
+ * ProductsTab Component
+ *
+ * This component renders a product management interface using a grid layout.
+ * It allows users to view, add, edit, and delete products, as well as export product data to Excel.
+ * The component integrates with a backend API for CRUD operations and uses React Query for data fetching.
+ *
+ * Features:
+ * - Displays a grid of products with filtering, paging, and resizing capabilities.
+ * - Supports adding, editing, and deleting products based on user access level.
+ * - Allows exporting product data to an Excel file.
+ * - Includes a confirmation dialog for save operations.
+ * - Automatically refetches product data at regular intervals.
+ *
+ * Hooks:
+ * - `useRef`: To reference the grid component.
+ * - `useState`: To manage component state, including product list, modals, and selected records.
+ * - `useQuery`: To fetch product data from the backend API.
+ * - `useEffect`: To handle side effects, such as setting grid page size and updating the product list.
+ *
+ * Props: None
+ *
+ * State Variables:
+ * - `productList`: Stores the list of products fetched from the API.
+ * - `insertFlag`: Indicates whether the current operation is an insert.
+ * - `openUpdateModal`: Controls the visibility of the update confirmation dialog.
+ * - `currentRecord`: Stores the record being edited or added.
+ * - `messageText`: Stores the message text for the confirmation dialog.
+ * - `selectedRecord`: Stores the ID of the currently selected product.
+ *
+ * Functions:
+ * - `GetAccessLevel`: Retrieves the user's access level from local storage.
+ * - `toolbarClick`: Handles toolbar actions, such as exporting to Excel.
+ * - `handleProductDelete`: Deletes a selected product by making a DELETE request to the API.
+ * - `actionComplete`: Handles grid actions, such as editing, adding, saving, and deleting.
+ * - `rowSelectedProduct`: Updates the selected record when a row is selected in the grid.
+ * - `SaveProductsData`: Saves or updates product data by making POST or PATCH requests to the API.
+ * - `onProductLoad`: Configures grid settings when the grid is loaded.
+ *
+ * Dependencies:
+ * - React
+ * - React Query
+ * - Syncfusion Grid Components
+ *
+ * Returns:
+ * - A JSX element containing the product grid and confirmation dialog.
+ */
 const ProductsTab = () => {
 	let productsGridRef = useRef(null);
 
@@ -85,7 +132,7 @@ const ProductsTab = () => {
 		const { data } = productsData;
 		setProductList(data);
 	}, [productsData]);
-	
+
 	const toolbarClick = (args) => {
 		console.log(`Toolbar Click: ${args.item.id}`);
 		if (productsGridRef && args.item.id === "productGridElement_excelexport") {
@@ -170,7 +217,8 @@ const ProductsTab = () => {
 			);
 			const json = await response.json();
 
-			if (response.ok) showSuccessDialogWithTimer("Record Successfully Added...");
+			if (response.ok)
+				showSuccessDialogWithTimer("Record Successfully Added...");
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(

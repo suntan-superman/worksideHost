@@ -1,6 +1,25 @@
 import React from "react";
 import axios from "axios";
 
+/**
+ * FileDownload Component
+ *
+ * This component provides a button to download a file from a backend API.
+ * The file is fetched as binary data (blob) and downloaded to the user's device.
+ *
+ * @component
+ *
+ * @example
+ * <FileDownload />
+ *
+ * @returns {JSX.Element} A React component with a button to trigger file download.
+ *
+ * @function handleDownload
+ * Handles the file download process by sending a GET request to the backend API.
+ * The file is retrieved as a blob and downloaded using a dynamically created anchor element.
+ *
+ * @throws Will log an error to the console if the file download fails.
+ */
 const FileDownload = () => {
 	const id = "67364d5e1c5887c50d0a262b";
 	const apiURL = `${process.env.REACT_APP_MONGO_URI}/api/download/${id}`;

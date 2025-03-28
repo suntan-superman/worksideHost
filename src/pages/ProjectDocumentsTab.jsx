@@ -32,6 +32,85 @@ import { showSuccessDialog } from "../utils/useSweetAlert";
 // TODO Need to Add FIlter Options for Documents
 // TODO FIlter by Date, By Status
 
+/**
+ * Component: ProjectDocumentsTab
+ *
+ * This component is responsible for managing and displaying a tree view of projects and their associated documents.
+ * It provides functionality for adding, deleting, and viewing documents, as well as filtering projects based on their status.
+ *
+ * State Variables:
+ * - `isLoading` (boolean): Indicates whether data is being loaded.
+ * - `refreshFlag` (boolean): Triggers a refresh of the tree data.
+ * - `needRefreshFlag` (boolean): Indicates if a refresh is needed.
+ * - `projectList` (array): List of projects fetched from the API.
+ * - `documentList` (array): List of documents fetched from the API.
+ * - `treeData` (array): Merged data structure of projects and documents for the tree view.
+ * - `hasData` (boolean): Indicates if data has been successfully loaded.
+ * - `docDescription` (string): Description of the document being added.
+ * - `currentFile` (File): The file selected for upload.
+ * - `documentPath` (string): Path of the document being added.
+ * - `viewDocFlag` (boolean): Controls the visibility of the document viewer.
+ * - `rightClickFlag` (boolean): Indicates if a right-click event occurred.
+ * - `showFilterDialog` (boolean): Controls the visibility of the filter dialog.
+ * - `selectedNodeData` (object): Data of the currently selected node in the tree view.
+ * - `selectedNodeLabel` (string): Label of the currently selected node.
+ * - `modalOpen` (boolean): Controls the visibility of the modal dialog.
+ * - `filterData` (object): Stores the filter settings for projects.
+ *
+ * Refs:
+ * - `treeObj`: Reference to the TreeViewComponent.
+ * - `menuObj`: Reference to the ContextMenuComponent.
+ *
+ * Functions:
+ * - `handleOpen`: Opens the modal dialog.
+ * - `handleAddDocument`: Handles the addition of a new document to a project.
+ * - `handleDeleteDocument`: Handles the deletion of a document.
+ * - `DeleteDocument`: Sends a DELETE request to the API to remove a document.
+ * - `handleClose`: Closes the modal dialog.
+ * - `fetchProjects`: Fetches the list of projects from the API.
+ * - `getDocuments`: Fetches the list of documents from the API.
+ * - `fetchDocuments`: Wrapper function to fetch documents and update state.
+ * - `MergeTreeData`: Merges project and document data into a tree structure.
+ * - `handleNodeSelect`: Handles the selection of a node in the tree view.
+ * - `onPostData`: Handles the posting of new document data to the API.
+ * - `RefreshData`: Triggers a refresh of the tree data.
+ * - `handleSelectFile`: Handles file selection for document upload.
+ * - `NodeClicked`: Handles click events on tree nodes.
+ * - `BeforeOpen`: Prepares the context menu before it opens.
+ * - `openInNewTab`: Opens a URL in a new browser tab.
+ * - `MenuClick`: Handles context menu item clicks.
+ * - `handleMouseClick`: Handles mouse click events for right-click logic.
+ * - `handleFileChange`: Updates the selected file state.
+ * - `OnCloseViewDialog`: Closes the document viewer dialog.
+ * - `OutputFilterLabel`: Renders the filter label based on the current filter settings.
+ * - `filterDialogSave`: Saves the filter settings.
+ * - `filterDialogClose`: Closes the filter dialog.
+ *
+ * Effects:
+ * - Fetches initial project and document data on component mount.
+ * - Refreshes tree data when `refreshFlag` changes.
+ * - Loads filter settings from local storage on component mount.
+ * - Saves filter settings to local storage when they change.
+ *
+ * Dependencies:
+ * - `TreeViewComponent`: Displays the tree structure of projects and documents.
+ * - `ContextMenuComponent`: Provides a context menu for tree nodes.
+ * - `AddDocumentForm`: Form for adding a new document.
+ * - `DeleteDocumentForm`: Form for deleting a document.
+ * - `DocumentsFilterModal`: Modal for configuring project filters.
+ * - `ViewDocument`: Component for viewing a document.
+ *
+ * API Endpoints:
+ * - `GET /api/project/`: Fetches the list of projects.
+ * - `GET /api/document/`: Fetches the list of documents.
+ * - `POST /api/document/`: Adds a new document.
+ * - `DELETE /api/document/`: Deletes a document.
+ *
+ * Props: None
+ *
+ * Returns:
+ * - JSX structure for the ProjectDocumentsTab component.
+ */
 const ProjectDocumentsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);
@@ -55,7 +134,6 @@ const ProjectDocumentsTab = () => {
 	let menuObj = useRef(null);
 	const cssClass = "mytree";
 
-	
 	const [filterData, setFilterData] = useState({
 		allProjects: true,
 		activeProjects: false,

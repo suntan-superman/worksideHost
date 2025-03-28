@@ -12,6 +12,15 @@ import PropTypes from "prop-types";
  * @param {React.ReactNode} [props.children] - Optional additional content
  * @returns {React.ReactElement} Rendered PageHeader component
  */
+/**
+ * A reusable component for rendering a page header with a category, title, and optional children.
+ *
+ * @param {Object} props - The props object.
+ * @param {string} props.category - The category text displayed in the header.
+ * @param {string} props.title - The title text displayed in the header.
+ * @param {React.ReactNode} [props.children] - Optional children elements to render below the title.
+ * @returns {JSX.Element} The rendered PageHeader component.
+ */
 const PageHeader = ({ category, title, children }) => {
 	return (
 		<div className="mb-10">

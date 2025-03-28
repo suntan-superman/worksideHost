@@ -1567,6 +1567,83 @@ const GetVendorIDByName = async (vendorName) => {
 };
 
 // Export all functions
+/**
+ * API functions exported from worksideAPI.jsx
+ *
+ * @module worksideAPI
+ * @exports fetchWithHandling - Handles API requests with error handling.
+ * @exports GetAllFirms - Retrieves all firms.
+ * @exports GetAllFirmsForSelection - Retrieves all firms for selection dropdowns.
+ * @exports GetAllSuppliers - Retrieves all suppliers.
+ * @exports GetAllRigCompanies - Retrieves all rig companies.
+ * @exports GetAllCustomers - Retrieves all customers.
+ * @exports GetAllContacts - Retrieves all contacts.
+ * @exports GetContactIDByEmail - Retrieves a contact ID by email.
+ * @exports GetContactsByFirm - Retrieves contacts associated with a specific firm.
+ * @exports GetFirmOptions - Retrieves firm options for dropdowns.
+ * @exports GetCustomerOptions - Retrieves customer options for dropdowns.
+ * @exports GetSupplierOptions - Retrieves supplier options for dropdowns.
+ * @exports GetContactOptions - Retrieves contact options for dropdowns.
+ * @exports GetFirmID - Retrieves a firm's ID.
+ * @exports GetFirmType - Retrieves a firm's type.
+ * @exports GetContactID - Retrieves a contact's ID.
+ * @exports GetCustomerSupplierMSAData - Retrieves MSA data for customers and suppliers.
+ * @exports GetSupplierGroupData - Retrieves supplier group data.
+ * @exports GetAllRequests - Retrieves all requests.
+ * @exports GetAllRequestsByProject - Retrieves all requests for a specific project.
+ * @exports SaveNewRequest - Saves a new request.
+ * @exports UpdateRequest - Updates an existing request.
+ * @exports SaveRequestBid - Saves a new request bid.
+ * @exports UpdateRequestBid - Updates an existing request bid.
+ * @exports DoesRequestBidExist - Checks if a request bid exists.
+ * @exports GetRequestBids - Retrieves request bids.
+ * @exports UpdateRequestStatus - Updates the status of a request.
+ * @exports SetRequestBidsStatus - Sets the status of request bids.
+ * @exports SetAwardedRequestBidStatus - Sets the status of an awarded request bid.
+ * @exports GetDeliveryAssociates - Retrieves delivery associates.
+ * @exports GetSupplierInfoFromID - Retrieves supplier information by ID.
+ * @exports GetSupplierIDFromName - Retrieves a supplier ID by name.
+ * @exports GetRequestsByCustomer - Retrieves requests associated with a specific customer.
+ * @exports GetRequestData - Retrieves data for a specific request.
+ * @exports GetRequestOptions - Retrieves request options for dropdowns.
+ * @exports GetRequestID - Retrieves a request's ID.
+ * @exports GetRequestCategoryOptions - Retrieves request category options for dropdowns.
+ * @exports GetRequestCategoryID - Retrieves a request category's ID.
+ * @exports GetRequestStatusOptions - Retrieves request status options for dropdowns.
+ * @exports GetAllUsers - Retrieves all users.
+ * @exports UserForgotPassword - Handles user password recovery.
+ * @exports UserDoesExist - Checks if a user exists.
+ * @exports UserResetPassword - Resets a user's password.
+ * @exports UserChangePassword - Changes a user's password.
+ * @exports UserLogin - Logs in a user.
+ * @exports UserRegister - Registers a new user.
+ * @exports UserLogout - Logs out a user.
+ * @exports UserIsAuthenticated - Checks if a user is authenticated.
+ * @exports GetProducts - Retrieves all products.
+ * @exports DeleteProduct - Deletes a product.
+ * @exports GetProductByID - Retrieves a product by ID.
+ * @exports GetProductOptions - Retrieves product options for dropdowns.
+ * @exports GetAllProjects - Retrieves all projects.
+ * @exports GetProjectsByStatus - Retrieves projects filtered by status.
+ * @exports GetAllProjectsByCustomer - Retrieves all projects associated with a specific customer.
+ * @exports DeleteProject - Deletes a project.
+ * @exports SaveProject - Saves a new project.
+ * @exports UpdateProject - Updates an existing project.
+ * @exports GetRigs - Retrieves all rigs.
+ * @exports GetRigsByRigCompany - Retrieves rigs associated with a specific rig company.
+ * @exports DeleteRig - Deletes a rig.
+ * @exports GetSupplierProductsByProduct - Retrieves supplier products by product.
+ * @exports createRequestTemplate - Creates a new request template.
+ * @exports getRequestTemplates - Retrieves all request templates.
+ * @exports updateRequestTemplate - Updates an existing request template.
+ * @exports deleteRequestTemplate - Deletes a request template.
+ * @exports GetAllSupplierGroupData - Retrieves all supplier group data.
+ * @exports UpdateRequestBidListUsers - Updates the user list for a request bid.
+ * @exports UpdateRequestBidListCompanies - Updates the company list for a request bid.
+ * @exports GetRequestBidListCompanies - Retrieves the company list for a request bid.
+ * @exports GetProjectIDByNameAndCustomer - Retrieves a project ID by name and customer.
+ * @exports GetVendorIDByName - Retrieves a vendor ID by name.
+ */
 export {
 	fetchWithHandling,
 	GetAllFirms,

@@ -57,6 +57,93 @@ const customStyles = {
 	}),
 };
 
+/**
+ * SupplierGroupUsersTabX Component
+ *
+ * This component provides a user interface for managing supplier groups, categories, and users.
+ * It includes functionality for adding, removing, and editing hierarchical data structures
+ * representing suppliers, groups, categories, and users. The component also supports saving
+ * changes to a backend API and handles unsaved changes gracefully.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered SupplierGroupUsersTabX component.
+ *
+ * @example
+ * <SupplierGroupUsersTabX />
+ *
+ * @description
+ * - Displays a tree view structure for managing supplier groups, categories, and users.
+ * - Allows users to add, remove, and edit nodes in the tree.
+ * - Supports context menus, modals, and confirmation dialogs for user interactions.
+ * - Fetches supplier data from an API and initializes the tree structure.
+ * - Handles unsaved changes with a "beforeunload" event listener.
+ *
+ * @features
+ * - Expand/Collapse all nodes in the tree view.
+ * - Context menu for right-click actions on tree nodes.
+ * - Modal dialogs for adding/removing groups, categories, and users.
+ * - Save and cancel changes functionality.
+ * - Fetch and initialize supplier data from a backend API.
+ *
+ * @dependencies
+ * - React
+ * - Material-UI (TreeView, TreeItem, Modal, Menu, etc.)
+ * - Axios
+ * - Styled-components
+ * - React-Select
+ * - Utility libraries like lodash
+ *
+ * @state
+ * - `expandAll` (boolean): Controls whether all tree nodes are expanded.
+ * - `selectedNodeLabel` (string): The label of the currently selected tree node.
+ * - `selectedNodeId` (string): The ID of the currently selected tree node.
+ * - `isLoading` (boolean): Indicates whether data is being loaded.
+ * - `hasUnsavedChanges` (boolean): Tracks if there are unsaved changes.
+ * - `addGroupModalOpen`, `addCategoryModalOpen`, `addUserModalOpen` (boolean): Controls the visibility of modals.
+ * - `removeCategoryModalOpen`, `removeUserModalOpen`, `removeSingleCategoryModalOpen`, `removeSingleUserModalOpen` (boolean): Controls the visibility of removal modals.
+ * - `open` (boolean): Controls the visibility of the main modal.
+ * - `currentSupplier` (string): The currently selected supplier.
+ * - `currentSupplierId` (string): The ID of the currently selected supplier.
+ * - `supplierIndex` (number): The index of the selected supplier in the dropdown.
+ * - `supplierOptions` (array): List of supplier options for the dropdown.
+ * - `expandedItems` (array): List of expanded tree node IDs.
+ * - `contextMenu` (object): Stores the position of the context menu.
+ * - `clickedNode` (string): The ID of the node that was right-clicked.
+ * - `groupTreeData` (array): The hierarchical data structure for the tree view.
+ *
+ * @methods
+ * - `setModeFlags(mode)`: Sets modal visibility flags based on the mode.
+ * - `fetchSupplierOptions()`: Fetches supplier options from the API.
+ * - `findTypeById(data, id)`: Finds the type of a node by its ID.
+ * - `findLabelById(data, id)`: Finds the label of a node by its ID.
+ * - `handleContextMenu(event, nodeId)`: Handles right-click context menu actions.
+ * - `handleAddGroup(data)`: Adds a new group to the tree.
+ * - `handleAddCategory(data)`: Adds a new category to a group.
+ * - `handleAddUser(data)`: Adds a new user to a group.
+ * - `handleRemoveCategory(data)`: Removes all categories under a group.
+ * - `handleRemoveUser(data)`: Removes all users under a group.
+ * - `handleRemoveSingleCategory(data)`: Removes a single category.
+ * - `handleRemoveSingleUser(data)`: Removes a single user.
+ * - `GetSupplierId(supplierName)`: Fetches the ID of a supplier by its name.
+ * - `InitializeGroupTreeData(supplierName, supplierId)`: Initializes the tree data for a supplier.
+ * - `SetGroupTreeDataFromDB(groupTreeData)`: Sets the tree data from the database.
+ * - `GetSupplierGroupData(supplierName)`: Fetches group data for a supplier.
+ * - `expandAllTreeItems()`: Expands all nodes in the tree.
+ * - `onSaveChanges()`: Saves changes to the backend API.
+ * - `onCancelChanges()`: Cancels unsaved changes.
+ *
+ * @modals
+ * - AddGroupForm: Modal for adding a new group.
+ * - AddCategoryOrUserDialog: Modal for adding a category or user.
+ * - RemoveCategoryOrUserForm: Modal for removing categories or users.
+ *
+ * @events
+ * - `beforeunload`: Prevents navigation if there are unsaved changes.
+ * - `onItemSelectionToggle`: Handles selection toggle for tree nodes.
+ * - `onItemClick`: Handles click events on tree nodes.
+ * - `onContextMenu`: Handles right-click context menu actions.
+ */
 const SupplierGroupUsersTabX = () => {
 	// const accessLevel = useUserStore((state) => state.accessLevel);
 	const [expandAll, setExpandAll] = useState(false);
@@ -799,7 +886,6 @@ const SupplierGroupUsersTabX = () => {
 								console.log("Supplier Data Found");
 								InitializeGroupTreeData(supplierName, id);
 							} else {
-								
 								console.log("Error: ", response.status);
 							}
 						})
@@ -913,7 +999,6 @@ const SupplierGroupUsersTabX = () => {
 	};
 
 	const onSaveChanges = async () => {
-
 		console.log(`groupTreeData: ${JSON.stringify(groupTreeData[0], null, 2)}`);
 		const requestOptions = {
 			method: "POST",

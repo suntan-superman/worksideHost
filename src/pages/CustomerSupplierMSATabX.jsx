@@ -13,7 +13,6 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import CustomerSupplierMSAEditTemplate from "../components/CustomerSupplierMSAEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
-import { toast } from "react-toastify";
 import axios from "axios";
 
 import { UseStateContext } from "../contexts/ContextProvider";
@@ -24,6 +23,63 @@ import {
 
 import "../index.css";
 
+/**
+ * CustomerSupplierMSATabX Component
+ *
+ * This component is responsible for managing and displaying the Customer-Supplier MSA (Master Service Agreement) data.
+ * It provides functionalities to add, edit, delete, and view MSA records using a Syncfusion Grid.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The rendered CustomerSupplierMSATabX component.
+ *
+ * @description
+ * - Fetches and displays Customer-Supplier MSA data from the backend.
+ * - Allows users with sufficient access levels to perform CRUD operations on the data.
+ * - Integrates with Syncfusion Grid for data display and editing.
+ * - Includes custom templates for editing MSA records.
+ *
+ * @dependencies
+ * - React
+ * - Syncfusion Grid components (GridComponent, ColumnsDirective, ColumnDirective, Inject)
+ * - Axios for API requests
+ * - Custom components: ConfirmationDialog, CustomerSupplierMSAEditTemplate
+ *
+ * @state
+ * - `messageText` (string): Text for confirmation dialogs.
+ * - `currentCustomerId` (string): ID of the currently selected customer.
+ * - `insertFlag` (boolean): Indicates whether a new record is being added.
+ * - `abortFlag` (boolean): Indicates whether an operation was aborted.
+ * - `openUpdateModal` (boolean): Controls the visibility of the confirmation dialog.
+ * - `currentRecord` (object): The record currently being edited or deleted.
+ * - `customerSupplierMSAData` (array): The dataset of Customer-Supplier MSA records.
+ *
+ * @context
+ * - `setCompanyID` (function): Sets the current company ID.
+ * - `setCompanyName` (function): Sets the current company name.
+ *
+ * @methods
+ * - `GetCustomerSupplierMSAData(id)`: Fetches MSA data for a given customer ID.
+ * - `GetSupplierId(supplierName)`: Retrieves the supplier ID by name.
+ * - `addRecord(record)`: Adds a new MSA record.
+ * - `updateRecord(record)`: Updates an existing MSA record.
+ * - `deleteRecord(record)`: Deletes an MSA record.
+ * - `GetAccessLevel()`: Retrieves the user's access level from local storage.
+ * - `handleActionBegin(args)`: Handles actions initiated in the Syncfusion Grid.
+ * - `actionComplete(args)`: Handles completion of actions in the Syncfusion Grid.
+ * - `doesSupplierExist(dataset, supplierName)`: Checks if a supplier exists in the dataset.
+ *
+ * @grid
+ * - `toolbarOptions`: Configures toolbar actions (Add, Edit, Delete).
+ * - `editOptions`: Configures editing options based on user access level.
+ * - `customEditTemplate`: Provides a custom template for editing MSA records.
+ *
+ * @modals
+ * - `ConfirmationDialog`: Displays a confirmation dialog for delete actions.
+ *
+ * @example
+ * <CustomerSupplierMSATabX />
+ */
 const CustomerSupplierMSATabX = () => {
 	const { setCompanyID, setCompanyName } = UseStateContext();
 	const [messageText, setMessageText] = useState("");
@@ -204,7 +260,7 @@ const CustomerSupplierMSATabX = () => {
 	};
 
 	const accessLevel = GetAccessLevel();
-	
+
 	const editOptions = {
 		allowEditing: accessLevel > 2,
 		allowAdding: accessLevel > 2,

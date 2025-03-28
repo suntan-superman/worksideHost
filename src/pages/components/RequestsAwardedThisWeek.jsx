@@ -14,6 +14,18 @@ import { CurrencyDollar as CurrencyDollarIcon } from "@phosphor-icons/react/dist
 
 import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
 
+/**
+ * A React component that displays information about requests awarded this week,
+ * including the total value, a trend indicator, and a button for more details.
+ *
+ * @param {Object} props - The component props.
+ * @param {number} props.diff - The percentage difference in awarded requests compared to last week.
+ * @param {"up"|"down"} props.trend - The trend direction, either "up" or "down".
+ * @param {Object} props.sx - The custom styles to apply to the root Card component.
+ * @param {number|string} props.value - The total value of requests awarded this week.
+ *
+ * @returns {JSX.Element} The rendered component.
+ */
 export function RequestsAwardedThisWeek({ diff, trend, sx, value }) {
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
 	const trendColor =

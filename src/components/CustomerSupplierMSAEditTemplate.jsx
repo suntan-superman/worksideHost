@@ -14,6 +14,45 @@ import {
 // Set Selection Options
 import { msaStatusOptions } from "../data/worksideOptions";
 
+/**
+ * CustomerSupplierMSAEditTemplate Component
+ *
+ * This component is used to manage the Customer-Supplier MSA (Master Service Agreement) edit template.
+ * It handles both the creation of new MSA records and the editing of existing ones.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {boolean} props.isAdd - Indicates whether the form is in "add" mode or "edit" mode.
+ * @param {string} props.customername - The name of the customer.
+ * @param {string} props.suppliername - The name of the supplier.
+ * @param {string} props.msastatus - The status of the MSA.
+ * @param {Date} props.msastatusdate - The date of the MSA status.
+ * @param {Date} props.msarenewaldate - The renewal date of the MSA.
+ *
+ * @returns {JSX.Element} The rendered CustomerSupplierMSAEditTemplate component.
+ *
+ * @example
+ * <CustomerSupplierMSAEditTemplate
+ *   isAdd={true}
+ *   customername="Example Customer"
+ *   suppliername="Example Supplier"
+ *   msastatus="ACTIVE"
+ *   msastatusdate={new Date()}
+ *   msarenewaldate={new Date()}
+ * />
+ *
+ * @remarks
+ * - The component uses `useState` to manage local state for form data, read-only flags, supplier options, and MSA data.
+ * - It uses `useEffect` to initialize data and fetch required options and records.
+ * - The `onChange` handler updates form data and validates supplier name uniqueness.
+ * - The component includes loading indicators and dropdowns for selecting suppliers and MSA statuses.
+ *
+ * @dependencies
+ * - `DropDownListComponent` for dropdown inputs.
+ * - `DatePickerComponent` for date inputs.
+ * - `UseStateContext` for accessing global state (e.g., `companyID` and `companyName`).
+ * - `GetAllSuppliers` and `GetCustomerSupplierMSAData` for fetching data from APIs.
+ */
 const CustomerSupplierMSAEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);

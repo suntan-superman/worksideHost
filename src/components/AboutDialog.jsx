@@ -11,6 +11,17 @@ import {
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 
+/**
+ * AboutDialog component displays information about the application, including
+ * build number, last build date, browser information, and operating system details.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open.
+ * @param {Function} props.onClose - Callback function to handle closing the dialog.
+ *
+ * @returns {JSX.Element} The rendered AboutDialog component.
+ */
 const AboutDialog = ({ open, onClose }) => {
 	const buildNumber = process.env.REACT_APP_BUILD_NUMBER || "1.0.0";
 	const lastBuildDate =

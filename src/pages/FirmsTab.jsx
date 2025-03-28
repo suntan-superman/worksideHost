@@ -38,6 +38,52 @@ let gridPageSize = 10;
 // TODO Update
 // TODO Create
 
+/**
+ * FirmsTab Component
+ *
+ * This component renders a grid interface for managing firm data. It includes functionalities
+ * for viewing, adding, editing, deleting, and exporting firm records. The grid is powered by
+ * Syncfusion's GridComponent and supports features like filtering, paging, and frozen columns.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The FirmsTab component.
+ *
+ * @description
+ * - Fetches firm data using `react-query` and displays it in a grid.
+ * - Provides CRUD operations for firm records with appropriate access control based on user access level.
+ * - Includes custom dialog templates for editing and adding records.
+ * - Supports exporting data to Excel format.
+ * - Implements custom input fields for phone numbers and other fields.
+ *
+ * @state
+ * - `isLoading` (boolean): Indicates whether data is being loaded.
+ * - `firmList` (array|null): Stores the list of firms fetched from the server.
+ * - `insertFlag` (boolean): Tracks whether a new record is being added.
+ * - `openUpdateModal` (boolean): Controls the visibility of the update confirmation dialog.
+ * - `messageText` (string): Message displayed in the confirmation dialog.
+ * - `currentRecord` (object): Stores the current record being edited or added.
+ * - `selectedRecord` (string|null): Stores the ID of the currently selected record.
+ *
+ * @functions
+ * - `GetAccessLevel`: Retrieves the user's access level from localStorage.
+ * - `toolbarClick`: Handles toolbar actions like exporting data.
+ * - `handleFirmDelete`: Deletes a selected firm record.
+ * - `actionComplete`: Handles actions like editing, adding, saving, and deleting records.
+ * - `firmsActionComplete`: Handles additional actions specific to the firms grid.
+ * - `rowSelectedFirm`: Updates the selected record when a row is selected.
+ * - `SaveFirmsData`: Saves or updates firm data based on the current operation.
+ * - `SaveLatestDefaults`: Saves the latest defaults for firm fields to localStorage.
+ * - `onFirmLoad`: Configures grid settings on load.
+ *
+ * @dependencies
+ * - `react-query`: For fetching and caching firm data.
+ * - `Syncfusion`: For the grid and related components.
+ * - `localStorage`: For storing user preferences and defaults.
+ *
+ * @example
+ * <FirmsTab />
+ */
 const FirmsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -49,7 +95,7 @@ const FirmsTab = () => {
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState([]);
 
-		const GetAccessLevel = () => {
+	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
 		if (value) {
 			return value;
@@ -101,21 +147,21 @@ const FirmsTab = () => {
 		},
 	};
 
-			// Get the firms data
-		const {
-			data: firmsData,
-			isLoading: firmsLoading,
-			isError: reqError,
-			isSuccess: reqSuccess,
-		} = useQuery({
-			queryKey: ["firms"],
-			queryFn: () => GetAllFirms(),
-			refetchInterval: 1000 * 10 * 60, // 1 minute refetch
-			refetchOnReconnect: true,
-			refetchOnWindowFocus: true,
-			// staleTime: 1000 * 60 * 60 * 24, // 1 Day
-			retry: 3,
-		});
+	// Get the firms data
+	const {
+		data: firmsData,
+		isLoading: firmsLoading,
+		isError: reqError,
+		isSuccess: reqSuccess,
+	} = useQuery({
+		queryKey: ["firms"],
+		queryFn: () => GetAllFirms(),
+		refetchInterval: 1000 * 10 * 60, // 1 minute refetch
+		refetchOnReconnect: true,
+		refetchOnWindowFocus: true,
+		// staleTime: 1000 * 60 * 60 * 24, // 1 Day
+		retry: 3,
+	});
 
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
@@ -129,7 +175,7 @@ const FirmsTab = () => {
 			setFirmList(data);
 		}
 	}, [firmsData]);
-	
+
 	const toolbarClick = (args) => {
 		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
 			if (accessLevel <= 2) {
@@ -378,7 +424,7 @@ const FirmsTab = () => {
 			</div>
 		);
 	}
-	
+
 	return (
 		<div>
 			{/* Companies Tab */}

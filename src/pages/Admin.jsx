@@ -14,19 +14,45 @@ import { Header } from "../components";
 import "../index.css";
 import "../App.css";
 
+/**
+ * Admin component renders the administrative dashboard for the application.
+ * It dynamically displays tabs based on the user's access level, which is
+ * retrieved from localStorage. The component also includes a loading spinner
+ * when data is being processed.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Admin component.
+ *
+ * @example
+ * // Usage
+ * <Admin />
+ *
+ * @description
+ * - Displays a header with the category "Workside" and title "Administrative".
+ * - Shows a loading spinner when `isLoading` is true.
+ * - Dynamically renders tabs based on the `showValidateUsersTab` state:
+ *   - If `showValidateUsersTab` is true, includes a "Validate Users" tab.
+ *   - Otherwise, excludes the "Validate Users" tab.
+ *
+ * @state {boolean} isLoading - Indicates whether the component is in a loading state.
+ * @state {boolean} showValidateUsersTab - Determines whether the "Validate Users" tab is displayed.
+ *
+ * @hook useEffect - Fetches the user's access level from localStorage on component mount
+ * and updates the `showValidateUsersTab` state accordingly.
+ */
 const Admin = () => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [showValidateUsersTab, setShowValidateUsersTab] = useState(false);
 
 	useEffect(() => {
 		const GetAccessLevel = () => {
-		const value = Number(localStorage.getItem("accessLevel"));
-		console.log("Access Level: ", value);
-		if (value) {
-			if (value > 2) setShowValidateUsersTab(true);
-			return value;
-		}
-		return 0;
+			const value = Number(localStorage.getItem("accessLevel"));
+			console.log("Access Level: ", value);
+			if (value) {
+				if (value > 2) setShowValidateUsersTab(true);
+				return value;
+			}
+			return 0;
 		};
 		GetAccessLevel();
 	}, []);

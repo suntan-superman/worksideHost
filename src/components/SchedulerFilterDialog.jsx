@@ -14,6 +14,31 @@ import {
 } from "@mui/material";
 import { green } from "@mui/material/colors";
 
+/**
+ * SchedulerFilterDialog is a React component that provides a dialog interface
+ * for filtering projects based on their statuses and associated companies.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Determines whether the dialog is open or closed.
+ * @param {Function} props.onClose - Callback function to handle closing the dialog.
+ * @param {Function} props.onApply - Callback function to handle applying the selected filters.
+ * @param {Array<Object>} props.projectData - Array of project objects containing project details.
+ * Each project object should have a `customer` property representing the company name.
+ *
+ * @returns {JSX.Element} A dialog component with filtering options for project statuses and companies.
+ *
+ * @example
+ * <SchedulerFilterDialog
+ *   open={isDialogOpen}
+ *   onClose={handleDialogClose}
+ *   onApply={handleFilterApply}
+ *   projectData={[
+ *     { id: 1, customer: "Company A" },
+ *     { id: 2, customer: "Company B" },
+ *   ]}
+ * />
+ */
 const SchedulerFilterDialog = ({ open, onClose, onApply, projectData }) => {
 	const [selectedStatuses, setSelectedStatuses] = useState([]);
 	const [selectedCompanies, setSelectedCompanies] = useState([]);

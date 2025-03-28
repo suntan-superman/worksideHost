@@ -13,6 +13,33 @@ import { GetProducts, GetAllFirms } from "../api/worksideAPI";
 
 // TODO Complete the SupplierProductEditTemplate component
 
+/**
+ * SupplierProductEditTemplate component is used to manage the editing of supplier products.
+ * It provides a form interface for selecting suppliers, categories, products, and updating their statuses.
+ * The component dynamically filters products based on the selected category and handles read-only states
+ * for existing data entries.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {boolean} props.isAdd - Determines if the form is in "add" mode or "edit" mode.
+ * @param {string} props.supplier - The selected supplier name.
+ * @param {string} props.category - The selected category name.
+ * @param {string} props.product - The selected product name.
+ * @param {string} props.status - The current status of the product.
+ * @param {Date} props.statusdate - The date associated with the current status.
+ *
+ * @returns {JSX.Element} The rendered SupplierProductEditTemplate component.
+ *
+ * @example
+ * <SupplierProductEditTemplate
+ *   isAdd={true}
+ *   supplier="Supplier A"
+ *   category="Category 1"
+ *   product="Product X"
+ *   status="ACTIVE"
+ *   statusdate={new Date()}
+ * />
+ */
 const SupplierProductEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [supplierOptions, setSupplierOptions] = useState([]);

@@ -11,6 +11,45 @@ import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
 
 import { GetAllFirmsForSelection } from "../api/worksideAPI";
 
+/**
+ * FirmEditTemplate Component
+ *
+ * This component renders a form for editing or adding firm details. It includes
+ * various input fields for firm information such as name, area, type, address, city,
+ * state, zip code, status, and status date. The component also handles read-only
+ * states and dynamically fetches options for dropdown fields.
+ *
+ * @component
+ * @param {Object} props - The properties passed to the component.
+ * @param {boolean} props.isAdd - Determines if the form is in "add" mode or "edit" mode.
+ * @param {string} props.name - The name of the firm.
+ * @param {string} props.area - The area of the firm.
+ * @param {string} props.type - The type of the firm.
+ * @param {string} props.address1 - The first line of the firm's address.
+ * @param {string} props.address2 - The second line of the firm's address.
+ * @param {string} props.city - The city of the firm.
+ * @param {string} props.state - The state of the firm.
+ * @param {string} props.zipCode - The zip code of the firm.
+ * @param {string} props.status - The status of the firm (e.g., ACTIVE, INACTIVE).
+ * @param {Date} props.statusdate - The date associated with the firm's status.
+ *
+ * @returns {JSX.Element} A form for editing or adding firm details.
+ *
+ * @example
+ * <FirmEditTemplate
+ *   isAdd={true}
+ *   name="Example Firm"
+ *   area="Downtown"
+ *   type="CUSTOMER"
+ *   address1="123 Main St"
+ *   address2="Suite 100"
+ *   city="Metropolis"
+ *   state="NY"
+ *   zipCode="12345"
+ *   status="ACTIVE"
+ *   statusdate={new Date()}
+ * />
+ */
 const FirmEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);

@@ -30,6 +30,54 @@ let gridPageSize = 10;
 // TODO Update
 // TODO Create
 
+/**
+ * SupplierProductsTab Component
+ *
+ * This component renders a grid interface for managing supplier-product relationships.
+ * It allows users to view, add, edit, and delete supplier-product records based on their access level.
+ * The component fetches data from APIs, handles user interactions, and manages state for the grid and modals.
+ *
+ * @component
+ *
+ * @returns {JSX.Element} The SupplierProductsTab component.
+ *
+ * @description
+ * - Fetches product and supplier-product data from the server on mount.
+ * - Displays a grid with supplier-product data, supporting filtering, paging, and editing.
+ * - Handles CRUD operations for supplier-product records via API calls.
+ * - Displays a confirmation dialog before saving or updating records.
+ * - Access level determines whether editing, adding, or deleting is allowed.
+ *
+ * @state
+ * - `productList` {Array|null} - List of products fetched from the server.
+ * - `supplierProductList` {Array|null} - List of supplier-product records fetched from the server.
+ * - `openUpdateModal` {boolean} - Controls the visibility of the confirmation dialog.
+ * - `messageText` {string} - Message displayed in the confirmation dialog.
+ * - `insertFlag` {boolean} - Indicates whether the current operation is an insert.
+ * - `currentRecord` {Object|null} - The record being edited or added.
+ * - `selectedRecord` {Object|null} - The currently selected record in the grid.
+ *
+ * @methods
+ * - `GetAccessLevel` - Retrieves the user's access level from localStorage.
+ * - `actionComplete` - Handles grid actions like editing, adding, and saving.
+ * - `rowSelectedSupplierProduct` - Handles row selection in the grid.
+ * - `onSupplierProductLoad` - Configures the grid on load.
+ * - `SaveSupplierProductsData` - Saves or updates supplier-product data via API calls.
+ *
+ * @dependencies
+ * - `GridComponent` - Syncfusion grid component for displaying and managing data.
+ * - `ColumnsDirective`, `ColumnDirective` - Define the structure of the grid columns.
+ * - `Inject` - Injects required Syncfusion grid services.
+ * - `ConfirmationDialog` - Custom dialog component for confirming save/update actions.
+ *
+ * @hooks
+ * - `useRef` - Used to reference the grid component.
+ * - `useState` - Manages component state.
+ * - `useEffect` - Fetches data on component mount.
+ *
+ * @example
+ * <SupplierProductsTab />
+ */
 const SupplierProductsTab = () => {
 	let supplierProductsGridRef = useRef(null);
 	const [productList, setProductList] = useState(null);

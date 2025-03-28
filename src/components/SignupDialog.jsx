@@ -30,13 +30,52 @@ const VALIDATION_RULES = {
  * SignupDialog Component - Handles user registration
  * @component
  */
+/**
+ * SignupDialog Component
+ *
+ * This component renders a signup dialog for creating a new user account. It includes
+ * form fields for user details, a company selection dropdown, and buttons for submitting,
+ * clearing, or canceling the form. The component also handles form validation, data submission,
+ * and error handling.
+ *
+ * Features:
+ * - Fetches and displays a list of companies for selection.
+ * - Validates user input based on predefined rules.
+ * - Submits the form data to the server for account creation.
+ * - Displays success or error messages based on the server response.
+ * - Provides options to clear the form or cancel the signup process.
+ *
+ * State Variables:
+ * - `data`: Stores the form data entered by the user.
+ * - `options`: Stores the list of company options for the dropdown.
+ * - `selectedOption`: Stores the currently selected company option.
+ * - `error`: Stores error messages for form validation or submission failures.
+ * - `isLoading`: Indicates whether the form submission is in progress.
+ *
+ * Refs:
+ * - `emailRef`: Reference to the email input field.
+ * - `passwordRef`: Reference to the password input field.
+ *
+ * Hooks:
+ * - `useEffect`: Fetches company names on mount and resets the form.
+ * - `useCallback`: Memoizes the function for fetching company names.
+ *
+ * Props:
+ * - None
+ *
+ * Dependencies:
+ * - `react-select` for the company dropdown.
+ * - `useNavigate` for navigation after successful signup.
+ *
+ * @returns {JSX.Element} The rendered signup dialog component.
+ */
 const SignupDialog = () => {
 	const [data, setData] = useState(INITIAL_FORM_STATE);
 	const [options, setOptions] = useState([]);
 	const [selectedOption, setSelectedOption] = useState(null);
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	
+
 	const emailRef = useRef(null);
 	const passwordRef = useRef(null);
 	const navigate = useNavigate();
@@ -44,14 +83,16 @@ const SignupDialog = () => {
 	// Memoized company names fetcher
 	const getCompanyNames = useCallback(async () => {
 		try {
-			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/firm`);
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/firm`,
+			);
 			if (!response.ok) {
-				throw new Error('Failed to fetch company names');
+				throw new Error("Failed to fetch company names");
 			}
 			return await response.json();
 		} catch (error) {
-			console.error('Error fetching company names:', error);
-			showErrorDialog('Failed to load company list');
+			console.error("Error fetching company names:", error);
+			showErrorDialog("Failed to load company list");
 			return [];
 		}
 	}, []);
@@ -73,14 +114,14 @@ const SignupDialog = () => {
 
 	// Reset form on mount
 	useEffect(() => {
-		if (emailRef.current) emailRef.current.value = '';
-		if (passwordRef.current) passwordRef.current.value = '';
+		if (emailRef.current) emailRef.current.value = "";
+		if (passwordRef.current) passwordRef.current.value = "";
 		setData(INITIAL_FORM_STATE);
 	}, []);
 
 	const handleChange = ({ currentTarget: input }) => {
 		setData((prev) => ({ ...prev, [input.name]: input.value }));
-		setError(''); // Clear error when user starts typing
+		setError(""); // Clear error when user starts typing
 	};
 
 	const handleSelectionChange = (selected) => {
@@ -107,28 +148,31 @@ const SignupDialog = () => {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setError('');
-		
+		setError("");
+
 		if (!validateForm()) return;
-		
+
 		setIsLoading(true);
 		console.log(`Data: ${JSON.stringify(data, null, 2)}`);
 		try {
-			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}/api/user/`, {
-				method: "POST",
-				body: JSON.stringify(data),
-				headers: {
-					"Content-Type": "application/json",
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/user/`,
+				{
+					method: "POST",
+					body: JSON.stringify(data),
+					headers: {
+						"Content-Type": "application/json",
+					},
 				},
-			});
+			);
 
 			const json = await response.json();
-			
+
 			if (response.ok) {
 				await showSuccessDialog("Check Email to Validate...");
 				setTimeout(() => navigate("/login"), 2000);
 			} else {
-				throw new Error(json.message || 'Registration failed');
+				throw new Error(json.message || "Registration failed");
 			}
 		} catch (error) {
 			await showErrorDialog(`Registration failed: ${error.message}`);
@@ -184,7 +228,7 @@ const SignupDialog = () => {
 									onSubmit={handleSubmit}
 									autoComplete="off"
 								>
-									<input type="text" name="dummy" style={{ display: 'none' }} />
+									<input type="text" name="dummy" style={{ display: "none" }} />
 									<h2 className="text-2xl font-bold text-green-500 mb-2">
 										Create Account
 									</h2>
@@ -255,10 +299,10 @@ const SignupDialog = () => {
 										type="submit"
 										disabled={isLoading}
 										className={`bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg ${
-											isLoading ? 'opacity-50 cursor-not-allowed' : ''
+											isLoading ? "opacity-50 cursor-not-allowed" : ""
 										}`}
 									>
-										{isLoading ? 'Signing up...' : 'Sign Up'}
+										{isLoading ? "Signing up..." : "Sign Up"}
 									</button>
 									<button
 										type="button"
