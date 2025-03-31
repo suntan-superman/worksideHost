@@ -11,6 +11,7 @@ import {
 	Admin,
 	Supplier,
 	Scheduler,
+	ManageTemplates,
 } from "./pages";
 import PrivateRoutes from "./utils/PrivateRoutes";
 import {
@@ -29,7 +30,6 @@ import VerifyEmail from "./pages/VerifyEmail";
 import { DeliveryTracker } from "./components/delivery-tracker";
 import ErrorBoundary from "./components/delivery-tracker/components/ErrorBoundary";
 import { QueryClient } from "@tanstack/react-query";
-
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
@@ -146,6 +146,7 @@ const MainApp = () => {
 							<Route path="dashboard" element={<Dashboard />} />
 							<Route path="projects" element={<Projects />} />
 							<Route path="requests" element={<Requests />} />
+							<Route path="templates" element={<ManageTemplates />} />
 							<Route
 								path="tracker"
 								element={
@@ -211,6 +212,7 @@ const App = () => {
 						</PrivateRoutes>
 					}
 				/>
+				<Route path="/manage-templates" element={<ManageTemplates />} />
 				<Route path="*" element={<Navigate replace to="/login" />} />
 			</Routes>
 		);

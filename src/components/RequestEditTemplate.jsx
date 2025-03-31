@@ -214,6 +214,9 @@ const RequestEditTemplate = (props) => {
 	const [showSaveTemplateDialog, setShowSaveTemplateDialog] = useState(false);
 	const [newTemplateName, setNewTemplateName] = useState("");
 	const [templateError, setTemplateError] = useState("");
+	const [templateVisibility, setTemplateVisibility] = useState("private");
+	const [templateVisibilityFilter, setTemplateVisibilityFilter] =
+		useState("all");
 
 	// Handle input changes
 	const onChange = (args) => {
@@ -604,10 +607,28 @@ const RequestEditTemplate = (props) => {
 		[FilterProducts],
 	);
 
+	const isFormValid = () => {
+		return (
+			formData.requestcategory &&
+			formData.requestname &&
+			formData.customername &&
+			formData.projectname &&
+			formData.rigcompany &&
+			formData.vendortype &&
+			(formData.vendortype !== "SSR" || formData.vendorName)
+		);
+	};
+
 	const handleSaveTemplate = async () => {
 		try {
 			if (!newTemplateName.trim()) {
 				throw new Error("Template name is required");
+			}
+
+			if (!isFormValid()) {
+				throw new Error(
+					"Please fill in all required fields before saving the template",
+				);
 			}
 
 			const existingTemplate = templates.find(
@@ -620,14 +641,16 @@ const RequestEditTemplate = (props) => {
 
 			const templateData = {
 				name: newTemplateName,
-				description: `${data.requestcategory} - ${data.requestname} template`,
-				category: data.requestcategory,
-				product: data.requestname,
-				comment: data.comment,
-				quantity: data.quantity,
-				preferredVendorType: data.vendortype,
-				preferredVendor: data.vendortype === "SSR" ? data.vendorName : null,
+				description: `${formData.requestcategory} - ${formData.requestname} template`,
+				category: formData.requestcategory,
+				product: formData.requestname,
+				comment: formData.comments,
+				quantity: formData.quantity,
+				preferredVendorType: formData.vendortype,
+				preferredVendor:
+					formData.vendortype === "SSR" ? formData.vendorName : null,
 				createdBy: userId,
+				visibility: templateVisibility,
 			};
 
 			const response = await createRequestTemplate(templateData);
@@ -638,6 +661,7 @@ const RequestEditTemplate = (props) => {
 			setShowSaveTemplateDialog(false);
 			setNewTemplateName("");
 			setTemplateError("");
+			setTemplateVisibility("private");
 			await showSuccessDialogWithTimer("Template saved successfully");
 			await fetchTemplates();
 		} catch (error) {
@@ -662,6 +686,24 @@ const RequestEditTemplate = (props) => {
 							×
 						</button>
 					</div>
+					<div className="mb-4">
+						<label
+							className="block text-sm font-medium text-gray-700 mb-2"
+							htmlFor="templateVisibilityFilter"
+						>
+							Template Visibility
+						</label>
+						<select
+							id="templateVisibilityFilter"
+							className="w-full p-2 border rounded"
+							value={templateVisibilityFilter}
+							onChange={(e) => setTemplateVisibilityFilter(e.target.value)}
+						>
+							<option value="all">All Templates</option>
+							<option value="private">Private Templates</option>
+							<option value="public">Public Templates</option>
+						</select>
+					</div>
 					{isLoadingTemplates ? (
 						<div className="text-center">Loading templates...</div>
 					) : templateError ? (
@@ -672,19 +714,40 @@ const RequestEditTemplate = (props) => {
 						</div>
 					) : (
 						<div className="max-h-60 overflow-y-auto">
-							{templates.map((template) => (
-								<button
-									type="button"
-									key={template._id}
-									className="w-full text-left p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
-									onClick={() => handleTemplateSelection(template)}
-								>
-									<h3 className="font-bold">{template.name}</h3>
-									<p className="text-sm text-gray-600">
-										{template.description}
-									</p>
-								</button>
-							))}
+							{templates
+								.filter(
+									(template) =>
+										templateVisibilityFilter === "all" ||
+										template.visibility === templateVisibilityFilter,
+								)
+								.map((template) => (
+									<button
+										type="button"
+										key={template._id}
+										className="w-full text-left p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
+										onClick={() => handleTemplateSelection(template)}
+									>
+										<div className="flex justify-between items-center">
+											<div>
+												<h3 className="font-bold">{template.name}</h3>
+												<p className="text-sm text-gray-600">
+													{template.description}
+												</p>
+											</div>
+											<span
+												className={`text-xs px-2 py-1 rounded ${
+													template.visibility === "public"
+														? "bg-green-100 text-green-800"
+														: "bg-gray-100 text-gray-800"
+												}`}
+											>
+												{template.visibility === "public"
+													? "Public"
+													: "Private"}
+											</span>
+										</div>
+									</button>
+								))}
 						</div>
 					)}
 				</div>
@@ -712,6 +775,19 @@ const RequestEditTemplate = (props) => {
 						value={newTemplateName}
 						onChange={(e) => setNewTemplateName(e.target.value)}
 					/>
+					<div className="mb-4">
+						<label className="block text-sm font-medium text-gray-700 mb-2">
+							Template Visibility
+						</label>
+						<select
+							className="w-full p-2 border rounded"
+							value={templateVisibility}
+							onChange={(e) => setTemplateVisibility(e.target.value)}
+						>
+							<option value="private">Private (Only visible to me)</option>
+							<option value="public">Public (Visible to all users)</option>
+						</select>
+					</div>
 					{templateError && (
 						<div className="text-red-500 mb-4">{templateError}</div>
 					)}
@@ -725,8 +801,11 @@ const RequestEditTemplate = (props) => {
 						</button>
 						<button
 							type="button"
-							className="bg-green-500 text-white px-4 py-2 rounded"
+							className={`${
+								isFormValid() ? "bg-green-500" : "bg-gray-400"
+							} text-white px-4 py-2 rounded`}
 							onClick={handleSaveTemplate}
+							disabled={!isFormValid()}
 						>
 							Save
 						</button>
