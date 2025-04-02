@@ -8,6 +8,7 @@ import {
 	DialogActions,
 	Button,
 } from "@mui/material";
+import { green } from "@mui/material/colors";
 
 /**
  * ConfirmationDialog component renders a modal dialog box to confirm or cancel an action.
@@ -28,8 +29,17 @@ const ConfirmationDialog = ({ open, message, onConfirm, onCancel }) => {
 				<p>{message}</p>
 			</DialogContent>
 			<DialogActions>
-				<Button onClick={onCancel}>Cancel</Button>
-				<Button onClick={onConfirm} variant="contained" color="primary">
+				<Button onClick={onCancel} sx={{ color: green[800] }}>
+					Cancel
+				</Button>
+				<Button
+					onClick={onConfirm}
+					variant="contained"
+					sx={{
+						backgroundColor: green[800],
+						"&:hover": { backgroundColor: green[600] },
+					}}
+				>
 					Confirm
 				</Button>
 			</DialogActions>
