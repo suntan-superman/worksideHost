@@ -144,6 +144,135 @@ const LogisticsExpertDashboard = () => {
 		setIsConfirmDialogOpen(true);
 	};
 
+	const renderEmptyState = (tab) => {
+		const emptyStateStyles = {
+			textAlign: "center",
+			padding: "2rem",
+			backgroundColor: "background.paper",
+			borderRadius: 1,
+			boxShadow: 1,
+		};
+
+		switch (tab) {
+			case 0: // Schedule View
+				return (
+					<Box sx={emptyStateStyles}>
+						<Typography variant="h6" gutterBottom color="text.secondary">
+							No Delivery Schedule Found
+						</Typography>
+						<Typography variant="body1" color="text.secondary" paragraph>
+							The Schedule View provides a calendar overview of all delivery
+							assignments. Here you can:
+						</Typography>
+						<Box
+							sx={{ textAlign: "left", maxWidth: "600px", margin: "0 auto" }}
+						>
+							<Typography component="ul" color="text.secondary">
+								<li>View all delivery requests in a calendar format</li>
+								<li>Track delivery status and progress</li>
+								<li>Monitor delivery associate availability</li>
+								<li>Identify scheduling conflicts</li>
+								<li>Plan and optimize delivery routes</li>
+							</Typography>
+						</Box>
+						<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+							New delivery schedules will appear here once they are created in
+							the system.
+						</Typography>
+					</Box>
+				);
+			case 1: // Assignments
+				return (
+					<Box sx={emptyStateStyles}>
+						<Typography variant="h6" gutterBottom color="text.secondary">
+							No Delivery Assignments Found
+						</Typography>
+						<Typography variant="body1" color="text.secondary" paragraph>
+							The Assignments view is your central hub for managing delivery
+							schedules. Here you can:
+						</Typography>
+						<Box
+							sx={{ textAlign: "left", maxWidth: "600px", margin: "0 auto" }}
+						>
+							<Typography component="ul" color="text.secondary">
+								<li>View and manage all delivery requests</li>
+								<li>Assign delivery associates to specific requests</li>
+								<li>Track estimated hours and travel times</li>
+								<li>
+									Monitor delivery status (pending, in progress, completed)
+								</li>
+								<li>Quickly identify and resolve scheduling conflicts</li>
+							</Typography>
+						</Box>
+						<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+							New assignments will appear here once they are created in the
+							system.
+						</Typography>
+					</Box>
+				);
+			case 2: // Workload Analysis
+				return (
+					<Box sx={emptyStateStyles}>
+						<Typography variant="h6" gutterBottom color="text.secondary">
+							No Workload Data Available
+						</Typography>
+						<Typography variant="body1" color="text.secondary" paragraph>
+							The Workload Analysis view helps you optimize delivery associate
+							schedules and workloads. Here you can:
+						</Typography>
+						<Box
+							sx={{ textAlign: "left", maxWidth: "600px", margin: "0 auto" }}
+						>
+							<Typography component="ul" color="text.secondary">
+								<li>View total hours assigned to each delivery associate</li>
+								<li>Analyze the number of assignments per associate</li>
+								<li>Monitor travel times and wait times</li>
+								<li>Identify and prevent workload conflicts</li>
+								<li>Balance workloads across the delivery team</li>
+							</Typography>
+						</Box>
+						<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+							Workload data will be displayed here once assignments are created
+							and delivery associates are assigned.
+						</Typography>
+					</Box>
+				);
+			case 3: // Logistics Expert
+				return (
+					<Box sx={emptyStateStyles}>
+						<Typography variant="h6" gutterBottom color="text.secondary">
+							No Logistics Expert Assignments
+						</Typography>
+						<Typography variant="body1" color="text.secondary" paragraph>
+							The Logistics Expert view provides advanced assignment management
+							capabilities. Here you can:
+						</Typography>
+						<Box
+							sx={{ textAlign: "left", maxWidth: "600px", margin: "0 auto" }}
+						>
+							<Typography component="ul" color="text.secondary">
+								<li>
+									Make sophisticated assignments with detailed time estimates
+								</li>
+								<li>Set specific arrival and departure times for deliveries</li>
+								<li>
+									Add detailed notes and instructions for complex deliveries
+								</li>
+								<li>Manage multiple stops and optimize routes</li>
+								<li>Handle special delivery requirements and constraints</li>
+							</Typography>
+						</Box>
+						<Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+							Advanced assignments will appear here once they are created using
+							the Logistics Expert features.
+						</Typography>
+					</Box>
+				);
+			default:
+				return null;
+		}
+	};
+
 	if (isLoadingAssignments || isLoadingDAs) {
 		return (
 			<Box
@@ -188,107 +317,129 @@ const LogisticsExpertDashboard = () => {
 				</Tabs>
 			</Paper>
 
-			{selectedTab === 0 && (
-				<DeliveryScheduleView
-					selectedDate={selectedDate}
-					onDateChange={handleDateChange}
-					onAssignmentSelect={handleAssignmentSelect}
-					assignments={assignments}
-				/>
-			)}
-
-			{selectedTab === 1 && (
-				<Grid container spacing={3}>
-					{assignments?.map((assignment) => (
-						<Grid item xs={12} md={6} lg={4} key={assignment._id}>
-							<Paper sx={{ p: 2 }}>
-								<Typography variant="h6">{assignment.requestName}</Typography>
-								<Typography color="textSecondary">
-									Customer: {assignment.customerName}
-								</Typography>
-								<Typography color="textSecondary">
-									Date: {format(parseISO(assignment.deliveryDate), "PPP")}
-								</Typography>
-								<Typography color="textSecondary">
-									DA: {assignment.deliveryAssociateName || "Unassigned"}
-								</Typography>
-								<Box sx={{ mt: 2 }}>
-									<Button
-										variant="contained"
-										color="success"
-										onClick={() => handleAssignmentSelect(assignment)}
-										sx={{ mr: 1 }}
-									>
-										Assign DA
-									</Button>
-									<Button
-										variant="outlined"
-										color="error"
-										onClick={() => handleCancelAssignment(assignment)}
-										sx={{ mr: 1 }}
-									>
-										Cancel
-									</Button>
-									<Button
-										variant="outlined"
-										color="warning"
-										onClick={() => handlePostponeAssignment(assignment)}
-									>
-										Postpone
-									</Button>
-								</Box>
-							</Paper>
-						</Grid>
-					))}
-				</Grid>
-			)}
-
-			{selectedTab === 2 && (
-				<Box>
-					<Typography variant="h6" gutterBottom>
-						Workload Analysis
-					</Typography>
-					{/* Workload analysis visualization will be implemented here */}
+			{isLoadingAssignments || isLoadingDAs ? (
+				<Box sx={{ display: "flex", justifyContent: "center", p: 3 }}>
+					<CircularProgress color="success" />
 				</Box>
-			)}
-
-			{selectedTab === 3 && (
-				<Box>
-					<Typography variant="h6" gutterBottom>
-						Logistics Expert View
-					</Typography>
-					<Grid container spacing={3}>
-						{assignments?.map((assignment) => (
-							<Grid item xs={12} md={6} lg={4} key={assignment._id}>
-								<Paper sx={{ p: 2 }}>
-									<Typography variant="h6">{assignment.requestName}</Typography>
-									<Typography color="textSecondary">
-										Customer: {assignment.customerName}
-									</Typography>
-									<Typography color="textSecondary">
-										Date: {format(parseISO(assignment.deliveryDate), "PPP")}
-									</Typography>
-									<Typography color="textSecondary">
-										Time: {format(parseISO(assignment.deliveryDate), "p")}
-									</Typography>
-									<Typography color="textSecondary">
-										DA: {assignment.deliveryAssociateName || "Unassigned"}
-									</Typography>
-									<Box sx={{ mt: 2 }}>
-										<Button
-											variant="contained"
-											color="success"
-											onClick={() => handleLogisticsExpertSelect(assignment)}
-											sx={{ mr: 1 }}
-										>
-											Advanced Assignment
-										</Button>
-									</Box>
-								</Paper>
-							</Grid>
-						))}
-					</Grid>
-				</Box>
+			) : (
+				<>
+					{selectedTab === 0 && (
+						<>
+							<DeliveryScheduleView
+								selectedDate={selectedDate}
+								onDateChange={handleDateChange}
+								assignments={assignments}
+								deliveryAssociates={deliveryAssociates?.data || []}
+								onAssignmentSelect={handleAssignmentSelect}
+								onLogisticsExpertSelect={handleLogisticsExpertSelect}
+							/>
+							{(!assignments || assignments.length === 0) &&
+								renderEmptyState(0)}
+						</>
+					)}
+					{selectedTab === 1 && (
+						<Box sx={{ mb: 2 }}>
+							<Typography variant="h6" gutterBottom>
+								Delivery Assignments
+							</Typography>
+							{!assignments || assignments.length === 0 ? (
+								renderEmptyState(1)
+							) : (
+								<Grid container spacing={2}>
+									{assignments.map((assignment) => (
+										<Grid item xs={12} sm={6} md={4} key={assignment._id}>
+											<Paper sx={{ p: 2 }}>
+												<Typography variant="subtitle1">
+													Request ID: {assignment.requestID}
+												</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Category: {assignment.requestCategory}
+												</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Status: {assignment.status}
+												</Typography>
+												<Button
+													variant="contained"
+													color="success"
+													size="small"
+													onClick={() => handleAssignmentSelect(assignment)}
+													sx={{ mt: 1 }}
+												>
+													Assign DA
+												</Button>
+											</Paper>
+										</Grid>
+									))}
+								</Grid>
+							)}
+						</Box>
+					)}
+					{selectedTab === 2 && (
+						<Box sx={{ mb: 2 }}>
+							<Typography variant="h6" gutterBottom>
+								Delivery Associate Workloads
+							</Typography>
+							{!assignments || assignments.length === 0 ? (
+								renderEmptyState(2)
+							) : (
+								<Grid container spacing={2}>
+									{(deliveryAssociates?.data || []).map((da) => (
+										<Grid item xs={12} sm={6} md={4} key={da._id}>
+											<Paper sx={{ p: 2 }}>
+												<Typography variant="subtitle1">{da.name}</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Total Hours: {calculateTotalHours(da._id)}
+												</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Assignments: {calculateAssignmentCount(da._id)}
+												</Typography>
+											</Paper>
+										</Grid>
+									))}
+								</Grid>
+							)}
+						</Box>
+					)}
+					{selectedTab === 3 && (
+						<Box sx={{ mb: 2 }}>
+							<Typography variant="h6" gutterBottom>
+								Logistics Expert Assignments
+							</Typography>
+							{!assignments || assignments.length === 0 ? (
+								renderEmptyState(3)
+							) : (
+								<Grid container spacing={2}>
+									{assignments.map((assignment) => (
+										<Grid item xs={12} sm={6} md={4} key={assignment._id}>
+											<Paper sx={{ p: 2 }}>
+												<Typography variant="subtitle1">
+													Request ID: {assignment.requestID}
+												</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Category: {assignment.requestCategory}
+												</Typography>
+												<Typography variant="body2" color="text.secondary">
+													Status: {assignment.status}
+												</Typography>
+												<Button
+													variant="contained"
+													color="success"
+													size="small"
+													onClick={() =>
+														handleLogisticsExpertSelect(assignment)
+													}
+													sx={{ mt: 1 }}
+												>
+													Advanced Assignment
+												</Button>
+											</Paper>
+										</Grid>
+									))}
+								</Grid>
+							)}
+						</Box>
+					)}
+				</>
 			)}
 
 			{selectedAssignment && (
