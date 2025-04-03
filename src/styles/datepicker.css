@@ -1,0 +1,61 @@
+/* Custom styling for Syncfusion date picker */
+.e-custom-datepicker.e-input-group {
+	border-radius: 4px;
+}
+
+.e-custom-datepicker.e-input-group:hover,
+.e-custom-datepicker.e-input-group.e-input-focus {
+	border-color: green;
+}
+
+.e-custom-datepicker .e-input-group-icon {
+	color: green;
+}
+
+.e-custom-datepicker .e-input-group-icon:hover {
+	color: darkgreen;
+}
+
+.e-custom-datepicker .e-input-group-icon.e-input-popup {
+	color: green;
+}
+
+.e-custom-datepicker .e-input-group-icon.e-input-popup:hover {
+	color: darkgreen;
+}
+
+/* Calendar popup styling */
+.e-calendar .e-header-container .e-header-cell {
+	color: green;
+}
+
+.e-calendar .e-content-container .e-content.e-month td.e-selected {
+	background-color: green;
+	color: white;
+}
+
+.e-calendar .e-content-container .e-content.e-month td.e-selected:hover {
+	background-color: darkgreen;
+}
+
+.e-calendar .e-content-container .e-content.e-month td.e-today {
+	background-color: rgba(0, 128, 0, 0.1);
+	color: green;
+	border: 1px solid green;
+}
+
+.e-calendar .e-content-container .e-content.e-month td.e-today:hover {
+	background-color: rgba(0, 128, 0, 0.2);
+}
+
+.e-calendar .e-content-container .e-content.e-month td:hover {
+	background-color: rgba(0, 128, 0, 0.1);
+}
+
+.e-calendar .e-footer-container .e-btn.e-btn-flat {
+	color: green;
+}
+
+.e-calendar .e-footer-container .e-btn.e-btn-flat:hover {
+	background-color: rgba(0, 128, 0, 0.1);
+} 

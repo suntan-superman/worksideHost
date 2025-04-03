@@ -538,20 +538,29 @@ const SetAwardedRequestBidStatus = async ({ reqID, supplierID }) => {
 
 /**
  * Fetches delivery associates from the API.
+ * @param {string} supplierId - Optional supplier ID to filter delivery associates.
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and delivery associates data.
  */
-const GetDeliveryAssociates = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/deliveryassociate`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch delivery associates. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching delivery associates:", error.message);
-        return { status: 500, data: [] };
-    }
+const GetDeliveryAssociates = async (supplierId) => {
+	try {
+		const response = await fetch(`${apiURL}/api/deliveryassociate`);
+		if (!response.ok) {
+			throw new Error(
+				`Failed to fetch delivery associates. Status: ${response.status}`,
+			);
+		}
+		const json = await response.json();
+
+		// Filter by supplier ID if provided
+		const filteredData = supplierId
+			? json.filter((da) => da.supplierid === supplierId)
+			: json;
+
+		return { status: response.status, data: filteredData };
+	} catch (error) {
+		console.error("Error fetching delivery associates:", error.message);
+		return { status: 500, data: [] };
+	}
 };
 
 /**
@@ -1566,6 +1575,71 @@ const GetVendorIDByName = async (vendorName) => {
 	}
 };
 
+/**
+ * Fetch delivery assignments with optional filters
+ * @param {Object} filters - Filter parameters
+ * @param {string} filters.deliveryAssociateId - Filter by delivery associate ID
+ * @param {string} filters.supplierId - Filter by supplier ID
+ * @param {string} filters.requestId - Filter by request ID
+ * @param {string} filters.startDate - Filter by start date (YYYY-MM-DD)
+ * @param {string} filters.endDate - Filter by end date (YYYY-MM-DD)
+ * @param {string} filters.category - Filter by request category
+ * @param {string} filters.status - Filter by assignment status
+ * @returns {Promise<Array>} Array of delivery assignments
+ */
+const fetchDeliveryAssignments = async (filters = {}) => {
+	const queryParams = new URLSearchParams();
+	for (const [key, value] of Object.entries(filters)) {
+		if (value) {
+			queryParams.append(key, value);
+		}
+	}
+
+	return fetchWithHandling(
+		`/api/delivery-assignments?${queryParams.toString()}`,
+	);
+};
+
+/**
+ * Create a new delivery assignment
+ * @param {Object} assignment - Assignment details
+ * @returns {Promise<Object>} Created assignment
+ */
+const createDeliveryAssignment = async (assignment) => {
+	return apiRequest("/api/delivery-assignments", "POST", assignment);
+};
+
+/**
+ * Update an existing delivery assignment
+ * @param {string} id - Assignment ID
+ * @param {Object} updates - Updated assignment details
+ * @returns {Promise<Object>} Updated assignment
+ */
+const updateDeliveryAssignment = async (id, updates) => {
+	return apiRequest(`/api/delivery-assignments/${id}`, "PUT", updates);
+};
+
+/**
+ * Delete a delivery assignment
+ * @param {string} id - Assignment ID
+ * @returns {Promise<void>}
+ */
+const deleteDeliveryAssignment = async (id) => {
+	return apiRequest(`/api/delivery-assignments/${id}`, "DELETE");
+};
+
+/**
+ * Get delivery associate workload for a specific date
+ * @param {string} deliveryAssociateId - Delivery associate ID
+ * @param {string} date - Date to check workload (YYYY-MM-DD)
+ * @returns {Promise<Object>} Workload information
+ */
+const getDeliveryAssociateWorkload = async (deliveryAssociateId, date) => {
+	return fetchWithHandling(
+		`/api/delivery-assignments/workload?deliveryAssociateId=${deliveryAssociateId}&date=${date}`,
+	);
+};
+
 // Export all functions
 /**
  * API functions exported from worksideAPI.jsx
@@ -1643,6 +1717,11 @@ const GetVendorIDByName = async (vendorName) => {
  * @exports GetRequestBidListCompanies - Retrieves the company list for a request bid.
  * @exports GetProjectIDByNameAndCustomer - Retrieves a project ID by name and customer.
  * @exports GetVendorIDByName - Retrieves a vendor ID by name.
+ * @exports fetchDeliveryAssignments - Retrieves delivery assignments with optional filters
+ * @exports createDeliveryAssignment - Creates a new delivery assignment
+ * @exports updateDeliveryAssignment - Updates an existing delivery assignment
+ * @exports deleteDeliveryAssignment - Deletes a delivery assignment
+ * @exports getDeliveryAssociateWorkload - Retrieves delivery associate workload for a specific date
  */
 export {
 	fetchWithHandling,
@@ -1717,4 +1796,9 @@ export {
 	GetRequestBidListCompanies,
 	GetProjectIDByNameAndCustomer,
 	GetVendorIDByName,
+	fetchDeliveryAssignments,
+	createDeliveryAssignment,
+	updateDeliveryAssignment,
+	deleteDeliveryAssignment,
+	getDeliveryAssociateWorkload,
 };

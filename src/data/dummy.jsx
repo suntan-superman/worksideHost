@@ -8,6 +8,7 @@ import {
 	// MdNotifications,
 	MdAccountTree,
 	MdRequestPage,
+	MdLocalShipping,
 } from "react-icons/md";
 import { TbTruckDelivery } from "react-icons/tb";
 import avatar from './avatar.jpg';
@@ -29,6 +30,10 @@ export const links = [
 			{
 				name: "requests",
 				icon: <MdRequestPage style={{ color: "green" }} size={24} />,
+			},
+			{
+				name: "logistics",
+				icon: <MdLocalShipping style={{ color: "green" }} size={24} />,
 			},
 			{
 				name: "tracker",

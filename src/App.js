@@ -30,6 +30,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import { DeliveryTracker } from "./components/delivery-tracker";
 import ErrorBoundary from "./components/delivery-tracker/components/ErrorBoundary";
 import { QueryClient } from "@tanstack/react-query";
+import LogisticsExpertDashboard from "./components/LogisticsExpertDashboard";
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
@@ -172,6 +173,7 @@ const MainApp = () => {
 							<Route path="admin" element={<Admin />} />
 							<Route path="supplier" element={<Supplier />} />
 							<Route path="scheduler" element={<Scheduler />} />
+							<Route path="logistics" element={<LogisticsExpertDashboard />} />
 							<Route
 								path="*"
 								element={

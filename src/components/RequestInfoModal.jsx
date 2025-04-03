@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
-import { format } from "date-fns";
+import { format, addHours } from "date-fns";
 import {
 	APIProvider,
 	Map as GoogleMap,
@@ -206,7 +206,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		if (recordID) {
 			fetchRequest();
 		}
-	}, [recordID]);
+	}, [recordID, apiUrl, staticSupplierID]);
 
 	// Fetch route data from the backend
 	const fetchRouteData = useCallback(async () => {
@@ -292,13 +292,18 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	};
 
 	// Add new handler for DA assignment
-	const handleDAAssignment = async (deliveryAssociateId) => {
+	const handleDAAssignment = async (deliveryAssociateId, estimatedHours) => {
 		try {
 			const response = await axios.put(
 				`${process.env.REACT_APP_MONGO_URI}/api/requestbid/${recordID}/da-assignment`,
 				{
 					deliveryAssociateId: deliveryAssociateId,
 					status: "ASSIGNED",
+					estimatedHours: estimatedHours,
+					estimatedArrivalTime: addHours(
+						new Date(requestData.datetimerequested),
+						estimatedHours,
+					),
 				},
 			);
 
@@ -553,6 +558,9 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 				onClose={() => setShowDADialog(false)}
 				onAssign={handleDAAssignment}
 				supplierID={supplierID}
+				requestID={recordID}
+				deliveryDate={requestData?.datetimerequested}
+				requestCategory={requestData?.requestcategory}
 			/>
 		</>
 	);
