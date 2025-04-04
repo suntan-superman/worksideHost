@@ -3,9 +3,11 @@ import React from "react";
 import { Link, NavLink } from "react-router-dom";
 import { MdOutlineCancel } from 'react-icons/md';
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
-import { links } from '../data/dummy';
+import { links } from "../data/worksideLayout";
 import { UseStateContext } from "../contexts/ContextProvider";
 import { signalIsUserLoggedIn } from "../stores/SignalStores";
+import { Divider } from "@mui/material";
+import { SchedulerIcon, RequestIcon } from "../icons/Icons";
 
 /**
  * Sidebar component that renders a collapsible sidebar with navigation links.
@@ -94,36 +96,42 @@ const Sidebar = () => {
 							</button>
 						</TooltipComponent>
 					</div>
-					<div className="mt-10 ">
-						{links.map((item, index) => (
-							<div key={item.title}>
-								<p className="text-gray-400 dark:text-gray-400 m-3 mt-4 uppercase">
-									{item.title}
-								</p>
-								{item.links.map((link) => {
-									const to = `/main/${link.name}`;
-									return (
-										<NavLink
-											to={to}
-											key={link.name}
-											onClick={handleCloseSideBar}
-											className={({ isActive }) =>
-												signalIsUserLoggedIn.value
-													? isActive
-														? activeLink
-														: normalLink
-													: normalLink
-											}
-										>
-											{link.icon}
-											<span className="capitalize text-bold text-xl text-white">
-												{link.name}
-											</span>
-										</NavLink>
-									);
-								})}
-							</div>
-						))}
+					<div className="mt-10">
+						{links.map((item, index) => {
+							if (item.type === "divider") {
+								return (
+									<Divider
+										key={`divider-${index}`}
+										sx={{
+											my: 2,
+											borderColor: "rgba(255, 255, 255, 0.3)",
+											width: "90%",
+											mx: "auto",
+											borderBottomWidth: 2,
+										}}
+									/>
+								);
+							}
+							return (
+								<NavLink
+									key={item.name}
+									to={`/main/${item.name}`}
+									onClick={handleCloseSideBar}
+									className={({ isActive }) =>
+										signalIsUserLoggedIn.value
+											? isActive
+												? activeLink
+												: normalLink
+											: normalLink
+									}
+								>
+									{item.icon}
+									<span className="capitalize text-bold text-xl text-white">
+										{item.name}
+									</span>
+								</NavLink>
+							);
+						})}
 					</div>
 				</>
 			)}
