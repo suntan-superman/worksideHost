@@ -7,7 +7,6 @@ import { links } from "../data/worksideLayout";
 import { UseStateContext } from "../contexts/ContextProvider";
 import { signalIsUserLoggedIn } from "../stores/SignalStores";
 import { Divider } from "@mui/material";
-import { SchedulerIcon, RequestIcon } from "../icons/Icons";
 
 /**
  * Sidebar component that renders a collapsible sidebar with navigation links.

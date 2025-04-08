@@ -1,5 +1,5 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
 	GridComponent,
 	ColumnsDirective,
@@ -308,38 +308,37 @@ const ValidateUsersTab = () => {
 			resetFormData();
 
 			// Get Contact Info by Email
-			await GetContactInfoByEmail(args.rowData.email).then(() => {
-				if (newUser === true) {
-					setFormData({
-						firstname: args.rowData?.firstName,
-						lastname: args.rowData?.lastName,
-						company: args.rowData?.company,
-						// Need to get classification from FIRM
-						classification: "SUPPLIER",
-						accesslevel: "STANDARD",
-						email: args.rowData?.email,
-						primaryphone: args.rowData?.phone,
-						status: "ACTIVE",
-					});
-				} else {
-					const newContactData = {
-						firstname: args.rowData?.firstName,
-						lastname: args.rowData?.lastName,
-						nickname: contactData?.nickname,
-						company: args.rowData?.company,
-						classification: contactData?.contactclass,
-						accesslevel: contactData?.accesslevel,
-						primaryphone: contactData?.primaryphone,
-						email: args.rowData?.email,
-						status: contactData?.status,
-						comment: contactData?.comment,
-					};
-					setFormData(newContactData);
-				}
-				setSelectedRecordData(args.rowData);
-				setSelectedRecord(args.rowData?._id);
-				setShowDialog(true);
-			});
+			await GetContactInfoByEmail(args.rowData.email);
+
+			if (newUser === true) {
+				setFormData({
+					firstname: args.rowData?.firstName,
+					lastname: args.rowData?.lastName,
+					company: args.rowData?.company,
+					classification: "SUPPLIER",
+					accesslevel: "STANDARD",
+					email: args.rowData?.email,
+					primaryphone: args.rowData?.phone,
+					status: "ACTIVE",
+				});
+			} else {
+				const newContactData = {
+					firstname: args.rowData?.firstName,
+					lastname: args.rowData?.lastName,
+					nickname: contactData?.nickname,
+					company: args.rowData?.company,
+					classification: contactData?.contactclass,
+					accesslevel: contactData?.accesslevel,
+					primaryphone: contactData?.primaryphone,
+					email: args.rowData?.email,
+					status: contactData?.status,
+					comment: contactData?.comment,
+				};
+				setFormData(newContactData);
+			}
+			setSelectedRecordData(args.rowData);
+			setSelectedRecord(args.rowData?._id);
+			setShowDialog(true);
 		}
 	};
 
@@ -347,7 +346,7 @@ const ValidateUsersTab = () => {
 		setShowDialog(false);
 	};
 
-	const SaveUserValidation = async () => {
+	const SaveUserValidation = useCallback(async () => {
 		if (selectedRecordData === null) {
 			return;
 		}
@@ -368,7 +367,7 @@ const ValidateUsersTab = () => {
 		} catch (error) {
 			showErrorDialog(`Error: ${error}`);
 		}
-	};
+	}, [selectedRecordData, updatedContactData]);
 
 	const GetContactInfoByEmail = async (email) => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${email}`;
@@ -378,24 +377,36 @@ const ValidateUsersTab = () => {
 
 		try {
 			const response = await fetch(fetchString);
-			await response.json().then((data) => {
-				if (data.newUser === true) {
-					setNewUser(true);
-					setContactData(null);
-					setContactID(null);
-					return;
-				}
-				setContactData(data[0]);
-				setContactID(data[0]?._id);
-				setNewUser(false);
-			});
+			const data = await response.json();
+
+			// Check if the response indicates no contact found
+			if (
+				!response.ok ||
+				data.message === "Contact not found" ||
+				!data ||
+				data.length === 0 ||
+				data.newUser === true
+			) {
+				setNewUser(true);
+				setContactData(null);
+				setContactID(null);
+				return;
+			}
+
+			// Contact found
+			setContactData(data[0]);
+			setContactID(data[0]?._id);
+			setNewUser(false);
 		} catch (error) {
+			// If there's an error, treat as new user
+			setNewUser(true);
+			setContactData(null);
+			setContactID(null);
 			showErrorDialog(`Error: ${error}`);
 		}
-		return;
 	};
 
-	const UpdateContactData = async () => {
+	const UpdateContactData = useCallback(async () => {
 		const id = contactID;
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/${id}`;
 		const requestOptions = {
@@ -425,9 +436,9 @@ const ValidateUsersTab = () => {
 			showErrorDialog(`Error: ${error}`);
 			console.error(error);
 		}
-	};
+	}, [contactID, formData, selectedRecordData]);
 
-	const AddContactData = async () => {
+	const AddContactData = useCallback(async () => {
 		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact`;
 		const { firmType } = await GetFirmType(formData.company);
 
@@ -450,6 +461,7 @@ const ValidateUsersTab = () => {
 				statusdate: new Date(),
 			}),
 		};
+
 		try {
 			const response = await fetch(fetchString, requestOptions);
 			const jsonData = await response.json();
@@ -457,9 +469,9 @@ const ValidateUsersTab = () => {
 		} catch (error) {
 			showErrorDialog(`Error: ${error}`);
 		}
-	};
+	}, [formData, selectedRecordData, updatedContactData]);
 
-	const SendEmailValidation = async (email) => {
+	const SendEmailValidation = useCallback(async (email) => {
 		const requestOptions = {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -475,33 +487,52 @@ const ValidateUsersTab = () => {
 			requestOptions,
 		);
 		return status;
-	};
+	}, []);
 
 	useEffect(() => {
 		if (modifyFlag === false || selectedRecordData === null) return;
+
 		setFormData((prev) => ({
 			...prev,
 			...updatedContactData,
 		}));
+
 		// Update User Record
 		SaveUserValidation().then(() => {
 			queryClient.invalidateQueries("pendingUsers");
+
 			if (updatedContactData?.status === "DECLINED") {
 				// Delete Contact Record
 				// DeleteContactData();
 			} else {
-				// Update User Record with updated nickname, company, cell number, access level, status
-				if (newUser === true) {
-					AddContactData();
+				// Handle contact data based on whether it's a new user or existing user
+				if (newUser) {
+					// Add new contact for new user
+					AddContactData().then(() => {
+						SendEmailValidation(selectedRecordData.email);
+						showSuccessDialogWithTimer("User Validated...Check Email");
+					});
 				} else {
-					UpdateContactData();
+					// Update existing contact
+					UpdateContactData().then(() => {
+						SendEmailValidation(selectedRecordData.email);
+						showSuccessDialogWithTimer("User Validated...Check Email");
+					});
 				}
-				const status = SendEmailValidation(selectedRecordData.email);
-				showSuccessDialogWithTimer("User Validated...Check Email");
 			}
 		});
+
 		setModifyFlag(false);
-	}, [modifyFlag === true && selectedRecordData !== null]);
+	}, [
+		modifyFlag,
+		selectedRecordData,
+		newUser,
+		queryClient,
+		SaveUserValidation,
+		AddContactData,
+		UpdateContactData,
+		SendEmailValidation,
+	]);
 
 	const dialogSave = (data) => {
 		updatedContactData = data;
