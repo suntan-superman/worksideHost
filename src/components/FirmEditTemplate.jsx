@@ -6,7 +6,8 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
 import { areaOptions } from "../data/worksideOptions";
 import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
-import { GetAllFirmsForSelection } from "../api/worksideAPI";
+import { GetAllFirms, GetAllFirmsForSelection } from "../api/worksideAPI";
+import { showSuccessDialog } from "../utils/useSweetAlert";
 
 /**
  * FirmEditTemplate Component
@@ -58,6 +59,8 @@ const FirmEditTemplate = (props) => {
 	const [customerOptions, setCustomerOptions] = useState([]);
 	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
 	const [contactOptions, setContactOptions] = useState([]);
+	const [existingFirm, setExistingFirm] = useState(null);
+	const [showExistingFirmModal, setShowExistingFirmModal] = useState(false);
 
 	// Load Google Maps API
 	useEffect(() => {
@@ -81,14 +84,33 @@ const FirmEditTemplate = (props) => {
 		setData({ ...props });
 	}, [props]);
 
+	const checkExistingFirm = useCallback(
+		async (firmName) => {
+			if (!firmName) return;
+			try {
+				const response = await GetAllFirms();
+				const foundFirm = response.data.find(
+					(firm) =>
+						firm.name.toLowerCase() === firmName.toLowerCase() &&
+						firm._id !== data._id,
+				);
+				setExistingFirm(foundFirm);
+			} catch (error) {
+				console.error("Error checking firm existence:", error);
+			}
+		},
+		[data._id],
+	);
+
+	const handleNameBlur = useCallback(
+		(e) => {
+			checkExistingFirm(e.target.value);
+		},
+		[checkExistingFirm],
+	);
+
 	const onChange = useCallback(
 		(args) => {
-			console.log(
-				"Field changed:",
-				args.target.name,
-				"New value:",
-				args.target.value,
-			);
 			const newData = { ...data, [args.target.name]: args.target.value };
 			setData(newData);
 			// Pass the updated data to the parent component
@@ -232,10 +254,8 @@ const FirmEditTemplate = (props) => {
 	]);
 
 	const handleKeyDown = useCallback((e) => {
-		console.log("KeyDown event:", e.key, "Target:", e.target.tagName);
 		// Only prevent Enter key in input fields
 		if (e.key === "Enter" && e.target.tagName === "INPUT") {
-			console.log("Preventing Enter key in input field");
 			e.preventDefault();
 			e.stopPropagation();
 			return false;
@@ -282,9 +302,23 @@ const FirmEditTemplate = (props) => {
 							placeholder="Enter Firm Name"
 							required={true}
 							onChange={onChange}
+							onBlur={handleNameBlur}
 							disabled={readOnlyFlag}
 							onKeyDown={handleKeyDown}
 						/>
+						{existingFirm && (
+							<div className="text-red-500 text-sm mt-1">
+								Firm already exists. Click{" "}
+								<button
+									type="button"
+									className="text-blue-500 underline"
+									onClick={() => setShowExistingFirmModal(true)}
+								>
+									here
+								</button>{" "}
+								to view details.
+							</div>
+						)}
 					</div>
 				</div>
 				{/* Row 2 */}
@@ -509,6 +543,77 @@ const FirmEditTemplate = (props) => {
 				)}
 				{/* End of Input Fields */}
 			</form>
+
+			{/* Existing Firm Details Modal */}
+			{showExistingFirmModal && existingFirm && (
+				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+					<div className="bg-white p-6 rounded-lg w-[600px] max-h-[80vh] overflow-y-auto">
+						<div className="flex justify-between items-center mb-4">
+							<h2 className="text-xl font-bold">Existing Firm Details</h2>
+							<button
+								type="button"
+								onClick={() => setShowExistingFirmModal(false)}
+								className="text-gray-500 hover:text-gray-700"
+							>
+								✕
+							</button>
+						</div>
+						<div className="space-y-4">
+							<div className="grid grid-cols-2 gap-4">
+								<div>
+									<span className="font-medium block mb-1">Name:</span>
+									<span>{existingFirm.name}</span>
+								</div>
+								<div>
+									<span className="font-medium block mb-1">Type:</span>
+									<span>{existingFirm.type}</span>
+								</div>
+								<div>
+									<span className="font-medium block mb-1">Area:</span>
+									<span>{existingFirm.area}</span>
+								</div>
+								<div>
+									<span className="font-medium block mb-1">Status:</span>
+									<span>{existingFirm.status}</span>
+								</div>
+							</div>
+							<div>
+								<span className="font-medium block mb-1">Address:</span>
+								<div className="space-y-1">
+									<span>{existingFirm.address1}</span>
+									{existingFirm.address2 && (
+										<span>, {existingFirm.address2}</span>
+									)}
+									<div>
+										{existingFirm.city && <span>{existingFirm.city}, </span>}
+										{existingFirm.state && <span>{existingFirm.state} </span>}
+										{existingFirm.zipCode && (
+											<span>{existingFirm.zipCode}</span>
+										)}
+									</div>
+								</div>
+							</div>
+							<div>
+								<span className="font-medium block mb-1">Status Date:</span>
+								<span>
+									{existingFirm.statusdate
+										? new Date(existingFirm.statusdate).toLocaleDateString()
+										: "N/A"}
+								</span>
+							</div>
+						</div>
+						<div className="mt-6 flex justify-end">
+							<button
+								type="button"
+								onClick={() => setShowExistingFirmModal(false)}
+								className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+							>
+								Close
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };
