@@ -1,5 +1,11 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
+import React, {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useMemo,
+} from "react";
 import {
 	GridComponent,
 	ColumnsDirective,
@@ -86,14 +92,14 @@ let gridPageSize = 10;
  */
 const FirmsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
-
-	let firmsGridRef = useRef(null);
-
+	const [formData, setFormData] = useState(null);
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState([]);
+
+	let firmsGridRef = useRef(null);
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -105,13 +111,23 @@ const FirmsTab = () => {
 
 	const accessLevel = GetAccessLevel();
 
-	const editOptions = {
-		allowEditing: accessLevel > 2,
-		allowAdding: accessLevel > 2,
-		allowDeleting: accessLevel > 2,
-		mode: "Dialog",
-		template: (props) => <FirmEditTemplate {...props} />,
-	};
+	const handleFormDataChange = useCallback((newData) => {
+		console.log("Form data updated:", newData);
+		setFormData(newData);
+	}, []);
+
+	const editOptions = useMemo(
+		() => ({
+			allowEditing: accessLevel > 2,
+			allowAdding: accessLevel > 2,
+			allowDeleting: accessLevel > 2,
+			mode: "Dialog",
+			template: (props) => (
+				<FirmEditTemplate {...props} onChange={handleFormDataChange} />
+			),
+		}),
+		[accessLevel, handleFormDataChange],
+	);
 
 	const toolbarOptions = ["Add", "Edit", "Delete", "ExcelExport"];
 	// const { firmData, dispatch: firmDispatch } = useFirmContext();
@@ -204,35 +220,60 @@ const FirmsTab = () => {
 		}
 	};
 
-	const actionComplete = async (args) => {
-		if (args.requestType === "beginEdit" || args.requestType === "add") {
-			const dialog = args.dialog;
-			dialog.showCloseIcon = false;
-			dialog.height = 500;
-			dialog.width = 600;
-			// Set Insert Flag
-			setInsertFlag(args.requestType === "add");
-			// change the header of the dialog
-			dialog.header =
-				args.requestType === "beginEdit"
-					? `Edit ${args.rowData.name}`
-					: "Workside New Firm";
-		}
-		if (args.requestType === "save") {
-			// Save or Update Data
-			const data = args.data;
-			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
-			setMessageText(`Update Firm ${args.data.name} Details?`);
-			console.log(`Action Complete Firms Data: ${JSON.stringify(data)}`);
-			setCurrentRecord(data);
-			setOpenUpdateModal(true);
-		}
-		if (args.requestType === "delete") {
-			// Delete Data
-			handleFirmDelete();
-			setInsertFlag(false);
-		}
-	};
+	const actionComplete = useCallback(
+		async (args) => {
+			console.log("Action Complete - Request Type:", args.requestType);
+			console.log("Action Complete - Args:", args);
+
+			if (args.requestType === "beginEdit" || args.requestType === "add") {
+				console.log("Opening dialog for:", args.requestType);
+				const dialog = args.dialog;
+				dialog.showCloseIcon = false;
+				dialog.height = 500;
+				dialog.width = 600;
+				setInsertFlag(args.requestType === "add");
+				dialog.header =
+					args.requestType === "beginEdit"
+						? `Edit ${args.rowData.name}`
+						: "Workside New Firm";
+			}
+			if (args.requestType === "save") {
+				console.log("Save action triggered");
+				// Use the formData state instead of trying to get values from form elements
+				const data = formData || {};
+				console.log("Save data:", data);
+
+				// Check each required field and build a list of missing ones
+				const missingFields = [];
+				if (!data.name) missingFields.push("Name");
+				if (!data.area) missingFields.push("Area");
+				if (!data.type) missingFields.push("Type");
+				if (!data.city) missingFields.push("City");
+				if (!data.state) missingFields.push("State");
+
+				if (missingFields.length > 0) {
+					console.log("Missing required fields:", missingFields);
+					showErrorDialog(
+						`Please fill in the following required fields: ${missingFields.join(", ")}`,
+					);
+					// Prevent the dialog from closing
+					args.cancel = true;
+					return;
+				}
+
+				console.log("All required fields present, proceeding with save");
+				setMessageText(`Update Firm ${data.name} Details?`);
+				setCurrentRecord(data);
+				setOpenUpdateModal(true);
+			}
+			if (args.requestType === "delete") {
+				console.log("Delete action triggered");
+				handleFirmDelete();
+				setInsertFlag(false);
+			}
+		},
+		[formData, handleFirmDelete],
+	);
 
 	const firmsActionComplete = async (args) => {
 		if (!firmsGridRef) return;

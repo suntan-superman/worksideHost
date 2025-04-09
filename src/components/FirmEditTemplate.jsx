@@ -1,14 +1,11 @@
 /* eslint-disable */
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import "../styles/material.css";
-
 import { areaOptions } from "../data/worksideOptions";
-
 import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
-
 import { GetAllFirmsForSelection } from "../api/worksideAPI";
 
 /**
@@ -32,6 +29,7 @@ import { GetAllFirmsForSelection } from "../api/worksideAPI";
  * @param {string} props.zipCode - The zip code of the firm.
  * @param {string} props.status - The status of the firm (e.g., ACTIVE, INACTIVE).
  * @param {Date} props.statusdate - The date associated with the firm's status.
+ * @param {function} props.onChange - Callback function to update parent component with form data.
  *
  * @returns {JSX.Element} A form for editing or adding firm details.
  *
@@ -48,35 +46,74 @@ import { GetAllFirmsForSelection } from "../api/worksideAPI";
  *   zipCode="12345"
  *   status="ACTIVE"
  *   statusdate={new Date()}
+ *   onChange={handleFormDataChange}
  * />
  */
 const FirmEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
-
-	// Handle input changes
-	const onChange = (args) => {
-		// Only for debugging purposes
-		// console.log(`Field: ${args.target.name} Value: ${args.target.value}`);
-		setData({ ...data, [args.target.name]: args.target.value });
-	};
-
+	const [isGeocoding, setIsGeocoding] = useState(false);
+	const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
 	const [customerOptions, setCustomerOptions] = useState([]);
 	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
 	const [contactOptions, setContactOptions] = useState([]);
 
+	// Load Google Maps API
+	useEffect(() => {
+		const loadGoogleMaps = () => {
+			const script = document.createElement("script");
+			script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places`;
+			script.async = true;
+			script.onload = () => setGoogleMapsLoaded(true);
+			document.head.appendChild(script);
+		};
+
+		if (!window.google) {
+			loadGoogleMaps();
+		} else {
+			setGoogleMapsLoaded(true);
+		}
+	}, []);
+
+	// Update local state when props change
+	useEffect(() => {
+		setData({ ...props });
+	}, [props]);
+
+	const onChange = useCallback(
+		(args) => {
+			console.log(
+				"Field changed:",
+				args.target.name,
+				"New value:",
+				args.target.value,
+			);
+			const newData = { ...data, [args.target.name]: args.target.value };
+			setData(newData);
+			// Pass the updated data to the parent component
+			if (props.onChange) {
+				props.onChange(newData);
+			}
+		},
+		[data, props],
+	);
+
+	// Fix for data.isAdd dependency
 	useEffect(() => {
 		// ReadOnly flag
-		if (data.isAdd) {
+		if (props.isAdd) {
 			setReadOnlyFlag(false);
-			data.status = "ACTIVE";
-			data.statusdate = new Date();
+			setData((prev) => ({
+				...prev,
+				status: "ACTIVE",
+				statusdate: new Date(),
+			}));
 			GetLatestEntries();
 		} else {
 			setReadOnlyFlag(true);
 		}
-	}, [data.isAdd]);
+	}, [props.isAdd]);
 
 	const GetLatestEntries = () => {
 		const area = localStorage.getItem("firmsLatestArea");
@@ -97,7 +134,8 @@ const FirmEditTemplate = (props) => {
 		}
 	};
 
-	const fetchOptions = async () => {
+	// Fix for fetchOptions dependency
+	const fetchOptions = useCallback(async () => {
 		setIsLoading(true);
 		await GetAllFirmsForSelection().then((response) => {
 			// Get Customers
@@ -113,7 +151,12 @@ const FirmEditTemplate = (props) => {
 			setRigCompanyOptions(rigCompanies);
 		});
 		setIsLoading(false);
-	};
+	}, []);
+
+	useEffect(() => {
+		// Get Customer and Rig Company Options from Firm Collection
+		fetchOptions();
+	}, [fetchOptions]);
 
 	// const fetchContacts = async () => {
 	// 	setIsLoading(true);
@@ -131,15 +174,82 @@ const FirmEditTemplate = (props) => {
 	// 	setIsLoading(false);
 	// };
 
-	useEffect(() => {
-		// Get Customer and Rig Company Options from Firm Collection
-		fetchOptions();
-	}, []);
-
 	// useEffect(() => {
 	// 	// Get Contact Options from Contact Collection
 	// 	fetchContacts();
 	// }, [data.customer]);
+
+	// Check if required fields are filled
+	const isFormValid = () => {
+		return data.name && data.area && data.type && data.city && data.state;
+	};
+
+	// Fix for geocodeAddress dependency
+	const geocodeAddress = useCallback(async () => {
+		if (!data.address1 || !data.city || !data.state) {
+			alert("Please fill in all address fields before geocoding");
+			return;
+		}
+
+		const fullAddress = `${data.address1}, ${data.city}, ${data.state} ${data.zipCode || ""}`;
+
+		try {
+			setIsGeocoding(true);
+			const geocoder = new window.google.maps.Geocoder();
+			const response = await geocoder.geocode({ address: fullAddress });
+
+			if (response?.results?.[0]) {
+				const { lat, lng } = response.results[0].geometry.location;
+				setData((prev) => ({ ...prev, lat: lat(), lng: lng() }));
+			} else {
+				alert("Could not find coordinates for this address");
+			}
+		} catch (error) {
+			console.error("Error geocoding address:", error);
+			alert("Error geocoding address. Please try again.");
+		} finally {
+			setIsGeocoding(false);
+		}
+	}, [data.address1, data.city, data.state, data.zipCode]);
+
+	useEffect(() => {
+		if (
+			data.type === "SUPPLIER" &&
+			data.address1 &&
+			data.city &&
+			data.state &&
+			data.zipCode
+		) {
+			geocodeAddress();
+		}
+	}, [
+		data.type,
+		data.address1,
+		data.city,
+		data.state,
+		data.zipCode,
+		geocodeAddress,
+	]);
+
+	const handleKeyDown = useCallback((e) => {
+		console.log("KeyDown event:", e.key, "Target:", e.target.tagName);
+		// Only prevent Enter key in input fields
+		if (e.key === "Enter" && e.target.tagName === "INPUT") {
+			console.log("Preventing Enter key in input field");
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	}, []);
+
+	const handleSubmit = (e) => {
+		// Only prevent form submission if it's not from the save button
+		if (!e.target.closest(".e-save")) {
+			e.preventDefault();
+			e.stopPropagation();
+			return false;
+		}
+	};
 
 	return (
 		<div className="flex justify-center items-center bg-white">
@@ -148,7 +258,11 @@ const FirmEditTemplate = (props) => {
 					<div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-green-500" />
 				</div>
 			)}
-			<div className="w-[600px] mx-[4px] space-y-2">
+			<form
+				className="w-[600px] mx-[4px] space-y-2"
+				onKeyDown={handleKeyDown}
+				onSubmit={handleSubmit}
+			>
 				{/* Row 1 */}
 				<div className="flex gap-4">
 					{/* Input 1 */}
@@ -169,6 +283,7 @@ const FirmEditTemplate = (props) => {
 							required={true}
 							onChange={onChange}
 							disabled={readOnlyFlag}
+							onKeyDown={handleKeyDown}
 						/>
 					</div>
 				</div>
@@ -333,8 +448,67 @@ const FirmEditTemplate = (props) => {
 						/>
 					</div>
 				</div>
+				{/* Row 6 - Only show for SUPPLIER type */}
+				{data.type === "SUPPLIER" && (
+					<div className="flex flex-col gap-2">
+						<div className="flex gap-4">
+							{/* Input 11 */}
+							<div className="flex flex-col w-1/2">
+								<label className="text-sm font-medium mb-1" htmlFor="field11">
+									Latitude{" "}
+									{isGeocoding && (
+										<span className="text-xs text-gray-500">
+											(Geocoding...)
+										</span>
+									)}
+								</label>
+								<input
+									type="number"
+									id="lat"
+									name="lat"
+									value={data.lat || ""}
+									className="e-input"
+									placeholder="Enter Latitude"
+									step="0.000001"
+									onChange={onChange}
+									readOnly={true}
+								/>
+							</div>
+							{/* Input 12 */}
+							<div className="flex flex-col w-1/2">
+								<label className="text-sm font-medium mb-1" htmlFor="field12">
+									Longitude{" "}
+									{isGeocoding && (
+										<span className="text-xs text-gray-500">
+											(Geocoding...)
+										</span>
+									)}
+								</label>
+								<input
+									type="number"
+									id="lng"
+									name="lng"
+									value={data.lng || ""}
+									className="e-input"
+									placeholder="Enter Longitude"
+									step="0.000001"
+									onChange={onChange}
+									readOnly={true}
+								/>
+							</div>
+						</div>
+						<button
+							type="button"
+							onClick={geocodeAddress}
+							disabled={isGeocoding || !googleMapsLoaded}
+							className="self-end px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:bg-gray-400"
+						>
+							{isGeocoding ? "Geocoding..." : "Get Coordinates"}
+						</button>
+					</div>
+				)}
 				{/* End of Input Fields */}
-			</div>
+			</form>
 		</div>
 	);
 };
