@@ -443,7 +443,7 @@ const ProjectRequestorsTab = () => {
 							<div className="flex items-center justify-center">
 								{selectedNodeData.parentID === null ? (
 									<button
-										className="bg-green-300 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
+										className="bg-green-500 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 										type="button"
 										disabled={!addButtonEnabled}
 										onClick={handleAddRequestor}

@@ -11,13 +11,14 @@ import {
 	Resize,
 	DragAndDrop,
 	ViewsDirective,
+	ExcelExport,
 } from "@syncfusion/ej2-react-schedule";
 import { GetAllProjects } from "../api/worksideAPI";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { showSuccessDialog } from "../utils/useSweetAlert";
 import { Header } from "../components";
 import { format } from "date-fns";
-import { MdFilterList } from "react-icons/md";
+import { MdFilterList, MdFileDownload } from "react-icons/md";
 import SchedulerFilterDialog from "../components/SchedulerFilterDialog";
 import { Box, Chip } from "@mui/material";
 
@@ -98,7 +99,7 @@ const Scheduler = () => {
 		window.innerHeight * 0.7,
 	);
 
-	const [reducerUpdate, forceReducerUpdate] = useReducer((x) => x + 1, 0);
+	const toolbarOptions = ["ExcelExport"];
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -267,6 +268,17 @@ const Scheduler = () => {
 		}
 	};
 
+	const onToolbarClick = (args) => {
+		if (args.item.id === "excelExport") {
+			// Get the current filtered data
+			const filteredData = FormatProjectData(projData?.data || []);
+			// Set the data source to the filtered data before export
+			scheduleObj.current.eventSettings.dataSource = filteredData;
+			// Trigger the export
+			scheduleObj.current.exportToExcel();
+		}
+	};
+
 	if (isProjectsLoading) {
 		return (
 			<div className="flex-grow bg-white pl-2 relative h-full">
@@ -281,7 +293,7 @@ const Scheduler = () => {
 	return (
 		<div className="flex-grow bg-white pl-2 relative h-full">
 			<Header category="Workside" title="Scheduler" />
-			<div className="flex flex-row justify-items-end justify-between gap-5 pr-2 pl-2 pt-1">
+			<div className="flex flex-row justify-items-end justify-between gap-5 pr-2 pl-2 pt-1 mb-2">
 				<div className="flex flex-row gap-2">
 					<p className="text-black text-sm font-bold">Filter Setting: </p>
 					<div className="flex gap-1 flex-wrap">
@@ -303,7 +315,19 @@ const Scheduler = () => {
 						))}
 					</div>
 				</div>
-				<div className="mr-4">
+				<div className="flex gap-2 mr-4">
+					<button
+						type="button"
+						onClick={() => {
+							const filteredData = FormatProjectData(projData?.data || []);
+							scheduleObj.current.eventSettings.dataSource = filteredData;
+							scheduleObj.current.exportToExcel();
+						}}
+						className="flex items-center gap-1 px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+					>
+						<MdFileDownload size={20} />
+						<span className="text-sm">Export to Excel</span>
+					</button>
 					<button type="button" onClick={() => setShowFilter(true)}>
 						<MdFilterList size={20} />
 					</button>
@@ -319,6 +343,8 @@ const Scheduler = () => {
 				}}
 				readonly={true}
 				currentView="Month"
+				toolbarClick={onToolbarClick}
+				showToolbar={true}
 			>
 				<ViewsDirective>
 					<Day />
@@ -327,7 +353,16 @@ const Scheduler = () => {
 					<Month />
 				</ViewsDirective>
 				<Inject
-					services={[Day, Week, WorkWeek, Month, Agenda, Resize, DragAndDrop]}
+					services={[
+						Day,
+						Week,
+						WorkWeek,
+						Month,
+						Agenda,
+						Resize,
+						DragAndDrop,
+						ExcelExport,
+					]}
 				/>
 			</ScheduleComponent>
 

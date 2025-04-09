@@ -740,7 +740,7 @@ const AddDocumentForm = ({
 				</div>
 				<div className="flex items-center justify-center">
 					<button
-						className="bg-green-300 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
+						className="bg-green-700 hover:bg-green-700 text-black font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 						type="button"
 						disabled={docPath.length === 0 || docDesc.length === 0}
 						onClick={handleAddDocument}
@@ -822,7 +822,7 @@ const ViewDocument = ({ onClose }) => {
 				PaperComponent={PaperComponent}
 			>
 				<DialogTitle id="viewDocumentDialog">
-					<span className="text-bold text-green-300">WORK</span>SIDE Document
+					<span className="text-bold text-green-700">WORK</span>SIDE Document
 				</DialogTitle>
 				<DialogContent style={{ width: "500px", height: "700px" }}>
 					{/* <Stack spacing={2} margin={3}> */}
@@ -937,7 +937,7 @@ const DocumentsFilterModal = ({ open, onOK, onClose, data, onUpdateData }) => {
 			PaperComponent={PaperComponent}
 		>
 			<DialogTitle id="schedulerFilterDialog">
-				<span className="text-bold text-green-300">WORK</span>SIDE Projects
+				<span className="text-bold text-green-700">WORK</span>SIDE Projects
 				Filter
 			</DialogTitle>
 			<DialogContent>

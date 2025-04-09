@@ -56,7 +56,7 @@ const ResetPasswordPage = () => {
 			PaperComponent={PaperComponent}
 		>
 			<DialogTitle id="forgotPasswordDialog">
-				<span className="text-bold text-green-300">WORK</span>SIDE Reset
+				<span className="text-bold text-green-700">WORK</span>SIDE Reset
 				Password
 			</DialogTitle>
 			<DialogContent>

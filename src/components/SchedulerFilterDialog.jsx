@@ -88,7 +88,7 @@ const SchedulerFilterDialog = ({ open, onClose, onApply, projectData }) => {
 	return (
 		<Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
 			<DialogTitle>
-				<span className="text-bold text-green-300">WORK</span>SIDE Scheduler
+				<span className="text-bold text-green-700">WORK</span>SIDE Scheduler
 				Filter
 			</DialogTitle>
 			<DialogContent>

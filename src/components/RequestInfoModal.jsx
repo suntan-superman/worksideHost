@@ -90,7 +90,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					disableAutoFocus
 				>
 					<DialogTitle>
-						<span className="text-bold text-green-300 text-xl">WORK</span>
+						<span className="text-bold text-green-700 text-xl">WORK</span>
 						<span className="text-bold text-black text-xl">SIDE</span>
 					</DialogTitle>
 					<DialogContent>
@@ -476,7 +476,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					disableAutoFocus
 				>
 					<DialogTitle id="requestDetailsDialog">
-						<span className="text-bold text-green-300 text-xl">WORK</span>
+						<span className="text-bold text-green-700 text-xl">WORK</span>
 						<span className="text-bold text-black text-xl">SIDE</span>
 						<br />
 						<p className="text-bold text-black text-xl">Request Details</p>

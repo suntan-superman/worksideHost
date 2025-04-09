@@ -1307,7 +1307,7 @@ const AddGroupForm = ({
 			)}
 			<div className="flex items-center justify-center gap-7">
 				<button
-					className="bg-green-300 hover:bg-green-600 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-[1px] border-solid border-black text-bold my-1 border-r-4 border-b-4"
+					className="bg-green-500 hover:bg-green-700 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-[1px] border-solid border-black text-bold my-1 border-r-4 border-b-4"
 					type="button"
 					// disabled={!buttonEnabled}
 					onClick={handleAddGroup}
@@ -1367,7 +1367,7 @@ const RemoveCategoryOrUserForm = ({
 			<Box>
 				<div className="flex items-center justify-center gap-10 mt-5">
 					<button
-						className="bg-green-300 hover:bg-green-600 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-2 border-black"
+						className="bg-green-500 hover:bg-green-700 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-2 border-black"
 						type="button"
 						// disabled={!buttonEnabled}
 						onClick={handleDelete}
@@ -1550,7 +1550,7 @@ const AddCategoryOrUserDialog = ({
 			<Box>
 				<div className="flex items-center justify-center gap-10 mt-5">
 					<button
-						className="bg-green-300 hover:bg-green-600 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-[1px] border-solid border-black text-bold my-1 border-r-4 border-b-4"
+						className="bg-green-500 hover:bg-green-700 text-black w-32 font-bold py-1 px-4 rounded mt-3 border-[1px] border-solid border-black text-bold my-1 border-r-4 border-b-4"
 						type="button"
 						// disabled={!buttonEnabled}
 						onClick={handleAdd}

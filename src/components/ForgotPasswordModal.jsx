@@ -110,7 +110,7 @@ const ForgotPasswordModal = ({ open, onOK, onClose }) => {
 			PaperComponent={PaperComponent}
 		>
 			<DialogTitle id="forgotPasswordDialog">
-				<span className="text-bold text-green-300">WORK</span>SIDE Forgot
+				<span className="text-bold text-green-7s00">WORK</span>SIDE Forgot
 				Password
 			</DialogTitle>
 			<DialogContent>

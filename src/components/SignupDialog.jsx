@@ -298,7 +298,7 @@ const SignupDialog = () => {
 									<button
 										type="submit"
 										disabled={isLoading}
-										className={`bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg ${
+										className={`bg-green-700 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-lg ${
 											isLoading ? "opacity-50 cursor-not-allowed" : ""
 										}`}
 									>
@@ -306,14 +306,14 @@ const SignupDialog = () => {
 									</button>
 									<button
 										type="button"
-										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
+										className="bg-green-700 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
 										onClick={handleClearForm}
 									>
 										Clear Form
 									</button>
 									<button
 										type="button"
-										className="bg-green-300 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
+										className="bg-green-700 hover:drop-shadow-xl hover:bg-white p-1 rounded-lg w-40 items-center justify-center border-2 border-solid border-black border-r-4 border-b-4 mt-2 font-bold text-sm"
 										onClick={() => {
 											window.location = "/login";
 										}}
