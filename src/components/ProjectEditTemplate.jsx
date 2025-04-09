@@ -5,6 +5,14 @@ import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/material.css";
+import {
+	Dialog,
+	DialogActions,
+	DialogContent,
+	DialogContentText,
+	DialogTitle,
+	Button,
+} from "@mui/material";
 
 import {
 	GetAllFirms,
@@ -57,7 +65,38 @@ import { areaOptions, projectStatusOptions } from "../data/worksideOptions";
  * />
  */
 const ProjectEditTemplate = (props) => {
-	const [data, setData] = useState({ ...props });
+	const [data, setData] = useState(() => {
+		// Initialize state with saved preferences if in add mode
+		if (props.isAdd) {
+			const savedPreferences = JSON.parse(
+				localStorage.getItem("projectPreferences") || "{}",
+			);
+			const today = new Date();
+			const tomorrow = new Date(today);
+			tomorrow.setDate(tomorrow.getDate() + 1);
+
+			// Format dates as M/D/Y
+			const formatDate = (date) => {
+				const dd = String(date.getDate());
+				const mm = String(date.getMonth() + 1);
+				const yyyy = date.getFullYear();
+				return `${mm}/${dd}/${yyyy}`;
+			};
+
+			return {
+				...props,
+				area: savedPreferences.area || "WEST COAST",
+				customer: savedPreferences.customer || props.customer,
+				rigcompany: savedPreferences.rigcompany || props.rigcompany,
+				status: savedPreferences.status || "PENDING",
+				customercontact: savedPreferences.customercontact || "",
+				statusdate: formatDate(today),
+				projectedstartdate: formatDate(tomorrow),
+				expectedduration: 1,
+			};
+		}
+		return { ...props };
+	});
 	const [isLoading, setIsLoading] = useState(false);
 	const [customerOptions, setCustomerOptions] = useState([]);
 	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
@@ -67,22 +106,44 @@ const ProjectEditTemplate = (props) => {
 	const [userLatitude, setUserLatitude] = useState(0);
 	const [userLongitude, setUserLongitude] = useState(0);
 	const [modifyFlag, setModifyFlag] = useState(true);
+	const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+	const [distance, setDistance] = useState(0);
 
-	// Handle input changes
+	// Save preferences when they change
 	const onChange = (args) => {
-		// Only for debugging purposes
 		if (args.target.name === "longdec" && validateLocationFlag) {
-			const distance = haversineDistance(
+			const calculatedDistance = haversineDistance(
 				userLatitude,
 				userLongitude,
 				data.latdec,
 				args.target.value,
 			);
-			if (distance > 100)
-				alert(
-					"Distance between user location and project location is greater than 100 miles",
-				);
+			setDistance(calculatedDistance);
+			if (calculatedDistance > 100) {
+				setConfirmDialogOpen(true);
+				return;
+			}
 		}
+
+		// Save preferences for area, customer, rigcompany, status, and customercontact
+		if (
+			["area", "customer", "rigcompany", "status", "customercontact"].includes(
+				args.target.name,
+			)
+		) {
+			const savedPreferences = JSON.parse(
+				localStorage.getItem("projectPreferences") || "{}",
+			);
+			const newPreferences = {
+				...savedPreferences,
+				[args.target.name]: args.target.value,
+			};
+			localStorage.setItem(
+				"projectPreferences",
+				JSON.stringify(newPreferences),
+			);
+		}
+
 		setData({ ...data, [args.target.name]: args.target.value });
 	};
 
@@ -146,8 +207,10 @@ const ProjectEditTemplate = (props) => {
 	};
 
 	useEffect(() => {
-		if (contactsData) setContactOptions(getContactOptions(contactsData.data));
-	}, [data.customer]);
+		if (contactsData?.data) {
+			setContactOptions(getContactOptions(contactsData.data));
+		}
+	}, [contactsData, data.customer]);
 
 	const GetCurrentLocation = () => {
 		if (navigator.geolocation) {
@@ -189,59 +252,14 @@ const ProjectEditTemplate = (props) => {
 	}
 
 	useEffect(() => {
-		// ReadOnly flag
+		// ReadOnly flag and default values
 		if (data.isAdd) {
 			setReadOnlyFlag(false);
-			SetDefaultDates();
-			data.area = "WEST COAST";
-			data.status = "PENDING";
-			data.statusdate = new Date();
-			data.projectedstartdate = new Date();
-			data.expectedduration = 1;
-
 			GetCurrentLocation();
 		} else {
 			setReadOnlyFlag(true);
 		}
 	}, [data.isAdd]);
-
-	const SetDefaultDates = () => {
-		// Set Status Date to Today
-		let statusdate;
-		let startdate;
-		{
-			const today = new Date();
-			const dd = String(today.getDate()).padStart(2, "0");
-			const mm = String(today.getMonth() + 1).padStart(2, "0");
-			const yyyy = today.getFullYear();
-			statusdate = `${yyyy}-${mm}-${dd}`;
-		}
-		{
-			const tomorrow = new Date();
-			tomorrow.setDate(tomorrow.getDate() + 1);
-			const dd = String(tomorrow.getDate()).padStart(2, "0");
-			const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
-			const yyyy = tomorrow.getFullYear();
-			startdate = `${yyyy}-${mm}-${dd}`;
-		}
-		setData({
-			...data,
-			statusdate: statusdate,
-			projectedstartdate: startdate,
-		});
-	};
-
-	const SetDefaultStartDate = () => {
-		// Set Status Date to Today
-		{
-			const today = new Date();
-			const dd = String(today.getDate()).padStart(2, "0");
-			const mm = String(today.getMonth() + 1).padStart(2, "0");
-			const yyyy = today.getFullYear();
-			const formattedDate = `${yyyy}-${mm}-${dd}`;
-			setData({ ...data, projectedstartdate: formattedDate });
-		}
-	};
 
 	if (isFirmError) {
 		console.log("Error in fetching firms data");
@@ -518,6 +536,32 @@ const ProjectEditTemplate = (props) => {
 				</div>
 				{/* End of Input Fields */}
 			</div>
+			<Dialog
+				open={confirmDialogOpen}
+				onClose={() => setConfirmDialogOpen(false)}
+			>
+				<DialogTitle>Confirm Location</DialogTitle>
+				<DialogContent>
+					<DialogContentText>
+						The distance between your location and the project location is{" "}
+						{distance.toFixed(2)} miles. Do you want to proceed?
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => setConfirmDialogOpen(false)} color="inherit">
+						Cancel
+					</Button>
+					<Button
+						onClick={() => {
+							setConfirmDialogOpen(false);
+							setData({ ...data, [args.target.name]: args.target.value });
+						}}
+						color="primary"
+					>
+						Proceed
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	);
 };

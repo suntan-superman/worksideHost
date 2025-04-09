@@ -32,6 +32,7 @@ import {
 	DeleteProject,
 	SaveProject,
 	UpdateProject,
+	GetAllRequestsByProject,
 } from "../api/worksideAPI";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
@@ -67,7 +68,7 @@ import {
  * - Syncfusion Grid: `GridComponent`, `ColumnsDirective`, `ColumnDirective`, `Inject`
  * - Material-UI: `Box`, `Chip`, `IconButton`
  * - Custom components: `ProjectEditTemplate`, `ConfirmationDialog`, `ProjectFilterDialog`
- * - Utility functions: `GetAllProjects`, `DeleteProject`, `SaveProject`, `UpdateProject`
+ * - Utility functions: `GetAllProjects`, `DeleteProject`, `SaveProject`, `UpdateProject`, `GetAllRequestsByProject`
  *
  * @state
  * - `haveData` (boolean): Indicates if project data is available.
@@ -134,11 +135,9 @@ const ProjectsTab = () => {
 		allowDeleting: accessLevel > 2,
 		mode: "Dialog",
 		template: (props) => <ProjectEditTemplate {...props} />,
-		// template: dialogTemplate,
 	};
 
-	const toolbarOptions = ["Add", "Edit"];
-	// const toolbarOptions = ["Add", "Edit", "Delete"];
+	const toolbarOptions = ["Add", "Edit", "Delete"];
 
 	const [selectedRecord, setSelectedRecord] = useState(null);
 	const settings = { mode: "Row" };
@@ -209,7 +208,7 @@ const ProjectsTab = () => {
 
 	// Define the mutation to update the data
 	const updateProjectMutation = useMutation({
-		mutationFn: async (id, body) => {
+		mutationFn: async ({ id, body }) => {
 			const { status, data } = await UpdateProject(id, body);
 			if (status === 200) {
 				return data;
@@ -224,16 +223,19 @@ const ProjectsTab = () => {
 		},
 	});
 
-	const handleDelete = async () => {
-		const deleteFlag = await showConfirmationDialog(
-			"Are you sure you want to delete this project?",
-		);
-		if (deleteFlag === true) {
-			deleteProjectMutation.mutate(selectedRecord);
+	const rowSelectedProject = (args) => {
+		if (args.data) {
+			setSelectedRecord(args.data._id);
 		}
 	};
 
 	const actionBegin = (args) => {
+		if (args.requestType === "delete") {
+			// Prevent the default delete action
+			args.cancel = true;
+			// Call our delete handler
+			handleDelete();
+		}
 		if (args.requestType === "save" && args.form) {
 			/** cast string to integer value */
 			// setValue("data.area", args.form.querySelector("#area").value, args);
@@ -241,7 +243,6 @@ const ProjectsTab = () => {
 	};
 
 	const actionComplete = async (args) => {
-		// console.log(`Action Complete: ${args.requestType}`);
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
@@ -258,7 +259,6 @@ const ProjectsTab = () => {
 		if (args.requestType === "save") {
 			// Save or Update Data
 			const data = args.data;
-			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
 			setMessageText(`Update Project ${args.data.projectname} Details?`);
 			setCurrentRecord(data);
 			setOpenUpdateModal(true);
@@ -267,36 +267,98 @@ const ProjectsTab = () => {
 
 	const SaveProjectData = async () => {
 		setOpenUpdateModal(false);
-		if (insertFlag) {
-			saveProjectMutation.mutate(currentRecord); // Trigger the mutation
 
+		// Check for duplicate project name
+		if (insertFlag) {
+			// Force a refresh of the projects data before checking for duplicates
+			await queryClient.invalidateQueries("projects");
+			const latestProjects = await queryClient.getQueryData("projects");
+
+			const existingProject = latestProjects?.data?.find(
+				(project) =>
+					project.projectname.toLowerCase() ===
+					currentRecord.projectname.toLowerCase(),
+			);
+
+			if (existingProject) {
+				showErrorDialog(
+					`A project with the name "${currentRecord.projectname}" already exists. Please choose a different name.`,
+				);
+				return;
+			}
+
+			saveProjectMutation.mutate(currentRecord);
 			setInsertFlag(false);
 		} else {
+			// Format dates to ISO strings
+			const formatDate = (date) => {
+				if (!date) return null;
+				return new Date(date).toISOString().split("T")[0];
+			};
+
 			const body = {
 				area: currentRecord.area,
 				customer: currentRecord.customer,
 				customercontact: currentRecord.customercontact,
 				rigcompany: currentRecord.rigcompany,
 				projectname: currentRecord.projectname,
-				description: currentRecord.description,
-				projectedstartdate: currentRecord.projectedstartdate,
-				actualstartdate: currentRecord.actualstartdate,
+				description: currentRecord.description || "",
+				projectedstartdate: formatDate(currentRecord.projectedstartdate),
+				actualstartdate: formatDate(currentRecord.actualstartdate),
 				expectedduration: currentRecord.expectedduration,
 				actualduration: currentRecord.actualduration,
 				status: currentRecord.status,
-				statusdate: currentRecord.statusdate,
-				comment: currentRecord.comment,
+				statusdate: formatDate(currentRecord.statusdate),
+				comment: currentRecord.comment || "",
 				latdec: currentRecord.latdec,
 				longdec: currentRecord.longdec,
 			};
 
-			updateProjectMutation.mutate(currentRecord._id, body); // Trigger the mutation
+			updateProjectMutation.mutate({ id: currentRecord._id, body });
 		}
 	};
 
-	const rowSelectedProject = (args) => {
-		if (args.data) {
-			setSelectedRecord(args.data._id);
+	const handleDelete = async () => {
+		if (!selectedRecord) {
+			showErrorDialog("Please select a project to delete");
+			return;
+		}
+
+		// Always show confirmation dialog first
+		const deleteFlag = await showConfirmationDialog(
+			"Are you sure you want to delete this project? This action cannot be undone.",
+		);
+
+		if (deleteFlag !== true) {
+			return; // User cancelled the deletion
+		}
+
+		try {
+			// Check if there are any associated requests
+			const { data: associatedRequests } =
+				await GetAllRequestsByProject(selectedRecord);
+
+			if (associatedRequests && associatedRequests.length > 0) {
+				showErrorDialog(
+					"Cannot delete project. There are associated requests that must be deleted first.",
+				);
+				return;
+			}
+
+			// If we get here, there are no associated requests and user confirmed deletion
+			const response = await DeleteProject(selectedRecord);
+
+			if (response.status === 200) {
+				// Invalidate the projects query to force a refresh
+				queryClient.invalidateQueries("projects");
+				// Clear the selected record
+				setSelectedRecord(null);
+				showSuccessDialogWithTimer("Project deleted successfully");
+			} else {
+				showErrorDialog("Failed to delete project. Please try again.");
+			}
+		} catch (error) {
+			showErrorDialog(`Error deleting project: ${error.message}`);
 		}
 	};
 
@@ -538,7 +600,9 @@ const ProjectsTab = () => {
 				<ConfirmationDialog
 					open={openUpdateModal}
 					message={messageText}
-					onConfirm={() => SaveProjectData()}
+					onConfirm={() => {
+						SaveProjectData();
+					}}
 					onCancel={() => setOpenUpdateModal(false)}
 				/>
 			)}
