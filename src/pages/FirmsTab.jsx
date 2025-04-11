@@ -27,7 +27,7 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import { Header } from "../components/Header";
 import { areaOptions } from "../data/worksideOptions";
 import { GetAllFirms } from "../api/worksideAPI";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
 	showErrorDialog,
@@ -39,10 +39,6 @@ import "../index.css";
 import "../App.css";
 
 let gridPageSize = 10;
-
-// TODO Delete
-// TODO Update
-// TODO Create
 
 /**
  * FirmsTab Component
@@ -67,9 +63,12 @@ let gridPageSize = 10;
  * - `firmList` (array|null): Stores the list of firms fetched from the server.
  * - `insertFlag` (boolean): Tracks whether a new record is being added.
  * - `openUpdateModal` (boolean): Controls the visibility of the update confirmation dialog.
+ * - `openDeleteModal` (boolean): Controls the visibility of the delete confirmation dialog.
  * - `messageText` (string): Message displayed in the confirmation dialog.
  * - `currentRecord` (object): Stores the current record being edited or added.
  * - `selectedRecord` (string|null): Stores the ID of the currently selected record.
+ * - `lastCoordinates` (object): Stores the last coordinates when a firm is saved.
+ * - `dialogDimensions` (object): Stores the dimensions of the dialog.
  *
  * @functions
  * - `GetAccessLevel`: Retrieves the user's access level from localStorage.
@@ -81,6 +80,9 @@ let gridPageSize = 10;
  * - `SaveFirmsData`: Saves or updates firm data based on the current operation.
  * - `SaveLatestDefaults`: Saves the latest defaults for firm fields to localStorage.
  * - `onFirmLoad`: Configures grid settings on load.
+ * - `handleFirmSave`: Handles saving a firm with coordinates.
+ * - `handleFirmAdd`: Handles adding a new firm with last coordinates.
+ * - `saveDialogDimensions`: Saves dialog dimensions to localStorage.
  *
  * @dependencies
  * - `react-query`: For fetching and caching firm data.
@@ -96,10 +98,21 @@ const FirmsTab = () => {
 	const [firmList, setFirmList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
+	const [openDeleteModal, setOpenDeleteModal] = useState(false);
 	const [messageText, setMessageText] = useState("");
 	const [currentRecord, setCurrentRecord] = useState([]);
+	const [lastCoordinates, setLastCoordinates] = useState({
+		lat: null,
+		lng: null,
+	});
+	const [dialogDimensions, setDialogDimensions] = useState({
+		height: 600,
+		width: 600,
+	});
 
 	let firmsGridRef = useRef(null);
+
+	const queryClient = useQueryClient();
 
 	const GetAccessLevel = () => {
 		const value = localStorage.getItem("accessLevel");
@@ -112,7 +125,6 @@ const FirmsTab = () => {
 	const accessLevel = GetAccessLevel();
 
 	const handleFormDataChange = useCallback((newData) => {
-		console.log("Form data updated:", newData);
 		setFormData(newData);
 	}, []);
 
@@ -126,7 +138,7 @@ const FirmsTab = () => {
 				<FirmEditTemplate {...props} onChange={handleFormDataChange} />
 			),
 		}),
-		[accessLevel, handleFormDataChange],
+		[accessLevel],
 	);
 
 	const toolbarOptions = ["Add", "Edit", "Delete", "ExcelExport"];
@@ -192,6 +204,13 @@ const FirmsTab = () => {
 		}
 	}, [firmsData]);
 
+	useEffect(() => {
+		const savedDimensions = localStorage.getItem("firmDialogDimensions");
+		if (savedDimensions) {
+			setDialogDimensions(JSON.parse(savedDimensions));
+		}
+	}, []);
+
 	const toolbarClick = (args) => {
 		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
 			if (accessLevel <= 2) {
@@ -206,31 +225,55 @@ const FirmsTab = () => {
 		}
 	};
 
-	const handleFirmDelete = async () => {
-		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/firm/${selectedRecord}`,
-			{
-				method: "DELETE",
-			},
-		);
-		const json = await response.json();
-
-		if (response.ok) {
-			showSuccessDialogWithTimer("Record Successfully Deleted...");
+	const checkFirmExists = useCallback(async (firmName, currentId = null) => {
+		try {
+			const response = await GetAllFirms();
+			const existingFirm = response.data.find(
+				(firm) =>
+					firm.name.toLowerCase() === firmName.toLowerCase() &&
+					firm._id !== currentId,
+			);
+			return existingFirm;
+		} catch (error) {
+			console.error("Error checking firm existence:", error);
+			return null;
 		}
-	};
+	}, []);
+
+	const saveDialogDimensions = useCallback((dimensions) => {
+		setDialogDimensions(dimensions);
+		localStorage.setItem("firmDialogDimensions", JSON.stringify(dimensions));
+	}, []);
 
 	const actionComplete = useCallback(
 		async (args) => {
-			console.log("Action Complete - Request Type:", args.requestType);
-			console.log("Action Complete - Args:", args);
+			console.log(
+				"actionComplete triggered with requestType:",
+				args.requestType,
+			);
+			console.log("actionComplete args:", args);
 
 			if (args.requestType === "beginEdit" || args.requestType === "add") {
 				console.log("Opening dialog for:", args.requestType);
 				const dialog = args.dialog;
 				dialog.showCloseIcon = false;
-				dialog.height = 500;
-				dialog.width = 600;
+				dialog.height = dialogDimensions.height;
+				dialog.width = dialogDimensions.width;
+				dialog.isResizable = true;
+				dialog.resizeStart = (args) => {
+					// Store new dimensions when resizing starts
+					saveDialogDimensions({
+						height: args.height,
+						width: args.width,
+					});
+				};
+				dialog.resize = (args) => {
+					// Update dimensions during resize
+					saveDialogDimensions({
+						height: args.height,
+						width: args.width,
+					});
+				};
 				setInsertFlag(args.requestType === "add");
 				dialog.header =
 					args.requestType === "beginEdit"
@@ -238,42 +281,100 @@ const FirmsTab = () => {
 						: "Workside New Firm";
 			}
 			if (args.requestType === "save") {
-				console.log("Save action triggered");
-				// Use the formData state instead of trying to get values from form elements
-				const data = formData || {};
-				console.log("Save data:", data);
-
-				// Check each required field and build a list of missing ones
-				const missingFields = [];
-				if (!data.name) missingFields.push("Name");
-				if (!data.area) missingFields.push("Area");
-				if (!data.type) missingFields.push("Type");
-				if (!data.city) missingFields.push("City");
-				if (!data.state) missingFields.push("State");
-
-				if (missingFields.length > 0) {
-					console.log("Missing required fields:", missingFields);
-					showErrorDialog(
-						`Please fill in the following required fields: ${missingFields.join(", ")}`,
-					);
-					// Prevent the dialog from closing
+				// Prevent saving if formData is null or empty
+				if (!formData) {
+					showErrorDialog("Please fill in all required fields before saving.");
 					args.cancel = true;
 					return;
 				}
 
-				console.log("All required fields present, proceeding with save");
-				setMessageText(`Update Firm ${data.name} Details?`);
-				setCurrentRecord(data);
+				// Check if the form is valid
+				if (!formData.isValid) {
+					showErrorDialog("Please fill in all required fields before saving.");
+					args.cancel = true;
+					return;
+				}
+
+				// Check for existing firm with same name
+				const existingFirm = await checkFirmExists(formData.name, formData._id);
+				if (existingFirm) {
+					showErrorDialog(
+						`A firm with the name "${formData.name}" already exists. Please choose a different name.`,
+					);
+					args.cancel = true;
+					return;
+				}
+
+				// If all validations pass, proceed with save
+				setMessageText(`Update Firm ${formData.name} Details?`);
+				setCurrentRecord(formData);
 				setOpenUpdateModal(true);
 			}
 			if (args.requestType === "delete") {
 				console.log("Delete action triggered");
-				handleFirmDelete();
-				setInsertFlag(false);
+				console.log("Full args.data:", args.data);
+				if (args.data && args.data.length > 0) {
+					const selectedFirm = args.data[0];
+					console.log("Selected firm for deletion:", selectedFirm);
+					console.log("Selected firm ID:", selectedFirm._id);
+					console.log("Expected ID: 67f6e33d5c7361330107d436");
+					setMessageText(
+						`Are you sure you want to delete the firm "${selectedFirm.name}"?`,
+					);
+					// Store the entire firm object in state
+					setCurrentRecord(selectedFirm);
+					setOpenDeleteModal(true);
+					args.cancel = true;
+				} else {
+					console.log("No firm data available for deletion");
+				}
+			}
+			if (args.requestType === "refresh") {
+				console.log("Refresh action triggered");
+				// Force a refetch of the firms data
+				queryClient.invalidateQueries(["firms"]);
 			}
 		},
-		[formData, handleFirmDelete],
+		[
+			formData,
+			checkFirmExists,
+			queryClient,
+			dialogDimensions,
+			saveDialogDimensions,
+		],
 	);
+
+	const handleFirmDelete = async () => {
+		console.log("handleFirmDelete called with currentRecord:", currentRecord);
+		console.log("Current record ID:", currentRecord?._id);
+		console.log("Expected ID: 67f6e33d5c7361330107d436");
+		setOpenDeleteModal(false);
+		try {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
+				{
+					method: "DELETE",
+				},
+			);
+			const json = await response.json();
+			console.log("Delete response:", json);
+
+			if (response.ok) {
+				console.log("Delete successful, invalidating query");
+				showSuccessDialogWithTimer("Record Successfully Deleted...");
+				// Force a refetch of the firms data
+				queryClient.invalidateQueries(["firms"]);
+				// Clear the current record
+				setCurrentRecord(null);
+			} else {
+				console.log("Delete failed:", json.message);
+				showErrorDialog(`Delete Failed: ${json.message}`);
+			}
+		} catch (error) {
+			console.log("Delete error:", error);
+			showErrorDialog("Error deleting firm. Please try again.");
+		}
+	};
 
 	const firmsActionComplete = async (args) => {
 		if (!firmsGridRef) return;
@@ -349,12 +450,25 @@ const FirmsTab = () => {
 	};
 
 	const SaveFirmsData = async () => {
+		console.log("SaveFirmsData called with currentRecord:", currentRecord);
+
+		// Additional validation before saving
+		if (
+			!currentRecord ||
+			!currentRecord.name ||
+			currentRecord.name.trim() === ""
+		) {
+			showErrorDialog("Cannot save a firm without a name.");
+			return;
+		}
+
 		// Close Modal
 		setOpenUpdateModal(false);
+
 		// Save or Update Data
 		if (insertFlag === true) {
+			console.log("Inserting new firm");
 			const response = await fetch(
-				// "http://localhost:4000/api/firm/",
 				`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
 				{
 					method: "POST",
@@ -366,13 +480,18 @@ const FirmsTab = () => {
 			);
 
 			const json = await response.json();
+			console.log("Insert response:", json);
 
 			if (response.ok) {
+				console.log("Insert successful, invalidating query");
 				showSuccessDialogWithTimer("Record Successfully Added...");
+				queryClient.invalidateQueries(["firms"]);
 			} else {
+				console.log("Insert failed:", json.message);
 				showErrorDialog(`Record Add Failed...${json.message}`);
 			}
 		} else {
+			console.log("Updating existing firm");
 			currentRecord.statusdate = new Date();
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
@@ -385,10 +504,14 @@ const FirmsTab = () => {
 				},
 			);
 			const json = await response.json();
+			console.log("Update response:", json);
 			if (response.ok) {
+				console.log("Update successful, invalidating query");
 				showSuccessDialogWithTimer("Record Successfully Updated...");
 				SaveLatestDefaults();
+				queryClient.invalidateQueries(["firms"]);
 			} else {
+				console.log("Update failed:", json.message);
 				showErrorDialog(`Record Update Failed...${json.message}`);
 			}
 			setInsertFlag(false);
@@ -456,6 +579,41 @@ const FirmsTab = () => {
 		}
 	};
 
+	const handleFirmSave = async (formData) => {
+		try {
+			// Store coordinates before saving
+			if (formData.lat && formData.lng) {
+				setLastCoordinates({ lat: formData.lat, lng: formData.lng });
+			}
+
+			// ... rest of the save logic ...
+		} catch (error) {
+			console.error("Error saving firm:", error);
+		}
+	};
+
+	const handleFirmAdd = () => {
+		// Restore last coordinates when adding a new firm
+		const initialData = {
+			...defaultFirmData,
+			lat: lastCoordinates.lat,
+			lng: lastCoordinates.lng,
+		};
+		setFormData(initialData);
+		setOpenDialog(true);
+	};
+
+	const handleActionBegin = (args) => {
+		if (args.requestType === "save") {
+			// Ensure we have valid form data
+			if (!formData) {
+				args.cancel = true;
+				showErrorDialog("Please fill in all required fields.");
+				return;
+			}
+		}
+	};
+
 	if (firmsLoading) {
 		return (
 			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
@@ -473,6 +631,7 @@ const FirmsTab = () => {
 				<GridComponent
 					id="firmGridElement"
 					dataSource={firmsData?.data}
+					actionBegin={handleActionBegin}
 					actionComplete={actionComplete}
 					allowSelection
 					allowFiltering
@@ -608,6 +767,14 @@ const FirmsTab = () => {
 					message={messageText}
 					onConfirm={() => SaveFirmsData()}
 					onCancel={() => setOpenUpdateModal(false)}
+				/>
+			)}
+			{openDeleteModal && (
+				<ConfirmationDialog
+					open={openDeleteModal}
+					message={messageText}
+					onConfirm={handleFirmDelete}
+					onCancel={() => setOpenDeleteModal(false)}
 				/>
 			)}
 		</div>

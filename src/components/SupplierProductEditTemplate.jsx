@@ -9,7 +9,12 @@ const productStatusOptions = ["ACTIVE", "INACTIVE"];
 
 let productOptions = null;
 
-import { GetProducts, GetAllFirms } from "../api/worksideAPI";
+import {
+	GetProducts,
+	GetAllFirms,
+	GetSupplierIDFromName,
+	GetAllSuppliers,
+} from "../api/worksideAPI";
 
 // TODO Complete the SupplierProductEditTemplate component
 
@@ -70,13 +75,68 @@ const SupplierProductEditTemplate = (props) => {
 		}
 	};
 
+	// Add function to get supplier ID
+	const getSupplierId = async (supplierName) => {
+		console.log("Getting supplier ID for:", supplierName);
+		try {
+			const response = await GetAllSuppliers();
+			console.log("All suppliers response:", response);
+			if (response.status === 200 && response.data) {
+				const supplier = response.data.find((s) => s.name === supplierName);
+				if (supplier) {
+					console.log("Found supplier:", supplier);
+					return supplier._id;
+				}
+			}
+			console.log("No supplier ID found");
+			return null;
+		} catch (error) {
+			console.error("Error getting supplier ID:", error);
+			return null;
+		}
+	};
+
 	// Handle input changes
-	const onChange = (args) => {
-		// Only for debugging purposes
-		setData({ ...data, [args.target.name]: args.target.value });
-		if (args.target.name === "category") {
+	const onChange = async (args) => {
+		console.log("SupplierProductEditTemplate - onChange called with:", args);
+		const newData = { ...data };
+
+		// Handle different types of input changes
+		if (args.target) {
+			// Regular input change
+			newData[args.target.name] = args.target.value;
+			console.log(
+				"Updated field:",
+				args.target.name,
+				"with value:",
+				args.target.value,
+			);
+		} else if (args.element) {
+			// Syncfusion component change
+			const fieldName = args.element.id;
+			newData[fieldName] = args.value;
+			console.log("Updated field:", fieldName, "with value:", args.value);
+		}
+
+		// Ensure supplier name is preserved
+		if (newData.supplier) {
+			console.log("Current supplier name:", newData.supplier);
+		}
+
+		setData(newData);
+
+		if (args.target?.name === "category") {
 			setCurrentCategory(args.target.value);
 			FilterProducts(args.target.value);
+		}
+
+		// Pass the updated data to the parent component
+		if (props.onChange) {
+			console.log(
+				"SupplierProductEditTemplate - Sending data to parent:",
+				newData,
+			);
+			props.onChange(newData);
 		}
 	};
 

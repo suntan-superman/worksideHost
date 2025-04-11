@@ -24,6 +24,12 @@ import {
 import "../index.css";
 import "../App.css";
 
+import {
+	GetProducts,
+	GetSupplierIDFromName,
+	GetAllSuppliers,
+} from "../api/worksideAPI";
+
 let gridPageSize = 10;
 
 // TODO Delete
@@ -151,26 +157,34 @@ const SupplierProductsTab = () => {
 	// }, [supplierProductDispatch]);
 
 	const actionComplete = async (args) => {
-		// console.log(`Action Complete: ${args.requestType}`);
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
 			dialog.height = 400;
 			dialog.width = 600;
-			// Set Insert Flag
 			setInsertFlag(args.requestType === "add");
-			// change the header of the dialog
 			dialog.header =
 				args.requestType === "beginEdit"
 					? `Edit ${args.rowData.supplier}-${args.rowData.product} Record`
 					: "Workside New Supplier-Product Record";
 		}
 		if (args.requestType === "save") {
-			// Save or Update Data
 			const data = args.data;
-			// console.log(`Save Project Data Before Modal: ${JSON.stringify(data)}`);
+			console.log("ActionComplete - Received data:", data);
+
+			// Create a clean data object with only required fields
+			const cleanData = {
+				supplier: data.supplier,
+				supplier_id: data.supplier_id,
+				category: data.category,
+				product: data.product,
+				status: data.status,
+				statusdate: data.statusdate,
+			};
+
+			console.log("ActionComplete - Clean data:", cleanData);
 			setMessageText(`Update Supplier: ${data.supplier} Record?`);
-			setCurrentRecord(data);
+			setCurrentRecord(cleanData);
 			setOpenUpdateModal(true);
 		}
 	};
@@ -200,9 +214,51 @@ const SupplierProductsTab = () => {
 		}
 	};
 
+	const GetSupplierIDFromName = async (supplierName) => {
+		try {
+			console.log("Getting supplier ID for:", supplierName);
+			const response = await GetAllSuppliers();
+			if (response.status === 200 && response.data) {
+				const supplier = response.data.find((s) => s.name === supplierName);
+				if (supplier) {
+					console.log("Found supplier ID:", supplier._id);
+					return supplier._id;
+				}
+			}
+			console.error("No supplier ID found for:", supplierName);
+			return null;
+		} catch (error) {
+			console.error("Error getting supplier ID:", error);
+			return null;
+		}
+	};
+
 	const SaveSupplierProductsData = async () => {
 		setOpenUpdateModal(false);
 		if (insertFlag === true) {
+			console.log("SaveSupplierProductsData - Current record:", currentRecord);
+
+			// Get supplier ID just before saving
+			const supplierId = await GetSupplierIDFromName(currentRecord.supplier);
+			console.log("Retrieved supplier ID:", supplierId);
+
+			if (!supplierId) {
+				showErrorDialog("Failed to get supplier ID. Please try again.");
+				return;
+			}
+
+			const cleanData = {
+				supplier: currentRecord.supplier, // Ensure supplier name is included
+				supplierid: supplierId,
+				categoryname: currentRecord.category,
+				productname: currentRecord.product,
+				status: currentRecord.status,
+				statusdate: currentRecord.statusdate,
+			};
+
+			console.log("SaveSupplierProductsData - Data being sent:", cleanData);
+			console.log("Supplier name in cleanData:", cleanData.supplier); // Log supplier name
+
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
 				{
@@ -210,11 +266,13 @@ const SupplierProductsTab = () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify(currentRecord),
+					body: JSON.stringify(cleanData),
 				},
 			);
 			const jsonData = await response.json();
-			if (response.status === 200) {
+			console.log("SaveSupplierProductsData - Response:", jsonData);
+
+			if (response.status === 200 || response.status === 201) {
 				showSuccessDialogWithTimer("Record Successfully Added...");
 			} else {
 				showErrorDialog(`Record Add Failed...${response.status}`);
@@ -266,7 +324,15 @@ const SupplierProductsTab = () => {
 					}}
 				>
 					<ColumnsDirective>
-						{/* <ColumnDirective field='_id' headerText='Id' textAlign='Left' width='50' isPrimaryKey='true' allowEditing='false' visible={false} /> */}
+						<ColumnDirective
+							field="_id"
+							headerText="Id"
+							textAlign="Left"
+							width="50"
+							isPrimaryKey="true"
+							allowEditing="false"
+							visible={false}
+						/>
 						<ColumnDirective
 							field="supplier"
 							headerText="Supplier"
