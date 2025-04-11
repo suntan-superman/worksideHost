@@ -182,39 +182,49 @@ const FirmEditTemplate = (props) => {
 		}
 	}, [data.address1, data.city, data.state, data.zipCode]);
 
-	const onChange = useCallback(
-		(args) => {
-			const newData = { ...data };
+	const onChange = (args) => {
+		console.log("FirmEditTemplate onChange - args:", args);
+		let name, value;
 
-			if (args.target) {
-				// Handle input fields
-				newData[args.target.name] = args.target.value;
-			} else if (args.value !== undefined) {
-				// Handle Syncfusion components
-				const fieldName = args.element.id;
-				newData[fieldName] = args.value;
+		if (args.target) {
+			// Handle input fields
+			name = args.target.name;
+			value = args.target.value;
+		} else if (args.value !== undefined) {
+			// Handle Syncfusion components
+			name = args.element.id;
+			value = args.value;
+		} else if (args.itemData) {
+			// Handle dropdown selections
+			name = args.element.id;
+			value = args.itemData.value || args.itemData.text;
+		}
 
-				// If type changes to SUPPLIER, trigger geocoding if address fields are filled
-				if (fieldName === "type" && args.value === "SUPPLIER") {
-					setData(newData);
-					if (newData.address1 && newData.city && newData.state) {
-						setTimeout(() => {
-							geocodeAddress();
-						}, 0);
-					}
-					return;
+		console.log("FirmEditTemplate onChange - name:", name, "value:", value);
+
+		// Update local state
+		setData((prevData) => {
+			const newData = { ...prevData, [name]: value };
+			console.log("FirmEditTemplate onChange - newData:", newData);
+
+			// If type changes to SUPPLIER, trigger geocoding if address fields are filled
+			if (name === "type" && value === "SUPPLIER") {
+				if (newData.address1 && newData.city && newData.state) {
+					setTimeout(() => {
+						geocodeAddress();
+					}, 0);
 				}
 			}
 
-			setData(newData);
+			return newData;
+		});
 
-			// Pass the updated data to the parent component
-			if (props.onChange) {
-				props.onChange(newData);
-			}
-		},
-		[data, props],
-	);
+		// Notify parent component of changes
+		if (props.onChange) {
+			console.log("FirmEditTemplate onChange - calling parent onChange");
+			props.onChange({ ...data, [name]: value });
+		}
+	};
 
 	// Fix for data.isAdd dependency
 	useEffect(() => {

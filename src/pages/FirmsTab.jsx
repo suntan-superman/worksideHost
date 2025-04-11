@@ -105,9 +105,11 @@ const FirmsTab = () => {
 		lat: null,
 		lng: null,
 	});
-	const [dialogDimensions, setDialogDimensions] = useState({
-		height: 600,
-		width: 600,
+	const [dialogDimensions, setDialogDimensions] = useState(() => {
+		const savedDimensions = localStorage.getItem("firmDialogDimensions");
+		return savedDimensions
+			? JSON.parse(savedDimensions)
+			: { height: 480, width: 480 };
 	});
 
 	let firmsGridRef = useRef(null);
@@ -125,7 +127,12 @@ const FirmsTab = () => {
 	const accessLevel = GetAccessLevel();
 
 	const handleFormDataChange = useCallback((newData) => {
-		setFormData(newData);
+		console.log("FirmsTab handleFormDataChange - newData:", newData);
+		setFormData((prevData) => {
+			const updatedData = { ...prevData, ...newData };
+			console.log("FirmsTab handleFormDataChange - updatedData:", updatedData);
+			return updatedData;
+		});
 	}, []);
 
 	const editOptions = useMemo(
@@ -241,6 +248,7 @@ const FirmsTab = () => {
 	}, []);
 
 	const saveDialogDimensions = useCallback((dimensions) => {
+		console.log("Saving dialog dimensions:", dimensions);
 		setDialogDimensions(dimensions);
 		localStorage.setItem("firmDialogDimensions", JSON.stringify(dimensions));
 	}, []);
@@ -257,57 +265,81 @@ const FirmsTab = () => {
 				console.log("Opening dialog for:", args.requestType);
 				const dialog = args.dialog;
 				dialog.showCloseIcon = false;
-				dialog.height = dialogDimensions.height;
-				dialog.width = dialogDimensions.width;
+
+				// Use saved dimensions or defaults
+				const savedDimensions = localStorage.getItem("firmDialogDimensions");
+				const dimensions = savedDimensions
+					? JSON.parse(savedDimensions)
+					: { height: 480, width: 480 };
+
+				console.log("Setting dialog dimensions:", dimensions);
+				dialog.height = dimensions.height;
+				dialog.width = dimensions.width;
 				dialog.isResizable = true;
+				dialog.enableResize = true;
+
 				dialog.resizeStart = (args) => {
-					// Store new dimensions when resizing starts
+					console.log("Dialog resize start - new dimensions:", {
+						height: args.height,
+						width: args.width,
+					});
 					saveDialogDimensions({
 						height: args.height,
 						width: args.width,
 					});
 				};
+
 				dialog.resize = (args) => {
-					// Update dimensions during resize
+					console.log("Dialog resize - new dimensions:", {
+						height: args.height,
+						width: args.width,
+					});
 					saveDialogDimensions({
 						height: args.height,
 						width: args.width,
 					});
 				};
+
 				setInsertFlag(args.requestType === "add");
 				dialog.header =
 					args.requestType === "beginEdit"
-						? `Edit ${args.rowData.name}`
-						: "Workside New Firm";
+						? `Edit ${args.rowData.name} Record`
+						: "Workside New Firm Record";
+
+				const formObj = args.form["ej2_instances"][0];
+
+				formObj.addRules("name", { required: true });
+				formObj.addRules("area", { required: true });
+				formObj.addRules("type", { required: true });
+				formObj.addRules("city", { required: true });
+				formObj.addRules("state", { required: true });
+				formObj.addRules("status", { required: true });
+				formObj.addRules("statusdate", { required: true });
 			}
 			if (args.requestType === "save") {
-				// Prevent saving if formData is null or empty
-				if (!formData) {
-					showErrorDialog("Please fill in all required fields before saving.");
-					args.cancel = true;
-					return;
-				}
+				const data = formData || args.data;
+				console.log("ActionComplete - Received data:", data);
+				console.log("ActionComplete - Name field value:", data.name);
 
-				// Check if the form is valid
-				if (!formData.isValid) {
-					showErrorDialog("Please fill in all required fields before saving.");
-					args.cancel = true;
-					return;
-				}
+				const cleanData = {
+					_id: data._id,
+					name: data.name,
+					area: data.area,
+					type: data.type,
+					city: data.city,
+					state: data.state,
+					status: data.status,
+					statusdate: data.statusdate,
+					address1: data.address1,
+					address2: data.address2,
+					zipCode: data.zipCode,
+					lat: data.lat,
+					lng: data.lng,
+				};
 
-				// Check for existing firm with same name
-				const existingFirm = await checkFirmExists(formData.name, formData._id);
-				if (existingFirm) {
-					showErrorDialog(
-						`A firm with the name "${formData.name}" already exists. Please choose a different name.`,
-					);
-					args.cancel = true;
-					return;
-				}
-
-				// If all validations pass, proceed with save
-				setMessageText(`Update Firm ${formData.name} Details?`);
-				setCurrentRecord(formData);
+				console.log("ActionComplete - Clean data:", cleanData);
+				setMessageText(`Update Firm: ${data.name} Record?`);
+				setCurrentRecord(cleanData);
 				setOpenUpdateModal(true);
 			}
 			if (args.requestType === "delete") {
@@ -321,7 +353,6 @@ const FirmsTab = () => {
 					setMessageText(
 						`Are you sure you want to delete the firm "${selectedFirm.name}"?`,
 					);
-					// Store the entire firm object in state
 					setCurrentRecord(selectedFirm);
 					setOpenDeleteModal(true);
 					args.cancel = true;
@@ -331,17 +362,10 @@ const FirmsTab = () => {
 			}
 			if (args.requestType === "refresh") {
 				console.log("Refresh action triggered");
-				// Force a refetch of the firms data
 				queryClient.invalidateQueries(["firms"]);
 			}
 		},
-		[
-			formData,
-			checkFirmExists,
-			queryClient,
-			dialogDimensions,
-			saveDialogDimensions,
-		],
+		[formData, checkFirmExists, queryClient, saveDialogDimensions],
 	);
 
 	const handleFirmDelete = async () => {
@@ -362,9 +386,7 @@ const FirmsTab = () => {
 			if (response.ok) {
 				console.log("Delete successful, invalidating query");
 				showSuccessDialogWithTimer("Record Successfully Deleted...");
-				// Force a refetch of the firms data
 				queryClient.invalidateQueries(["firms"]);
-				// Clear the current record
 				setCurrentRecord(null);
 			} else {
 				console.log("Delete failed:", json.message);
@@ -391,15 +413,12 @@ const FirmsTab = () => {
 				dialog.header = "Workside Firms";
 			}
 			if (args.requestType === "add") {
-				// set insert flag
 				setInsertFlag(true);
 			}
 			if (args.requestType === "update") {
-				// set insert flag
 				setInsertFlag(false);
 			}
 			if (args.requestType === "save") {
-				// Save or Update Data
 				const { data } = args;
 
 				if (insertFlag === true) {
@@ -427,7 +446,6 @@ const FirmsTab = () => {
 				setInsertFlag(false);
 			}
 			if (args.requestType === "delete") {
-				// Delete Data
 				handleFirmDelete();
 				setInsertFlag(false);
 			}
@@ -436,12 +454,8 @@ const FirmsTab = () => {
 
 	const rowSelectedFirm = () => {
 		if (firmsGridRef) {
-			/** Get the selected row indexes */
 			const selectedrowindex = firmsGridRef.getSelectedRowIndexes();
-			/** Get the selected records. */
 			setSelectedRecord(firmList[selectedrowindex]._id);
-			// eslint-disable-next-line prefer-template
-			// setEmptyFields([]);
 		}
 	};
 
@@ -451,21 +465,22 @@ const FirmsTab = () => {
 
 	const SaveFirmsData = async () => {
 		console.log("SaveFirmsData called with currentRecord:", currentRecord);
+		console.log("SaveFirmsData - Name field value:", currentRecord?.name);
 
-		// Additional validation before saving
-		if (
-			!currentRecord ||
-			!currentRecord.name ||
-			currentRecord.name.trim() === ""
-		) {
+		if (!currentRecord) {
+			console.log("SaveFirmsData - No current record");
 			showErrorDialog("Cannot save a firm without a name.");
 			return;
 		}
 
-		// Close Modal
+		if (!currentRecord.name || currentRecord.name.trim() === "") {
+			console.log("SaveFirmsData - Name is empty or whitespace");
+			showErrorDialog("Cannot save a firm without a name.");
+			return;
+		}
+
 		setOpenUpdateModal(false);
 
-		// Save or Update Data
 		if (insertFlag === true) {
 			console.log("Inserting new firm");
 			const response = await fetch(
@@ -492,12 +507,38 @@ const FirmsTab = () => {
 			}
 		} else {
 			console.log("Updating existing firm");
-			currentRecord.statusdate = new Date();
+
+			// Get the current firm data to ensure we have the supplier_id
+			const currentFirm = firmList.find(
+				(firm) => firm._id === currentRecord._id,
+			);
+			if (!currentFirm) {
+				console.log("Could not find firm with _id:", currentRecord._id);
+				console.log("Available firms:", firmList);
+				showErrorDialog("Could not find the firm to update.");
+				return;
+			}
+
+			// Create update data with supplier_id if it exists
+			const updateData = {
+				...currentRecord,
+				supplier_id: currentFirm.supplier_id || currentRecord.supplier_id,
+			};
+
+			// Store coordinates if they exist
+			if (updateData.lat && updateData.lng) {
+				setLastCoordinates({ lat: updateData.lat, lng: updateData.lng });
+				localStorage.setItem(
+					"lastCoordinates",
+					JSON.stringify({ lat: updateData.lat, lng: updateData.lng }),
+				);
+			}
+
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
 				{
 					method: "PATCH",
-					body: JSON.stringify(currentRecord),
+					body: JSON.stringify(updateData),
 					headers: {
 						"Content-Type": "application/json",
 					},
@@ -525,9 +566,6 @@ const FirmsTab = () => {
 		localStorage.setItem("firmsLatestState", currentRecord.state);
 	};
 
-	// *******************************************************
-	// This is for custom phone and email editing in dialog
-	// *******************************************************
 	let phElem;
 	let phObject;
 	const createcusphonemaskinputn = () => {
@@ -540,7 +578,6 @@ const FirmsTab = () => {
 	const readcusphonemaskinputFn = () => phObject.value;
 	const writecusphonemaskinputFn = (args) => {
 		phObject = new MaskedTextBox({
-			// value: args.rowData[args.column.field].toString(),
 			value: args.rowData[args.column.field],
 			mask: "000-000-0000",
 			placeholder: "Phone",
@@ -556,23 +593,10 @@ const FirmsTab = () => {
 		write: writecusphonemaskinputFn,
 	};
 
-	// const mailidRules = { email: [true, 'Enter valid Email'] };
-	// *******************************************************
-	// End of custom code
-	// *******************************************************
 	const onFirmLoad = () => {
 		const gridElement = document.getElementById("firmGridElement");
 		if (gridElement?.ej2_instances[0]) {
 			const gridInstance = gridElement.ej2_instances[0];
-			/** height of the each row */
-			// const rowHeight = gridInstance.getRowHeight();
-			/** Grid height */
-			// const gridHeight = gridInstance.height;
-			/** initial page size */
-			// const pageSize = gridInstance.pageSettings.pageSize;
-			/** new page size is obtained here */
-			// const pageResize = (gridHeight - (pageSize * rowHeight)) / rowHeight;
-			// gridInstance.pageSettings.pageSize = pageSize + Math.round(pageResize);
 			gridInstance.pageSettings.pageSize = gridPageSize;
 			gridInstance.pageSettings.frozenColumns = 3;
 			gridInstance.pageSettings.freeze = true;
@@ -581,11 +605,13 @@ const FirmsTab = () => {
 
 	const handleFirmSave = async (formData) => {
 		try {
-			// Store coordinates before saving
 			if (formData.lat && formData.lng) {
 				setLastCoordinates({ lat: formData.lat, lng: formData.lng });
+				localStorage.setItem(
+					"lastCoordinates",
+					JSON.stringify({ lat: formData.lat, lng: formData.lng }),
+				);
 			}
-
 			// ... rest of the save logic ...
 		} catch (error) {
 			console.error("Error saving firm:", error);
@@ -593,11 +619,16 @@ const FirmsTab = () => {
 	};
 
 	const handleFirmAdd = () => {
-		// Restore last coordinates when adding a new firm
+		// Try to get last coordinates from localStorage
+		const savedCoordinates = localStorage.getItem("lastCoordinates");
+		const lastCoords = savedCoordinates
+			? JSON.parse(savedCoordinates)
+			: lastCoordinates;
+
 		const initialData = {
 			...defaultFirmData,
-			lat: lastCoordinates.lat,
-			lng: lastCoordinates.lng,
+			lat: lastCoords.lat,
+			lng: lastCoords.lng,
 		};
 		setFormData(initialData);
 		setOpenDialog(true);
@@ -605,7 +636,6 @@ const FirmsTab = () => {
 
 	const handleActionBegin = (args) => {
 		if (args.requestType === "save") {
-			// Ensure we have valid form data
 			if (!formData) {
 				args.cancel = true;
 				showErrorDialog("Please fill in all required fields.");
@@ -626,7 +656,6 @@ const FirmsTab = () => {
 
 	return (
 		<div>
-			{/* Companies Tab */}
 			<div className="absolute top-[50px] left-[20px] w-[100%] flex flex-row items-center justify-start">
 				<GridComponent
 					id="firmGridElement"
