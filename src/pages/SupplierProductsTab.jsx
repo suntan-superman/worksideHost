@@ -170,8 +170,6 @@ const SupplierProductsTab = () => {
 		}
 		if (args.requestType === "save") {
 			const data = args.data;
-			console.log("ActionComplete - Received data:", data);
-
 			// Create a clean data object with only required fields
 			const cleanData = {
 				supplier: data.supplier,
@@ -182,7 +180,6 @@ const SupplierProductsTab = () => {
 				statusdate: data.statusdate,
 			};
 
-			console.log("ActionComplete - Clean data:", cleanData);
 			setMessageText(`Update Supplier: ${data.supplier} Record?`);
 			setCurrentRecord(cleanData);
 			setOpenUpdateModal(true);
@@ -216,12 +213,10 @@ const SupplierProductsTab = () => {
 
 	const GetSupplierIDFromName = async (supplierName) => {
 		try {
-			console.log("Getting supplier ID for:", supplierName);
 			const response = await GetAllSuppliers();
 			if (response.status === 200 && response.data) {
 				const supplier = response.data.find((s) => s.name === supplierName);
 				if (supplier) {
-					console.log("Found supplier ID:", supplier._id);
 					return supplier._id;
 				}
 			}
@@ -236,11 +231,8 @@ const SupplierProductsTab = () => {
 	const SaveSupplierProductsData = async () => {
 		setOpenUpdateModal(false);
 		if (insertFlag === true) {
-			console.log("SaveSupplierProductsData - Current record:", currentRecord);
-
 			// Get supplier ID just before saving
 			const supplierId = await GetSupplierIDFromName(currentRecord.supplier);
-			console.log("Retrieved supplier ID:", supplierId);
 
 			if (!supplierId) {
 				showErrorDialog("Failed to get supplier ID. Please try again.");
@@ -256,9 +248,6 @@ const SupplierProductsTab = () => {
 				statusdate: currentRecord.statusdate,
 			};
 
-			console.log("SaveSupplierProductsData - Data being sent:", cleanData);
-			console.log("Supplier name in cleanData:", cleanData.supplier); // Log supplier name
-
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
 				{
@@ -270,7 +259,6 @@ const SupplierProductsTab = () => {
 				},
 			);
 			const jsonData = await response.json();
-			console.log("SaveSupplierProductsData - Response:", jsonData);
 
 			if (response.status === 200 || response.status === 201) {
 				showSuccessDialogWithTimer("Record Successfully Added...");

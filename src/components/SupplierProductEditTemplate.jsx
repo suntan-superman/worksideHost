@@ -53,6 +53,7 @@ const SupplierProductEditTemplate = (props) => {
 	const [filteredProducts, setFilteredProducts] = useState([]);
 	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
 	const [currentCategory, setCurrentCategory] = useState("");
+	const [duplicateError, setDuplicateError] = useState("");
 
 	useEffect(() => {
 		// ReadOnly flag
@@ -97,6 +98,30 @@ const SupplierProductEditTemplate = (props) => {
 	};
 
 	// Handle input changes
+	const checkForDuplicate = async (supplier, category, product) => {
+		try {
+			const response = await fetch(
+				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct/check-duplicate`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						supplier,
+						categoryname: category,
+						productname: product,
+					}),
+				},
+			);
+			const data = await response.json();
+			return data.exists;
+		} catch (error) {
+			console.error("Error checking for duplicate:", error);
+			return false;
+		}
+	};
+
 	const onChange = async (args) => {
 		console.log("SupplierProductEditTemplate - onChange called with:", args);
 		const newData = { ...data };
@@ -118,16 +143,29 @@ const SupplierProductEditTemplate = (props) => {
 			console.log("Updated field:", fieldName, "with value:", args.value);
 		}
 
-		// Ensure supplier name is preserved
-		if (newData.supplier) {
-			console.log("Current supplier name:", newData.supplier);
-		}
-
 		setData(newData);
 
 		if (args.target?.name === "category") {
 			setCurrentCategory(args.target.value);
 			FilterProducts(args.target.value);
+		}
+
+		// Check for duplicate if all three fields are present
+		if (newData.supplier && newData.category && newData.product) {
+			const isDuplicate = await checkForDuplicate(
+				newData.supplier,
+				newData.category,
+				newData.product,
+			);
+			if (isDuplicate) {
+				setDuplicateError(
+					"This combination of supplier, category, and product already exists.",
+				);
+			} else {
+				setDuplicateError("");
+			}
+		} else {
+			setDuplicateError("");
 		}
 
 		// Pass the updated data to the parent component
@@ -221,6 +259,9 @@ const SupplierProductEditTemplate = (props) => {
 				</div>
 			)}
 			<div className="w-[600px] mx-[4px] space-y-2">
+				{duplicateError && (
+					<div className="text-red-500 text-sm mb-2">{duplicateError}</div>
+				)}
 				{/* Row 1 */}
 				<div className="flex gap-4">
 					{/* Input 1 */}
