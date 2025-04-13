@@ -111,7 +111,11 @@ import { requestStatusOptions } from "../data/worksideOptions";
  * - Includes loading indicators and error handling for data fetching and template operations.
  */
 const RequestEditTemplate = (props) => {
-	const data = props.rowData || {};
+	console.log("RequestEditTemplate - props:", props);
+	console.log("RequestEditTemplate - rowData:", props.rowData);
+
+	// Use rowData if available, otherwise use the entire props object
+	const data = props.rowData || props;
 	const userId = useUserStore((state) => state.userID);
 	const [customerChangeFlag, setCustomerChangeFlag] = useState(false);
 
@@ -139,43 +143,31 @@ const RequestEditTemplate = (props) => {
 		return defaults;
 	}, []);
 
-	// Function to save preferences
-	const savePreferences = (formData) => {
-		localStorage.setItem("lastCustomer", formData.customername || "");
-		localStorage.setItem("lastCustomerContact", formData.customercontact || "");
-		localStorage.setItem("lastProject", formData.projectname || "");
-		localStorage.setItem("lastRigCompany", formData.rigcompany || "");
-		localStorage.setItem(
-			"lastRigCompanyContact",
-			formData.rigcompanycontact || "",
-		);
-		localStorage.setItem("lastStatus", formData.status || "OPEN");
-	};
-
 	const [formData, setFormData] = useState(() => {
+		console.log("RequestEditTemplate - Initializing formData with data:", data);
 		const storedPrefs = getStoredPreferences();
 		const isNewRequest = !data._id;
 		const now = new Date();
 
-		// console.log("Initializing form data:", {
-		// 	isNewRequest,
-		// 	storedPrefs,
-		// 	data,
-		// 	props,
-		// });
+		console.log("RequestEditTemplate - Initial form data:", {
+			isNewRequest,
+			storedPrefs,
+			data,
+			props,
+		});
 
-		return {
+		const initialData = {
 			...data,
-			requestcategory: "",
-			requestname: "",
-			quantity: 1,
-			comments: "",
-			vendortype: "MSA",
-			vendorName: "",
+			requestcategory: data.requestcategory || "",
+			requestname: data.requestname || "",
+			quantity: data.quantity || 1,
+			comments: data.comments || "",
+			vendortype: data.vendortype || "MSA",
+			vendorName: data.vendorName || "",
 			status: isNewRequest ? storedPrefs.status || "NOT-AWARDED" : data.status,
-			statusdate: now,
-			datetimerequested: getDefaultDateTime(),
-			creationdate: now,
+			statusdate: data.statusdate || now,
+			datetimerequested: data.datetimerequested || getDefaultDateTime(),
+			creationdate: data.creationdate || now,
 			customername: isNewRequest ? storedPrefs.customername : data.customername,
 			customercontact: isNewRequest
 				? storedPrefs.customercontact
@@ -186,6 +178,9 @@ const RequestEditTemplate = (props) => {
 				? storedPrefs.rigcompanycontact
 				: data.rigcompanycontact,
 		};
+
+		console.log("RequestEditTemplate - Initialized formData:", initialData);
+		return initialData;
 	});
 
 	// Add useEffect to handle initial data loading
@@ -220,41 +215,47 @@ const RequestEditTemplate = (props) => {
 
 	// Handle input changes
 	const onChange = (args) => {
-		if (args.value !== undefined) {
-			const name = args.element?.id || args.target?.name;
-			const value = args.itemData?.value || args.value;
+		console.log("RequestEditTemplate onChange - args:", args);
+		let name;
+		let value;
 
-			setFormData((prev) => {
-				const newData = { ...prev, [name]: value };
-				// Save preferences when relevant fields change
-				if (
-					[
-						"customername",
-						"customercontact",
-						"projectname",
-						"rigcompany",
-						"rigcompanycontact",
-						"status",
-					].includes(name)
-				) {
-					savePreferences(newData);
-				}
-				return newData;
-			});
+		if (args.target) {
+			name = args.target.name;
+			value = args.target.value;
+		} else if (args.value !== undefined) {
+			name = args.element.id;
+			value = args.value;
+		} else if (args.itemData) {
+			name = args.element.id;
+			value = args.itemData.value || args.itemData.text;
+		}
 
-			if (name === "requestcategory") {
-				FilterProducts(value);
+		console.log("RequestEditTemplate onChange - name:", name, "value:", value);
+
+		setFormData((prevData) => {
+			const newData = { ...prevData, [name]: value };
+			console.log("RequestEditTemplate onChange - newData:", newData);
+
+			// Notify parent component of changes
+			if (props.onChange) {
+				props.onChange(newData);
 			}
-			if (name === "vendortype" && value === "SSR") {
-				GetSSRVendors();
-			}
-			if (name === "customername") {
-				setCustomerChangeFlag(true);
-				setFormData((prev) => ({ ...prev, customercontact: "" }));
-			}
-			if (name === "rigcompany") {
-				setFormData((prev) => ({ ...prev, rigcompanycontact: "" }));
-			}
+
+			return newData;
+		});
+
+		if (name === "requestcategory") {
+			FilterProducts(value);
+		}
+		if (name === "vendortype" && value === "SSR") {
+			GetSSRVendors();
+		}
+		if (name === "customername") {
+			setCustomerChangeFlag(true);
+			setFormData((prev) => ({ ...prev, customercontact: "" }));
+		}
+		if (name === "rigcompany") {
+			setFormData((prev) => ({ ...prev, rigcompanycontact: "" }));
 		}
 	};
 
@@ -776,10 +777,14 @@ const RequestEditTemplate = (props) => {
 						onChange={(e) => setNewTemplateName(e.target.value)}
 					/>
 					<div className="mb-4">
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label
+							className="block text-sm font-medium text-gray-700 mb-2"
+							htmlFor="templateVisibility"
+						>
 							Template Visibility
 						</label>
 						<select
+							id="templateVisibility"
 							className="w-full p-2 border rounded"
 							value={templateVisibility}
 							onChange={(e) => setTemplateVisibility(e.target.value)}

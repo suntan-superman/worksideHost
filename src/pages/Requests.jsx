@@ -1,5 +1,11 @@
 /* eslint-disable */
-import React, { useEffect, useState, useRef } from "react";
+import React, {
+	useEffect,
+	useState,
+	useRef,
+	useCallback,
+	useMemo,
+} from "react";
 import { DataManager, Query } from "@syncfusion/ej2-data";
 import {
 	GridComponent,
@@ -31,9 +37,7 @@ import RequestInfoModal from "../components/RequestInfoModal";
 import { UseStateContext } from "../contexts/ContextProvider";
 import RequestEditTemplate from "../components/RequestEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
-
 import { Header } from "../components";
-
 import {
 	showErrorDialog,
 	showWarningDialog,
@@ -53,7 +57,6 @@ import {
 import RequestFilterDialog from "../components/RequestFilterDialog";
 
 import axios from "axios";
-// import { Toast } from "@syncfusion/ej2-react-notifications";
 
 let gridPageSize = 8;
 let clientName = "CRC";
@@ -163,58 +166,6 @@ function getUsersBySupplierAndCategory(supplierId, categoryLabel, dataset) {
 	return [];
 }
 
-/**
- * The `Requests` component is a React functional component that renders a grid-based interface
- * for managing and viewing requests. It includes features such as filtering, sorting, editing,
- * and exporting data. The component integrates with a backend API to fetch and update request data
- * and uses various React hooks and third-party libraries for state management and UI rendering.
- *
- * @component
- *
- * @returns {JSX.Element} The rendered `Requests` component.
- *
- * @description
- * - Fetches request data using the `useQuery` hook from `react-query`.
- * - Allows filtering requests by status and date range.
- * - Provides CRUD operations for requests, including adding, editing, and deleting.
- * - Supports exporting request data to Excel.
- * - Displays a modal dialog for detailed request information and confirmation dialogs for updates.
- * - Includes customizable toolbar options and grid settings.
- *
- * @dependencies
- * - `react-query` for data fetching and caching.
- * - `@syncfusion/ej2-react-grids` for grid rendering and interaction.
- * - `@mui/material` for UI components like `Box`, `Chip`, `FormControl`, and `Select`.
- * - `axios` for making HTTP requests.
- *
- * @state
- * - `isLoading` {boolean} - Indicates whether the component is in a loading state.
- * - `requestList` {Array|null} - Stores the list of requests fetched from the API.
- * - `filteredRequestList` {Array|null} - Stores the filtered list of requests based on active filters.
- * - `activeFilters` {Array} - Stores the currently applied status filters.
- * - `dateRangeFilter` {string} - Stores the selected date range filter.
- * - `selectedRecord` {string|null} - Stores the ID of the currently selected request.
- * - `showDialog` {boolean} - Controls the visibility of the request details modal.
- * - `openUpdateModal` {boolean} - Controls the visibility of the update confirmation dialog.
- * - `messageText` {string} - Stores the message text for the confirmation dialog.
- * - `currentRecord` {Object|null} - Stores the data of the request being edited or updated.
- *
- * @methods
- * - `GetAccessLevel` - Retrieves the user's access level from local storage.
- * - `GetUserId` - Retrieves the user's ID from local storage.
- * - `filterRequestsByDateRange` - Filters requests based on the selected date range.
- * - `handleDateRangeChange` - Updates the date range filter state.
- * - `handleFilterApply` - Applies selected status filters.
- * - `handleRemoveFilter` - Removes a specific status filter.
- * - `SaveRequestData` - Saves or updates request data to the backend.
- * - `SendRequestEmail` - Sends email notifications to suppliers.
- * - `toolbarClick` - Handles toolbar actions like exporting data.
- * - `rowSelectedRequest` - Handles row selection in the grid.
- * - `actionComplete` - Handles actions like saving or editing requests.
- *
- * @example
- * <Requests />
- */
 const Requests = () => {
 	const requestGridRef = useRef(null);
 	const queryClient = useQueryClient();
@@ -234,7 +185,6 @@ const Requests = () => {
 	const [dateRangeFilter, setDateRangeFilter] = useState("all");
 	const [filteredRequestList, setFilteredRequestList] = useState(null);
 
-	// Move useQuery up here
 	const {
 		data: reqData,
 		isError: reqError,
@@ -264,7 +214,6 @@ const Requests = () => {
 	const accessLevel = GetAccessLevel();
 
 	function removeQuotes(str) {
-		// Remove all double quotes from the string
 		return str.replace(/"/g, "");
 	}
 
@@ -279,7 +228,6 @@ const Requests = () => {
 
 	const userId = GetUserId();
 
-	// Initial setup effect
 	useEffect(() => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
@@ -288,7 +236,6 @@ const Requests = () => {
 		clientName = companyName;
 		setCompanyName(companyName);
 
-		// Load and apply filters after grid is initialized
 		const savedFilters = localStorage.getItem("requestFilterSelections");
 		if (savedFilters) {
 			const filters = JSON.parse(savedFilters);
@@ -296,7 +243,6 @@ const Requests = () => {
 		}
 	}, []);
 
-	// Modify the grid load handler
 	const onRequestLoad = () => {
 		const gridElement = document.getElementById("requestGridElement");
 		if (gridElement?.ej2_instances[0]) {
@@ -305,92 +251,7 @@ const Requests = () => {
 		}
 	};
 
-	// Modify the filter application effect
-	useEffect(() => {
-		if (!requestGridRef.current || !reqData?.data) {
-			console.log("Grid or data not ready");
-			return;
-		}
-
-		try {
-			const grid = requestGridRef.current;
-
-			// Clear existing filters first
-			grid.clearFiltering();
-
-			if (activeFilters.length > 0) {
-				// Create filter object
-				const filterObject = {
-					columns: [
-						{
-							field: "status",
-							matchCase: false,
-							operator: "equal",
-							predicate: "or",
-							value: activeFilters[0], // Set initial value
-						},
-					],
-				};
-
-				// Add additional values for OR condition
-				if (activeFilters.length > 1) {
-					for (const status of activeFilters.slice(1)) {
-						filterObject.columns.push({
-							field: "status",
-							matchCase: false,
-							operator: "equal",
-							predicate: "or",
-							value: status,
-						});
-					}
-				}
-
-				// Apply filters
-				grid.filterSettings = filterObject;
-				grid.dataBind();
-			}
-		} catch (error) {
-			console.error("Error applying filters:", error);
-		}
-	}, [activeFilters, reqData]);
-
-	// Query client effect
-	useEffect(() => {
-		queryClient.invalidateQueries("requests");
-	}, [queryClient]);
-
-	const editOptions = {
-		allowEditing: accessLevel > 2,
-		allowAdding: accessLevel > 2,
-		allowEditOnDblClick: accessLevel > 2,
-		allowDeleting: accessLevel > 2,
-		mode: "Dialog",
-		template: (props) => <RequestEditTemplate {...props} />,
-	};
-
-	const toolbarOptions = ["Add", "Edit", "ExcelExport"];
-
-	const [selectedRecord, setSelectedRecord] = useState(null);
-	const [showDialog, setShowDialog] = useState(false);
-	const settings = { mode: "Row" };
-	const position = { X: "center", Y: "center" };
-	const dialogAnimationSettings = {
-		effect: "FlipX",
-		duration: 3000,
-		delay: 1000,
-	};
-
-	// Add date range filter options
-	const dateRangeOptions = [
-		{ value: "all", label: "All Time" },
-		{ value: "today", label: "Today" },
-		{ value: "tomorrow", label: "Tomorrow" },
-		{ value: "thisWeek", label: "This Week" },
-		{ value: "thisMonth", label: "This Month" },
-	];
-
-	// Add date filtering function
-	const filterRequestsByDateRange = (requests, range) => {
+	const filterRequestsByDateRange = useCallback((requests, range) => {
 		if (!requests) return [];
 
 		const today = new Date();
@@ -421,9 +282,8 @@ const Requests = () => {
 					return true;
 			}
 		});
-	};
+	}, []);
 
-	// Update useEffect for request data to include date filtering
 	useEffect(() => {
 		if (reqData) {
 			const data = reqData?.data;
@@ -433,9 +293,41 @@ const Requests = () => {
 				setFilteredRequestList(filteredData);
 			}
 		}
-	}, [reqData, dateRangeFilter]);
+	}, [reqData, dateRangeFilter, filterRequestsByDateRange]);
 
-	// Add date range filter handler
+	useEffect(() => {
+		queryClient.invalidateQueries("requests");
+	}, [queryClient]);
+
+	const editOptions = {
+		allowEditing: accessLevel > 2,
+		allowAdding: accessLevel > 2,
+		allowEditOnDblClick: accessLevel > 2,
+		allowDeleting: accessLevel > 2,
+		mode: "Dialog",
+		template: (props) => <RequestEditTemplate {...props} />,
+	};
+
+	const toolbarOptions = ["Add", "Edit", "ExcelExport"];
+
+	const [selectedRecord, setSelectedRecord] = useState(null);
+	const [showDialog, setShowDialog] = useState(false);
+	const settings = { mode: "Row" };
+	const position = { X: "center", Y: "center" };
+	const dialogAnimationSettings = {
+		effect: "FlipX",
+		duration: 3000,
+		delay: 1000,
+	};
+
+	const dateRangeOptions = [
+		{ value: "all", label: "All Time" },
+		{ value: "today", label: "Today" },
+		{ value: "tomorrow", label: "Tomorrow" },
+		{ value: "thisWeek", label: "This Week" },
+		{ value: "thisMonth", label: "This Month" },
+	];
+
 	const handleDateRangeChange = (event) => {
 		setDateRangeFilter(event.target.value);
 	};
@@ -470,8 +362,6 @@ const Requests = () => {
 		setShowDialog(true);
 	};
 
-	// TODO Get Company Options from DB
-	// Set Location Type Selection Options
 	const companyOptions = [
 		{ name: "Aera Energy", nameId: "1" },
 		{ name: "Berry", nameId: "2" },
@@ -491,7 +381,6 @@ const Requests = () => {
 
 	const rowSelectedRequest = (args) => {
 		if (requestGridRef) {
-			/** Get the selected row id */
 			setSelectedRecord(args.data._id);
 		}
 	};
@@ -501,7 +390,6 @@ const Requests = () => {
 			<button
 				type="button"
 				style={{
-					// background: currentColor,
 					background: "black",
 					color: "white",
 					padding: "5px",
@@ -521,7 +409,6 @@ const Requests = () => {
 	);
 
 	const rowDataBound = (args) => {
-		// For example, conditionally highlight rows where age is greater than 25.
 		if (args.data.status === "SSR-REQ") {
 			args.row.style.backgroundColor = "yellow";
 		}
@@ -529,10 +416,10 @@ const Requests = () => {
 			args.row.style.backgroundColor = "#22C55E";
 		}
 	};
+
 	const actionBegin = (args) => {
 		if (args.requestType === "save" && args.form) {
-			/** cast string to integer value */
-			// setValue("data.area", args.form.querySelector("#area").value, args);
+			// Handle form validation if needed
 		}
 	};
 
@@ -550,7 +437,6 @@ const Requests = () => {
 	};
 
 	const SendRequestEmail = async (emailList) => {
-		// Check if emailList is empty or not provided
 		if (!emailList || emailList.length === 0) {
 			await showWarningDialog("No email addresses provided");
 			return;
@@ -559,7 +445,6 @@ const Requests = () => {
 		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/email/`;
 
 		try {
-			// Send email for each email address concurrently
 			await Promise.all(
 				emailList.map((emailAddress) =>
 					axios.post(strAPI, {
@@ -580,19 +465,31 @@ const Requests = () => {
 	};
 
 	const actionComplete = async (args) => {
+		console.log("actionComplete - args:", args);
+		
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
 			dialog.showCloseIcon = false;
 			setInsertFlag(args.requestType === "add");
+			
+			// Get the actual record data from the grid
+			const recordData = args.rowData;
+			console.log("Editing record data:", recordData);
+			
 			dialog.header =
 				args.requestType === "beginEdit"
-					? `Edit Request: ${args.rowData.projectname} ${args.rowData.requestname}`
+					? `Edit Request: ${recordData.projectname} ${recordData.requestname}`
 					: "Workside New Request";
 		}
 		if (args.requestType === "save") {
+			// Get the actual record data from the grid
+			const recordData = args.rowData;
+			console.log("Saving record data:", recordData);
+
 			// Prepare the data with all required fields
 			const requestData = {
 				...args.data,
+				_id: recordData._id, // Ensure we have the correct _id
 				requestorid: userId || "",
 				categoryname: args.data.requestcategory,
 				comments: args.data.comments || args.data.comment || "",
@@ -613,6 +510,7 @@ const Requests = () => {
 				quantity: args.data.quantity || 1,
 			};
 
+			console.log("Prepared request data:", requestData);
 			setMessageText(`Update Request ${requestData.requestname} Details?`);
 			setCurrentRecord(requestData);
 			setOpenUpdateModal(true);
@@ -638,13 +536,11 @@ const Requests = () => {
 
 			const result = await response.json();
 
-			// After successful save, update user distribution list and company list
 			if (result.data) {
 				try {
 					const supplierGroupData = await GetAllSupplierGroupData();
 					let userDistList = [];
 
-					// Get users based on vendor type
 					if (requestData.vendortype !== "SSR") {
 						userDistList = getUsersByCategory(
 							requestData.requestcategory,
@@ -660,10 +556,8 @@ const Requests = () => {
 					const emailAddresses = getEmailAddresses(userDistList);
 					const emailList = formatEmailList(emailAddresses);
 
-					// Update bid list users using the API function
 					await UpdateRequestBidListUsers(result.data._id, emailList);
 
-					// Get and update bid list companies
 					if (emailAddresses.length > 0) {
 						const bidListCompaniesResponse =
 							await GetRequestBidListCompanies(emailAddresses);
@@ -672,7 +566,6 @@ const Requests = () => {
 							bidListCompaniesResponse?.data &&
 							Array.isArray(bidListCompaniesResponse.data)
 						) {
-							// Format the bid list companies data
 							const bidList = {
 								bidList: bidListCompaniesResponse.data.map((company) => ({
 									companyId: company.companyId,
@@ -680,19 +573,9 @@ const Requests = () => {
 								})),
 							};
 
-							// Update bid list companies
-							const updateCompaniesResponse =
-								await UpdateRequestBidListCompanies(result.data._id, bidList);
-
-							if (updateCompaniesResponse.status !== 200) {
-								console.warn(
-									"Failed to update bid list companies:",
-									updateCompaniesResponse,
-								);
-							}
+							await UpdateRequestBidListCompanies(result.data._id, bidList);
 						}
 
-						// Send emails to the distribution list
 						await SendRequestEmail(emailAddresses);
 					}
 
@@ -712,27 +595,86 @@ const Requests = () => {
 		}
 	};
 
-	const recordClick = (args) => {
-		// if (args.target.classList.contains("requestData")) {
-		// 	const rowObj = requestGridRef.getRowObjectFromUID(
-		// 		closest(args.target, ".e-row").getAttribute("data-uid"),
-		// 	);
-		setSelectedRecord(args.rowData._id);
-		// setShowDialog(true);
-		// }
-	};
+	const handleFilterApply = (filters) => {
+		console.log("handleFilterApply - Received filters:", filters);
+		setActiveFilters(filters);
+		localStorage.setItem("requestFilterSelections", JSON.stringify(filters));
+		setFilterDialogOpen(false);
 
-	const SaveRequestsData = async () => {};
+		// Apply filters to the grid
+		if (requestGridRef.current && reqData?.data) {
+			const grid = requestGridRef.current;
+			console.log("handleFilterApply - Grid reference:", grid);
+			console.log("handleFilterApply - Current grid data:", reqData.data);
 
-	const handleFilterApply = (selectedFilters) => {
-		setActiveFilters(selectedFilters);
+			grid.clearFiltering();
+			console.log("handleFilterApply - Cleared existing filters");
+
+			if (filters.length > 0) {
+				const filterObject = {
+					columns: filters.map((status) => ({
+						field: "status",
+						matchCase: false,
+						operator: "equal",
+						predicate: "or",
+						value: status,
+					})),
+				};
+				console.log(
+					"handleFilterApply - Applying filter object:",
+					filterObject,
+				);
+				grid.filterSettings = filterObject;
+				grid.dataBind();
+				console.log("handleFilterApply - Applied filters and bound data");
+			}
+		} else {
+			console.log("handleFilterApply - Grid ref or data not available:", {
+				hasGridRef: !!requestGridRef.current,
+				hasData: !!reqData?.data,
+			});
+		}
 	};
 
 	const handleRemoveFilter = (filterToRemove) => {
+		console.log("handleRemoveFilter - Removing filter:", filterToRemove);
 		const newFilters = activeFilters.filter(
 			(filter) => filter !== filterToRemove,
 		);
+		console.log("handleRemoveFilter - New filters:", newFilters);
 		setActiveFilters(newFilters);
+		localStorage.setItem("requestFilterSelections", JSON.stringify(newFilters));
+
+		if (requestGridRef.current) {
+			// Update grid filters
+			const grid = requestGridRef.current;
+			console.log("handleRemoveFilter - Grid reference:", grid);
+			grid.clearFiltering();
+			console.log("handleRemoveFilter - Cleared existing filters");
+
+			if (newFilters.length > 0) {
+				const filterObject = {
+					columns: newFilters.map((status) => ({
+						field: "status",
+						matchCase: false,
+						operator: "equal",
+						predicate: "or",
+						value: status,
+					})),
+				};
+				console.log(
+					"handleRemoveFilter - Applying filter object:",
+					filterObject,
+				);
+				grid.filterSettings = filterObject;
+				grid.dataBind();
+				console.log("handleRemoveFilter - Applied filters and bound data");
+			} else {
+				console.log("handleRemoveFilter - No filters to apply");
+			}
+		} else {
+			console.log("handleRemoveFilter - Grid ref not available");
+		}
 	};
 
 	if (reqLoading) {
@@ -847,7 +789,6 @@ const Requests = () => {
 					toolbar={toolbarOptions}
 					toolbarClick={toolbarClick}
 					rowSelected={rowSelectedRequest}
-					recordClick={recordClick}
 					editSettings={editOptions}
 					enablePersistence
 					load={onRequestLoad}
@@ -893,12 +834,6 @@ const Requests = () => {
 							width="100"
 							edit={companySelections}
 						/>
-						{/* <ColumnDirective
-							field="customercontact"
-							headerText="Cust Contact"
-							textAlign="Left"
-							width="100"
-						/> */}
 						<ColumnDirective
 							field="projectname"
 							headerText="Project"
@@ -911,21 +846,6 @@ const Requests = () => {
 							textAlign="left"
 							width="50"
 						/>
-						{/* <ColumnDirective
-							field="rigcompanycontact"
-							headerText="Rig Contact"
-							textAlign="left"
-							width="50"
-						/> */}
-						{/* <ColumnDirective
-							field="creationdate"
-							headerText="Date Created"
-							type="date"
-							editType="datepickeredit"
-							format="MM/dd/yyy"
-							textAlign="Right"
-							width="140"
-						/> */}
 						<ColumnDirective
 							field="quantity"
 							headerText="Quantity"

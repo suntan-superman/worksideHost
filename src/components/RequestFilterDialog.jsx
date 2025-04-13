@@ -10,9 +10,13 @@ import {
 	FormControlLabel,
 	Checkbox,
 	Stack,
+	List,
+	ListItem,
 } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
+import SelectAllIcon from "@mui/icons-material/SelectAll";
+import ClearIcon from "@mui/icons-material/Clear";
 
 const STORAGE_KEY = 'requestFilterSelections';
 const DIALOG_POSITION_KEY = 'requestFilterDialogPosition';
@@ -68,20 +72,28 @@ const RequestFilterDialog = ({
 		return saved ? JSON.parse(saved) : [];
 	});
 
+	// Update selectedFilters when dialog opens to stay in sync with chips
 	useEffect(() => {
-		// Load saved filters on component mount
-		const saved = localStorage.getItem(STORAGE_KEY);
-		if (saved) {
-			setSelectedFilters(JSON.parse(saved));
+		if (open) {
+			const saved = localStorage.getItem(STORAGE_KEY);
+			setSelectedFilters(saved ? JSON.parse(saved) : []);
 		}
-	}, []);
+	}, [open]);
 
-	const handleToggle = (status) => {
+	const handleToggleFilter = (status) => {
 		setSelectedFilters((prev) =>
 			prev.includes(status)
-				? prev.filter((item) => item !== status)
+				? prev.filter((s) => s !== status)
 				: [...prev, status],
 		);
+	};
+
+	const handleSelectAll = () => {
+		setSelectedFilters([...requestStatusOptions]);
+	};
+
+	const handleClearAll = () => {
+		setSelectedFilters([]);
 	};
 
 	const handleApply = () => {
@@ -96,52 +108,102 @@ const RequestFilterDialog = ({
 			onClose={onClose}
 			PaperComponent={PaperComponent}
 			aria-labelledby="requestFilterDialog"
+			maxWidth="xs"
+			fullWidth
+			PaperProps={{
+				sx: {
+					width: "75%",
+					maxWidth: "400px",
+				},
+			}}
 		>
-			<DialogTitle id="requestFilterDialog">
-				<span className="text-bold text-green-500 text-xl">WORK</span>
-				<span className="text-bold text-black text-xl">SIDE</span>
-				<br />
-				<p className="text-bold text-black text-xl">Filter Requests</p>
+			<DialogTitle sx={{ pb: 1 }}>
+				<div className="flex justify-between items-center">
+					<span className="text-lg font-medium">Filter Requests</span>
+					<div className="flex gap-2">
+						<Button
+							variant="outlined"
+							size="small"
+							onClick={handleSelectAll}
+							startIcon={<SelectAllIcon />}
+							sx={{
+								color: "#2f8842",
+								borderColor: "#2f8842",
+								"&:hover": {
+									borderColor: "#2f8842",
+									backgroundColor: "rgba(47, 136, 66, 0.04)",
+								},
+								fontSize: "0.75rem",
+							}}
+						>
+							Select All
+						</Button>
+						<Button
+							variant="outlined"
+							size="small"
+							onClick={handleClearAll}
+							startIcon={<ClearIcon />}
+							sx={{
+								color: "#2f8842",
+								borderColor: "#2f8842",
+								"&:hover": {
+									borderColor: "#2f8842",
+									backgroundColor: "rgba(47, 136, 66, 0.04)",
+								},
+								fontSize: "0.75rem",
+							}}
+						>
+							Clear All
+						</Button>
+					</div>
+				</div>
 			</DialogTitle>
-			<DialogContent>
-				<Stack spacing={2}>
-					<FormGroup>
-						{requestStatusOptions.map((status) => (
+			<DialogContent sx={{ pt: 1 }}>
+				<List dense>
+					{requestStatusOptions.map((status) => (
+						<ListItem key={status} sx={{ py: 0.5 }}>
 							<FormControlLabel
-								key={status}
 								control={
 									<Checkbox
 										checked={selectedFilters.includes(status)}
-										onChange={() => handleToggle(status)}
+										onChange={() => handleToggleFilter(status)}
 										sx={{
-											color: "green",
+											color: "#2f8842",
 											"&.Mui-checked": {
-												color: "green",
+												color: "#2f8842",
 											},
 										}}
 									/>
 								}
-								label={status}
+								label={<span className="text-sm">{status}</span>}
 							/>
-						))}
-					</FormGroup>
-				</Stack>
+						</ListItem>
+					))}
+				</List>
 			</DialogContent>
-			<DialogActions>
+			<DialogActions sx={{ px: 3, py: 2 }}>
 				<Button
-					variant="contained"
-					onClick={handleApply}
+					onClick={onClose}
 					sx={{
-						backgroundColor: "green",
+						color: "#2f8842",
 						"&:hover": {
-							backgroundColor: "darkgreen",
+							backgroundColor: "rgba(47, 136, 66, 0.04)",
+						},
+					}}
+				>
+					Cancel
+				</Button>
+				<Button
+					onClick={handleApply}
+					variant="contained"
+					sx={{
+						backgroundColor: "#2f8842",
+						"&:hover": {
+							backgroundColor: "#256e33",
 						},
 					}}
 				>
 					Apply
-				</Button>
-				<Button variant="contained" color="error" onClick={onClose}>
-					Close
 				</Button>
 			</DialogActions>
 		</Dialog>
