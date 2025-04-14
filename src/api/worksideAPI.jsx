@@ -624,7 +624,7 @@ const GetRequestsByCustomer = async (clientName) => {
 		console.error("Invalid customer name provided.");
 		return { status: 400, data: [] };
 	}
-
+console.log(`Customer Name: ${cleanCustomer}`);
 	try {
 		const response = await fetch(
 			`${apiURL}/api/request/bycustomername/${cleanCustomer}`,

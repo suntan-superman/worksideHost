@@ -156,17 +156,15 @@ const ProjectsTab = () => {
 		refetchOnWindowFocus: true,
 	});
 
+	const filterProjects = (projects, companies) => {
+		if (!projects || !Array.isArray(projects)) return [];
+		if (!companies || companies.length === 0) return projects;
+		return projects.filter((project) => companies.includes(project.customer));
+	};
+
 	useEffect(() => {
 		if (projData?.data) {
-			let filteredData = projData.data;
-
-			// Apply company filters if any are selected
-			if (selectedCompanies.length > 0) {
-				filteredData = projData.data.filter((project) =>
-					selectedCompanies.includes(project.customer),
-				);
-			}
-
+			const filteredData = filterProjects(projData.data, selectedCompanies);
 			setProjectData(filteredData);
 			setHaveData(true);
 		}

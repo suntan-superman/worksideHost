@@ -24,6 +24,8 @@ import { useQueryClient, useMutation } from "@tanstack/react-query";
 import {
 	SaveRequestBid,
 	UpdateRequestStatus,
+	GetSupplierInfoFromID,
+	GetSupplierIDFromName,
 } from "../api/worksideAPI";
 
 
@@ -123,6 +125,12 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	const [disableAcceptButton, setDisableAcceptButton] = useState(false);
 	const queryClient = useQueryClient();
 	const [requestData, setRequestData] = useState(null);
+	const [locationError, setLocationError] = useState(null);
+	const [mapCenter, setMapCenter] = useState({ lat: 35.2, lng: -119.3 }); // Default center
+	const [requestLocation, setRequestLocation] = useState({
+		lat: 35.2,
+		lng: -119.3,
+	}); // Default location
 	let staticSupplierID = null;
 
 	// New state for route tracking
@@ -133,15 +141,9 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 
 	const apiKey = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-	const reqLocation = {
-		lat: 35.2,
-		lng: -119.3,
-	};
-
-	const delLocation = {
-		lat: 35.48,
-		lng: -118.9,
-	};
+	// Remove the hardcoded locations and use the state variables
+	const reqLocation = requestLocation;
+	const delLocation = lastLocation || { lat: 35.48, lng: -118.9 }; // Use lastLocation if available, otherwise default
 
 	// Add state for modal dimensions
 	const [modalDimensions, setModalDimensions] = useState(() => {
@@ -210,44 +212,70 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 
 	// Fetch route data from the backend
 	const fetchRouteData = useCallback(async () => {
-		if (!requestData?._id || !requestData?.ssrVendorId) return;
-		// TODO Let's get fake data for now
-		const reqID = "65f123abc456def789012345";
-		const supplierID = "65f123abc456def789012346";
+		if (!requestData?._id || !requestData?.ssrVendorId) {
+			console.log("Missing required data for fetchRouteData");
+			return;
+		}
+
 		try {
-			const response = await axios.post(
-				`${process.env.REACT_APP_MONGO_URI}/api/mapping/coordinates`,
-				{
-					requestid: reqID,
-					supplierid: supplierID,
-					// requestid: requestData._id,
-					// supplierid: requestData.ssrVendorId,
-				},
-				{
-					headers: {
-						"Content-Type": "application/json",
+			// First try to get the delivery location
+			try {
+				const response = await axios.post(
+					`${process.env.REACT_APP_MONGO_URI}/api/mapping/coordinates`,
+					{
+						requestid: requestData._id,
+						supplierid: requestData.ssrVendorId,
 					},
-				},
+					{
+						headers: {
+							"Content-Type": "application/json",
+						},
+					},
+				);
+
+				if (response.data && response.data.length > 0) {
+					const formattedRoute = response.data.map((point) => ({
+						lat: point.lat,
+						lng: point.lng,
+						timestamp: new Date(point.date),
+					}));
+
+					setRouteData(formattedRoute);
+					setLastLocation(formattedRoute[formattedRoute.length - 1]);
+					setLastUpdate(
+						new Date(
+							response.data[response.data.length - 1].date,
+						).toLocaleTimeString(),
+					);
+					return; // Exit if we successfully got delivery location
+				}
+			} catch (error) {
+				console.log("No delivery location available, trying supplier location");
+			}
+
+			// If we get here, either the API call failed or no delivery location was found
+			// Try to get supplier location
+			const supplierResponse = await GetSupplierInfoFromID(
+				requestData.ssrVendorId,
 			);
 
-			if (response.data && response.data.length > 0) {
-				const formattedRoute = response.data.map((point) => ({
-					lat: point.lat,
-					lng: point.lng,
-					timestamp: new Date(point.date),
-				}));
-
-				setRouteData(formattedRoute);
-				setLastLocation(formattedRoute[formattedRoute.length - 1]);
-				setLastUpdate(
-					new Date(
-						response.data[response.data.length - 1].date,
-					).toLocaleTimeString(),
-				);
+			if (supplierResponse?.status === 200 && supplierResponse?.data) {
+				const supplier = supplierResponse.data;
+				if (supplier.lat && supplier.lng) {
+					setLastLocation({
+						lat: supplier.lat,
+						lng: supplier.lng,
+					});
+					setLastUpdate("Supplier Location");
+					setRouteData([]); // Clear any existing route
+				} else {
+					setLocationError("Supplier location not available");
+				}
+			} else {
+				setLocationError("Supplier location not available");
 			}
 		} catch (error) {
-			console.error("Error fetching route data:", error);
-			showErrorDialog(`Failed to fetch route data: ${error.message}`);
+			showErrorDialog(`Failed to fetch location data: ${error.message}`);
 		}
 	}, [requestData]);
 
@@ -319,6 +347,23 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 
 	// Add new handler for Accept Request
 	const handleAcceptRequest = async () => {
+		let localSupplierID = null;
+
+		// If we have a supplier name, get the supplier ID
+		if (requestData.vendorName) {
+			const data = await GetSupplierIDFromName(requestData.vendorName);
+			if (data?.length > 0) {
+				localSupplierID = data[0]?.data?._id;
+			} else {
+				console.log(
+					"No supplier data found for vendorName:",
+					requestData.vendorName,
+				);
+			}
+		} else {
+			console.log("No vendorName found in requestData");
+		}
+
 		// Update request status
 		{
 			const response = await UpdateRequestStatus({
@@ -332,7 +377,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		// Create New SSR Bid
 		const reqBidData = {
 			requestid: requestData._id,
-			supplierid: staticSupplierID || supplierID,
+			supplierid: localSupplierID || staticSupplierID || supplierID,
 			suppliercontactid: null,
 			creationdate: new Date(),
 			quantity: requestData.quantity,
@@ -342,14 +387,9 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			status: "SSR-ACCEPTED",
 			statusdate: new Date(),
 			comment: requestData.comment,
+			ssrVendorId: localSupplierID, // Add the supplier ID to the request data
 		};
 		saveRequestBidMutation.mutateAsync(reqBidData);
-
-		// if (requestResponse.status === 200 && bidResponse.status === 200) {
-		// 	showSuccessDialogWithTimer("Request Accepted Successfully");
-		// 	queryClient.invalidateQueries(["requests"]);
-		// 	onClose();
-		// }
 	};
 
 	function PaperComponent(props) {
@@ -395,7 +435,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						height: "100%",
 						borderRadius: "8px",
 					}}
-					defaultCenter={reqLocation}
+					defaultCenter={mapCenter}
 					defaultZoom={8}
 					gestureHandling={"greedy"}
 				>
@@ -409,8 +449,8 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					</AdvancedMarker>
 
 					{/* Current Location Marker */}
-					{lastLocation && (
-						<AdvancedMarker position={lastLocation} title="Current Location">
+					{delLocation && (
+						<AdvancedMarker position={delLocation} title="Current Location">
 							<div style={{ fontSize: "24px" }}>🚛</div>
 						</AdvancedMarker>
 					)}
@@ -441,6 +481,48 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			)}
 		</div>
 	);
+
+	useEffect(() => {
+		if (requestData?.project_id) {
+			// Fetch project data using the project ID
+			const fetchProjectData = async () => {
+				try {
+					const response = await axios.get(
+						`${apiUrl}/api/project/${requestData.project_id}`,
+					);
+
+					if (response.data) {
+						const project = response.data;
+						if (project.latdec && project.longdec) {
+							setMapCenter({
+								lat: project.latdec,
+								lng: project.longdec,
+							});
+							setRequestLocation({
+								lat: project.latdec,
+								lng: project.longdec,
+							});
+							setLocationError(null);
+						} else {
+							console.log(
+								"Project found but no location data available. Project data:",
+								project,
+							);
+							setLocationError("Project location data not available");
+						}
+					} else {
+						setLocationError("Project location data not available");
+					}
+				} catch (error) {
+					setLocationError("Error fetching project location data");
+				}
+			};
+
+			fetchProjectData();
+		} else {
+			setLocationError("Project location data not available");
+		}
+	}, [requestData?.project_id, apiUrl]);
 
 	return (
 		<>
@@ -482,6 +564,9 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						<p className="text-bold text-black text-xl">Request Details</p>
 					</DialogTitle>
 					<DialogContent>
+						{locationError && (
+							<div className="text-red-500 text-sm mb-2">{locationError}</div>
+						)}
 						<Stack spacing={2} sx={{ flex: "none" }}>
 							<div className="flex space-x-4">
 								{/* Column 1 */}

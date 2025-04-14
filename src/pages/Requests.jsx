@@ -185,6 +185,21 @@ const Requests = () => {
 	const [dateRangeFilter, setDateRangeFilter] = useState("all");
 	const [filteredRequestList, setFilteredRequestList] = useState(null);
 
+		useEffect(() => {
+			const numGridRows = Number(localStorage.getItem("numGridRows"));
+			if (numGridRows) gridPageSize = numGridRows;
+
+			const companyName = localStorage.getItem("companyName");
+			clientName = companyName;
+			setCompanyName(companyName);
+
+			const savedFilters = localStorage.getItem("requestFilterSelections");
+			if (savedFilters) {
+				const filters = JSON.parse(savedFilters);
+				setActiveFilters(filters);
+			}
+		}, []);
+
 	const {
 		data: reqData,
 		isError: reqError,
@@ -227,21 +242,6 @@ const Requests = () => {
 	};
 
 	const userId = GetUserId();
-
-	useEffect(() => {
-		const numGridRows = Number(localStorage.getItem("numGridRows"));
-		if (numGridRows) gridPageSize = numGridRows;
-
-		const companyName = localStorage.getItem("companyName");
-		clientName = companyName;
-		setCompanyName(companyName);
-
-		const savedFilters = localStorage.getItem("requestFilterSelections");
-		if (savedFilters) {
-			const filters = JSON.parse(savedFilters);
-			setActiveFilters(filters);
-		}
-	}, []);
 
 	const onRequestLoad = () => {
 		const gridElement = document.getElementById("requestGridElement");

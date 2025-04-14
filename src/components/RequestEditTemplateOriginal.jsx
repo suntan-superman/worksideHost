@@ -112,17 +112,10 @@ import { requestStatusOptions } from "../data/worksideOptions";
  */
 const RequestEditTemplate = (props) => {
 	console.log("RequestEditTemplate - props:", props);
+	console.log("RequestEditTemplate - rowData:", props.rowData);
 
-	// Extract data from props
+	// Use rowData if available, otherwise use the entire props object
 	const data = props.rowData || props;
-	const isNewRequest = !data._id;
-
-	console.log("RequestEditTemplate - data:", {
-		isNewRequest,
-		data,
-		props,
-	});
-
 	const userId = useUserStore((state) => state.userID);
 	const [customerChangeFlag, setCustomerChangeFlag] = useState(false);
 
@@ -151,109 +144,51 @@ const RequestEditTemplate = (props) => {
 	}, []);
 
 	const [formData, setFormData] = useState(() => {
+		console.log("RequestEditTemplate - Initializing formData with data:", data);
 		const storedPrefs = getStoredPreferences();
+		const isNewRequest = !data._id;
 		const now = new Date();
 
-		console.log("RequestEditTemplate - Initializing formData:", {
+		console.log("RequestEditTemplate - Initial form data:", {
 			isNewRequest,
 			storedPrefs,
 			data,
+			props,
 		});
 
-		// For existing records, use the data directly
-		if (!isNewRequest) {
-			console.log("Editing existing record with data:", data);
-			return {
-				...data,
-				requestcategory: data.requestcategory || data.categoryname || "",
-				requestname: data.requestname || "",
-				quantity: data.quantity || 1,
-				comments: data.comments || "",
-				vendortype: data.vendortype || "MSA",
-				vendorName: data.vendorName || data.ssrVendorName || "",
-				status: data.status || "NOT-AWARDED",
-				statusdate: data.statusdate ? new Date(data.statusdate) : now,
-				datetimerequested: data.datetimerequested
-					? new Date(data.datetimerequested)
-					: getDefaultDateTime(),
-				creationdate: data.creationdate ? new Date(data.creationdate) : now,
-				customername: data.customername || "",
-				customercontact: data.customercontact || "",
-				projectname: data.projectname || "",
-				rigcompany: data.rigcompany || "",
-				rigcompanycontact: data.rigcompanycontact || "",
-			};
-		}
-
-		// For new records, use stored preferences
-		return {
-			requestcategory: "",
-			requestname: "",
-			quantity: 1,
-			comments: "",
-			vendortype: "MSA",
-			vendorName: "",
-			status: storedPrefs.status || "NOT-AWARDED",
-			statusdate: now,
-			datetimerequested: getDefaultDateTime(),
-			creationdate: now,
-			customername: storedPrefs.customername || "",
-			customercontact: storedPrefs.customercontact || "",
-			projectname: storedPrefs.projectname || "",
-			rigcompany: storedPrefs.rigcompany || "",
-			rigcompanycontact: storedPrefs.rigcompanycontact || "",
+		const initialData = {
+			...data,
+			requestcategory: data.requestcategory || "",
+			requestname: data.requestname || "",
+			quantity: data.quantity || 1,
+			comments: data.comments || "",
+			vendortype: data.vendortype || "MSA",
+			vendorName: data.vendorName || "",
+			status: isNewRequest ? storedPrefs.status || "NOT-AWARDED" : data.status,
+			statusdate: data.statusdate || now,
+			datetimerequested: data.datetimerequested || getDefaultDateTime(),
+			creationdate: data.creationdate || now,
+			customername: isNewRequest ? storedPrefs.customername : data.customername,
+			customercontact: isNewRequest
+				? storedPrefs.customercontact
+				: data.customercontact,
+			projectname: isNewRequest ? storedPrefs.projectname : data.projectname,
+			rigcompany: isNewRequest ? storedPrefs.rigcompany : data.rigcompany,
+			rigcompanycontact: isNewRequest
+				? storedPrefs.rigcompanycontact
+				: data.rigcompanycontact,
 		};
+
+		console.log("RequestEditTemplate - Initialized formData:", initialData);
+		return initialData;
 	});
-
-	const [isLoading, setIsLoading] = useState(false);
-	const [customerOptions, setCustomerOptions] = useState([]);
-	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
-	const [rigCompanyContactOptions, setRigCompanyContactOptions] = useState([]);
-	const [contactOptions, setContactOptions] = useState([]);
-	const [projectOptions, setProjectOptions] = useState([]);
-	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
-	const [msaVendorOptions, setMSAVendorOptions] = useState([]);
-	const [allCategories, setAllCategories] = useState([]);
-	const [filteredProducts, setFilteredProducts] = useState([]);
-	const [products, setProducts] = useState([]);
-	const [allProducts, setAllProducts] = useState([]);
-
-	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
-
-	// Update FilterProducts function to be memoized
-	const FilterProducts = useCallback(
-		(selectedCategory) => {
-			try {
-				if (!selectedCategory || !allProducts?.length) {
-					console.log("No category selected or no products available");
-					setFilteredProducts([]);
-					return;
-				}
-
-				const filtered = allProducts
-					.filter((p) => p.categoryname === selectedCategory)
-					.map((p) => ({
-						text: p.productname,
-						value: p.productname,
-					}));
-				const uniqueFiltered = [...new Set(filtered.map(JSON.stringify))].map(
-					JSON.parse,
-				);
-				setFilteredProducts(uniqueFiltered);
-			} catch (error) {
-				console.error("Error filtering products:", error);
-				setFilteredProducts([]);
-			}
-		},
-		[allProducts],
-	);
 
 	// Add useEffect to handle initial data loading
 	useEffect(() => {
 		const isNewRequest = !data._id;
 		if (isNewRequest) {
 			const storedPrefs = getStoredPreferences();
-			console.log("Loading stored preferences for new request:", storedPrefs);
+			// console.log("Loading stored preferences for new request:", storedPrefs);
 
 			setFormData((prev) => ({
 				...prev,
@@ -264,49 +199,8 @@ const RequestEditTemplate = (props) => {
 				rigcompanycontact: storedPrefs.rigcompanycontact || "",
 				status: storedPrefs.status || "NOT-AWARDED",
 			}));
-		} else {
-			console.log("Editing existing request with data:", {
-				requestcategory: data.requestcategory,
-				requestname: data.requestname,
-				vendortype: data.vendortype,
-				ssrVendorName: data.ssrVendorName,
-			});
-
-			// Set the category and product immediately
-			if (data.requestcategory) {
-				console.log("Setting category:", data.requestcategory);
-				setFormData((prev) => ({
-					...prev,
-					requestcategory: data.requestcategory,
-					requestname: data.requestname || "",
-				}));
-
-				// Then filter products for this category
-				console.log("Filtering products for category:", data.requestcategory);
-				FilterProducts(data.requestcategory);
-			}
 		}
-	}, [
-		data._id,
-		getStoredPreferences,
-		FilterProducts,
-		data.requestcategory,
-		data.requestname,
-		data.vendortype,
-		data.ssrVendorName,
-	]);
-
-	// Add useEffect to handle SSR vendor population for existing records
-	useEffect(() => {
-		if (
-			formData.requestcategory &&
-			formData.requestname &&
-			formData.vendortype === "SSR"
-		) {
-			console.log("Form data has SSR requirements, triggering GetSSRVendors");
-			GetSSRVendors();
-		}
-	}, [formData.requestcategory, formData.requestname, formData.vendortype]);
+	}, [data._id, getStoredPreferences]);
 
 	// Template state
 	const [templates, setTemplates] = useState([]);
@@ -364,6 +258,21 @@ const RequestEditTemplate = (props) => {
 			setFormData((prev) => ({ ...prev, rigcompanycontact: "" }));
 		}
 	};
+
+	const [isLoading, setIsLoading] = useState(false);
+	const [customerOptions, setCustomerOptions] = useState([]);
+	const [rigCompanyOptions, setRigCompanyOptions] = useState([]);
+	const [rigCompanyContactOptions, setRigCompanyContactOptions] = useState([]);
+	const [contactOptions, setContactOptions] = useState([]);
+	const [projectOptions, setProjectOptions] = useState([]);
+	const [readOnlyFlag, setReadOnlyFlag] = useState(false);
+	const [msaVendorOptions, setMSAVendorOptions] = useState([]);
+	const [allCategories, setAllCategories] = useState([]);
+	const [filteredProducts, setFilteredProducts] = useState([]);
+	const [products, setProducts] = useState([]);
+	const [allProducts, setAllProducts] = useState([]);
+
+	const vendorTypeOptions = ["MSA", "OPEN", "SSR"];
 
 	// Get the project data
 	const { data: projData } = useQuery({
@@ -444,6 +353,34 @@ const RequestEditTemplate = (props) => {
 			setFilteredProducts([]);
 		}
 	}, [allProducts, formData.requestcategory]);
+
+	// Update FilterProducts function to be memoized
+	const FilterProducts = useCallback(
+		(selectedCategory) => {
+			try {
+				if (!selectedCategory || !allProducts?.length) {
+					console.log("No category selected or no products available");
+					setFilteredProducts([]);
+					return;
+				}
+
+				const filtered = allProducts
+					.filter((p) => p.categoryname === selectedCategory)
+					.map((p) => ({
+						text: p.productname,
+						value: p.productname,
+					}));
+				const uniqueFiltered = [...new Set(filtered.map(JSON.stringify))].map(
+					JSON.parse,
+				);
+				setFilteredProducts(uniqueFiltered);
+			} catch (error) {
+				console.error("Error filtering products:", error);
+				setFilteredProducts([]);
+			}
+		},
+		[allProducts],
+	);
 
 	const getCustomers = useCallback((firms) => {
 		if (firms === undefined || firms === null) return [];
@@ -840,10 +777,14 @@ const RequestEditTemplate = (props) => {
 						onChange={(e) => setNewTemplateName(e.target.value)}
 					/>
 					<div className="mb-4">
-						<label className="block text-sm font-medium text-gray-700 mb-2">
+						<label
+							className="block text-sm font-medium text-gray-700 mb-2"
+							htmlFor="templateVisibility"
+						>
 							Template Visibility
 						</label>
 						<select
+							id="templateVisibility"
 							className="w-full p-2 border rounded"
 							value={templateVisibility}
 							onChange={(e) => setTemplateVisibility(e.target.value)}
