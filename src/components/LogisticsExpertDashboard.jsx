@@ -17,6 +17,8 @@ import DeliveryScheduleView from "./DeliveryScheduleView";
 import DeliveryAssociateDialog from "./DeliveryAssociateDialog";
 import LogisticsExpertDialog from "./LogisticsExpertDialog";
 import ConfirmationDialog from "./ConfirmationDialog";
+import RouteDesigner from "./route-designer/RouteDesigner";
+import { RouteProvider } from "./route-designer/RouteContext";
 import {
 	fetchDeliveryAssignments,
 	GetDeliveryAssociates,
@@ -45,6 +47,7 @@ const LogisticsExpertDashboard = () => {
 		message: "",
 		onConfirm: null,
 	});
+	const [isRouteDesignerFullscreen, setIsRouteDesignerFullscreen] = useState(false);
 
 	// Fetch delivery assignments for the selected date range
 	const { data: assignmentsResponse, isLoading: isLoadingAssignments } =
@@ -69,6 +72,24 @@ const LogisticsExpertDashboard = () => {
 		queryKey: ["deliveryAssociates"],
 		queryFn: GetDeliveryAssociates,
 	});
+
+	// Helper functions for workload analysis
+	const calculateTotalHours = (deliveryAssociateId) => {
+		// Calculate total hours for this delivery associate
+		const associateAssignments = assignments.filter(
+			assignment => assignment.deliveryAssociateId === deliveryAssociateId
+		);
+		return associateAssignments.reduce((total, assignment) => {
+			return total + (assignment.estimatedHours || 0);
+		}, 0);
+	};
+
+	const calculateAssignmentCount = (deliveryAssociateId) => {
+		// Count assignments for this delivery associate
+		return assignments.filter(
+			assignment => assignment.deliveryAssociateId === deliveryAssociateId
+		).length;
+	};
 
 	const handleTabChange = (event, newValue) => {
 		setSelectedTab(newValue);
@@ -314,6 +335,7 @@ const LogisticsExpertDashboard = () => {
 					<Tab label="Assignments" />
 					<Tab label="Workload Analysis" />
 					<Tab label="Logistics Expert" />
+					<Tab label="Route Optimizer" />
 				</Tabs>
 			</Paper>
 
@@ -439,6 +461,39 @@ const LogisticsExpertDashboard = () => {
 							)}
 						</Box>
 					)}
+					{selectedTab === 4 && !isRouteDesignerFullscreen && (
+						<Box sx={{ mb: 2 }}>
+							<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+								<Typography variant="h6">
+									Route Optimizer
+								</Typography>
+								<Button
+									variant="contained"
+									color="primary"
+									onClick={() => setIsRouteDesignerFullscreen(true)}
+									sx={{ 
+										bgcolor: 'success.main',
+										'&:hover': { bgcolor: 'success.dark' }
+									}}
+								>
+									🔍 Fullscreen View
+								</Button>
+							</Box>
+							<RouteProvider>
+								<Box 
+									sx={{ 
+										height: 'calc(100vh - 300px)',
+										border: '1px solid #ddd',
+										borderRadius: 1,
+										overflow: 'hidden',
+										position: 'relative'
+									}}
+								>
+									<RouteDesigner />
+								</Box>
+							</RouteProvider>
+						</Box>
+					)}
 				</>
 			)}
 
@@ -475,6 +530,64 @@ const LogisticsExpertDashboard = () => {
 				onConfirm={confirmDialogConfig.onConfirm}
 				onCancel={() => setIsConfirmDialogOpen(false)}
 			/>
+
+			{/* Fullscreen Route Designer Overlay */}
+			{isRouteDesignerFullscreen && (
+				<Box
+					sx={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
+						right: 0,
+						bottom: 0,
+						zIndex: 9999,
+						bgcolor: 'background.default'
+					}}
+				>
+					{/* Fullscreen Header with Exit Button */}
+					<Box
+						sx={{
+							position: 'absolute',
+							top: 0,
+							left: 0,
+							right: 0,
+							zIndex: 10000,
+							bgcolor: 'white',
+							borderBottom: '1px solid #ddd',
+							px: 3,
+							py: 2,
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
+							boxShadow: 1
+						}}
+					>
+						<Typography variant="h5" sx={{ fontWeight: 'bold', color: 'success.main' }}>
+							Route Optimizer - Fullscreen Mode
+						</Typography>
+						<Button
+							variant="contained"
+							color="secondary"
+							onClick={() => setIsRouteDesignerFullscreen(false)}
+							sx={{ 
+								bgcolor: 'error.main',
+								'&:hover': { bgcolor: 'error.dark' }
+							}}
+						>
+							✕ Exit Fullscreen
+						</Button>
+					</Box>
+
+					{/* Fullscreen Route Designer */}
+					<Box sx={{ pt: '64px', height: '100vh' }}>
+						<RouteProvider>
+							<Box sx={{ height: 'calc(100vh - 64px)' }}>
+								<RouteDesigner />
+							</Box>
+						</RouteProvider>
+					</Box>
+				</Box>
+			)}
 		</Box>
 	);
 };

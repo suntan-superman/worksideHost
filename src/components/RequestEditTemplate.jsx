@@ -26,30 +26,6 @@ import {
 } from "../utils/useSweetAlert";
 import useUserStore from "../stores/UserStore";
 
-// Set Selection Options
-// const categoryOptions = [
-// 	"Frac Services",
-// 	"Cementing",
-// 	"Drilling Tools Rental",
-// 	"Inspection and Testing",
-// 	"Containments",
-// 	"Mud Management",
-// 	"Generators, Engines",
-// 	"Fluid Storage",
-// 	"Rig Mats",
-// 	"Rig Walking Systems",
-// 	"Rig Moving",
-// 	"Rig Cleaning",
-// 	"Rig Maintenance",
-// 	"Rig Decommissioning",
-// 	"Rig Commissioning",
-// 	"Rig Construction",
-// 	"Rig Upgrades",
-// 	"Rig Refurbishment",
-// 	"Rig Inspection",
-// 	"Rig Certification",
-// ];
-
 import { requestStatusOptions } from "../data/worksideOptions";
 
 /**
@@ -204,6 +180,49 @@ const RequestEditTemplate = (props) => {
 			rigcompanycontact: storedPrefs.rigcompanycontact || "",
 		};
 	});
+
+	useEffect(() => {
+		if (props && props._id) {
+			if (formData.isNewRequest || formData._id !== props._id) {
+				setFormData((prevData) => ({
+					...prevData,
+					isNewRequest: false,
+					...props,
+				}));
+				console.log("Editing existing record with data:", props);
+			}
+		} else {
+			if (!formData.isNewRequest) {
+				setFormData((prevData) => ({
+					...prevData,
+					isNewRequest: true,
+				}));
+				console.log("Creating new record");
+			}
+		}
+	}, [props, formData.isNewRequest, formData._id]);
+
+	const handleSave = () => {
+		if (!formData.isNewRequest && formData._id) {
+			console.log("Saving existing record with ID:", formData._id);
+			// Ensure the _id is included in the save payload for updates
+			const saveData = {
+				...formData,
+				_id: formData._id,
+			};
+			console.log("Save payload for update:", saveData);
+			// Call save API or pass data to parent
+		} else {
+			console.log("Adding new record");
+			// Exclude _id for new records
+			const saveData = {
+				...formData,
+				_id: undefined,
+			};
+			console.log("Save payload for new record:", saveData);
+			// Handle new record save logic
+		}
+	};
 
 	const [isLoading, setIsLoading] = useState(false);
 	const [customerOptions, setCustomerOptions] = useState([]);

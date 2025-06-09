@@ -53,28 +53,28 @@ export default function DashboardXX() {
 	const supplierList = [
 		{
 			id: "PRD-005",
-			name: "Baker Hughes",
-			rating: "5",
-		},
-		{
-			id: "PRD-004",
 			name: "Halliburton",
 			rating: "4.9",
 		},
 		{
+			id: "PRD-004",
+			name: "Baker Hughes",
+			rating: "4.7",
+		},
+		{
 			id: "PRD-003",
 			name: "EnergyLink",
-			rating: "4.9",
+			rating: "4.6",
 		},
 		{
 			id: "PRD-002",
 			name: "Basic",
-			rating: "4.85",
+			rating: "4.55",
 		},
 		{
 			id: "PRD-001",
 			name: "San Joaquin Bit",
-			rating: "3.0",
+			rating: "3.5",
 		},
 	];
 

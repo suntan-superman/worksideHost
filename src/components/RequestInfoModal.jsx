@@ -28,7 +28,6 @@ import {
 	GetSupplierIDFromName,
 } from "../api/worksideAPI";
 
-
 import {
 	showErrorDialog,
 	showSuccessDialogWithTimer,
@@ -213,7 +212,10 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	// Fetch route data from the backend
 	const fetchRouteData = useCallback(async () => {
 		if (!requestData?._id || !requestData?.ssrVendorId) {
-			console.log("Missing required data for fetchRouteData");
+			console.log("Missing required data for fetchRouteData", {
+				requestId: requestData?._id,
+				supplierId: requestData?.ssrVendorId,
+			});
 			return;
 		}
 
@@ -233,6 +235,8 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					},
 				);
 
+				console.log("Delivery location response:", response.data);
+
 				if (response.data && response.data.length > 0) {
 					const formattedRoute = response.data.map((point) => ({
 						lat: point.lat,
@@ -250,17 +254,24 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					return; // Exit if we successfully got delivery location
 				}
 			} catch (error) {
-				console.log("No delivery location available, trying supplier location");
+				console.log("No delivery location available, trying supplier location", error);
 			}
 
 			// If we get here, either the API call failed or no delivery location was found
 			// Try to get supplier location
+			console.log(
+				"Fetching supplier location for ID:",
+				requestData.ssrVendorId,
+			);
 			const supplierResponse = await GetSupplierInfoFromID(
 				requestData.ssrVendorId,
 			);
 
+			console.log("Supplier response:", supplierResponse);
+
 			if (supplierResponse?.status === 200 && supplierResponse?.data) {
 				const supplier = supplierResponse.data;
+				console.log("Supplier data:", supplier);
 				if (supplier.lat && supplier.lng) {
 					setLastLocation({
 						lat: supplier.lat,
@@ -269,12 +280,15 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 					setLastUpdate("Supplier Location");
 					setRouteData([]); // Clear any existing route
 				} else {
+					console.log("Supplier location not available in response:", supplier);
 					setLocationError("Supplier location not available");
 				}
 			} else {
+				console.log("Failed to fetch supplier location:", supplierResponse);
 				setLocationError("Supplier location not available");
 			}
 		} catch (error) {
+			console.error("Error fetching location data:", error);
 			showErrorDialog(`Failed to fetch location data: ${error.message}`);
 		}
 	}, [requestData]);

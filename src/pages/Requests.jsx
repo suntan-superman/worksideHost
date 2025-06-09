@@ -185,20 +185,20 @@ const Requests = () => {
 	const [dateRangeFilter, setDateRangeFilter] = useState("all");
 	const [filteredRequestList, setFilteredRequestList] = useState(null);
 
-		useEffect(() => {
-			const numGridRows = Number(localStorage.getItem("numGridRows"));
-			if (numGridRows) gridPageSize = numGridRows;
+	useEffect(() => {
+		const numGridRows = Number(localStorage.getItem("numGridRows"));
+		if (numGridRows) gridPageSize = numGridRows;
 
-			const companyName = localStorage.getItem("companyName");
-			clientName = companyName;
-			setCompanyName(companyName);
+		const companyName = localStorage.getItem("companyName");
+		clientName = companyName;
+		setCompanyName(companyName);
 
-			const savedFilters = localStorage.getItem("requestFilterSelections");
-			if (savedFilters) {
-				const filters = JSON.parse(savedFilters);
-				setActiveFilters(filters);
-			}
-		}, []);
+		const savedFilters = localStorage.getItem("requestFilterSelections");
+		if (savedFilters) {
+			const filters = JSON.parse(savedFilters);
+			setActiveFilters(filters);
+		}
+	}, []);
 
 	const {
 		data: reqData,
@@ -332,8 +332,14 @@ const Requests = () => {
 		setDateRangeFilter(event.target.value);
 	};
 
-	if (reqError) {
-		console.log(`Error: ${reqError}`);
+	if (reqLoading) {
+		return (
+			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
+				<div className="absolute top-[50%] left-[50%]">
+					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
+				</div>
+			</div>
+		);
 	}
 
 	const FilterOptions = {
@@ -418,8 +424,16 @@ const Requests = () => {
 	};
 
 	const actionBegin = (args) => {
-		if (args.requestType === "save" && args.form) {
-			// Handle form validation if needed
+		if (args.requestType === "save") {
+			console.log("Saving record with args:", args);
+			if (!args.form || !args.form.elements) {
+				console.error("Form elements are not available during save operation.");
+				return;
+			}
+			console.log(
+				"Form elements available for save operation:",
+				args.form.elements,
+			);
 		}
 	};
 
@@ -464,55 +478,39 @@ const Requests = () => {
 		}
 	};
 
-	const actionComplete = async (args) => {
+	const actionComplete = (args) => {
 		console.log("actionComplete - args:", args);
-		
+
 		if (args.requestType === "beginEdit" || args.requestType === "add") {
 			const dialog = args.dialog;
-			dialog.showCloseIcon = false;
-			setInsertFlag(args.requestType === "add");
-			
-			// Get the actual record data from the grid
-			const recordData = args.rowData;
-			console.log("Editing record data:", recordData);
-			
-			dialog.header =
-				args.requestType === "beginEdit"
-					? `Edit Request: ${recordData.projectname} ${recordData.requestname}`
-					: "Workside New Request";
+			if (dialog) {
+				dialog.showCloseIcon = false;
+				dialog.isResizable = true;
+				dialog.enableResize = true;
+				dialog.height = "480px";
+				dialog.width = "600px";
+
+				const formObj = args.form?.ej2_instances?.[0];
+				if (formObj) {
+					formObj.addRules("requestname", { required: true });
+					formObj.addRules("customername", { required: true });
+					formObj.addRules("projectname", { required: true });
+					formObj.addRules("status", { required: true });
+					formObj.addRules("datetimerequested", { required: true });
+				}
+			}
 		}
+
 		if (args.requestType === "save") {
-			// Get the actual record data from the grid
-			const recordData = args.rowData;
+			const recordData = args.data;
+			if (!recordData) {
+				console.error("No record data available for saving.");
+				return;
+			}
 			console.log("Saving record data:", recordData);
 
-			// Prepare the data with all required fields
-			const requestData = {
-				...args.data,
-				_id: recordData._id, // Ensure we have the correct _id
-				requestorid: userId || "",
-				categoryname: args.data.requestcategory,
-				comments: args.data.comments || args.data.comment || "",
-				customercontact: args.data.customercontact || "",
-				rigcompanycontact: args.data.rigcompanycontact || "",
-				project_id: await GetProjectID(args.data.projectname),
-				ssrVendorName:
-					args.data.vendorType === "SSR" ? args.data.vendorName : "",
-				ssrVendorId:
-					args.data.vendorType === "SSR"
-						? await GetVendorID(args.data.vendorName)
-						: "",
-				creationdate: args.data.creationdate || new Date(),
-				datetimerequested: args.data.datetimerequested || getNextWholeHour(),
-				statusdate: args.data.statusdate || new Date(),
-				status: args.data.status || "OPEN",
-				vendortype: args.data.vendortype || "MSA",
-				quantity: args.data.quantity || 1,
-			};
-
-			console.log("Prepared request data:", requestData);
-			setMessageText(`Update Request ${requestData.requestname} Details?`);
-			setCurrentRecord(requestData);
+			setMessageText(`Update Request: ${recordData.requestname} Details?`);
+			setCurrentRecord(recordData);
 			setOpenUpdateModal(true);
 		}
 	};
@@ -676,16 +674,6 @@ const Requests = () => {
 			console.log("handleRemoveFilter - Grid ref not available");
 		}
 	};
-
-	if (reqLoading) {
-		return (
-			<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">
-				<div className="absolute top-[50%] left-[50%]">
-					<div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-green-500" />
-				</div>
-			</div>
-		);
-	}
 
 	return (
 		<div className="relative bg-gainsboro-100 w-full h-[768px] overflow-hidden text-left text-lg text-black font-paragraph-button-text">

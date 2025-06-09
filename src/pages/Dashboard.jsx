@@ -42,12 +42,12 @@ export default function Dashboard() {
 	const supplierList = [
 		{
 			id: "PRD-005",
-			name: "Baker Hughes",
+			name: "Halliburton",
 			rating: "5",
 		},
 		{
 			id: "PRD-004",
-			name: "Halliburton",
+			name: "Baker Hughes",
 			rating: "4.9",
 		},
 		{
