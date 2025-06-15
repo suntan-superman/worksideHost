@@ -14,6 +14,7 @@ import {
 	Box,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
+import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
 
 /**
  * HelpDialog component provides a modal dialog for submitting user feedback.
@@ -43,6 +44,18 @@ const HelpDialog = ({ open, onClose }) => {
 
 	const handleSubmit = async () => {
 		try {
+			// Get userName from localStorage
+			const userEmail = localStorage.getItem("userEmail");
+			const loginName = localStorage.getItem("loginName");
+			
+			// Use userEmail if available, otherwise fall back to loginName
+			const userName = userEmail ? JSON.parse(userEmail) : loginName;
+			
+			if (!userName) {
+				console.error("No userName found in localStorage");
+				return;
+			}
+
 			const response = await fetch(
 				`${process.env.REACT_APP_MONGO_URI}/api/feedback`,
 				{
@@ -53,6 +66,7 @@ const HelpDialog = ({ open, onClose }) => {
 					body: JSON.stringify({
 						type: feedbackType,
 						description,
+						userName,
 						status: "open",
 					}),
 				},
@@ -60,6 +74,7 @@ const HelpDialog = ({ open, onClose }) => {
 			if (response.ok) {
 				setDescription("");
 				onClose();
+				showSuccessDialogWithTimer("Feedback submitted successfully!");
 			}
 		} catch (error) {
 			console.error("Error submitting feedback:", error);
@@ -94,7 +109,7 @@ const HelpDialog = ({ open, onClose }) => {
 								label="Idea"
 							/>
 							<FormControlLabel
-								value="small-bug"
+								value="smallBug"
 								control={
 									<Radio
 										sx={{
@@ -108,7 +123,7 @@ const HelpDialog = ({ open, onClose }) => {
 								label="Small Bug"
 							/>
 							<FormControlLabel
-								value="urgent-bug"
+								value="urgentBug"
 								control={
 									<Radio
 										sx={{
