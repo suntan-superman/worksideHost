@@ -101,7 +101,7 @@ const SupplierProductEditTemplate = (props) => {
 	const checkForDuplicate = async (supplier, category, product) => {
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct/check-duplicate`,
+				`${process.env.REACT_APP_API_URL}/api/supplierproduct/check-duplicate`,
 				{
 					method: "POST",
 					headers: {

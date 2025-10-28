@@ -106,11 +106,17 @@ const CustomerSupplierMSATabX = () => {
 	const GetCustomerSupplierMSAData = async (id) => {
 		if (id) {
 			// TODO Fix This
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customersuppliermsa/${id}`;
-			// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+			const fetchString = `${process.env.REACT_APP_API_URL}/api/customersuppliermsa/${id}`;
+			// const fetchString = `${process.env.REACT_APP_API_URL}/api/suppliergroup/${id}`;
+			
+			// Get authentication token
+			const token = localStorage.getItem('auth_token');
 			const requestOptions = {
 				method: "GET",
-				headers: { "Content-Type": "application/json" },
+				headers: { 
+					"Content-Type": "application/json",
+					...(token && { "Authorization": `Bearer ${token}` })
+				},
 			};
 			try {
 				fetch(fetchString, requestOptions).then((response) => {
@@ -137,7 +143,7 @@ const CustomerSupplierMSATabX = () => {
 	};
 
 	const GetSupplierId = async (supplierName) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/firm/getSupplierIdByName/${supplierName}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/firm/getSupplierIdByName/${supplierName}`;
 		let supplierId = "";
 		try {
 			await axios.get(fetchString).then((response) => {
@@ -164,7 +170,7 @@ const CustomerSupplierMSATabX = () => {
 	const addRecord = async (record) => {
 		// Get Supplier ID
 		const supplierId = await GetSupplierId(record.suppliername);
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customersuppliermsa/`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/customersuppliermsa/`;
 		const requestOptions = {
 			method: "POST",
 			body: JSON.stringify({
@@ -195,7 +201,7 @@ const CustomerSupplierMSATabX = () => {
 
 	// Function to update a record
 	const updateRecord = async (record) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customersuppliermsa/${record._id}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/customersuppliermsa/${record._id}`;
 		const requestOptions = {
 			method: "PATCH",
 			body: JSON.stringify({
@@ -231,7 +237,7 @@ const CustomerSupplierMSATabX = () => {
 
 	// Function to delete a record
 	const deleteRecord = async (record) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/customersuppliermsa/${record._id}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/customersuppliermsa/${record._id}`;
 		const requestOptions = {
 			method: "DELETE",
 			headers: {

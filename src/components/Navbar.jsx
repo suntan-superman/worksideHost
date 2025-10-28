@@ -152,8 +152,18 @@ const NavBar = () => {
 				const contactId = localStorage.getItem("contactID")?.replace(/"/g, "");
 				if (!contactId) return;
 
+				// Get auth token
+				const token = localStorage.getItem('auth_token');
+				const headers = {
+					'Content-Type': 'application/json',
+				};
+				if (token) {
+					headers['Authorization'] = `Bearer ${token}`;
+				}
+
 				const response = await axios.get(
-					`${process.env.REACT_APP_MONGO_URI}/api/contact/${contactId}`,
+					`${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/contact/${contactId}`,
+					{ headers }
 				);
 				if (response.data && response.data.avatar) {
 					setUserAvatar(response.data.avatar);

@@ -17,7 +17,7 @@ import "../index.css";
 
 import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
 
-const apiUrl = process.env.REACT_APP_MONGO_URI;
+const apiUrl = process.env.REACT_APP_API_URL;
 
 let gridPageSize = 12;
 
@@ -48,7 +48,7 @@ let gridPageSize = 12;
  *
  * Dependencies:
  * - `GridComponent` from Syncfusion for rendering the grid.
- * - Environment variable `REACT_APP_MONGO_URI` for API endpoint configuration.
+ * - Environment variable `REACT_APP_API_URL` for API endpoint configuration.
  *
  * Returns:
  * - A JSX element containing the product management interface.
@@ -92,7 +92,7 @@ const Products = () => {
 		const fetchProducts = async () => {
 			setIsLoading(true);
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product`,
+				`${process.env.REACT_APP_API_URL}/api/product`,
 			);
 			const json = await response.json();
 
@@ -107,7 +107,7 @@ const Products = () => {
 	// }, [dispatch]);
 
 	const handleDelete = async () => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/product/${selectedRecord}`;
 		const response = await fetch(fetchString, {
 			method: "DELETE",
 		});
@@ -144,7 +144,7 @@ const Products = () => {
 
 				if (insertFlag === true) {
 					const response = await fetch(
-						`${process.env.REACT_APP_MONGO_URI}/api/product/`,
+						`${process.env.REACT_APP_API_URL}/api/product/`,
 						{
 							method: "POST",
 							body: JSON.stringify(data),

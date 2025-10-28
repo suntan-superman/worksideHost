@@ -146,7 +146,7 @@ const ProductsTab = () => {
 
 	const handleProductDelete = async () => {
 		const response = await fetch(
-			`${process.env.REACT_APP_MONGO_URI}/api/product/${selectedRecord}`,
+			`${process.env.REACT_APP_API_URL}/api/product/${selectedRecord}`,
 			{
 				method: "DELETE",
 			},
@@ -206,7 +206,7 @@ const ProductsTab = () => {
 		setOpenUpdateModal(false);
 		if (insertFlag === true) {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product/`,
+				`${process.env.REACT_APP_API_URL}/api/product/`,
 				{
 					method: "POST",
 					body: JSON.stringify(currentRecord),
@@ -222,7 +222,7 @@ const ProductsTab = () => {
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/product/${currentRecord._id}`,
 				{
 					method: "PATCH",
 					body: JSON.stringify(currentRecord),

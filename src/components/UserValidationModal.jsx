@@ -25,7 +25,7 @@ const UserValidationModal = ({ recordID, open, onOK, onClose }) => {
 	// Utilize useEffect to get Request Details
 	// useEffect(() => {
 	//   const fetchRequest = async () => {
-	//     const apiUrl = process.env.REACT_APP_MONGO_URI;
+	//     const apiUrl = process.env.REACT_APP_API_URL;
 
 	// 					// const fetchString = `${apiUrl}/api/request/${recordID}`;
 	// 					const fetchString = `/api/request/${recordID}`;

@@ -48,8 +48,9 @@ const RouteTracker = ({
 
 	const fetchRouteData = useCallback(async () => {
 		try {
+			const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 			const response = await axios.post(
-				"https://workside-software.wl.r.appspot.com/api/mapping/coordinates",
+				`${apiURL}/api/mapping/coordinates`,
 				{
 					requestid: requestId,
 					supplierid: supplierId,

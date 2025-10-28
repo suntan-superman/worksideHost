@@ -64,7 +64,7 @@ import {
  * @dependencies
  * - React hooks: `useState`, `useEffect`, `useCallback`, `useRef`
  * - External libraries: `axios`, `react-query`, `react-draggable`, `date-fns`
- * - Environment variables: `REACT_APP_GOOGLE_MAPS_API_KEY`, `REACT_APP_MONGO_URI`
+ * - Environment variables: `REACT_APP_GOOGLE_MAPS_API_KEY`, `REACT_APP_API_URL`
  *
  * @todo
  * - Replace hardcoded request and supplier IDs in `fetchRouteData` with dynamic values.
@@ -166,12 +166,17 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		});
 	};
 
-	const apiUrl = process.env.REACT_APP_MONGO_URI;
+	const apiUrl = process.env.REACT_APP_API_URL;
 
 	useEffect(() => {
 		const fetchRequest = async () => {
 			const fetchString = `${apiUrl}/api/request/${recordID}`;
-			const response = await fetch(fetchString);
+			
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) headers['Authorization'] = `Bearer ${token}`;
+			
+			const response = await fetch(fetchString, { headers });
 			const json = await response.json();
 
 			// Store the complete request data
@@ -222,17 +227,19 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 		try {
 			// First try to get the delivery location
 			try {
+				const token = localStorage.getItem('auth_token');
+				const headers = { 
+					"Content-Type": "application/json",
+					...(token && { "Authorization": `Bearer ${token}` })
+				};
+				
 				const response = await axios.post(
-					`${process.env.REACT_APP_MONGO_URI}/api/mapping/coordinates`,
+					`${process.env.REACT_APP_API_URL}/api/mapping/coordinates`,
 					{
 						requestid: requestData._id,
 						supplierid: requestData.ssrVendorId,
 					},
-					{
-						headers: {
-							"Content-Type": "application/json",
-						},
-					},
+					{ headers }
 				);
 
 				console.log("Delivery location response:", response.data);
@@ -336,8 +343,12 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 	// Add new handler for DA assignment
 	const handleDAAssignment = async (deliveryAssociateId, estimatedHours) => {
 		try {
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) headers['Authorization'] = `Bearer ${token}`;
+			
 			const response = await axios.put(
-				`${process.env.REACT_APP_MONGO_URI}/api/requestbid/${recordID}/da-assignment`,
+				`${process.env.REACT_APP_API_URL}/api/requestbid/${recordID}/da-assignment`,
 				{
 					deliveryAssociateId: deliveryAssociateId,
 					status: "ASSIGNED",
@@ -347,6 +358,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 						estimatedHours,
 					),
 				},
+				{ headers }
 			);
 
 			if (response.status === 200) {
@@ -501,8 +513,13 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			// Fetch project data using the project ID
 			const fetchProjectData = async () => {
 				try {
+					const token = localStorage.getItem('auth_token');
+					const headers = { 'Content-Type': 'application/json' };
+					if (token) headers['Authorization'] = `Bearer ${token}`;
+					
 					const response = await axios.get(
 						`${apiUrl}/api/project/${requestData.project_id}`,
+						{ headers }
 					);
 
 					if (response.data) {

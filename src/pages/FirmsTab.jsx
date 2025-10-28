@@ -375,7 +375,7 @@ const FirmsTab = () => {
 		setOpenDeleteModal(false);
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/firm/${currentRecord._id}`,
 				{
 					method: "DELETE",
 				},
@@ -423,7 +423,7 @@ const FirmsTab = () => {
 
 				if (insertFlag === true) {
 					const response = await fetch(
-						`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
+						`${process.env.REACT_APP_API_URL}/api/firm/`,
 						{
 							method: "POST",
 							body: JSON.stringify(data),
@@ -484,7 +484,7 @@ const FirmsTab = () => {
 		if (insertFlag === true) {
 			console.log("Inserting new firm");
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm/`,
+				`${process.env.REACT_APP_API_URL}/api/firm/`,
 				{
 					method: "POST",
 					body: JSON.stringify(currentRecord),
@@ -535,7 +535,7 @@ const FirmsTab = () => {
 			}
 
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/firm/${currentRecord._id}`,
 				{
 					method: "PATCH",
 					body: JSON.stringify(updateData),

@@ -83,7 +83,7 @@ const DeliveryAssociateDialog = ({
 	const [estimatedArrivalTime, setEstimatedArrivalTime] = useState(null);
 	const [workloadConflict, setWorkloadConflict] = useState(false);
 	const [notes, setNotes] = useState("");
-	const apiURL = process.env.REACT_APP_MONGO_URI;
+	const apiURL = process.env.REACT_APP_API_URL;
 
 	// Fetch delivery associates
 	const { data: deliveryAssociatesResponse, isLoading } = useQuery({

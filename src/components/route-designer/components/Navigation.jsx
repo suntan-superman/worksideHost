@@ -126,7 +126,7 @@ const saveRouteStateToBackend = async (routeState) => {
 
     console.log('Full request data being sent:', JSON.stringify(requestData, null, 2));
 
-    const response = await fetch(`${process.env.REACT_APP_MONGO_URI}api/routes/temp`, {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/temp`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

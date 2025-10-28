@@ -267,9 +267,18 @@ const SupplierGroupUsersTabX = () => {
 	useEffect(() => {
 		const fetchSupplierOptions = async () => {
 			setIsLoading(true);
+			const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+			
+			// Get authentication token
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) {
+				headers['Authorization'] = `Bearer ${token}`;
+			}
+			
 			const response = await fetch(
-				// "http://localhost:4000/api/firm",
-				`${process.env.REACT_APP_MONGO_URI}/api/firm`,
+				`${apiURL}/api/firm`,
+				{ headers }
 			);
 			const json = await response.json();
 			// Get Suppliers
@@ -825,7 +834,7 @@ const SupplierGroupUsersTabX = () => {
 		// TODO Fix This
 		const response = await axios.get(
 			// "http://localhost:4000/api/firm",
-			`${process.env.REACT_APP_MONGO_URI}/api/firm`,
+			`${process.env.REACT_APP_API_URL}/api/firm`,
 		);
 		const data = response.data;
 		const supplierResult = data.filter((d) => d.name === supplierName);
@@ -863,7 +872,7 @@ const SupplierGroupUsersTabX = () => {
 	const GetSupplierGroupData = async (supplierName) => {
 		GetSupplierId(supplierName).then((id) => {
 			if (id) {
-				// const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+				// const fetchString = `${process.env.REACT_APP_API_URL}/api/suppliergroup/${id}`;
 				const fetchString = `https://workside-software.wl.r.appspot.com/api/suppliergroup/${id}`;
 				// const fetchString = `http://localhost:4000/api/suppliergroup/${id}`;
 				const requestOptions = {
@@ -907,7 +916,7 @@ const SupplierGroupUsersTabX = () => {
 	// 	GetSupplierId(supplierName).then((id) => {
 	// 		console.log(`supplier id: ${id}`);
 	// 		if (id) {
-	// 			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/suppliergroup/${id}`;
+	// 			const fetchString = `${process.env.REACT_APP_API_URL}/api/suppliergroup/${id}`;
 	// 			const requestOptions = {
 	// 				method: "GET",
 	// 				headers: { "Content-Type": "application/json" },
@@ -1007,7 +1016,7 @@ const SupplierGroupUsersTabX = () => {
 		};
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/suppliergroup`,
+				`${process.env.REACT_APP_API_URL}/api/suppliergroup`,
 				requestOptions,
 			);
 			const jsonData = await response.json();
@@ -1248,7 +1257,7 @@ const AddGroupForm = ({
 		// Get the list of users if mode === addUser
 		const fetchContacts = async () => {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/contact`,
+				`${process.env.REACT_APP_API_URL}/api/contact`,
 			);
 			const json = await response.json();
 			const customerResult = json.filter((j) => j.firm === currentSupplier);
@@ -1428,7 +1437,7 @@ const AddCategoryOrUserDialog = ({
 		const fetchContacts = async () => {
 			const response = await fetch(
 				// "http://localhost:4000/api/contact",
-				`${process.env.REACT_APP_MONGO_URI}/api/contact`,
+				`${process.env.REACT_APP_API_URL}/api/contact`,
 			);
 			const json = await response.json();
 			const customerResult = json.filter((j) => j.firm === currentSupplier);
@@ -1462,7 +1471,7 @@ const AddCategoryOrUserDialog = ({
 			// TODO Change Back
 			const response = await fetch(
 				// "http://localhost:4000/api/product",
-				`${process.env.REACT_APP_MONGO_URI}/api/product`,
+				`${process.env.REACT_APP_API_URL}/api/product`,
 			);
 			const json = await response.json();
 			const categories = getUniqueCategories(json);

@@ -255,7 +255,7 @@ function RouteDesigner() {
 			};
 
 			const response = await axios.post(
-				`${process.env.REACT_APP_MONGO_URI}api/routes/avoidance-zones`,
+				`${process.env.REACT_APP_API_URL}api/routes/avoidance-zones`,
 				apiData,
 				{
 					headers: {
@@ -278,7 +278,7 @@ function RouteDesigner() {
 	const fetchNearbyZones = useCallback(async (lat, lng, maxDistance = 10000) => {
 		try {
 			const response = await axios.get(
-				`${process.env.REACT_APP_MONGO_URI}api/routes/avoidance-zones/nearby`,
+				`${process.env.REACT_APP_API_URL}api/routes/avoidance-zones/nearby`,
 				{
 					params: { lat, lng, maxDistance }
 				}
@@ -363,7 +363,7 @@ function RouteDesigner() {
 		try {
 			console.log('Deleting standalone avoidance zone:', zoneId);
 			
-			await axios.delete(`${process.env.REACT_APP_MONGO_URI}api/routes/avoidance-zones/${zoneId}`);
+			await axios.delete(`${process.env.REACT_APP_API_URL}api/routes/avoidance-zones/${zoneId}`);
 			
 			console.log('Avoidance zone deleted successfully');
 			
@@ -417,7 +417,7 @@ function RouteDesigner() {
 	const getAffectedRoutes = useCallback(async (zoneId) => {
 		try {
 			const response = await axios.get(
-				`${process.env.REACT_APP_MONGO_URI}api/routes/avoidance-zones/${zoneId}/affected-routes`
+				`${process.env.REACT_APP_API_URL}api/routes/avoidance-zones/${zoneId}/affected-routes`
 			);
 			return response.data || [];
 		} catch (error) {
@@ -1366,7 +1366,7 @@ function RouteDesigner() {
 	const fetchSavedRoutes = useCallback(async () => {
 		// console.log('Fetching saved routes...');
 		try {
-			const response = await axios.get(`${process.env.REACT_APP_MONGO_URI}api/routes`);
+			const response = await axios.get(`${process.env.REACT_APP_API_URL}api/routes`);
 			// console.log('Fetched routes:', response.data);
 			setSavedRoutes(response.data);
 		} catch (error) {
@@ -1399,7 +1399,7 @@ function RouteDesigner() {
 			// Fetch the latest routes directly to ensure we have up-to-date data
 			let currentSavedRoutes = [];
 			try {
-				const response = await axios.get(`${process.env.REACT_APP_MONGO_URI}api/routes`);
+				const response = await axios.get(`${process.env.REACT_APP_API_URL}api/routes`);
 				currentSavedRoutes = response.data;
 				console.log('Fetched current saved routes:', currentSavedRoutes);
 			} catch (fetchError) {
@@ -1410,7 +1410,7 @@ function RouteDesigner() {
 			// Also try to fetch ALL routes including inactive ones to see if there's a conflict
 			let allRoutes = [];
 			try {
-				const allResponse = await axios.get(`${process.env.REACT_APP_MONGO_URI}api/routes?includeInactive=true`);
+				const allResponse = await axios.get(`${process.env.REACT_APP_API_URL}api/routes?includeInactive=true`);
 				allRoutes = allResponse.data;
 				console.log('Fetched ALL routes (including inactive):', allRoutes);
 			} catch (fetchError) {
@@ -1580,7 +1580,7 @@ function RouteDesigner() {
 				console.log('Taking UPDATE path for existing route:', existingRoute._id);
 				setRouteWarning('Updating existing route...');
 				response = await axios.put(
-					`${process.env.REACT_APP_MONGO_URI}api/routes/${existingRoute._id}`,
+					`${process.env.REACT_APP_API_URL}api/routes/${existingRoute._id}`,
 						routeData,
 						{
 							headers: {
@@ -1593,7 +1593,7 @@ function RouteDesigner() {
 				console.log('Taking CREATE path - no existing route found');
 				setRouteWarning('Saving route to server...');
 				response = await axios.post(
-					`${process.env.REACT_APP_MONGO_URI}api/routes`,
+					`${process.env.REACT_APP_API_URL}api/routes`,
 					routeData,
 					{
 						headers: {
@@ -1632,7 +1632,7 @@ function RouteDesigner() {
 						// Try a direct search API call if available
 						let foundRoute = null;
 						try {
-							const searchResponse = await axios.get(`${process.env.REACT_APP_MONGO_URI}api/routes/search?name=${encodeURIComponent(routeName)}`);
+							const searchResponse = await axios.get(`${process.env.REACT_APP_API_URL}api/routes/search?name=${encodeURIComponent(routeName)}`);
 							foundRoute = searchResponse.data;
 							console.log('Found route via search API:', foundRoute);
 						} catch (searchError) {
@@ -1642,7 +1642,7 @@ function RouteDesigner() {
 						if (foundRoute && foundRoute._id) {
 							// Try to update the found route
 							const updateResponse = await axios.put(
-								`${process.env.REACT_APP_MONGO_URI}api/routes/${foundRoute._id}`,
+								`${process.env.REACT_APP_API_URL}api/routes/${foundRoute._id}`,
 								routeData,
 								{
 									headers: {
@@ -2047,7 +2047,7 @@ function RouteDesigner() {
 	const handleDeleteRoute = async (routeId) => {
 		try {
 			if (window.confirm('Are you sure you want to delete this route? This action cannot be undone.')) {
-				await axios.delete(`${process.env.REACT_APP_MONGO_URI}api/routes/${routeId}`);
+				await axios.delete(`${process.env.REACT_APP_API_URL}api/routes/${routeId}`);
 				fetchSavedRoutes(); // Refresh the routes list
 			}
 		} catch (error) {
@@ -2303,7 +2303,7 @@ function RouteDesigner() {
 
 			// console.log('Saving route state to backend:', routeStateData);
 			
-			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}api/routes/temp`, {
+			const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/temp`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
@@ -2339,7 +2339,7 @@ function RouteDesigner() {
 			// Disable auto-fit bounds during restoration to prevent unwanted zoom
 			setShouldAutoFitBounds(false);
 			
-			const response = await fetch(`${process.env.REACT_APP_MONGO_URI}api/routes/${routeId}`);
+			const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/${routeId}`);
 			
 			if (response.ok) {
 				const routeData = await response.json();
@@ -2605,7 +2605,7 @@ function RouteDesigner() {
 				
 				// Clean up the temporary route from backend
 				try {
-					await fetch(`${process.env.REACT_APP_MONGO_URI}api/routes/${routeId}`, {
+					await fetch(`${process.env.REACT_APP_API_URL}api/routes/${routeId}`, {
 						method: 'DELETE'
 					});
 					// console.log('Temporary route cleaned up');

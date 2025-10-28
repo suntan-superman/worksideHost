@@ -212,7 +212,7 @@ const ValidateUsersTab = () => {
 
 				if (insertFlag === true) {
 					const response = await fetch(
-						`${process.env.REACT_APP_MONGO_URI}/api/user/`,
+						`${process.env.REACT_APP_API_URL}/api/user/`,
 						{
 							method: "POST",
 							body: JSON.stringify(data),
@@ -350,7 +350,7 @@ const ValidateUsersTab = () => {
 		if (selectedRecordData === null) {
 			return;
 		}
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${selectedRecordData.email}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/user/${selectedRecordData.email}`;
 		const requestOptions = {
 			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
@@ -370,7 +370,7 @@ const ValidateUsersTab = () => {
 	}, [selectedRecordData, updatedContactData]);
 
 	const GetContactInfoByEmail = async (email) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${email}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/contact/email/${email}`;
 		setContactData(null);
 		setContactID(null);
 		setNewUser(true);
@@ -408,7 +408,7 @@ const ValidateUsersTab = () => {
 
 	const UpdateContactData = useCallback(async () => {
 		const id = contactID;
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/${id}`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/contact/${id}`;
 		const requestOptions = {
 			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
@@ -439,7 +439,7 @@ const ValidateUsersTab = () => {
 	}, [contactID, formData, selectedRecordData]);
 
 	const AddContactData = useCallback(async () => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact`;
+		const fetchString = `${process.env.REACT_APP_API_URL}/api/contact`;
 		const { firmType } = await GetFirmType(formData.company);
 
 		const requestOptions = {

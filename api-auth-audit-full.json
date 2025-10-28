@@ -1,0 +1,704 @@
+{
+  "api\\worksideAPI.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 263,
+      "code": "const response = await axios.get(`${apiURL}/api/contact/email/${email}`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 361,
+      "code": "const response = await fetch(`${apiURL}/api/suppliergroup/${id}`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 763,
+      "code": "const response = await axios.post(`${apiURL}/api/user/register`, {"
+    }
+  ],
+  "components\\delivery-tracker\\adapters\\vehicleDataAdapter.js": [
+    {
+      "type": "FETCH",
+      "line": 39,
+      "code": "const response = await fetch('/api/vehicles');"
+    }
+  ],
+  "components\\delivery-tracker\\services\\deliveryApi.js": [
+    {
+      "type": "AXIOS",
+      "line": 10,
+      "code": "const response = await axios.get(`${BASE_URL}/delivery-history`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 27,
+      "code": "const response = await axios.post(`${BASE_URL}/delivery-paths`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 53,
+      "code": "const response = await axios.get(`${BASE_URL}/delivery-success`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 66,
+      "code": "const response = await axios.get(`${BASE_URL}/analytics`, {"
+    }
+  ],
+  "components\\delivery-tracker\\services\\worksideAPI.jsx": [
+    {
+      "type": "FETCH",
+      "line": 31,
+      "code": "const response = await fetch(`${apiURL}${endpoint}`, options);"
+    },
+    {
+      "type": "FETCH",
+      "line": 265,
+      "code": "const response = await fetch(`${apiURL}/api/customersuppliermsa/${id}`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 292,
+      "code": "const response = await fetch(`${apiURL}/api/suppliergroup/${id}`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 314,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 341,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 403,
+      "code": "const response = await fetch(`${apiURL}/api/requestbidsview`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 432,
+      "code": "const response = await axios.patch(`${apiURL}/api/request`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 456,
+      "code": "const response = await axios.post(`${apiURL}/api/requestbid/updateall`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 480,
+      "code": "const response = await axios.patch(`${apiURL}/api/requestbid`, {"
+    },
+    {
+      "type": "FETCH",
+      "line": 503,
+      "code": "const response = await fetch(`${apiURL}/api/firm/${id}`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 544,
+      "code": "await axios.get(fetchString).then((res) => {"
+    },
+    {
+      "type": "FETCH",
+      "line": 584,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 612,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 637,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 665,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 694,
+      "code": "const response = await fetch(`${apiURL}/api/request`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 721,
+      "code": "const response = await axios.post(`${apiURL}/api/user/forgotPassword`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 743,
+      "code": "const response = await axios.post("
+    },
+    {
+      "type": "AXIOS",
+      "line": 771,
+      "code": "const response = await axios.post(`${apiURL}/api/user/resetPassword`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 800,
+      "code": "const response = await axios.post(`${apiURL}/api/user/changePassword`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 829,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "AXIOS",
+      "line": 857,
+      "code": "const response = await axios.post(`${apiURL}/api/user/register`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 874,
+      "code": "const response = await axios.post(`${apiURL}/api/user/logout`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 888,
+      "code": "const response = await axios.post(`${apiURL}/api/user/isAuthenticated`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 902,
+      "code": "const response = await fetch(`${apiURL}/api/product`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 926,
+      "code": "const response = await fetch(`${apiURL}/api/product/${id}`, {"
+    },
+    {
+      "type": "FETCH",
+      "line": 948,
+      "code": "const response = await fetch(`${apiURL}/api/product/${id}`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 963,
+      "code": "const response = await fetch(`${apiURL}/api/product`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1001,
+      "code": "const response = await axios.get(`${apiURL}/api/project`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 1029,
+      "code": "const response = await fetch(`${apiURL}/api/project`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 1079,
+      "code": "const response = await fetch(`${apiURL}/api/rig`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 1107,
+      "code": "const response = await fetch(`${apiURL}/api/rig`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 1138,
+      "code": "const response = await fetch(fetchString, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1164,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1241,
+      "code": "const response = await axios.post(`${apiURL}/api/requesttemplate`, templateData)"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1268,
+      "code": "const response = await axios.get(`${apiURL}/api/requesttemplate`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1324,
+      "code": "const response = await axios.put("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1354,
+      "code": "const response = await axios.delete("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1380,
+      "code": "const response = await axios.post(`${apiURL}/api/mapping`, {"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1403,
+      "code": "const response = await axios.get(`${apiURL}/api/mapping/${userId}`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1418,
+      "code": "const response = await axios.get(`${apiURL}/api/mapping`, {"
+    }
+  ],
+  "components\\DeliveryScheduleView.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 74,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "AXIOS",
+      "line": 92,
+      "code": "const response = await axios.get("
+    }
+  ],
+  "components\\FileDownload.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 30,
+      "code": "const response = await axios.get(apiURL, {"
+    }
+  ],
+  "components\\ForgotPasswordModal.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 93,
+      "code": "const res = await axios.post(fetchString, {"
+    }
+  ],
+  "components\\HelpDialog.jsx": [
+    {
+      "type": "FETCH",
+      "line": 59,
+      "code": "const response = await fetch("
+    }
+  ],
+  "components\\LoginDialog.jsx": [
+    {
+      "type": "FETCH",
+      "line": 182,
+      "code": "const response = await fetch(fetchString, {"
+    }
+  ],
+  "components\\RequestInfoModal.jsx": [
+    {
+      "type": "FETCH",
+      "line": 174,
+      "code": "const response = await fetch(fetchString);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 225,
+      "code": "const response = await axios.post("
+    },
+    {
+      "type": "AXIOS",
+      "line": 339,
+      "code": "const response = await axios.put("
+    },
+    {
+      "type": "AXIOS",
+      "line": 504,
+      "code": "const response = await axios.get("
+    }
+  ],
+  "components\\ResetPassword.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 50,
+      "code": "const res = await axios.post(fetchString, {"
+    }
+  ],
+  "components\\route-designer\\components\\Navigation.jsx": [
+    {
+      "type": "FETCH",
+      "line": 129,
+      "code": "const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/temp`, "
+    }
+  ],
+  "components\\route-designer\\RouteDesigner.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 257,
+      "code": "const response = await axios.post("
+    },
+    {
+      "type": "AXIOS",
+      "line": 280,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "AXIOS",
+      "line": 366,
+      "code": "await axios.delete(`${process.env.REACT_APP_API_URL}api/routes/avoidance-zones/$"
+    },
+    {
+      "type": "AXIOS",
+      "line": 419,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1369,
+      "code": "const response = await axios.get(`${process.env.REACT_APP_API_URL}api/routes`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1402,
+      "code": "const response = await axios.get(`${process.env.REACT_APP_API_URL}api/routes`);"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1413,
+      "code": "const allResponse = await axios.get(`${process.env.REACT_APP_API_URL}api/routes?"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1582,
+      "code": "response = await axios.put("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1595,
+      "code": "response = await axios.post("
+    },
+    {
+      "type": "AXIOS",
+      "line": 1635,
+      "code": "const searchResponse = await axios.get(`${process.env.REACT_APP_API_URL}api/rout"
+    },
+    {
+      "type": "AXIOS",
+      "line": 1644,
+      "code": "const updateResponse = await axios.put("
+    },
+    {
+      "type": "AXIOS",
+      "line": 2050,
+      "code": "await axios.delete(`${process.env.REACT_APP_API_URL}api/routes/${routeId}`);"
+    },
+    {
+      "type": "FETCH",
+      "line": 2306,
+      "code": "const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/temp`, "
+    },
+    {
+      "type": "FETCH",
+      "line": 2342,
+      "code": "const response = await fetch(`${process.env.REACT_APP_API_URL}api/routes/${route"
+    },
+    {
+      "type": "FETCH",
+      "line": 2608,
+      "code": "await fetch(`${process.env.REACT_APP_API_URL}api/routes/${routeId}`, {"
+    }
+  ],
+  "components\\RouteTracker\\RouteTracker.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 52,
+      "code": "const response = await axios.post("
+    }
+  ],
+  "components\\SignupDialog.jsx": [
+    {
+      "type": "FETCH",
+      "line": 86,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 158,
+      "code": "const response = await fetch("
+    }
+  ],
+  "components\\SupplierProductEditTemplate.jsx": [
+    {
+      "type": "FETCH",
+      "line": 103,
+      "code": "const response = await fetch("
+    }
+  ],
+  "components\\ThemeSettings.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 127,
+      "code": "const response = await axios.patch(url, { avatar });"
+    }
+  ],
+  "components\\UserValidationModal.jsx": [
+    {
+      "type": "FETCH",
+      "line": 34,
+      "code": "// \t\t\t\t\tconst response = await fetch(fetchString);"
+    }
+  ],
+  "pages\\ContactsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 273,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 290,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\CustomerSupplierMSATabX.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 149,
+      "code": "await axios.get(fetchString).then((response) => {"
+    }
+  ],
+  "pages\\FirmsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 377,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 425,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 486,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 537,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\NotificationDialog.jsx": [
+    {
+      "type": "FETCH",
+      "line": 53,
+      "code": "// const response = await fetch(\"http://localhost:4000/api/notifications/realtim"
+    },
+    {
+      "type": "FETCH",
+      "line": 55,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\Products.jsx": [
+    {
+      "type": "FETCH",
+      "line": 94,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 111,
+      "code": "const response = await fetch(fetchString, {"
+    },
+    {
+      "type": "FETCH",
+      "line": 146,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\ProductsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 148,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 208,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 224,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\ProjectDocumentsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 173,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 407,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "AXIOS",
+      "line": 452,
+      "code": "const result = await axios.post("
+    },
+    {
+      "type": "FETCH",
+      "line": 509,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\ProjectRequestorsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 125,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 330,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\Requests.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 473,
+      "code": "axios.post(strAPI, {"
+    },
+    {
+      "type": "FETCH",
+      "line": 529,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\RigsTab.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 161,
+      "code": "// \taxios.get(`${process.env.REACT_APP_API_URL}/api/rig/`).then((res) => {"
+    },
+    {
+      "type": "FETCH",
+      "line": 201,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 340,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\SampleRequest.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 270,
+      "code": "axios.post(strAPI, {"
+    }
+  ],
+  "pages\\SupplierGroupUsersTabX.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 835,
+      "code": "const response = await axios.get("
+    },
+    {
+      "type": "FETCH",
+      "line": 1018,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 1259,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 1438,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 1472,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\SupplierProductsTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 271,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 290,
+      "code": "const response = await fetch("
+    }
+  ],
+  "pages\\ValidateUsersTab.jsx": [
+    {
+      "type": "FETCH",
+      "line": 214,
+      "code": "const response = await fetch("
+    },
+    {
+      "type": "FETCH",
+      "line": 365,
+      "code": "const response = await fetch(fetchString, requestOptions);"
+    },
+    {
+      "type": "FETCH",
+      "line": 379,
+      "code": "const response = await fetch(fetchString);"
+    },
+    {
+      "type": "FETCH",
+      "line": 432,
+      "code": "const response = await fetch(fetchString, requestOptions);"
+    },
+    {
+      "type": "FETCH",
+      "line": 466,
+      "code": "const response = await fetch(fetchString, requestOptions);"
+    }
+  ],
+  "pages\\VerifyEmail.jsx": [
+    {
+      "type": "AXIOS",
+      "line": 92,
+      "code": "const checkResponse = await axios.post(checkVerifiedUrl, { email });"
+    },
+    {
+      "type": "AXIOS",
+      "line": 106,
+      "code": "const verifyResponse = await axios.get(verifyUrl);"
+    }
+  ],
+  "services\\notification-service.js": [
+    {
+      "type": "AXIOS",
+      "line": 21,
+      "code": "const response = await axios.post(this.expoPushEndpoint, messages, {"
+    }
+  ],
+  "utils\\useFetch.jsx": [
+    {
+      "type": "FETCH",
+      "line": 27,
+      "code": "const response = await fetch(url);"
+    }
+  ],
+  "utils\\useFetchWithOptions.jsx": [
+    {
+      "type": "FETCH",
+      "line": 32,
+      "code": "const response = await fetch(url, {"
+    }
+  ]
+}

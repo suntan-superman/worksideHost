@@ -2,8 +2,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-	baseURL: process.env.REACT_APP_MONGO_URI
-		|| "https://workside-software.wl.r.appspot.com",
+	baseURL: process.env.REACT_APP_API_URL
+		|| "http://localhost:5000",
 	timeout: 10000,
 	headers: {
 		"Content-Type": "application/json",
@@ -11,8 +11,13 @@ const axiosInstance = axios.create({
 	},
 });
 
-// Add request interceptor for debugging
+// Add request interceptor for auth and debugging
 axiosInstance.interceptors.request.use((request) => {
+	// Add authentication token from localStorage
+	const token = localStorage.getItem('auth_token');
+	if (token) {
+		request.headers['Authorization'] = `Bearer ${token}`;
+	}
 	// console.log("Starting Request:", request.url);
 	return request;
 });

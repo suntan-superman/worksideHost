@@ -143,7 +143,7 @@ const RigsTab = () => {
 	// const fetchRigCompanies = async () => {
 	// 	try {
 	// 		await axios
-	// 			.get(`${process.env.REACT_APP_MONGO_URI}/api/firm/`)
+	// 			.get(`${process.env.REACT_APP_API_URL}/api/firm/`)
 	// 			.then((res) => {
 	// 				const jsonResults = res.data;
 	// 				const result = jsonResults.filter(
@@ -158,7 +158,7 @@ const RigsTab = () => {
 	// };
 
 	// const fetchRigs = async () => {
-	// 	axios.get(`${process.env.REACT_APP_MONGO_URI}/api/rig/`).then((res) => {
+	// 	axios.get(`${process.env.REACT_APP_API_URL}/api/rig/`).then((res) => {
 	// 		const jsonResults = res.data;
 	// 		// console.log(`Rig List: ${JSON.stringify(jsonResults, null, 2)}`);
 	// 		setRigList(jsonResults);
@@ -199,7 +199,7 @@ const RigsTab = () => {
 
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/rig/${id}`,
+				`${process.env.REACT_APP_API_URL}/api/rig/${id}`,
 				requestOptions,
 			);
 			const jsonData = await response.json();
@@ -338,7 +338,7 @@ const RigsTab = () => {
 		};
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/rig/`,
+				`${process.env.REACT_APP_API_URL}/api/rig/`,
 				requestOptions,
 			);
 			const jsonData = await response.json().then((data) => {

@@ -57,7 +57,7 @@ const HelpDialog = ({ open, onClose }) => {
 			}
 
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/feedback`,
+				`${process.env.REACT_APP_API_URL}/api/feedback`,
 				{
 					method: "POST",
 					headers: {

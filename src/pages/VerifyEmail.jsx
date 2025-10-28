@@ -85,7 +85,7 @@ const VerifyEmail = () => {
 				}
 
 				const apiUrl =
-					process.env.REACT_APP_MONGO_URI || "http://localhost:8081";
+					process.env.REACT_APP_API_URL || "http://localhost:8081";
 
 				// First check if user is already verified
 				const checkVerifiedUrl = `${apiUrl}/api/user/is-user-validated`;

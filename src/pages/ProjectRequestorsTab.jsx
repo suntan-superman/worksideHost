@@ -77,7 +77,7 @@ import {
  * - `useState`, `useEffect`, `useRef`: React hooks for state management and DOM manipulation.
  *
  * Environment Variables:
- * - `REACT_APP_MONGO_URI`: Base URL for the backend API.
+ * - `REACT_APP_API_URL`: Base URL for the backend API.
  */
 const ProjectRequestorsTab = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +123,7 @@ const ProjectRequestorsTab = () => {
 
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/projectrequestor/${id}`,
+				`${process.env.REACT_APP_API_URL}/api/projectrequestor/${id}`,
 				requestOptions,
 			);
 			const jsonData = await response.json();
@@ -179,8 +179,12 @@ const ProjectRequestorsTab = () => {
 
 	const fetchProjects = async () => {
 		try {
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) headers['Authorization'] = `Bearer ${token}`;
+
 			await axios
-				.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
+				.get(`${process.env.REACT_APP_API_URL}/api/project/`, { headers })
 				.then((res) => {
 					const jsonResults = res.data;
 					// console.log(`Projects: ${JSON.stringify(jsonResults)}`);
@@ -192,7 +196,11 @@ const ProjectRequestorsTab = () => {
 	};
 
 	const fetchAvailableRequestors = async () => {
-		axios.get(`${process.env.REACT_APP_MONGO_URI}/api/contact/`).then((res) => {
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
+		axios.get(`${process.env.REACT_APP_API_URL}/api/contact/`, { headers }).then((res) => {
 			const jsonResults = res.data;
 
 			const result = jsonResults.filter(
@@ -212,11 +220,19 @@ const ProjectRequestorsTab = () => {
 	};
 
 	const fetchAssignedRequestors = async () => {
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		axios
-			.get(`${process.env.REACT_APP_MONGO_URI}/api/projectrequestor/`)
+			.get(`${process.env.REACT_APP_API_URL}/api/projectrequestor/`, { headers })
 			.then((res) => {
 				const jsonResults = res.data;
 				setAssignedRequestorList(jsonResults);
+			})
+			.catch((error) => {
+				console.error('Error fetching project requestors:', error);
+				setAssignedRequestorList([]); // Set empty array on error
 			});
 	};
 
@@ -316,7 +332,7 @@ const ProjectRequestorsTab = () => {
 		};
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/projectrequestor/`,
+				`${process.env.REACT_APP_API_URL}/api/projectrequestor/`,
 				requestOptions,
 			);
 			const jsonData = await response.json().then((data) => {

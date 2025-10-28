@@ -22,7 +22,7 @@ import axios from "axios";
  */
 const FileDownload = () => {
 	const id = "67364d5e1c5887c50d0a262b";
-	const apiURL = `${process.env.REACT_APP_MONGO_URI}/api/download/${id}`;
+	const apiURL = `${process.env.REACT_APP_API_URL}/api/download/${id}`;
 
 	const handleDownload = async () => {
 		try {

@@ -46,7 +46,7 @@ const ResetPassword = () => {
 		} else if (newpassword.length < 8) {
 			await showErrorDialog("Password must be at least 8 characters long");
 		} else {
-			const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/resetpassword`;
+			const fetchString = `${process.env.REACT_APP_API_URL}/api/user/resetpassword`;
 			const res = await axios.post(fetchString, {
 				email: userEmail.replace(/"/g, ""),
 				password: newpassword,

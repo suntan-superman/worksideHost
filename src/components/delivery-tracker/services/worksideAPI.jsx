@@ -1,7 +1,8 @@
 /* eslint-disable */
 import axios from "axios";
 
-const apiURL = "https://workside-software.wl.r.appspot.com";
+// Use environment variable for API URL
+const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 /**
  * Extracts selected fields from firm data.

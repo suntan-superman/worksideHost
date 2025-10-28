@@ -84,7 +84,7 @@ const SignupDialog = () => {
 	const getCompanyNames = useCallback(async () => {
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/firm`,
+				`${process.env.REACT_APP_API_URL}/api/firm`,
 			);
 			if (!response.ok) {
 				throw new Error("Failed to fetch company names");
@@ -156,7 +156,7 @@ const SignupDialog = () => {
 		console.log(`Data: ${JSON.stringify(data, null, 2)}`);
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/user/`,
+				`${process.env.REACT_APP_API_URL}/api/user/`,
 				{
 					method: "POST",
 					body: JSON.stringify(data),

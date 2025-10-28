@@ -122,7 +122,7 @@ const ThemeSettings = () => {
 				console.error("No user ID found");
 				return;
 			}
-			const url = `${process.env.REACT_APP_MONGO_URI}/api/contact/${contactId}/avatar`;
+			const url = `${process.env.REACT_APP_API_URL}/api/contact/${contactId}/avatar`;
 			console.log("url ", url);
 			const response = await axios.patch(url, { avatar });
 

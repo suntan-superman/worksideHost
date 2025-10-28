@@ -171,7 +171,7 @@ const ProjectDocumentsTab = () => {
 		setIsLoading(true);
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/document`,
+				`${process.env.REACT_APP_API_URL}/api/document`,
 				{
 					method: "POST",
 					body: formData,
@@ -210,7 +210,7 @@ const ProjectDocumentsTab = () => {
 		// window.alert(`ID: ${id} Owner: ${owner_id} Access: ${accessLevel}`);
 		try {
 			await axios
-				.delete(`${process.env.REACT_APP_MONGO_URI}/api/document/`, {
+				.delete(`${process.env.REACT_APP_API_URL}/api/document/`, {
 					data: {
 						id: id,
 						owner_id: owner_id,
@@ -268,8 +268,12 @@ const ProjectDocumentsTab = () => {
 
 	const fetchProjects = async () => {
 		try {
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) headers['Authorization'] = `Bearer ${token}`;
+
 			await axios
-				.get(`${process.env.REACT_APP_MONGO_URI}/api/project/`)
+				.get(`${process.env.REACT_APP_API_URL}/api/project/`, { headers })
 				.then((res) => {
 					if (res.status === 200) {
 						const jsonResults = res.data;
@@ -285,8 +289,12 @@ const ProjectDocumentsTab = () => {
 	const getDocuments = async () => {
 		// Function to make Axios GET request inside a Promise
 		return new Promise((resolve, reject) => {
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) headers['Authorization'] = `Bearer ${token}`;
+
 			axios
-				.get(`${process.env.REACT_APP_MONGO_URI}/api/document/`) // Replace with your API endpoint
+				.get(`${process.env.REACT_APP_API_URL}/api/document/`, { headers }) // Replace with your API endpoint
 				.then((response) => resolve(response.data))
 				.catch((err) => reject(err));
 		});
@@ -298,7 +306,8 @@ const ProjectDocumentsTab = () => {
 				setDocumentList(responseData);
 			})
 			.catch((err) => {
-				console.error(err.message);
+				console.error('Error fetching documents:', err.message);
+				setDocumentList([]); // Set empty array on error to prevent crash
 			});
 	};
 
@@ -397,7 +406,7 @@ const ProjectDocumentsTab = () => {
 		};
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/document/`,
+				`${process.env.REACT_APP_API_URL}/api/document/`,
 				requestOptions,
 			);
 			const jsonData = await response.json().then((data) => {
@@ -442,7 +451,7 @@ const ProjectDocumentsTab = () => {
 		};
 
 		const result = await axios.post(
-			`${process.env.REACT_APP_MONGO_URI}/api/document`,
+			`${process.env.REACT_APP_API_URL}/api/document`,
 			requestOptions,
 		);
 		console.log(result);
@@ -499,7 +508,7 @@ const ProjectDocumentsTab = () => {
 			try {
 				// window.alert(`API URL: ${apiURL}`);
 				const response = await fetch(
-					`${process.env.REACT_APP_MONGO_URI}/api/document/${id}`,
+					`${process.env.REACT_APP_API_URL}/api/document/${id}`,
 					requestOptions,
 				);
 				let signedUrl = "";

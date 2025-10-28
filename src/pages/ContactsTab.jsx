@@ -66,7 +66,7 @@ let gridPageSize = 10;
  *
  * Dependencies:
  * - Syncfusion GridComponent and related services (Selection, Edit, Filter, etc.).
- * - Environment variable `REACT_APP_MONGO_URI` for API endpoint.
+ * - Environment variable `REACT_APP_API_URL` for API endpoint.
  *
  * @component
  */
@@ -108,8 +108,18 @@ const ContactsTab = () => {
 
 	useEffect(() => {
 		const fetchContacts = async () => {
+			const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+			
+			// Get authentication token
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) {
+				headers['Authorization'] = `Bearer ${token}`;
+			}
+			
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/contact`,
+				`${apiURL}/api/contact`,
+				{ headers }
 			);
 			const json = await response.json();
 			setContactList(json);
@@ -261,7 +271,7 @@ const ContactsTab = () => {
 	const SaveContactsData = async () => {
 		if (insertFlag === true) {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/contact/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/contact/${currentRecord._id}`,
 				{
 					method: "POST",
 					body: JSON.stringify(currentRecord),
@@ -278,7 +288,7 @@ const ContactsTab = () => {
 			}
 		} else {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/contact/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/contact/${currentRecord._id}`,
 				{
 					method: "PUT",
 					body: JSON.stringify(currentRecord),

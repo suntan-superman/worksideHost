@@ -72,7 +72,7 @@ const DeliveryScheduleView = ({ supplierId, onAssignmentClick }) => {
 		queryKey: ["products"],
 		queryFn: async () => {
 			const response = await axios.get(
-				`${process.env.REACT_APP_MONGO_URI}/api/products`,
+				`${process.env.REACT_APP_API_URL}/api/products`,
 			);
 			return response.data;
 		},
@@ -90,7 +90,7 @@ const DeliveryScheduleView = ({ supplierId, onAssignmentClick }) => {
 		],
 		queryFn: async () => {
 			const response = await axios.get(
-				`${process.env.REACT_APP_MONGO_URI}/api/delivery-assignments`,
+				`${process.env.REACT_APP_API_URL}/api/delivery-assignments`,
 				{
 					params: {
 						startDate: format(startDate, "yyyy-MM-dd"),

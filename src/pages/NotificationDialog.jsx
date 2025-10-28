@@ -53,7 +53,7 @@ const NotificationDialog = ({ open, onClose }) => {
 			// const response = await fetch("http://localhost:4000/api/notifications/realtime", {
 
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/notifications/realtime`,
+				`${process.env.REACT_APP_API_URL}/api/notifications/realtime`,
 				{
 					method: "POST",
 					headers: {

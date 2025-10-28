@@ -89,10 +89,23 @@ const LoginDialog = () => {
 	};
 
 	const isUserValidated = async (userName) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/is-user-validated`;
+		const fetchString = `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/user/is-user-validated`;
+		
+		// Get the token that was just stored
+		const token = localStorage.getItem('auth_token');
+		
+		const headers = {
+			'Content-Type': 'application/json',
+		};
+		
+		if (token) {
+			headers['Authorization'] = `Bearer ${token}`;
+		}
+		
 		const res = await axios.post(fetchString, {
 			email: userName,
-		});
+		}, { headers });
+		
 		if (res.data.status === false) {
 			window.alert(`User Not Validated: ${userName}`);
 			return false;
@@ -105,11 +118,22 @@ const LoginDialog = () => {
 	};
 
 	const getUserAccessLevel = async (userName) => {
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/contact/email/${userName}`;
+		const fetchString = `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/contact/email/${userName}`;
 		let accessLevel = -1;
 		
+		// Get the token for authentication
+		const token = localStorage.getItem('auth_token');
+		
+		const headers = {
+			'Content-Type': 'application/json',
+		};
+		
+		if (token) {
+			headers['Authorization'] = `Bearer ${token}`;
+		}
+		
 		try {
-			const response = await axios.get(fetchString);
+			const response = await axios.get(fetchString, { headers });
 			SaveContactID(response.data._id);
 			if (response.data) {
 				switch (response.data.accesslevel) {
@@ -149,12 +173,50 @@ const LoginDialog = () => {
 		showSuccessDialogWithTimer("Logging In...");
 		localStorage.removeItem("logInFlag");
 		setErrorMsg("");
-		const fetchString = `${process.env.REACT_APP_MONGO_URI}/api/user/${userName}?password=${password}`;
+		
+		// NEW: Use the updated multi-tenant authentication endpoint
+		const fetchString = `${process.env.REACT_APP_API_URL || "http://localhost:4000"}/api/auth`;
+		console.log('🌐 [WEB LOGIN] Using API URL:', fetchString);
+		
 		try {
-			const response = await fetch(fetchString);
-			const jsonData = await response.json();
+			const response = await fetch(fetchString, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email: userName.trim().toLowerCase(),
+					password: password
+				}),
+			});
 
-			if (jsonData.status === true) {
+			console.log('🌐 [WEB LOGIN] Response status:', response.status);
+			
+			if (!response.ok) {
+				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			}
+
+			const jsonData = await response.json();
+			console.log('🌐 [WEB LOGIN] Response data:', jsonData);
+
+			if (jsonData.data && jsonData.data.user) {
+				const userData = jsonData.data.user;
+				
+				// Store authentication token for API requests
+				if (jsonData.data.token) {
+					console.log('🌐 [WEB LOGIN] Storing authentication token...');
+					localStorage.setItem("auth_token", jsonData.data.token);
+				}
+
+				// Map to existing web app structure
+				const mappedUser = {
+					user: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+					email: userData.email,
+					userId: userData.id,
+					company: userData.firm?.name || "Unknown",
+					userToken: jsonData.data.token
+				};
+
 				// First check if user is validated
 				const validationFlag = await isUserValidated(userName);
 				
@@ -170,21 +232,21 @@ const LoginDialog = () => {
 					setIsLoggedIn(true);
 					setUserLoggedIn(true);
 					localStorage.setItem("logInFlag", "true");
-					localStorage.setItem("token", jsonData.user.userToken);
-					setGlobalUserName(JSON.stringify(jsonData.user.user));
+					localStorage.setItem("token", mappedUser.userToken);
+					setGlobalUserName(JSON.stringify(mappedUser.user));
 					localStorage.setItem(
 						"userName",
-						JSON.stringify(jsonData.user.user),
+						JSON.stringify(mappedUser.user),
 					);
-					const email = JSON.stringify(jsonData.user.email);
+					const email = JSON.stringify(mappedUser.email);
 					localStorage.setItem("userEmail", email);
-					localStorage.setItem("userID", JSON.stringify(jsonData.user.userId));
+					localStorage.setItem("userID", JSON.stringify(mappedUser.userId));
 					setUserEmail(email);
 					onSaveUserName(userName, email);
-					setCompanyName(jsonData.user.company);
+					setCompanyName(mappedUser.company);
 					localStorage.setItem(
 						"companyName",
-						JSON.stringify(jsonData.user.company),
+						JSON.stringify(mappedUser.company),
 					);
 				});
 				window.location = "/main/dashboard";
@@ -192,8 +254,9 @@ const LoginDialog = () => {
 				await showErrorDialog("Invalid Username or Password");
 			}
 		} catch (error) {
-			await showErrorDialog(`Error: ${error}`);
-			setErrorMsg(error.response.data.message);
+			console.error('🌐 [WEB LOGIN] Error:', error);
+			await showErrorDialog(`Error: ${error.message}`);
+			setErrorMsg(error.message);
 			localStorage.setItem("logInFlag", "false");
 		}
 	};

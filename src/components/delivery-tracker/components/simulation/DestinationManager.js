@@ -32,15 +32,18 @@ const DestinationManager = ({
       const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
       if (savedPosition) {
         const parsed = JSON.parse(savedPosition);
-        // Validate the parsed data
+        // Validate the parsed data and ensure it's on-screen
         if (parsed && typeof parsed.x === 'number' && typeof parsed.y === 'number') {
-          return parsed;
+          // Ensure position is visible on screen
+          const validX = Math.max(0, Math.min(parsed.x, window.innerWidth - 200));
+          const validY = Math.max(0, Math.min(parsed.y, window.innerHeight - 200));
+          return { x: validX, y: validY };
         }
       }
     } catch (error) {
       console.warn('Failed to load dialog position:', error);
     }
-    // Fallback position
+    // Fallback position - centered
     return {
       x: Math.max(0, (window.innerWidth - 600) / 2),
       y: 100
@@ -55,7 +58,7 @@ const DestinationManager = ({
   useEffect(() => {
     if (open) {
       const savedPosition = localStorage.getItem(DIALOG_POSITION_KEY);
-      setPosition(savedPosition ? JSON.parse(savedPosition) : { x: 20, y: -500 });
+      setPosition(savedPosition ? JSON.parse(savedPosition) : { x: 100, y: 100 });
     }
   }, [open]);
 

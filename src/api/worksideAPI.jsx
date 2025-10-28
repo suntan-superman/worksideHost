@@ -2,7 +2,8 @@
 import axios from "axios";
 import { format } from "date-fns";
 
-const apiURL = "https://workside-software.wl.r.appspot.com";
+// Use environment variable for API URL
+const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
 
 /******************************************************************************
  * Core Utility Functions
@@ -25,14 +26,31 @@ const extractFirmFields = (dataArray) => {
 };
 
 /**
- * Handles API requests with error handling.
+ * Handles API requests with error handling and authentication.
  * @param {string} endpoint - The API endpoint.
  * @param {object} [options] - Fetch options.
  * @returns {Promise<object>} - API response or error object.
  */
 const fetchWithHandling = async (endpoint, options = {}) => {
     try {
-        const response = await fetch(`${apiURL}${endpoint}`, options);
+        // Get authentication token from localStorage (web equivalent of AsyncStorage)
+        const token = localStorage.getItem('auth_token');
+        
+        // Add authentication headers if token exists
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers,
+        };
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${apiURL}${endpoint}`, {
+            ...options,
+            headers,
+        });
+        
         if (!response.ok) {
             throw new Error(`HTTP Error! Status: ${response.status}`);
         }
@@ -53,11 +71,23 @@ const fetchWithHandling = async (endpoint, options = {}) => {
  */
 const apiRequest = async (endpoint, method, payload) => {
     try {
+        // Get authentication token from localStorage
+        const token = localStorage.getItem('auth_token');
+        
+        // Add authentication headers if token exists
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        
         const response = await axios({
             method,
             url: `${apiURL}${endpoint}`,
             data: payload,
-            headers: { "Content-Type": "application/json" },
+            headers,
         });
         return { status: response.status, data: response.data };
     } catch (error) {
@@ -313,17 +343,8 @@ const GetCustomerSupplierMSAData = async (id) => {
         console.error("Invalid ID provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/customersuppliermsa/${id}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch MSA data with status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching MSA data:", error.message);
-        return { status: 500, data: null };
-    }
+    const result = await fetchWithHandling(`/api/customersuppliermsa/${id}`);
+    return result;
 };
 
 /**
@@ -354,17 +375,9 @@ const GetSupplierGroupData = async (id) => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and all request data.
  */
 const GetAllRequests = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/request`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch requests with status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching all requests:", error.message);
-        return { status: 500, data: [] };
-    }
+    // Use fetchWithHandling which includes auth token
+    const result = await fetchWithHandling('/api/request');
+    return result;
 };
 
 /**
@@ -377,17 +390,10 @@ const GetAllRequestsByProject = async (projectId) => {
         console.error("Invalid project ID provided.");
         return { status: 400, data: [] };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/request/byprojectid/${projectId}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch project requests with status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching requests by project:", error.message);
-        return { status: 500, data: [] };
-    }
+    
+    // Use fetchWithHandling which includes auth token
+    const result = await fetchWithHandling(`/api/request/byprojectid/${projectId}`);
+    return result;
 };
 
 /**
@@ -429,21 +435,12 @@ const UpdateRequestBid = async (reqBidData) =>
  * @returns {Promise<{status: number, data?: object}>} - Status and existing bid data if found
  */
 const DoesRequestBidExist = async (reqID, supplierID) => {
-    const strAPI = `${apiURL}/api/requestbid/doesBidExist`;
     const body = {
         requestid: reqID,
         supplierid: supplierID,
     };
-
-    try {
-        const response = await axios.post(strAPI, body);
-        if (response.status === 200) {
-            return { status: 200, data: response.data };
-        }
-        return { status: 400 };
-    } catch (error) {
-        return { status: 500 };
-    }
+    const result = await apiRequest('/api/requestbid/doesBidExist', 'POST', body);
+    return result;
 };
 
 /**
@@ -451,17 +448,8 @@ const DoesRequestBidExist = async (reqID, supplierID) => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to the status and bids data.
  */
 const GetRequestBids = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/requestbidsview`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch request bids. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching request bids:", error.message);
-        return { status: 500, data: [] };
-    }
+    const result = await fetchWithHandling('/api/requestbidsview');
+    return result;
 };
 
 /**
@@ -476,16 +464,11 @@ const UpdateRequestStatus = async ({ reqID, status }) => {
         console.error("Invalid parameters provided to UpdateRequestStatus.");
         return { status: 400 };
     }
-    try {
-        const response = await axios.patch(`${apiURL}/api/request`, {
-            id: reqID,
-            status: status,
-        });
-        return { status: response.status };
-    } catch (error) {
-        console.error("Error updating request status:", error.message);
-        return { status: error.response?.status || 500 };
-    }
+    const result = await apiRequest('/api/request', 'PATCH', {
+        id: reqID,
+        status: status,
+    });
+    return result;
 };
 
 /**
@@ -500,16 +483,11 @@ const SetRequestBidsStatus = async ({ reqID, status }) => {
         console.error("Invalid parameters provided to SetRequestBidsStatus.");
         return { status: 400 };
     }
-    try {
-        const response = await axios.patch(`${apiURL}/api/requestbid/setstatus`, {
-            requestid: reqID,
-            status: status,
-        });
-        return { status: response.status };
-    } catch (error) {
-        console.error("Error updating request bids status:", error.message);
-        return { status: error.response?.status || 500 };
-    }
+    const result = await apiRequest('/api/requestbid/setstatus', 'PATCH', {
+        requestid: reqID,
+        status: status,
+    });
+    return result;
 };
 
 /**
@@ -524,16 +502,11 @@ const SetAwardedRequestBidStatus = async ({ reqID, supplierID }) => {
         console.error("Invalid parameters provided to SetAwardedRequestBidStatus.");
         return { status: 400 };
     }
-    try {
-        const response = await axios.patch(`${apiURL}/api/requestbid/setawarded`, {
-            requestid: reqID,
-            supplierid: supplierID,
-        });
-        return { status: response.status };
-    } catch (error) {
-        console.error("Error updating awarded request bid status:", error.message);
-        return { status: error.response?.status || 500 };
-    }
+    const result = await apiRequest('/api/requestbid/setawarded', 'PATCH', {
+        requestid: reqID,
+        supplierid: supplierID,
+    });
+    return result;
 };
 
 /**
@@ -542,25 +515,15 @@ const SetAwardedRequestBidStatus = async ({ reqID, supplierID }) => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and delivery associates data.
  */
 const GetDeliveryAssociates = async (supplierId) => {
-	try {
-		const response = await fetch(`${apiURL}/api/deliveryassociate`);
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch delivery associates. Status: ${response.status}`,
-			);
-		}
-		const json = await response.json();
-
+	const result = await fetchWithHandling('/api/deliveryassociate');
+	if (result.status === 200 && result.data) {
 		// Filter by supplier ID if provided
 		const filteredData = supplierId
-			? json.filter((da) => da.supplierid === supplierId)
-			: json;
-
-		return { status: response.status, data: filteredData };
-	} catch (error) {
-		console.error("Error fetching delivery associates:", error.message);
-		return { status: 500, data: [] };
+			? result.data.filter((da) => da.supplierid === supplierId)
+			: result.data;
+		return { status: result.status, data: filteredData };
 	}
+	return result;
 };
 
 /**
@@ -573,17 +536,8 @@ const GetSupplierInfoFromID = async (id) => {
         console.error("Invalid supplier ID provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/firm/${id}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch supplier info. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching supplier info:", error.message);
-        return { status: 500, data: null };
-    }
+    const result = await fetchWithHandling(`/api/firm/${id}`);
+    return result;
 };
 
 /**
@@ -596,20 +550,10 @@ const GetSupplierIDFromName = async (name) => {
 		console.error("Invalid Name provided to GetSupplierIDFromName.");
 		return [{ status: 400, data: [] }];
 	}
-	try {
-		const response = await fetch(`${apiURL}/api/firm/getSupplierIdByName/${name}`);
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch Supplier ID. Status: ${response.status}`,
-			);
-		}
-
-		const json = await response.json();
-		return [{ status: response.status, data: json }];
-	} catch (error) {
-		console.error("Error fetching supplier info:", error.message);
-		return [{ status: 500, data: [] }];
-	}
+	
+	// Use fetchWithHandling which includes auth token
+	const result = await fetchWithHandling(`/api/firm/getSupplierIdByName/${name}`);
+	return [result];
 };
 
 /**
@@ -624,24 +568,9 @@ const GetRequestsByCustomer = async (clientName) => {
 		console.error("Invalid customer name provided.");
 		return { status: 400, data: [] };
 	}
-console.log(`Customer Name: ${cleanCustomer}`);
-	try {
-		const response = await fetch(
-			`${apiURL}/api/request/bycustomername/${cleanCustomer}`,
-		);
-
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch customer requests. Status: ${response.status}`,
-			);
-		}
-
-		const json = await response.json();
-		return { status: response.status, data: json };
-	} catch (error) {
-		console.error("Error fetching customer requests:", error.message);
-		return { status: 500, data: [] };
-	}
+	// Use fetchWithHandling which includes auth token
+	const result = await fetchWithHandling(`/api/request/bycustomername/${cleanCustomer}`);
+	return result;
 };
 
 /**
@@ -654,17 +583,8 @@ const GetRequestData = async (id) => {
         console.error("Invalid request ID provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/request/${id}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch request data. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching request data:", error.message);
-        return { status: 500, data: null };
-    }
+    const result = await fetchWithHandling(`/api/request/${id}`);
+    return result;
 };
 
 /**
@@ -672,26 +592,14 @@ const GetRequestData = async (id) => {
  * @returns {Promise<{ status: number, data: string[] }>} - A promise resolving to status and request options.
  */
 const GetRequestOptions = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/request`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch request options. Status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        if (!Array.isArray(json)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const requestOptions = json
+    const result = await fetchWithHandling('/api/request');
+    if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        const requestOptions = result.data
             .filter((request) => typeof request.name === "string")
             .map((request) => request.name);
-
-        return { status: response.status, data: requestOptions };
-    } catch (error) {
-        console.error("Error fetching request options:", error.message);
-        return { status: 500, data: [] };
+        return { status: result.status, data: requestOptions };
     }
+    return result;
 };
 
 /**
@@ -719,26 +627,14 @@ const GetRequestID = async (request) => {
  * @returns {Promise<{ status: number, data: string[] }>} - A promise resolving to status and category options.
  */
 const GetRequestCategoryOptions = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/requestcategory`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch category options. Status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        if (!Array.isArray(json)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const categoryOptions = json
+    const result = await fetchWithHandling('/api/requestcategory');
+    if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        const categoryOptions = result.data
             .filter((category) => typeof category.name === "string")
             .map((category) => category.name);
-
-        return { status: response.status, data: categoryOptions };
-    } catch (error) {
-        console.error("Error fetching category options:", error.message);
-        return { status: 500, data: [] };
+        return { status: result.status, data: categoryOptions };
     }
+    return result;
 };
 
 /**
@@ -751,19 +647,12 @@ const GetRequestCategoryID = async (category) => {
         console.error("Invalid category name provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/requestcategory`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch category data. Status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        const categoryData = json.find((c) => c.name === category);
-        return { status: response.status, data: categoryData?._id || null };
-    } catch (error) {
-        console.error("Error fetching category ID:", error.message);
-        return { status: 500, data: null };
+    const result = await fetchWithHandling('/api/requestcategory');
+    if (result.status === 200 && result.data) {
+        const categoryData = result.data.find((c) => c.name === category);
+        return { status: result.status, data: categoryData?._id || null };
     }
+    return result;
 };
 
 /**
@@ -771,26 +660,14 @@ const GetRequestCategoryID = async (category) => {
  * @returns {Promise<{ status: number, data: string[] }>} - A promise resolving to status and status options.
  */
 const GetRequestStatusOptions = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/requeststatus`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch status options. Status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        if (!Array.isArray(json)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const statusOptions = json
+    const result = await fetchWithHandling('/api/requeststatus');
+    if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        const statusOptions = result.data
             .filter((status) => typeof status.name === "string")
             .map((status) => status.name);
-
-        return { status: response.status, data: statusOptions };
-    } catch (error) {
-        console.error("Error fetching status options:", error.message);
-        return { status: 500, data: [] };
+        return { status: result.status, data: statusOptions };
     }
+    return result;
 };
 
 /******************************************************************************
@@ -802,17 +679,8 @@ const GetRequestStatusOptions = async () => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and user data.
  */
 const GetAllUsers = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/user`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch users. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching users:", error.message);
-        return { status: 500, data: [] };
-    }
+    const result = await fetchWithHandling('/api/user');
+    return result;
 };
 
 /**
@@ -821,13 +689,8 @@ const GetAllUsers = async () => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserForgotPassword = async (email) => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/forgotpassword`, { email });
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserForgotPassword:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/forgotpassword', 'POST', { email });
+    return result;
 };
 
 /**
@@ -836,13 +699,8 @@ const UserForgotPassword = async (email) => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserDoesExist = async (email) => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/doesexist`, { email });
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserDoesExist:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/doesexist', 'POST', { email });
+    return result;
 };
 
 /**
@@ -852,16 +710,11 @@ const UserDoesExist = async (email) => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserResetPassword = async (token, password) => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/resetpassword`, {
-            token: token.trim(),
-            password: password.trim(),
-        });
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserResetPassword:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/resetpassword', 'POST', {
+        token: token.trim(),
+        password: password.trim(),
+    });
+    return result;
 };
 
 /**
@@ -871,16 +724,11 @@ const UserResetPassword = async (token, password) => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserChangePassword = async (oldPassword, newPassword) => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/changepassword`, {
-            oldpassword: oldPassword.trim(),
-            newpassword: newPassword.trim(),
-        });
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserChangePassword:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/changepassword', 'POST', {
+        oldpassword: oldPassword.trim(),
+        newpassword: newPassword.trim(),
+    });
+    return result;
 };
 
 /**
@@ -926,13 +774,8 @@ const UserRegister = async (email, password) => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserLogout = async () => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/logout`);
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserLogout:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/logout', 'POST', {});
+    return result;
 };
 
 /**
@@ -940,13 +783,8 @@ const UserLogout = async () => {
  * @returns {Promise<{status: number, data: object}>} Response status and data.
  */
 const UserIsAuthenticated = async () => {
-    try {
-        const response = await axios.post(`${apiURL}/api/user/isAuthenticated`);
-        return { status: response.status, data: response.data };
-    } catch (error) {
-        console.error("Error in UserIsAuthenticated:", error.message);
-        return { status: error.response?.status || 500, data: null };
-    }
+    const result = await apiRequest('/api/user/isAuthenticated', 'POST', {});
+    return result;
 };
 
 /******************************************************************************
@@ -958,17 +796,8 @@ const UserIsAuthenticated = async () => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and product data.
  */
 const GetProducts = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/product`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching products:", error.message);
-        return { status: 500, data: [] };
-    }
+    const result = await fetchWithHandling('/api/product');
+    return result;
 };
 
 /**
@@ -981,19 +810,8 @@ const DeleteProduct = async (id) => {
         console.error("Invalid product ID provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/product/${id}`, {
-            method: "DELETE",
-        });
-        if (!response.ok) {
-            throw new Error(`Failed to delete product. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error deleting product:", error.message);
-        return { status: 500, data: null };
-    }
+    const result = await apiRequest(`/api/product/${id}`, 'DELETE');
+    return result;
 };
 
 /**
@@ -1006,17 +824,8 @@ const GetProductByID = async (id) => {
         console.error("Invalid product ID provided.");
         return { status: 400, data: null };
     }
-    try {
-        const response = await fetch(`${apiURL}/api/product/${id}`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch product. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching product:", error.message);
-        return { status: 500, data: null };
-    }
+    const result = await fetchWithHandling(`/api/product/${id}`);
+    return result;
 };
 
 /**
@@ -1024,26 +833,14 @@ const GetProductByID = async (id) => {
  * @returns {Promise<{status: number, data: string[] | null}>} Response status and product options.
  */
 const GetProductOptions = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/product`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch products. Status: ${response.status}`);
-        }
-
-        const json = await response.json();
-        if (!Array.isArray(json)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const productOptions = json
+    const result = await fetchWithHandling('/api/product');
+    if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        const productOptions = result.data
             .filter((product) => typeof product.productname === "string")
             .map((product) => product.productname);
-
-        return { status: response.status, data: productOptions };
-    } catch (error) {
-        console.error("Error fetching product options:", error.message);
-        return { status: null, data: null };
+        return { status: result.status, data: productOptions };
     }
+    return { status: result.status || null, data: null };
 };
 
 /******************************************************************************
@@ -1056,12 +853,8 @@ const GetProductOptions = async () => {
  */
 const GetAllProjects = async () => {
     try {
-        const response = await fetch(`${apiURL}/api/project`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch projects. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
+        const result = await fetchWithHandling('/api/project');
+        return result;
     } catch (error) {
         console.error("Error fetching projects:", error.message);
         return { status: 500, data: [] };
@@ -1075,26 +868,14 @@ const GetAllProjects = async () => {
  * @returns {Promise<{ status: number, data: object[] | null }>} - A promise resolving to status and filtered project data.
  */
 const GetProjectsByStatus = async (status, customer) => {
-    try {
-        const response = await axios.get(`${apiURL}/api/project`);
-
-        if (response.status !== 200) {
-            throw new Error(`Failed to fetch projects. Status: ${response.status}`);
-        }
-
-        if (!Array.isArray(response.data)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const projects = response.data.filter(
+    const result = await fetchWithHandling('/api/project');
+    if (result.status === 200 && result.data && Array.isArray(result.data)) {
+        const projects = result.data.filter(
             (project) => project.customer === customer && project.status === status,
         );
-
         return { status: 200, data: projects };
-    } catch (error) {
-        console.error("Error in GetProjectsByStatus:", error.message);
-        return { status: 500, data: null };
     }
+    return { status: result.status || 500, data: null };
 };
 
 /**
@@ -1103,21 +884,9 @@ const GetProjectsByStatus = async (status, customer) => {
  * @returns {Promise<{status: number | null, data: object[] | null}>} Response status and filtered project data.
  */
 const GetAllProjectsByCustomer = async (customerName) => {
-    // const apiURL = "https://keen-squid-lately.ngrok-free.app";
-    try {
-        const response = await fetch(`${apiURL}/api/project/customer/${customerName}`);
-
-        if (!response.ok) {
-            throw new Error(`Failed to fetch projects. Status: ${response.status}`);
-        }
-
-        const projects = await response.json();
-        
-        return { status: response.status, data: projects };
-    } catch (error) {
-        console.error("Error in GetAllProjectsByCustomer:", error.message);
-        return { status: null, data: null };
-    }
+    // Use fetchWithHandling which includes auth token
+    const result = await fetchWithHandling(`/api/project/customer/${customerName}`);
+    return result;
 };
 
 /**
@@ -1156,6 +925,10 @@ const GetProjectIDByNameAndCustomer = async (projectName, customer) => {
 			throw new Error("Project name and customer are required");
 		}
 
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		const response = await axios.get(
 			`${apiURL}/api/project/id-by-name-customer`,
 			{
@@ -1163,6 +936,7 @@ const GetProjectIDByNameAndCustomer = async (projectName, customer) => {
 					projectname: projectName,
 					customer: cleanCustomer,
 				},
+				headers,
 			},
 		);
 
@@ -1194,17 +968,8 @@ const GetProjectIDByNameAndCustomer = async (projectName, customer) => {
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and rig data.
  */
 const GetRigs = async () => {
-    try {
-        const response = await fetch(`${apiURL}/api/rig`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch rigs. Status: ${response.status}`);
-        }
-        const json = await response.json();
-        return { status: response.status, data: json };
-    } catch (error) {
-        console.error("Error fetching rigs:", error.message);
-        return { status: 500, data: [] };
-    }
+    const result = await fetchWithHandling('/api/rig');
+    return result;
 };
 
 /**
@@ -1216,18 +981,12 @@ const GetRigsByRigCompany = async (rigCompany) => {
     try {
         if (!rigCompany) throw new Error("Rig company name is required.");
 
-        const response = await fetch(`${apiURL}/api/rig`);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch rigs. Status: ${response.status}`);
+        const result = await fetchWithHandling('/api/rig');
+        if (result.status === 200 && result.data && Array.isArray(result.data)) {
+            const rigs = result.data.filter((rig) => rig.rigcompanyname === rigCompany);
+            return { status: result.status, data: rigs };
         }
-
-        const json = await response.json();
-        if (!Array.isArray(json)) {
-            throw new Error("Unexpected response format. Expected an array.");
-        }
-
-        const rigs = json.filter((rig) => rig.rigcompanyname === rigCompany);
-        return { status: response.status, data: rigs };
+        return result;
     } catch (error) {
         console.error("Error fetching rigs by company:", error.message);
         return { status: 500, data: [] };
@@ -1243,15 +1002,8 @@ const DeleteRig = async (id) => {
     try {
         if (!id) throw new Error("Rig ID is required.");
 
-        const response = await fetch(`${apiURL}/api/rig/${id}`, {
-            method: "DELETE",
-        });
-
-        if (!response.ok) {
-            throw new Error(`Failed to delete rig. Status: ${response.status}`);
-        }
-
-        return { status: response.status, data: await response.json() };
+        const result = await apiRequest(`/api/rig/${id}`, 'DELETE');
+        return result;
     } catch (error) {
         console.error("Error deleting rig:", error.message);
         return { status: 500, data: null };
@@ -1270,10 +1022,15 @@ const GetSupplierProductsByProduct = async (category, product) => {
             throw new Error("Category and product are required.");
         }
 
+        const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
         const response = await axios.get(
             `${apiURL}/api/supplierproductsview/byproduct`,
             {
                 params: { category, product },
+                headers,
             },
         );
 
@@ -1346,7 +1103,11 @@ const createRequestTemplate = async (templateData) => {
 			throw new Error("Preferred vendor is required for SSR type");
 		}
 
-		const response = await axios.post(`${apiURL}/api/requesttemplate`, templateData);
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
+		const response = await axios.post(`${apiURL}/api/requesttemplate`, templateData, { headers });
 		return {
 			status: response.status,
 			data: response.data,
@@ -1373,8 +1134,13 @@ const getRequestTemplates = async (userId) => {
 			throw new Error("Valid userId is required");
 		}
 
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		const response = await axios.get(`${apiURL}/api/requesttemplate`, {
 			params: { createdBy: userId },
+			headers,
 		});
 
 		return {
@@ -1429,9 +1195,14 @@ const updateRequestTemplate = async (templateId, updateData) => {
 			}
 		}
 
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		const response = await axios.put(
 			`${apiURL}/api/requesttemplate/${templateId}`,
 			updateData,
+			{ headers },
 		);
 		return {
 			status: response.status,
@@ -1459,8 +1230,13 @@ const deleteRequestTemplate = async (templateId) => {
 			throw new Error("Valid templateId is required");
 		}
 
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		const response = await axios.delete(
 			`${apiURL}/api/requesttemplate/${templateId}`,
+			{ headers },
 		);
 		return {
 			status: response.status,
@@ -1481,62 +1257,25 @@ const deleteRequestTemplate = async (templateId) => {
  * @returns {Promise<{ status: number, data: object | null }>} - A promise resolving to status and supplier group data.
  */
 const GetAllSupplierGroupData = async () => {
-	try {
-		const response = await fetch(`${apiURL}/api/suppliergroup`);
-		if (!response.ok) {
-			throw new Error(
-				`Failed to fetch supplier group data with status: ${response.status}`,
-			);
-		}
-
-		const json = await response.json();
-		return { status: response.status, data: json };
-	} catch (error) {
-		console.error("Error fetching supplier group data:", error.message);
-		return { status: 500, data: null };
-	}
+	const result = await fetchWithHandling('/api/suppliergroup');
+	return result;
 };
 
 const UpdateRequestBidListUsers = async (reqID, bidListUsers) => {
-    const strAPI = `${apiURL}/api/request/${reqID}/bid-list-users`;
-    const body = bidListUsers;
-    try {
-        const response = await axios.patch(strAPI, body);
-        if (response.status === 200) {
-            return { status: 200, data: response.data };
-        }
-        return { status: 400 };
-    } catch (error) {
-        return { status: 500 };
-    }
+    const result = await apiRequest(`/api/request/${reqID}/bid-list-users`, 'PATCH', bidListUsers);
+    return result;
 };
 
 const UpdateRequestBidListCompanies = async (reqID, bidList) => {
-    const strAPI = `${apiURL}/api/request/${reqID}/bid-list-companies`;
-    const body = bidList;
-    try {
-        const response = await axios.patch(strAPI, body);
-        if (response.status === 200) {
-            return { status: 200, data: response.data };
-        }
-        return { status: 400 };
-    } catch (error) {
-        return { status: 500 };
-    }
+    const result = await apiRequest(`/api/request/${reqID}/bid-list-companies`, 'PATCH', bidList);
+    return result;
 };
 
 const GetRequestBidListCompanies = async (bidListUsers) => {
-	const strAPI = `${apiURL}/api/contact/companies-by-emails`;
 	const body = { bidListUsers };
-	console.log(`StrAPI: ${strAPI}`);
 	console.log(`Body: ${JSON.stringify(body)}`);
-	try {
-		const response = await axios.post(strAPI, body);
-		return { status: response.status, data: response.data };
-	} catch (error) {
-		console.error("Error getting bid list companies:", error);
-		return { status: error.response?.status || 500, data: null };
-	}
+	const result = await apiRequest('/api/contact/companies-by-emails', 'POST', body);
+	return result;
 };
 
 /**
@@ -1550,10 +1289,15 @@ const GetVendorIDByName = async (vendorName) => {
 			throw new Error("Vendor name is required");
 		}
 
+		const token = localStorage.getItem('auth_token');
+		const headers = { 'Content-Type': 'application/json' };
+		if (token) headers['Authorization'] = `Bearer ${token}`;
+
 		const response = await axios.get(`${apiURL}/api/firm/id-by-name`, {
 			params: {
 				name: vendorName,
 			},
+			headers,
 		});
 
 		if (response.status === 200) {

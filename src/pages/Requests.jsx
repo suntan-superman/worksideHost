@@ -206,16 +206,17 @@ const Requests = () => {
 		isLoading: reqLoading,
 		isSuccess: isReqSuccess,
 	} = useQuery({
-		queryKey: ["requests"],
+		queryKey: ["requests", companyName], // Include companyName so query refetches when company changes
 		queryFn: async () => {
-			const res = await GetRequestsByCustomer(clientName);
+			const res = await GetRequestsByCustomer(companyName || clientName);
 			return res;
 		},
 		refetchInterval: 1000 * 10,
 		refetchOnReconnect: true,
 		refetchOnWindowFocus: true,
-		staleTime: 1000 * 60 * 60 * 24,
+		staleTime: 1000 * 5, // Reduced from 24 hours to 5 seconds for testing
 		retry: 3,
+		enabled: !!companyName, // Only run query when companyName is set
 	});
 
 	const GetAccessLevel = () => {
@@ -286,11 +287,28 @@ const Requests = () => {
 
 	useEffect(() => {
 		if (reqData) {
-			const data = reqData?.data;
-			if (data) {
-				setRequestList(data);
-				const filteredData = filterRequestsByDateRange(data, dateRangeFilter);
+			// Backend returns { status, data: { data: [...], customer, tenantId } }
+			// So we need to access reqData.data.data to get the actual array
+			const responseData = reqData?.data;
+			const requestsArray = responseData?.data || responseData; // Handle both nested and direct array
+			
+			// Ensure data is an array before using it
+			if (requestsArray && Array.isArray(requestsArray)) {
+				setRequestList(requestsArray);
+				const filteredData = filterRequestsByDateRange(requestsArray, dateRangeFilter);
 				setFilteredRequestList(filteredData);
+				
+				// Force grid refresh to update Syncfusion grid
+				setTimeout(() => {
+					const gridElement = document.getElementById("requestGridElement");
+					if (gridElement?.ej2_instances[0]) {
+						gridElement.ej2_instances[0].refresh();
+					}
+				}, 100);
+			} else {
+				console.error('Error: Request data is not an array');
+				setRequestList([]);
+				setFilteredRequestList([]);
 			}
 		}
 	}, [reqData, dateRangeFilter, filterRequestsByDateRange]);
@@ -456,7 +474,7 @@ const Requests = () => {
 			return;
 		}
 
-		const strAPI = `${process.env.REACT_APP_MONGO_URI}/api/email/`;
+		const strAPI = `${process.env.REACT_APP_API_URL}/api/email/`;
 
 		try {
 			await Promise.all(
@@ -518,7 +536,7 @@ const Requests = () => {
 	const SaveRequestData = async (requestData) => {
 		try {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/request/`,
+				`${process.env.REACT_APP_API_URL}/api/request/`,
 				{
 					method: "POST",
 					headers: {
@@ -759,7 +777,7 @@ const Requests = () => {
 				</Box>
 				<GridComponent
 					id="requestGridElement"
-					dataSource={filteredRequestList || reqData?.data}
+					dataSource={filteredRequestList || []}
 					allowSelection
 					allowFiltering
 					allowPaging

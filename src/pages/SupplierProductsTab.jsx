@@ -122,8 +122,18 @@ const SupplierProductsTab = () => {
 
 	useEffect(() => {
 		const fetchProducts = async () => {
+			const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+			
+			// Get authentication token
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) {
+				headers['Authorization'] = `Bearer ${token}`;
+			}
+			
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/product`,
+				`${apiURL}/api/product`,
+				{ headers }
 			);
 			const json = await response.json();
 
@@ -139,8 +149,18 @@ const SupplierProductsTab = () => {
 
 	useEffect(() => {
 		const fetchSupplierProducts = async () => {
+			const apiURL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+			
+			// Get authentication token
+			const token = localStorage.getItem('auth_token');
+			const headers = { 'Content-Type': 'application/json' };
+			if (token) {
+				headers['Authorization'] = `Bearer ${token}`;
+			}
+			
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
+				`${apiURL}/api/supplierproduct`,
+				{ headers }
 			);
 			const json = await response.json();
 
@@ -249,7 +269,7 @@ const SupplierProductsTab = () => {
 			};
 
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct`,
+				`${process.env.REACT_APP_API_URL}/api/supplierproduct`,
 				{
 					method: "POST",
 					headers: {
@@ -268,7 +288,7 @@ const SupplierProductsTab = () => {
 			setInsertFlag(false);
 		} else {
 			const response = await fetch(
-				`${process.env.REACT_APP_MONGO_URI}/api/supplierproduct/${currentRecord._id}`,
+				`${process.env.REACT_APP_API_URL}/api/supplierproduct/${currentRecord._id}`,
 				{
 					method: "PATCH",
 					headers: {
