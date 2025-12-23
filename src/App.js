@@ -58,7 +58,7 @@ const ThemeSettingButton = () => {
 					type="button"
 					onClick={() => setThemeSettings(true)}
 					style={{ background: currentColor, borderRadius: "50%" }}
-					className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+					className="p-3 text-3xl text-white hover:drop-shadow-xl hover:bg-light-gray"
 				>
 					<FiSettings />
 				</button>
@@ -71,13 +71,13 @@ const LogOutButton = () => {
   const { currentColor } = UseStateContext();
 
   return (
-    <div className="fixed left-4 bottom-4 pl-3" style={{ zIndex: "1000" }}>
+    <div className="fixed pl-3 left-4 bottom-4" style={{ zIndex: "1000" }}>
       <TooltipComponent content="Log Out" position="Top">
         <button
           type="button"
           onClick={onLogOut}
           style={{ background: currentColor, borderRadius: "50%" }}
-          className="text-3xl text-white p-3 hover:drop-shadow-xl hover:bg-light-gray"
+          className="p-3 text-3xl text-white hover:drop-shadow-xl hover:bg-light-gray"
         >
           <BsFillLockFill />
         </button>
@@ -88,7 +88,7 @@ const LogOutButton = () => {
 
 const SideBarComponent = () => {
   return (
-		<div className="w-72 fixed sidebar dark:bg-secondary-dark-bg bg-white ">
+		<div className="fixed bg-white w-72 sidebar dark:bg-secondary-dark-bg ">
 			<Sidebar />
 		</div>
 	);
@@ -96,7 +96,7 @@ const SideBarComponent = () => {
 
 const NavBarComponent = () => {
   return (
-			<div className="fixed md:static bg-main-bg dark:bg-main-dark-bg navbar w-full ">
+			<div className="fixed w-full md:static bg-main-bg dark:bg-main-dark-bg navbar ">
 				<NavBar />
 			</div>
 		);
@@ -126,7 +126,7 @@ const MainApp = () => {
 
 	return (
 		<div className={currentMode === "Dark" ? "dark" : ""}>
-			<div className="flex relative dark:bg-main-dark-bg w-full">
+			<div className="relative flex w-full dark:bg-main-dark-bg">
 				<ThemeSettingButton />
 				<LogOutButton />
 				<SideBarComponent />
@@ -196,12 +196,12 @@ const MainApp = () => {
 const queryClient = new QueryClient();
 
 const App = () => {
-  // registerLicense(
-  //   "Ngo9BigBOggjHTQxAR8/V1NDaF5cWWtCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH9cdHZXRGhYWUV3VkE="
-  // );
   registerLicense(
-    "ORg4AjUWIQA/Gnt3VVhhQlJDfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5bd0diUX1WcnNQT2lVWkd2"
+    "Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWH1ccnVSRGRdWUJwXUtWYEg="
   );
+  // registerLicense(
+  //   "ORg4AjUWIQA/Gnt3VVhhQlJDfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTH5bd0diUX1WcnNQT2lVWkd2"
+  // );
 
   return (
 			<Routes>

@@ -193,7 +193,18 @@ const LoginDialog = () => {
 			console.log('🌐 [WEB LOGIN] Response status:', response.status);
 			
 			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				// Try to get error message from response body
+				let errorMessage = "Login failed";
+				try {
+					const errorData = await response.json();
+					errorMessage = errorData.message || errorMessage;
+				} catch {
+					// If we can't parse JSON, use status text
+					errorMessage = response.status === 401 
+						? "Invalid email or password" 
+						: `Server error (${response.status})`;
+				}
+				throw new Error(errorMessage);
 			}
 
 			const jsonData = await response.json();
@@ -214,7 +225,8 @@ const LoginDialog = () => {
 					email: userData.email,
 					userId: userData.id,
 					company: userData.firm?.name || "Unknown",
-					userToken: jsonData.data.token
+					userToken: jsonData.data.token,
+					role: userData.role || "STANDARD"
 				};
 
 				// First check if user is validated
@@ -225,38 +237,59 @@ const LoginDialog = () => {
 					return;
 				}
 
-				// Only proceed with login if user is validated
-				await getUserAccessLevel(userName).then((data) => {
-					setUserAccessLevel(data);
-					localStorage.setItem("accessLevel", data);
-					setIsLoggedIn(true);
-					setUserLoggedIn(true);
-					localStorage.setItem("logInFlag", "true");
-					localStorage.setItem("token", mappedUser.userToken);
-					setGlobalUserName(JSON.stringify(mappedUser.user));
-					localStorage.setItem(
-						"userName",
-						JSON.stringify(mappedUser.user),
-					);
-					const email = JSON.stringify(mappedUser.email);
-					localStorage.setItem("userEmail", email);
-					localStorage.setItem("userID", JSON.stringify(mappedUser.userId));
-					setUserEmail(email);
-					onSaveUserName(userName, email);
-					setCompanyName(mappedUser.company);
-					localStorage.setItem(
-						"companyName",
-						JSON.stringify(mappedUser.company),
-					);
-				});
+				// Convert role to access level number
+				const roleToAccessLevel = {
+					"GUEST": 0,
+					"STANDARD": 1,
+					"POWER": 2,
+					"ADMIN": 3,
+					"SUPERADMIN": 4
+				};
+				const accessLevelNum = roleToAccessLevel[mappedUser.role] ?? 1;
+				console.log('🌐 [WEB LOGIN] User role:', mappedUser.role, '-> Access Level:', accessLevelNum);
+
+				// Store user data in localStorage
+				setUserAccessLevel(accessLevelNum);
+				localStorage.setItem("accessLevel", accessLevelNum);
+				localStorage.setItem("userRole", mappedUser.role);
+				setIsLoggedIn(true);
+				setUserLoggedIn(true);
+				localStorage.setItem("logInFlag", "true");
+				localStorage.setItem("token", mappedUser.userToken);
+				setGlobalUserName(JSON.stringify(mappedUser.user));
+				localStorage.setItem(
+					"userName",
+					JSON.stringify(mappedUser.user),
+				);
+				const email = JSON.stringify(mappedUser.email);
+				localStorage.setItem("userEmail", email);
+				localStorage.setItem("userID", JSON.stringify(mappedUser.userId));
+				setUserEmail(email);
+				onSaveUserName(userName, email);
+				setCompanyName(mappedUser.company);
+				localStorage.setItem("companyName", mappedUser.company);
+				// Store firm info for multi-tenant routing
+				localStorage.setItem("firmId", userData.firm?.id || "");
+				localStorage.setItem("firmType", userData.firm?.type || "");
+				console.log('🌐 [WEB LOGIN] Stored firm info:', userData.firm);
+				
+				// Also try to get contact ID (non-blocking)
+				getUserAccessLevel(userName).catch(err => console.log('Contact lookup failed (non-critical):', err));
+				
 				window.location = "/main/dashboard";
 			} else {
-				await showErrorDialog("Invalid Username or Password");
+				await showErrorDialog("Unable to complete login. Please try again.");
 			}
 		} catch (error) {
 			console.error('🌐 [WEB LOGIN] Error:', error);
-			await showErrorDialog(`Error: ${error.message}`);
-			setErrorMsg(error.message);
+			// Show user-friendly error message
+			const userMessage = error.message.includes("Invalid email or password")
+				? "Invalid email or password. Please check your credentials and try again."
+				: error.message.includes("Network") || error.message.includes("fetch")
+				? "Unable to connect to the server. Please check your internet connection."
+				: error.message || "An unexpected error occurred. Please try again.";
+			await showErrorDialog(userMessage);
+			setErrorMsg(userMessage);
 			localStorage.setItem("logInFlag", "false");
 		}
 	};

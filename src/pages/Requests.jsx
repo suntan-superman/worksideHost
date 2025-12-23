@@ -23,7 +23,8 @@ import {
 } from "@syncfusion/ej2-react-grids";
 
 import {
-	GetRequestsByCustomer,
+	GetAllRequests,
+	GetRequestsBySupplier,
 	GetProjectIDByNameAndCustomer,
 	GetVendorIDByName,
 	GetAllSupplierGroupData,
@@ -177,6 +178,8 @@ const Requests = () => {
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [currentRecord, setCurrentRecord] = useState(null);
 	const [companyName, setCompanyName] = useState("");
+	const [firmId, setFirmId] = useState("");
+	const [firmType, setFirmType] = useState("");
 	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
 	const [activeFilters, setActiveFilters] = useState(() => {
 		const saved = localStorage.getItem("requestFilterSelections");
@@ -189,9 +192,23 @@ const Requests = () => {
 		const numGridRows = Number(localStorage.getItem("numGridRows"));
 		if (numGridRows) gridPageSize = numGridRows;
 
-		const companyName = localStorage.getItem("companyName");
-		clientName = companyName;
-		setCompanyName(companyName);
+		let storedCompanyName = localStorage.getItem("companyName");
+		// Handle legacy JSON-stringified values (remove surrounding quotes)
+		if (storedCompanyName && storedCompanyName.startsWith('"') && storedCompanyName.endsWith('"')) {
+			storedCompanyName = storedCompanyName.slice(1, -1);
+		}
+		clientName = storedCompanyName;
+		setCompanyName(storedCompanyName);
+		
+		// Get firm info for multi-tenant routing
+		const storedFirmId = localStorage.getItem("firmId") || "";
+		const storedFirmType = localStorage.getItem("firmType") || "";
+		setFirmId(storedFirmId);
+		setFirmType(storedFirmType);
+		
+		console.log('[REQUESTS] Company name from localStorage:', storedCompanyName);
+		console.log('[REQUESTS] Firm ID:', storedFirmId);
+		console.log('[REQUESTS] Firm Type:', storedFirmType);
 
 		const savedFilters = localStorage.getItem("requestFilterSelections");
 		if (savedFilters) {
@@ -206,9 +223,36 @@ const Requests = () => {
 		isLoading: reqLoading,
 		isSuccess: isReqSuccess,
 	} = useQuery({
-		queryKey: ["requests", companyName], // Include companyName so query refetches when company changes
+		queryKey: ["requests", firmType, firmId], // Include firmType and firmId so query refetches if they change
 		queryFn: async () => {
-			const res = await GetRequestsByCustomer(companyName || clientName);
+			// Get user's access level
+			const userAccessLevel = Number(localStorage.getItem("accessLevel")) || 0;
+			const isSuperAdmin = userAccessLevel >= 4;
+			const isSupplier = firmType === "SUPPLIER";
+			
+			console.log('[REQUESTS] Firm Type:', firmType);
+			console.log('[REQUESTS] Firm ID:', firmId);
+			console.log('[REQUESTS] Access Level:', userAccessLevel);
+			console.log('[REQUESTS] Is SUPERADMIN:', isSuperAdmin);
+			console.log('[REQUESTS] Is Supplier:', isSupplier);
+			
+			let res;
+			// SUPERADMIN sees ALL requests (backend handles this)
+			// Regular SUPPLIER sees only their assigned requests
+			// Regular CUSTOMER sees only their tenant's requests
+			if (isSuperAdmin || !isSupplier) {
+				console.log('[REQUESTS] Fetching all requests (SUPERADMIN or CUSTOMER)');
+				res = await GetAllRequests();
+			} else if (isSupplier && firmId) {
+				console.log('[REQUESTS] Fetching requests for SUPPLIER:', firmId);
+				res = await GetRequestsBySupplier(firmId);
+			} else {
+				console.log('[REQUESTS] No valid fetch criteria, returning empty');
+				return { status: 200, data: { data: [] } };
+			}
+			
+			console.log('[REQUESTS] API Response:', res);
+			console.log('[REQUESTS] Response data:', res?.data);
 			return res;
 		},
 		refetchInterval: 1000 * 10,
@@ -216,7 +260,7 @@ const Requests = () => {
 		refetchOnWindowFocus: true,
 		staleTime: 1000 * 5, // Reduced from 24 hours to 5 seconds for testing
 		retry: 3,
-		enabled: !!companyName, // Only run query when companyName is set
+		enabled: !!firmType, // Only run when firmType is set
 	});
 
 	const GetAccessLevel = () => {
@@ -287,10 +331,27 @@ const Requests = () => {
 
 	useEffect(() => {
 		if (reqData) {
-			// Backend returns { status, data: { data: [...], customer, tenantId } }
-			// So we need to access reqData.data.data to get the actual array
+			// Backend returns { status, data: { data: [...], page, limit, total, pages } }
+			// fetchWithHandling wraps it as { status, data: <response> }
+			console.log('[REQUESTS] Processing response data:', reqData);
+			
 			const responseData = reqData?.data;
-			const requestsArray = responseData?.data || responseData; // Handle both nested and direct array
+			console.log('[REQUESTS] responseData:', responseData);
+			
+			// Handle different response structures
+			let requestsArray;
+			if (responseData?.data && Array.isArray(responseData.data)) {
+				// Nested structure: { data: { data: [...] } }
+				requestsArray = responseData.data;
+			} else if (Array.isArray(responseData)) {
+				// Direct array: { data: [...] }
+				requestsArray = responseData;
+			} else {
+				console.error('[REQUESTS] Unexpected response structure:', responseData);
+				requestsArray = [];
+			}
+			
+			console.log('[REQUESTS] Extracted requests array:', requestsArray?.length, 'items');
 			
 			// Ensure data is an array before using it
 			if (requestsArray && Array.isArray(requestsArray)) {
@@ -410,16 +471,19 @@ const Requests = () => {
 	};
 
 	const gridTemplate = (props) => (
-		<div>
+		<div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
 			<button
 				type="button"
 				style={{
-					background: "black",
+					background: "#2563EB",
 					color: "white",
-					padding: "5px",
-					borderRadius: "5%",
-					fontWeight: "bold",
-					fontSize: "14px",
+					padding: "6px 12px",
+					borderRadius: "4px",
+					fontWeight: "600",
+					fontSize: "13px",
+					border: "1px solid #1D4ED8",
+					cursor: "pointer",
+					boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
 				}}
 				className="requestData"
 				onClick={() => {

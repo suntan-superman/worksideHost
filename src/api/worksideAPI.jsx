@@ -381,6 +381,22 @@ const GetAllRequests = async () => {
 };
 
 /**
+ * Fetches all requests assigned to a specific supplier.
+ * Use this for SUPPLIER users to see requests where they are the assigned vendor.
+ * @param {string} supplierId - The supplier's firm ID.
+ * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and request data.
+ */
+const GetRequestsBySupplier = async (supplierId) => {
+    if (!supplierId || typeof supplierId !== "string") {
+        console.error("Invalid supplier ID provided.");
+        return { status: 400, data: [] };
+    }
+    // Use fetchWithHandling which includes auth token
+    const result = await fetchWithHandling(`/api/request/bysupplier/${supplierId}`);
+    return result;
+};
+
+/**
  * Fetches all requests associated with a specific project ID.
  * @param {string} projectId - The project ID for filtering requests.
  * @returns {Promise<{ status: number, data: object[] }>} - A promise resolving to status and project-specific request data.
@@ -1487,6 +1503,7 @@ export {
 	GetCustomerSupplierMSAData,
 	GetSupplierGroupData,
 	GetAllRequests,
+	GetRequestsBySupplier,
 	GetAllRequestsByProject,
 	SaveNewRequest,
 	UpdateRequest,

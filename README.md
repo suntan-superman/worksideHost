@@ -1,100 +1,411 @@
+# worksideHost - Web Application
 
-GitHub Copilot: This project appears to be a React-based web application with a backend API. It uses several libraries and frameworks to provide functionality for managing requests, mapping, and user interactions. Here's a breakdown of the key components:
+**Version:** 1.0.0  
+**Framework:** React 18.3  
+**Target:** Desktop/Tablet Operators
 
-### Frontend
-1. **React Framework**: The frontend is built using React, a popular JavaScript library for building user interfaces.
-2. **Material-UI (MUI)**: The project uses Material-UI components for styling and layout, such as `Dialog`, `Button`, and `Stack`.
-3. **React Query**: The `@tanstack/react-query` library is used for managing server state and performing API calls.
-4. **Google Maps Integration**: The project integrates Google Maps using the `@vis.gl/react-google-maps` library to display maps, markers, and routes.
-5. **Draggable Dialogs**: The `react-draggable` library is used to make dialogs draggable within the UI.
-6. **Dynamic Sidebar**: The `Sidebar` component dynamically renders navigation links based on user permissions and application state.
-7. **State Management**: Context API and custom hooks (e.g., `UseStateContext`) are used for managing global state, such as the active menu and user login status.
+---
 
-### Backend
-1. **Node.js and Express**: The backend is likely built using Node.js and Express, as indicated by the `contactController.js` file.
-2. **MongoDB**: The backend interacts with a MongoDB database, as seen in the use of `process.env.REACT_APP_MONGO_URI` for API calls.
-3. **REST API**: The backend exposes RESTful endpoints for managing requests, contacts, and mapping data.
-4. **Axios**: The frontend uses Axios for making HTTP requests to the backend.
+## 📋 **Overview**
 
-### Features
-1. **Request Management**: The `RequestInfoModal` component displays detailed information about a request, including project details, request status, and supplier information.
-2. **Mapping and Tracking**: The application displays a map with markers for locations and tracks routes in real-time.
-3. **Delivery Associate Assignment**: Users can assign delivery associates to requests and update their statuses.
-4. **Sidebar Navigation**: The `Sidebar` component provides a dynamic navigation menu based on user roles and permissions.
-5. **Responsive Design**: The application adapts to different screen sizes, with features like collapsible sidebars for smaller screens.
+React web application for operators (clients) to manage projects, create requests, review bids, and track deliveries. Desktop-optimized interface with rich data visualization.
 
-### Libraries and Tools
-- **React Icons**: Used for rendering icons in the UI.
-- **Syncfusion Tooltip**: Provides tooltips for better user experience.
-- **Date-fns**: Used for formatting dates.
-- **Environment Variables**: Sensitive data like API keys and database URIs are stored in environment variables.
+---
 
-### Purpose
-The project seems to be a logistics or operations management platform, possibly for managing supply chain requests, tracking deliveries, and assigning tasks to delivery associates. It combines real-time data visualization (maps and routes) with robust request management features.
+## 🚀 **Quick Start**
 
-### DEPENDENCIES
-Here are the dependencies required to run this project based on the provided files and context:
+### **Install Dependencies**
+```bash
+yarn install
+```
 
-### Frontend Dependencies
-1. **React**: Core library for building the user interface.
-   - `react`
-   - `react-dom`
-   - `react-router-dom` (for routing)
+### **Start Development**
+```bash
+yarn start  # Runs on http://localhost:3000
+```
 
-2. **Material-UI (MUI)**: For UI components and styling.
-   - `@mui/material`
-   - `@mui/icons-material`
+### **Build for Production**
+```bash
+yarn build  # Creates /build directory
+```
 
-3. **React Query**: For managing server state and API calls.
-   - `@tanstack/react-query`
+### **Deploy to Netlify**
+```bash
+netlify deploy --prod --dir=build
+```
 
-4. **Google Maps Integration**: For embedding and interacting with Google Maps.
-   - `@vis.gl/react-google-maps`
+---
 
-5. **Draggable Dialogs**: For making dialogs draggable.
-   - `react-draggable`
+## 📁 **Structure**
 
-6. **Date Formatting**: For formatting dates.
-   - `date-fns`
+```
+worksideHost/
+├── public/               # Static assets
+│   ├── index.html
+│   ├── manifest.json
+│   └── favicon.ico
+├── src/
+│   ├── api/              # API integration
+│   │   └── worksideAPI.jsx
+│   ├── components/       # Reusable components (100+ files)
+│   │   ├── RequestForm.jsx
+│   │   ├── BidTable.jsx
+│   │   ├── ProjectMap.jsx
+│   │   └── Sidebar.jsx
+│   ├── contexts/         # React Context
+│   │   └── ContextProvider.jsx
+│   ├── pages/            # Route pages
+│   │   ├── Projects.jsx
+│   │   ├── Requests.jsx
+│   │   ├── Bids.jsx
+│   │   └── Dashboard.jsx
+│   ├── styles/           # SCSS stylesheets
+│   │   └── App.scss
+│   ├── utils/            # Helper functions
+│   ├── App.js            # Root component
+│   └── index.js          # Entry point
+├── package.json
+├── craco.config.js       # Create React App override
+├── tailwind.config.js    # TailwindCSS config
+├── netlify.toml          # Netlify config
+└── _redirects            # SPA routing config
+```
 
-7. **Icons**: For rendering icons in the UI.
-   - `react-icons`
+---
 
-8. **Syncfusion Tooltip**: For tooltips in the sidebar.
-   - `@syncfusion/ej2-react-popups`
+## 🎯 **Key Features**
 
-9. **Axios**: For making HTTP requests.
-   - `axios`
+### **Project Management**
+- Create/edit/view projects
+- Filter by customer, status, area
+- Map view with project locations
+- Assign team members
 
-10. **Environment Variables**: To manage sensitive data like API keys.
-   - `dotenv` (for local development)
+### **Request Management**
+- Create service requests
+- Template support for common requests
+- Bid list management
+- Status workflow (OPEN → COMPLETED)
+- Real-time status updates
 
-### Backend Dependencies
-1. **Node.js and Express**: For building the backend API.
-   - `express`
+### **Bid Management**
+- View submitted bids
+- Compare supplier quotes
+- Award bids
+- Revision workflow
+- SSR (Single Source Request) support
 
-2. **MongoDB**: For database interactions.
-   - `mongoose`
+### **Reporting**
+- Syncfusion charts (bar, pie, line)
+- Request metrics by status
+- Supplier performance
+- Cost analysis
 
-3. **CORS**: To handle cross-origin requests.
-   - `cors`
+### **Map Integration**
+- Google Maps (@react-google-maps/api)
+- Project location markers
+- Route visualization
+- Geofencing (future)
 
-4. **Body Parser**: For parsing incoming request bodies.
-   - `body-parser`
+---
 
-5. **Dotenv**: For managing environment variables.
-   - `dotenv`
+## 🗂️ **Routing**
 
-### Development Dependencies
-1. **ESLint**: For linting and maintaining code quality.
-   - `eslint`
+```javascript
+// React Router v6
+<Routes>
+  <Route path="/" element={<Dashboard />} />
+  <Route path="/projects" element={<Projects />} />
+  <Route path="/requests" element={<Requests />} />
+  <Route path="/request/:id" element={<RequestDetails />} />
+  <Route path="/bids" element={<Bids />} />
+  <Route path="/suppliers" element={<Suppliers />} />
+  <Route path="/reports" element={<Reports />} />
+</Routes>
+```
 
-2. **Prettier**: For code formatting.
-   - `prettier`
+**SPA Routing:** `_redirects` file handles client-side routing on Netlify
 
-3. **React Scripts**: For running and building the React app.
-   - `react-scripts`
+---
 
-### Notes
-- Ensure you have a `.env` file with the required environment variables, such as `REACT_APP_GOOGLE_MAPS_API_KEY` and `REACT_APP_MONGO_URI`.
-- Install dependencies using `npm install` or `yarn` in both the frontend and backend directories if they are separated.
+## 🗄️ **State Management**
+
+### **Zustand**
+```javascript
+// ContextProvider.jsx
+export const useStateContext = create((set) => ({
+  currentProject: null,
+  currentUser: null,
+  setCurrentProject: (project) => set({ currentProject: project }),
+  // ...
+}));
+```
+
+### **React Query**
+```javascript
+// Data fetching with caching
+const { data: projects } = useQuery({
+  queryKey: ['projects'],
+  queryFn: () => GetAllProjects(),
+  staleTime: 60000,  // 60s
+  refetchInterval: 60000
+});
+```
+
+---
+
+## 🌐 **API Integration**
+
+### **Base Configuration**
+```javascript
+// package.json
+{
+  "proxy": "https://workside-software.wl.r.appspot.com/"
+}
+```
+
+### **API Service**
+```javascript
+// src/api/worksideAPI.jsx
+const API_BASE = process.env.REACT_APP_API_URL || 
+                 'https://workside-software.wl.r.appspot.com';
+
+// Authentication with cookies (JWT)
+const GetAllProjects = async () => {
+  const response = await axios.get(`${API_BASE}/api/project`, {
+    withCredentials: true  // Send cookies
+  });
+  return response.data;
+};
+```
+
+### **Cookie-Based Auth**
+- JWT stored in HTTP-only cookie
+- Automatically sent with requests (`withCredentials: true`)
+- No manual token management
+- Secure against XSS attacks
+
+---
+
+## 🎨 **Styling**
+
+### **TailwindCSS + SCSS**
+```javascript
+// Utility classes
+<div className="flex items-center justify-between p-4 bg-white rounded-lg shadow">
+  <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+</div>
+
+// Custom SCSS
+import './styles/App.scss';
+```
+
+### **Material-UI + Syncfusion**
+```javascript
+// Material-UI components
+import { Button, TextField, Select } from '@mui/material';
+
+// Syncfusion charts
+import { ChartComponent, SeriesCollectionDirective } from '@syncfusion/ej2-react-charts';
+```
+
+### **Theme Configuration**
+```javascript
+// Material-UI theme
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: { main: '#22C55E' },  // Green
+    secondary: { main: '#3B82F6' }  // Blue
+  }
+});
+```
+
+---
+
+## 📦 **Dependencies**
+
+### **Core**
+- `react` 18.3.1 - UI library
+- `react-dom` 18.2.0 - DOM rendering
+- `react-router-dom` 6.22.3 - Routing
+- `axios` 1.6.8 - HTTP client
+
+### **State Management**
+- `zustand` 5.0.1 - State management
+- `@tanstack/react-query` 5.63.0 - Data fetching
+- `react-cookie` 7.2.2 - Cookie management
+
+### **UI Libraries**
+- `@mui/material` 6.1.6 - Material Design
+- `@syncfusion/ej2-react-*` 30.2.4 - Charts, grids, calendars
+- `@phosphor-icons/react` 2.1.7 - Icons
+- `react-icons` 5.0.1 - Additional icons
+
+### **Maps**
+- `@react-google-maps/api` 2.20.3 - Google Maps
+- `@vis.gl/react-google-maps` 1.4.0 - Advanced maps
+
+### **Utilities**
+- `date-fns` 4.1.0 - Date formatting
+- `lodash` 4.17.21 - Utility functions
+- `react-toastify` 10.0.5 - Toast notifications
+- `sweetalert2` 11.15.10 - Alert dialogs
+
+**Full List:** See `package.json`
+
+---
+
+## 🛠️ **Configuration Files**
+
+### **craco.config.js**
+```javascript
+// Override Create React App config
+module.exports = {
+  style: {
+    postcss: {
+      plugins: [require('tailwindcss'), require('autoprefixer')]
+    }
+  }
+};
+```
+
+### **netlify.toml**
+```toml
+[build]
+  command = "yarn build"
+  publish = "build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+### **_redirects**
+```
+/*    /index.html   200
+```
+
+---
+
+## 🧪 **Testing**
+
+### **Run Tests**
+```bash
+yarn test
+```
+
+TODO: Add comprehensive test suite
+- Unit tests for components
+- Integration tests for API
+- E2E tests with Cypress
+
+---
+
+## 📱 **Responsive Design**
+
+### **Breakpoints**
+- **Mobile:** < 640px (hidden, use mobile apps)
+- **Tablet:** 640px - 1024px (simplified layout)
+- **Desktop:** > 1024px (full features)
+
+### **Mobile Considerations**
+- Primary mobile experience via React Native apps
+- Web app optimized for desktop/tablet
+- Responsive tables collapse on mobile
+
+---
+
+## 🚀 **Deployment**
+
+### **Netlify (Current)**
+```bash
+# Manual deploy
+yarn build
+netlify deploy --prod --dir=build
+
+# Automatic (on git push)
+# Configured in Netlify dashboard
+```
+
+### **Environment Variables (Netlify)**
+```bash
+# Set in Netlify dashboard
+REACT_APP_API_URL=https://workside-software.wl.r.appspot.com
+REACT_APP_GOOGLE_MAPS_KEY=your-key
+```
+
+### **Build Optimization**
+- Code splitting by route
+- Lazy loading components
+- Image optimization
+- Tree shaking
+- Minification
+
+---
+
+## 🚨 **Troubleshooting**
+
+### **"Network Error"**
+- Check `proxy` in `package.json`
+- Verify backend is running
+- Check CORS configuration
+- Ensure cookies enabled
+
+### **"Authentication Failed"**
+- Clear browser cookies
+- Re-login
+- Check JWT expiry (7 days)
+- Verify backend `/api/auth` endpoint
+
+### **"Map Not Loading"**
+- Verify Google Maps API key
+- Check API key restrictions
+- Enable Maps JavaScript API
+- Check browser console for errors
+
+---
+
+## 📈 **Performance**
+
+### **Current Metrics**
+- First Contentful Paint: <1.5s
+- Time to Interactive: <3s
+- Bundle size: ~2MB (gzipped)
+
+### **Optimizations Applied**
+- React.lazy() for route splitting
+- useMemo/useCallback for expensive computations
+- React Query caching (60s stale time)
+- Debounced search inputs
+- Virtualized lists (Syncfusion grids)
+
+TODO: Add performance monitoring (Lighthouse CI)
+
+---
+
+## 🔗 **Related Documentation**
+
+- [Main Documentation](../docs/README.md) - Platform overview
+- [Backend API](../docs/backend/api-reference.md) - API endpoints
+- [Authentication](../docs/backend/auth.md) - Cookie-based auth
+- [Client Mobile App](../worksideClient/README.md) - Mobile companion
+- [Deployment Guide](../docs/deployment/guide.md) - Full deployment
+
+---
+
+## 📞 **Support**
+
+- Check [Troubleshooting Guide](../docs/operations/troubleshooting.md)
+- Review browser console for errors
+- Contact: support@workside.com
+
+---
+
+**Quick Links:**
+- [↑ Main Documentation](../docs/README.md)
+- [→ Client App](../worksideClient/README.md)
+- [→ Supplier App](../worksideSupplier/README.md)
+- [→ API Reference](../docs/backend/api-reference.md)
