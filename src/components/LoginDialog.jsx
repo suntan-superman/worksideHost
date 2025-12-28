@@ -48,33 +48,36 @@
  */
 /* eslint-disable */
 
-import React, { useState, useEffect } from "react";
-import { FaRegEnvelope } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { FaRegEnvelope, FaEye, FaEyeSlash } from "react-icons/fa";
 import { MdLockOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { UseStateContext } from "../contexts/ContextProvider";
+import { useToast } from "../contexts/ToastContext";
 import ForgotPasswordModal from "./ForgotPasswordModal";
 import "../index.css";
 import useUserStore from "../stores/UserStore";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
-
 const LoginDialog = () => {
 	const { setIsLoggedIn, setGlobalUserName, setUserEmail, setCompanyName } =
 		UseStateContext();
+	const toast = useToast();
 	const setUserLoggedIn = useUserStore((state) => state.setUserLoggedIn);
 	const setUserAccessLevel = useUserStore((state) => state.setUserAccessLevel);
 
 	const [userName, setUserName] = useState("");
 	const [password, setPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
 	const [saveUserChecked, setSaveUserChecked] = useState(false);
 	const [forgotPasswordChecked, setForgotPasswordChecked] = useState(false);
 	const [forgotPasswordFlag, setForgotPasswordFlag] = useState(false);
 	const [errorMsg, setErrorMsg] = useState("");
+
+	// Refs for tab navigation
+	const emailInputRef = useRef(null);
+	const passwordInputRef = useRef(null);
+	const signInButtonRef = useRef(null);
 
 	const isFormValid = userName?.trim() !== "" && password?.trim() !== "";
 
@@ -170,7 +173,7 @@ const LoginDialog = () => {
 			setForgotPasswordFlag(true);
 			return;
 		}
-		showSuccessDialogWithTimer("Logging In...");
+		toast.loading("Logging In...", "Please Wait");
 		localStorage.removeItem("logInFlag");
 		setErrorMsg("");
 		
@@ -233,7 +236,7 @@ const LoginDialog = () => {
 				const validationFlag = await isUserValidated(userName);
 				
 				if (!validationFlag) {
-					await showErrorDialog("User is not validated. Please check your email for validation link.");
+					toast.error("User is not validated. Please check your email for validation link.");
 					return;
 				}
 
@@ -278,7 +281,7 @@ const LoginDialog = () => {
 				
 				window.location = "/main/dashboard";
 			} else {
-				await showErrorDialog("Unable to complete login. Please try again.");
+				toast.error("Unable to complete login. Please try again.");
 			}
 		} catch (error) {
 			console.error('🌐 [WEB LOGIN] Error:', error);
@@ -288,7 +291,7 @@ const LoginDialog = () => {
 				: error.message.includes("Network") || error.message.includes("fetch")
 				? "Unable to connect to the server. Please check your internet connection."
 				: error.message || "An unexpected error occurred. Please try again.";
-			await showErrorDialog(userMessage);
+			toast.error(userMessage);
 			setErrorMsg(userMessage);
 			localStorage.setItem("logInFlag", "false");
 		}
@@ -308,7 +311,23 @@ const LoginDialog = () => {
 			setUserName(user);
 		};
 		getUserName();
+		// Focus on email input when component mounts
+		if (emailInputRef.current) {
+			emailInputRef.current.focus();
+		}
 	}, []);
+
+	// Handle keyboard navigation
+	const handleKeyDown = (e, nextRef) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			if (nextRef && nextRef.current) {
+				nextRef.current.focus();
+			} else if (isFormValid) {
+				onSignIn(e);
+			}
+		}
+	};
 
 	const enabledButtonStyle =
 		"bg-green-500 border-2 border-black-500 text-white rounded-full px-12 py-2 inline-block font-semibold hover:bg-green-500 hover:text-white";
@@ -342,44 +361,67 @@ const LoginDialog = () => {
 								<div className="border-2 w-full border-green-500 inline-block mb-2" />
 								{/* Login Info */}
 								<div className="flex flex-col items-center">
-									<div className="bg-gray-200 w-72 p-2 flex items-center mb-3">
+									<div className="bg-gray-200 w-72 p-2 flex items-center mb-3 rounded-md focus-within:ring-2 focus-within:ring-green-500">
 										<FaRegEnvelope className="text-black m-2" />
 										<input
+											ref={emailInputRef}
 											type="email"
 											name="email"
 											placeholder="Email"
 											tabIndex={1}
 											value={userName}
 											onChange={(e) => setUserName(e.target.value)}
+											onKeyDown={(e) => handleKeyDown(e, passwordInputRef)}
 											className="bg-gray-200 outline-none text-sm flex-1"
+											autoComplete="email"
 										/>
 									</div>
-									<div className="bg-gray-200 w-72 p-2 flex items-center mb-3">
+									<div className="bg-gray-200 w-72 p-2 flex items-center mb-3 rounded-md focus-within:ring-2 focus-within:ring-green-500">
 										<MdLockOutline className="text-black m-2" />
 										<input
-											type="password"
+											ref={passwordInputRef}
+											type={showPassword ? "text" : "password"}
 											name="password"
 											placeholder="Password"
+											tabIndex={2}
+											value={password}
 											onChange={(e) => setPassword(e.target.value)}
+											onKeyDown={(e) => handleKeyDown(e, signInButtonRef)}
 											className="bg-gray-200 outline-none text-sm flex-1"
+											autoComplete="current-password"
 										/>
+										<button
+											type="button"
+											tabIndex={3}
+											onClick={() => setShowPassword(!showPassword)}
+											className="text-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 rounded p-1 transition-colors"
+											aria-label={showPassword ? "Hide password" : "Show password"}
+										>
+											{showPassword ? (
+												<FaEyeSlash className="w-5 h-5" />
+											) : (
+												<FaEye className="w-5 h-5" />
+											)}
+										</button>
 									</div>
 									<div className="flex w-72 mb-5 justify-between">
-										<label className="flex items-center text-xs">
+										<label className="flex items-center text-xs cursor-pointer">
 											<input
 												type="checkbox"
 												name="remember"
-												className="mr-1"
+												tabIndex={4}
+												className="mr-1 cursor-pointer"
 												checked={saveUserChecked}
 												onChange={checkSaveUserHandler}
 											/>
 											Remember me
 										</label>
-										<label className="flex items-center text-xs">
+										<label className="flex items-center text-xs cursor-pointer">
 											<input
 												type="checkbox"
 												name="forgotpw"
-												className="mr-1"
+												tabIndex={5}
+												className="mr-1 cursor-pointer"
 												checked={forgotPasswordChecked}
 												onChange={checkForgotPasswordHandler}
 											/>
@@ -387,12 +429,14 @@ const LoginDialog = () => {
 										</label>
 									</div>
 									{errorMsg && (
-										<div className="border-2 border-red-500 text-red-500 bg-white rounded-full px-12 py-2 inline-block font-semibold">
+										<div className="border-2 border-red-500 text-red-500 bg-white rounded-full px-12 py-2 inline-block font-semibold mb-3">
 											{errorMsg}
 										</div>
 									)}
 									<button
+										ref={signInButtonRef}
 										type="button"
+										tabIndex={6}
 										className={
 											isFormValid ? enabledButtonStyle : disabledButtonStyle
 										}

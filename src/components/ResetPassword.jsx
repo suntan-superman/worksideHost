@@ -11,7 +11,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { Card, CardContent } from "@mui/material";
 
-import { showErrorDialog } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 /**
  * ResetPassword Component
@@ -34,6 +34,7 @@ import { showErrorDialog } from "../utils/useSweetAlert";
  * <ResetPassword />
  */
 const ResetPassword = () => {
+	const toast = useToast();
 	const userEmail = localStorage.getItem("email");
 
 	const handleSubmit = async (e) => {
@@ -42,9 +43,9 @@ const ResetPassword = () => {
 		const newpassword = data.get("newpassword");
 		const confirmpassword = data.get("confirmpassword");
 		if (newpassword !== confirmpassword) {
-			await showErrorDialog("New Password and Confirm Password do not match!");
+			toast.error("New Password and Confirm Password do not match!");
 		} else if (newpassword.length < 8) {
-			await showErrorDialog("Password must be at least 8 characters long");
+			toast.error("Password must be at least 8 characters long");
 		} else {
 			const fetchString = `${process.env.REACT_APP_API_URL}/api/user/resetpassword`;
 			const res = await axios.post(fetchString, {
@@ -52,9 +53,9 @@ const ResetPassword = () => {
 				password: newpassword,
 			});
 			if (res.data.status === false) {
-				await showErrorDialog(res.data.message);
+				toast.error(res.data.message);
 			} else {
-				await showErrorDialog(res.data.message);
+				toast.success(res.data.message);
 				setTimeout(() => {
 					window.location = "/login";
 				}, 2000);

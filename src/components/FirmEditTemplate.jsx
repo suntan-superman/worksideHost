@@ -7,7 +7,6 @@ import "../styles/material.css";
 import { areaOptions } from "../data/worksideOptions";
 import { firmStatusOptions, firmTypeOptions } from "../data/worksideOptions";
 import { GetAllFirms, GetAllFirmsForSelection } from "../api/worksideAPI";
-import { showSuccessDialog } from "../utils/useSweetAlert";
 
 const FirmEditTemplate = (props) => {
 	const [data, setData] = useState({ ...props });

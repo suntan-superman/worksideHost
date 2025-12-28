@@ -16,10 +16,7 @@ import {
 import SupplierProductEditTemplate from "../components/SupplierProductEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import "../index.css";
 import "../App.css";
@@ -85,6 +82,7 @@ let gridPageSize = 10;
  * <SupplierProductsTab />
  */
 const SupplierProductsTab = () => {
+	const toast = useToast();
 	let supplierProductsGridRef = useRef(null);
 	const [productList, setProductList] = useState(null);
 	const [supplierProductList, setSupplierProductList] = useState(null);
@@ -255,7 +253,7 @@ const SupplierProductsTab = () => {
 			const supplierId = await GetSupplierIDFromName(currentRecord.supplier);
 
 			if (!supplierId) {
-				showErrorDialog("Failed to get supplier ID. Please try again.");
+				toast.error("Failed to get supplier ID. Please try again.");
 				return;
 			}
 
@@ -281,9 +279,9 @@ const SupplierProductsTab = () => {
 			const jsonData = await response.json();
 
 			if (response.status === 200 || response.status === 201) {
-				showSuccessDialogWithTimer("Record Successfully Added...");
+				toast.success("Record Successfully Added...");
 			} else {
-				showErrorDialog(`Record Add Failed...${response.status}`);
+				toast.error(`Record Add Failed...${response.status}`);
 			}
 			setInsertFlag(false);
 		} else {
@@ -299,9 +297,9 @@ const SupplierProductsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				showSuccessDialogWithTimer("Record Successfully Updated...");
+				toast.success("Record Successfully Updated...");
 			} else {
-				showErrorDialog(`Record Update Failed...${response.status}`);
+				toast.error(`Record Update Failed...${response.status}`);
 			}
 		}
 	};

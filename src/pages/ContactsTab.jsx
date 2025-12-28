@@ -16,10 +16,7 @@ import {
 } from "@syncfusion/ej2-react-grids";
 import ContactEditTemplate from "../components/ContactEditTemplate";
 
-import {
-	showWarningDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import "../index.css";
 import "../App.css";
@@ -72,6 +69,7 @@ let gridPageSize = 10;
  */
 const ContactsTab = () => {
 	let contactsGridRef = useRef(null);
+	const toast = useToast();
 
 	const [contactList, setContactList] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
@@ -131,7 +129,7 @@ const ContactsTab = () => {
 		console.log(`Toolbar Click: ${args.item.id}`);
 		if (contactsGridRef && args.item.id === "contactGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				showWarningDialog("You do not have permission to export data.");
+				toast.warning("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
@@ -283,7 +281,7 @@ const ContactsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				await showSuccessDialogWithTimer("Record Successfully Added...");
+				toast.success("Record Successfully Added...");
 				setOpenUpdateModal(false);
 			}
 		} else {
@@ -300,7 +298,7 @@ const ContactsTab = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				await showSuccessDialogWithTimer("Record Successfully Updated...");
+				toast.success("Record Successfully Updated...");
 				setOpenUpdateModal(false);
 			}
 		}

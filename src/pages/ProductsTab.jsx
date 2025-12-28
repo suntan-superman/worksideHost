@@ -20,7 +20,7 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import { GetProducts } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
-import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import "../index.css";
 import "../App.css";
@@ -80,6 +80,7 @@ let gridPageSize = 10;
  * - A JSX element containing the product grid and confirmation dialog.
  */
 const ProductsTab = () => {
+	const toast = useToast();
 	let productsGridRef = useRef(null);
 
 	const [productList, setProductList] = useState(null);
@@ -154,7 +155,7 @@ const ProductsTab = () => {
 		const json = await response.json();
 
 		if (response.ok) {
-			showSuccessDialogWithTimer("Record Successfully Deleted...");
+			toast.success("Record Successfully Deleted...");
 		}
 	};
 
@@ -218,7 +219,7 @@ const ProductsTab = () => {
 			const json = await response.json();
 
 			if (response.ok)
-				showSuccessDialogWithTimer("Record Successfully Added...");
+				toast.success("Record Successfully Added...");
 			setOpenUpdateModal(false);
 		} else {
 			const response = await fetch(
@@ -234,7 +235,7 @@ const ProductsTab = () => {
 			const json = await response.json();
 
 			if (response.ok)
-				showSuccessDialogWithTimer("Record Successfully Updated...");
+				toast.success("Record Successfully Updated...");
 		}
 	};
 

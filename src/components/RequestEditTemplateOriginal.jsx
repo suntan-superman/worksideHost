@@ -20,10 +20,7 @@ import {
 } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 import useUserStore from "../stores/UserStore";
 
 // Set Selection Options
@@ -111,6 +108,7 @@ import { requestStatusOptions } from "../data/worksideOptions";
  * - Includes loading indicators and error handling for data fetching and template operations.
  */
 const RequestEditTemplate = (props) => {
+	const toast = useToast();
 	console.log("RequestEditTemplate - props:", props);
 	console.log("RequestEditTemplate - rowData:", props.rowData);
 
@@ -477,7 +475,7 @@ const RequestEditTemplate = (props) => {
 				!formData.requestcategory ||
 				!formData.requestname
 			) {
-				await showErrorDialog(
+				toast.error(
 					"Please select a Request Category and Request Name!",
 				);
 				return;
@@ -498,7 +496,7 @@ const RequestEditTemplate = (props) => {
 			});
 
 			if (filteredSuppliers.length === 0) {
-				showErrorDialog("No Sole Source Vendors/Suppliers Found!");
+				toast.warning("No Sole Source Vendors/Suppliers Found!");
 			} else {
 				const uniqueSuppliers = [
 					...new Set(filteredSuppliers.map((s) => s.supplier)),
@@ -507,7 +505,7 @@ const RequestEditTemplate = (props) => {
 			}
 		} catch (error) {
 			console.error("Error in GetSSRVendors:", error);
-			showErrorDialog(`Error fetching suppliers: ${error.message}`);
+			toast.error(`Error fetching suppliers: ${error.message}`);
 		}
 	};
 
@@ -599,10 +597,10 @@ const RequestEditTemplate = (props) => {
 				}
 
 				setShowTemplateDialog(false);
-				await showSuccessDialogWithTimer("Template applied successfully");
+				toast.success("Template applied successfully");
 			} catch (error) {
 				console.error("Error applying template:", error);
-				await showErrorDialog(`Failed to apply template: ${error.message}`);
+				toast.error(`Failed to apply template: ${error.message}`);
 			}
 		},
 		[FilterProducts],
@@ -663,12 +661,12 @@ const RequestEditTemplate = (props) => {
 			setNewTemplateName("");
 			setTemplateError("");
 			setTemplateVisibility("private");
-			await showSuccessDialogWithTimer("Template saved successfully");
+			toast.success("Template saved successfully");
 			await fetchTemplates();
 		} catch (error) {
 			console.error("Save template error:", error);
 			setTemplateError(error.message);
-			await showErrorDialog(error.message);
+			toast.error(error.message);
 		}
 	};
 

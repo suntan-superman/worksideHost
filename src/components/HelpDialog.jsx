@@ -14,7 +14,7 @@ import {
 	Box,
 } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 /**
  * HelpDialog component provides a modal dialog for submitting user feedback.
@@ -31,6 +31,7 @@ import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
  * <HelpDialog open={isDialogOpen} onClose={handleDialogClose} />
  */
 const HelpDialog = ({ open, onClose }) => {
+	const toast = useToast();
 	const [feedbackType, setFeedbackType] = useState("idea");
 	const [description, setDescription] = useState("");
 
@@ -74,7 +75,7 @@ const HelpDialog = ({ open, onClose }) => {
 			if (response.ok) {
 				setDescription("");
 				onClose();
-				showSuccessDialogWithTimer("Feedback submitted successfully!");
+				toast.success("Feedback submitted successfully!");
 			}
 		} catch (error) {
 			console.error("Error submitting feedback:", error);

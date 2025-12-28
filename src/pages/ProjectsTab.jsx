@@ -36,11 +36,8 @@ import {
 } from "../api/worksideAPI";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 
-import {
-	showConfirmationDialog,
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
+import useConfirmation from "../hooks/useConfirmation";
 
 /**
  * ProjectsTab Component
@@ -103,6 +100,8 @@ import {
  * <ProjectsTab />
  */
 const ProjectsTab = () => {
+	const toast = useToast();
+	const { confirm, ConfirmationDialog: ConfirmDialog } = useConfirmation();
 	const [haveData, setHaveData] = useState(false);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);
@@ -179,11 +178,11 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			showSuccessDialogWithTimer("Project successfully deleted");
+			toast.success("Project successfully deleted");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			showErrorDialog(`Error deleting project...${error}`);
+			toast.error(`Error deleting project...${error}`);
 		},
 	});
 
@@ -196,11 +195,11 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			showSuccessDialogWithTimer("Project saved successfully:");
+			toast.success("Project saved successfully:");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			showErrorDialog(`Error saving project: ${error}`);
+			toast.error(`Error saving project: ${error}`);
 		},
 	});
 
@@ -213,11 +212,11 @@ const ProjectsTab = () => {
 			}
 		},
 		onSuccess: (data) => {
-			showSuccessDialogWithTimer("Project updated successfully:");
+			toast.success("Project updated successfully:");
 			queryClient.invalidateQueries("projects");
 		},
 		onError: (error) => {
-			showErrorDialog(`Error updating project: ${error}`);
+			toast.error(`Error updating project: ${error}`);
 		},
 	});
 
@@ -279,7 +278,7 @@ const ProjectsTab = () => {
 			);
 
 			if (existingProject) {
-				showErrorDialog(
+				toast.error(
 					`A project with the name "${currentRecord.projectname}" already exists. Please choose a different name.`,
 				);
 				return;
@@ -318,14 +317,14 @@ const ProjectsTab = () => {
 
 	const handleDelete = async () => {
 		if (!selectedRecord) {
-			showErrorDialog("Please select a project to delete");
+			toast.error("Please select a project to delete");
 			return;
 		}
 
 		// Always show confirmation dialog first
-		const deleteFlag = await showConfirmationDialog(
-			"Are you sure you want to delete this project? This action cannot be undone.",
-		);
+		const deleteFlag = await confirm({
+			message: "Are you sure you want to delete this project? This action cannot be undone.",
+		});
 
 		if (deleteFlag !== true) {
 			return; // User cancelled the deletion
@@ -337,7 +336,7 @@ const ProjectsTab = () => {
 				await GetAllRequestsByProject(selectedRecord);
 
 			if (associatedRequests && associatedRequests.length > 0) {
-				showErrorDialog(
+				toast.error(
 					"Cannot delete project. There are associated requests that must be deleted first.",
 				);
 				return;
@@ -351,12 +350,12 @@ const ProjectsTab = () => {
 				queryClient.invalidateQueries("projects");
 				// Clear the selected record
 				setSelectedRecord(null);
-				showSuccessDialogWithTimer("Project deleted successfully");
+				toast.success("Project deleted successfully");
 			} else {
-				showErrorDialog("Failed to delete project. Please try again.");
+				toast.error("Failed to delete project. Please try again.");
 			}
 		} catch (error) {
-			showErrorDialog(`Error deleting project: ${error.message}`);
+			toast.error(`Error deleting project: ${error.message}`);
 		}
 	};
 
@@ -616,6 +615,7 @@ const ProjectsTab = () => {
 						: []
 				}
 			/>
+			<ConfirmDialog />
 		</div>
 	);
 };

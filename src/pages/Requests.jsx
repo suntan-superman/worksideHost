@@ -39,11 +39,7 @@ import { UseStateContext } from "../contexts/ContextProvider";
 import RequestEditTemplate from "../components/RequestEditTemplate";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import { Header } from "../components";
-import {
-	showErrorDialog,
-	showWarningDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {
@@ -168,6 +164,7 @@ function getUsersBySupplierAndCategory(supplierId, categoryLabel, dataset) {
 }
 
 const Requests = () => {
+	const toast = useToast();
 	const requestGridRef = useRef(null);
 	const queryClient = useQueryClient();
 	const [isLoading, setIsLoading] = useState(false);
@@ -428,14 +425,14 @@ const Requests = () => {
 	const toolbarClick = (args) => {
 		if (requestGridRef && args.item.id === "requestGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				showWarningDialog("You do not have permission to export data.");
+				toast.warning("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
 				fileName: "worksideRequests.xlsx",
 			};
 			requestGridRef.current.excelExport(excelExportProperties);
-			showSuccessDialogWithTimer("Request Data Exported...");
+			toast.success("Request Data Exported...");
 		}
 	};
 
@@ -534,7 +531,7 @@ const Requests = () => {
 
 	const SendRequestEmail = async (emailList) => {
 		if (!emailList || emailList.length === 0) {
-			await showWarningDialog("No email addresses provided");
+			toast.warning("No email addresses provided");
 			return;
 		}
 
@@ -553,10 +550,10 @@ const Requests = () => {
 				),
 			);
 
-			await showSuccessDialogWithTimer("Suppliers Notified Via Email");
+			toast.success("Suppliers Notified Via Email");
 		} catch (error) {
 			console.error("Error sending emails:", error);
-			await showErrorDialog(`Error Sending Email: ${error.message}`);
+			toast.error(`Error Sending Email: ${error.message}`);
 		}
 	};
 
@@ -659,18 +656,18 @@ const Requests = () => {
 						await SendRequestEmail(emailAddresses);
 					}
 
-					await showSuccessDialogWithTimer("Request saved successfully");
+					toast.success("Request saved successfully");
 					setOpenUpdateModal(false);
 					queryClient.invalidateQueries(["requests"]);
 				} catch (error) {
 					console.error("Error updating bid lists:", error);
-					await showErrorDialog(`Error updating bid lists: ${error.message}`);
+					toast.error(`Error updating bid lists: ${error.message}`);
 					setOpenUpdateModal(false);
 				}
 			}
 		} catch (error) {
 			console.error("Error saving request:", error);
-			await showErrorDialog(`Error saving request: ${error.message}`);
+			toast.error(`Error saving request: ${error.message}`);
 			setOpenUpdateModal(false);
 		}
 	};

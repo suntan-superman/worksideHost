@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { registerLicense } from "@syncfusion/ej2-base";
 import { TooltipComponent } from "@syncfusion/ej2-react-popups";
 import { UseStateContext } from "./contexts/ContextProvider";
+import { ToastProvider } from "./contexts/ToastContext";
 import {
 	Dashboard,
 	Projects,
@@ -25,7 +26,7 @@ import NavBar from "./components/Navbar";
 import { FiSettings } from "react-icons/fi";
 import { BsFillLockFill } from "react-icons/bs";
 
-import { showConfirmationDialog } from "./utils/useSweetAlert";
+import useConfirmation from "./hooks/useConfirmation";
 import VerifyEmail from "./pages/VerifyEmail";
 import { DeliveryTracker } from "./components/delivery-tracker";
 import ErrorBoundary from "./components/delivery-tracker/components/ErrorBoundary";
@@ -34,19 +35,6 @@ import LogisticsExpertDashboard from "./components/LogisticsExpertDashboard";
 
 import "./styles/material.css";
 // TODO: Implement privileges based on access level
-
-	const onLogOut = async () => {
-		const logoutFlag = await showConfirmationDialog(
-			"Are you sure you want to log out?",
-		);
-
-		if (logoutFlag === true) {
-			localStorage.removeItem("token");
-			localStorage.removeItem("userName");
-			localStorage.setItem("logInFlag", "false");
-			window.location = "/login";
-		}
-	};
 
 const ThemeSettingButton = () => {
   const { currentColor, setThemeSettings } = UseStateContext();
@@ -69,20 +57,42 @@ const ThemeSettingButton = () => {
 
 const LogOutButton = () => {
   const { currentColor } = UseStateContext();
+  const { confirm, ConfirmationDialog } = useConfirmation();
+
+  const handleLogOut = async () => {
+    const logoutFlag = await confirm({
+      title: 'Log Out',
+      message: 'Are you sure you want to log out?',
+      confirmText: 'Yes, Log Out',
+      cancelText: 'Cancel',
+      variant: 'primary',
+      icon: 'question',
+    });
+
+    if (logoutFlag === true) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+      localStorage.setItem("logInFlag", "false");
+      window.location = "/login";
+    }
+  };
 
   return (
-    <div className="fixed pl-3 left-4 bottom-4" style={{ zIndex: "1000" }}>
-      <TooltipComponent content="Log Out" position="Top">
-        <button
-          type="button"
-          onClick={onLogOut}
-          style={{ background: currentColor, borderRadius: "50%" }}
-          className="p-3 text-3xl text-white hover:drop-shadow-xl hover:bg-light-gray"
-        >
-          <BsFillLockFill />
-        </button>
-      </TooltipComponent>
-    </div>
+    <>
+      <div className="fixed pl-3 left-4 bottom-4" style={{ zIndex: "1000" }}>
+        <TooltipComponent content="Log Out" position="Top">
+          <button
+            type="button"
+            onClick={handleLogOut}
+            style={{ background: currentColor, borderRadius: "50%" }}
+            className="p-3 text-3xl text-white hover:drop-shadow-xl hover:bg-light-gray"
+          >
+            <BsFillLockFill />
+          </button>
+        </TooltipComponent>
+      </div>
+      <ConfirmationDialog />
+    </>
   );
 }
 
@@ -204,6 +214,7 @@ const App = () => {
   // );
 
   return (
+		<ToastProvider>
 			<Routes>
 				<Route path="/" element={<Navigate replace to="/login" />} />
 				<Route path="/login" element={<LoginDialog />} />
@@ -220,6 +231,7 @@ const App = () => {
 				<Route path="/manage-templates" element={<ManageTemplates />} />
 				<Route path="*" element={<Navigate replace to="/login" />} />
 			</Routes>
+		</ToastProvider>
 		);
 };
 

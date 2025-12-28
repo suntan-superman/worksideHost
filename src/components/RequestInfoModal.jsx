@@ -28,10 +28,7 @@ import {
 	GetSupplierIDFromName,
 } from "../api/worksideAPI";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 /**
  * RequestInfoModal Component
@@ -71,6 +68,7 @@ import {
  * - Improve error handling and user feedback for API calls.
  */
 const RequestInfoModal = ({ recordID, open, onClose }) => {
+	const toast = useToast();
 	// Add early return if recordID is null/undefined AND dialog is open
 	if (open && !recordID) {
 		console.warn("RequestInfoModal opened without a valid recordID");
@@ -296,7 +294,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			}
 		} catch (error) {
 			console.error("Error fetching location data:", error);
-			showErrorDialog(`Failed to fetch location data: ${error.message}`);
+			toast.error(`Failed to fetch location data: ${error.message}`);
 		}
 	}, [requestData]);
 
@@ -321,7 +319,7 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			await SaveRequestBid(reqBidData);
 		},
 		onSuccess: () => {
-			showSuccessDialogWithTimer("Request Bid Saved Successfully");
+			toast.success("Request Bid Saved Successfully");
 			queryClient.invalidateQueries("requests");
 		},
 		onError: (error) => {
@@ -362,12 +360,12 @@ const RequestInfoModal = ({ recordID, open, onClose }) => {
 			);
 
 			if (response.status === 200) {
-				showSuccessDialogWithTimer("Delivery Associate Assigned Successfully");
+				toast.success("Delivery Associate Assigned Successfully");
 				queryClient.invalidateQueries(["requests"]);
 			}
 		} catch (error) {
 			console.error("Error assigning delivery associate:", error);
-			showErrorDialog("Failed to assign delivery associate");
+			toast.error("Failed to assign delivery associate");
 		}
 	};
 

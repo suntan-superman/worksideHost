@@ -24,11 +24,12 @@ import RequestFilterDialog from "../components/RequestFilterDialog";
 import { GetAllRequests } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
-import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 let gridPageSize = 10;
 
 const RequestsTab = () => {
+	const toast = useToast();
 	const [haveData, setHaveData] = useState(false);
 	const [insertFlag, setInsertFlag] = useState(false);
 	const [openUpdateModal, setOpenUpdateModal] = useState(false);

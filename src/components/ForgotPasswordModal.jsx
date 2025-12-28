@@ -12,7 +12,7 @@ import {
 import Paper from "@mui/material/Paper";
 import Draggable from "react-draggable";
 import axios from "axios";
-import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 /**
  * ForgotPasswordModal Component
@@ -36,6 +36,7 @@ import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
  * />
  */
 const ForgotPasswordModal = ({ open, onOK, onClose }) => {
+	const toast = useToast();
 	if (!open) return null;
 
 	const [email, setEmail] = useState("");
@@ -57,7 +58,7 @@ const ForgotPasswordModal = ({ open, onOK, onClose }) => {
 
 	const ValidateData = async () => {
 		if (email.length < 6 || email.length > 50) {
-			await showErrorDialog("Email must be between 6 and 50 characters");
+			toast.error("Email must be between 6 and 50 characters");
 			return false;
 		}
 		return true;
@@ -79,13 +80,12 @@ const ForgotPasswordModal = ({ open, onOK, onClose }) => {
 				.post(getUserFetchString)
 				.then((res) => {
 					if (res.status !== 200) {
-						showErrorDialog(`User Does Not Exist: ${userEmail}`).then(() => {
-							return;
-						});
+						toast.error(`User Does Not Exist: ${userEmail}`);
+						return;
 					}
 				})
 				.catch((err) => {
-					showErrorDialog(`Error Status: ${JSON.stringify(err.status)}`);
+					toast.error(`Error Status: ${JSON.stringify(err.status)}`);
 				});
 
 			window.alert(`Data is valid. Email: ${email}`);
@@ -95,9 +95,9 @@ const ForgotPasswordModal = ({ open, onOK, onClose }) => {
 			});
 
 			if (res.data.status === false) {
-				await showErrorDialog(res.data.message);
+				toast.error(res.data.message);
 			} else {
-				await showSuccessDialog(res.data.message);
+				toast.success(res.data.message);
 			}
 			onOK();
 		}

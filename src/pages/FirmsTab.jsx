@@ -29,11 +29,7 @@ import { areaOptions } from "../data/worksideOptions";
 import { GetAllFirms } from "../api/worksideAPI";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import {
-	showErrorDialog,
-	showWarningDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import "../index.css";
 import "../App.css";
@@ -93,6 +89,7 @@ let gridPageSize = 10;
  * <FirmsTab />
  */
 const FirmsTab = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [formData, setFormData] = useState(null);
 	const [firmList, setFirmList] = useState(null);
@@ -221,7 +218,7 @@ const FirmsTab = () => {
 	const toolbarClick = (args) => {
 		if (firmsGridRef && args.item.id === "firmGridElement_excelexport") {
 			if (accessLevel <= 2) {
-				showWarningDialog("You do not have permission to export data.");
+				toast.warning("You do not have permission to export data.");
 				return;
 			}
 			const excelExportProperties = {
@@ -385,16 +382,16 @@ const FirmsTab = () => {
 
 			if (response.ok) {
 				console.log("Delete successful, invalidating query");
-				showSuccessDialogWithTimer("Record Successfully Deleted...");
+				toast.success("Record Successfully Deleted...");
 				queryClient.invalidateQueries(["firms"]);
 				setCurrentRecord(null);
 			} else {
 				console.log("Delete failed:", json.message);
-				showErrorDialog(`Delete Failed: ${json.message}`);
+				toast.error(`Delete Failed: ${json.message}`);
 			}
 		} catch (error) {
 			console.log("Delete error:", error);
-			showErrorDialog("Error deleting firm. Please try again.");
+			toast.error("Error deleting firm. Please try again.");
 		}
 	};
 
@@ -469,13 +466,13 @@ const FirmsTab = () => {
 
 		if (!currentRecord) {
 			console.log("SaveFirmsData - No current record");
-			showErrorDialog("Cannot save a firm without a name.");
+			toast.error("Cannot save a firm without a name.");
 			return;
 		}
 
 		if (!currentRecord.name || currentRecord.name.trim() === "") {
 			console.log("SaveFirmsData - Name is empty or whitespace");
-			showErrorDialog("Cannot save a firm without a name.");
+			toast.error("Cannot save a firm without a name.");
 			return;
 		}
 
@@ -499,11 +496,11 @@ const FirmsTab = () => {
 
 			if (response.ok) {
 				console.log("Insert successful, invalidating query");
-				showSuccessDialogWithTimer("Record Successfully Added...");
+				toast.success("Record Successfully Added...");
 				queryClient.invalidateQueries(["firms"]);
 			} else {
 				console.log("Insert failed:", json.message);
-				showErrorDialog(`Record Add Failed...${json.message}`);
+				toast.error(`Record Add Failed...${json.message}`);
 			}
 		} else {
 			console.log("Updating existing firm");
@@ -515,7 +512,7 @@ const FirmsTab = () => {
 			if (!currentFirm) {
 				console.log("Could not find firm with _id:", currentRecord._id);
 				console.log("Available firms:", firmList);
-				showErrorDialog("Could not find the firm to update.");
+				toast.error("Could not find the firm to update.");
 				return;
 			}
 
@@ -548,12 +545,12 @@ const FirmsTab = () => {
 			console.log("Update response:", json);
 			if (response.ok) {
 				console.log("Update successful, invalidating query");
-				showSuccessDialogWithTimer("Record Successfully Updated...");
+				toast.success("Record Successfully Updated...");
 				SaveLatestDefaults();
 				queryClient.invalidateQueries(["firms"]);
 			} else {
 				console.log("Update failed:", json.message);
-				showErrorDialog(`Record Update Failed...${json.message}`);
+				toast.error(`Record Update Failed...${json.message}`);
 			}
 			setInsertFlag(false);
 		}
@@ -638,7 +635,7 @@ const FirmsTab = () => {
 		if (args.requestType === "save") {
 			if (!formData) {
 				args.cancel = true;
-				showErrorDialog("Please fill in all required fields.");
+				toast.error("Please fill in all required fields.");
 				return;
 			}
 		}

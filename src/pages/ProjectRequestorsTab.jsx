@@ -8,10 +8,7 @@ import Select from "react-select";
 import axios from "axios";
 import "../index.css";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 // TODO Need to Add FIlter Options for Requestors
 // TODO FIlter by Date, By Status
@@ -80,6 +77,7 @@ import {
  * - `REACT_APP_API_URL`: Base URL for the backend API.
  */
 const ProjectRequestorsTab = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);
 	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);
@@ -128,7 +126,7 @@ const ProjectRequestorsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				showSuccessDialogWithTimer(
+				toast.success(
 					`Requestor ${jsonData.userFirstName} ${jsonData.userLastName} Deleted...`,
 				);
 
@@ -142,7 +140,7 @@ const ProjectRequestorsTab = () => {
 				);
 			}
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 			console.error(error);
 		}
 		setIsLoading(false);
@@ -351,7 +349,7 @@ const ProjectRequestorsTab = () => {
 			setIsLoading(false);
 		} catch (error) {
 			setIsLoading(false);
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 			console.error(error);
 		}
 		setIsLoading(false);

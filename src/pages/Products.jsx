@@ -15,7 +15,7 @@ import { Header } from "../components";
 // import { useProductContext } from "../hooks/useProductContext";
 import "../index.css";
 
-import { showSuccessDialogWithTimer } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -54,6 +54,7 @@ let gridPageSize = 12;
  * - A JSX element containing the product management interface.
  */
 const Products = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [filteredProducts, setFilteredProducts] = useState(null);
 	const [insertFlag, setInsertFlag] = useState(false);
@@ -112,7 +113,7 @@ const Products = () => {
 			method: "DELETE",
 		});
 		if (response.ok) {
-			showSuccessDialogWithTimer("Record Successfully Deleted...");
+			toast.success("Record Successfully Deleted...");
 		}
 	};
 

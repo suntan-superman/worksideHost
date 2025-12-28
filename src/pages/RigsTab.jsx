@@ -11,13 +11,7 @@ import useUserStore from "../stores/UserStore";
 import { GetAllRigCompanies, GetRigs } from "../api/worksideAPI";
 import { useQuery } from "@tanstack/react-query";
 
-import {
-	showConfirmationDialog,
-	showErrorDialog,
-	showWarningDialog,
-	showSuccessDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 // TODO Need to Add FIlter Options for Rigs
 // TODO FIlter by Area, Company
@@ -82,6 +76,7 @@ import {
  * @component
  */
 const RigsTab = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);
 	const [rigCompanyList, setRigCompanyList] = useState([]);
@@ -204,7 +199,7 @@ const RigsTab = () => {
 			);
 			const jsonData = await response.json();
 			if (response.status === 200) {
-				showSuccessDialogWithTimer(`Rig ${jsonData.rigname} Deleted...`);
+				toast.success(`Rig ${jsonData.rigname} Deleted...`);
 
 				if (treeObj.current) {
 					treeObj.current.removeNodes([jsonData._id]); // Pass the node ID to delete
@@ -216,7 +211,7 @@ const RigsTab = () => {
 				);
 			}
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 			console.error(error);
 		}
 	};

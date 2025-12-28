@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import Select from "react-select";
 
-import { showErrorDialog, showSuccessDialog } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 // Initial form state
 const INITIAL_FORM_STATE = {
@@ -70,6 +70,7 @@ const VALIDATION_RULES = {
  * @returns {JSX.Element} The rendered signup dialog component.
  */
 const SignupDialog = () => {
+	const toast = useToast();
 	const [data, setData] = useState(INITIAL_FORM_STATE);
 	const [options, setOptions] = useState([]);
 	const [selectedOption, setSelectedOption] = useState(null);
@@ -92,10 +93,10 @@ const SignupDialog = () => {
 			return await response.json();
 		} catch (error) {
 			console.error("Error fetching company names:", error);
-			showErrorDialog("Failed to load company list");
+			toast.error("Failed to load company list");
 			return [];
 		}
-	}, []);
+	}, [toast]);
 
 	// Fetch company names on mount
 	useEffect(() => {
@@ -169,13 +170,13 @@ const SignupDialog = () => {
 			const json = await response.json();
 
 			if (response.ok) {
-				await showSuccessDialog("Check Email to Validate...");
+				toast.success("Check Email to Validate...");
 				setTimeout(() => navigate("/login"), 2000);
 			} else {
 				throw new Error(json.message || "Registration failed");
 			}
 		} catch (error) {
-			await showErrorDialog(`Registration failed: ${error.message}`);
+			toast.error(`Registration failed: ${error.message}`);
 		} finally {
 			setIsLoading(false);
 		}

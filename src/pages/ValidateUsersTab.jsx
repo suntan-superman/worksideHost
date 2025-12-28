@@ -27,10 +27,7 @@ import "../App.css";
 import "../styles/syncfusionStyles.css";
 // import { Send } from "@mui/icons-material";
 
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 ///////////////////////////////////////////////////////////////////
 
 let gridPageSize = 10;
@@ -95,6 +92,7 @@ let updatedContactData = null;
  * - A JSX element containing the user grid and modal dialog for editing user details.
  */
 const ValidateUsersTab = () => {
+	const toast = useToast();
 	const queryClient = useQueryClient();
 	const [showDialog, setShowDialog] = useState(false);
 
@@ -295,14 +293,14 @@ const ValidateUsersTab = () => {
 	const recordClick = async (args) => {
 		if (args.target.classList.contains("userData")) {
 			if (args.rowData.isEmailValid === false) {
-				showErrorDialog("Email is not Validated...");
+				toast.error("Email is not Validated...");
 				return;
 			}
 			if (
 				args.rowData.isEmailValid === true &&
 				args.rowData.isUserValidated === true
 			) {
-				showErrorDialog("User Already Validated...");
+				toast.error("User Already Validated...");
 				return;
 			}
 			resetFormData();
@@ -365,7 +363,7 @@ const ValidateUsersTab = () => {
 			const response = await fetch(fetchString, requestOptions);
 			const jsonData = await response.json();
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 		}
 	}, [selectedRecordData, updatedContactData]);
 
@@ -402,7 +400,7 @@ const ValidateUsersTab = () => {
 			setNewUser(true);
 			setContactData(null);
 			setContactID(null);
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 		}
 	};
 
@@ -433,7 +431,7 @@ const ValidateUsersTab = () => {
 			const jsonData = await response.json();
 			setContactData(jsonData);
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 			console.error(error);
 		}
 	}, [contactID, formData, selectedRecordData]);
@@ -467,7 +465,7 @@ const ValidateUsersTab = () => {
 			const jsonData = await response.json();
 			setContactData(jsonData);
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 		}
 	}, [formData, selectedRecordData, updatedContactData]);
 
@@ -510,13 +508,13 @@ const ValidateUsersTab = () => {
 					// Add new contact for new user
 					AddContactData().then(() => {
 						SendEmailValidation(selectedRecordData.email);
-						showSuccessDialogWithTimer("User Validated...Check Email");
+						toast.success("User Validated...Check Email");
 					});
 				} else {
 					// Update existing contact
 					UpdateContactData().then(() => {
 						SendEmailValidation(selectedRecordData.email);
-						showSuccessDialogWithTimer("User Validated...Check Email");
+						toast.success("User Validated...Check Email");
 					});
 				}
 			}

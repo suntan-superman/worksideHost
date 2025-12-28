@@ -16,10 +16,7 @@ import ConfirmationDialog from "../components/ConfirmationDialog";
 import axios from "axios";
 
 import { UseStateContext } from "../contexts/ContextProvider";
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 import "../index.css";
 
@@ -81,6 +78,7 @@ import "../index.css";
  * <CustomerSupplierMSATabX />
  */
 const CustomerSupplierMSATabX = () => {
+	const toast = useToast();
 	const { setCompanyID, setCompanyName } = UseStateContext();
 	const [messageText, setMessageText] = useState("");
 	const [currentCustomerId, setCurrentCustomerId] = useState("");
@@ -189,13 +187,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					showSuccessDialogWithTimer("Record Successfully Added...");
+					toast.success("Record Successfully Added...");
 				} else {
-					showErrorDialog(`Record Add Failed...${response.status}`);
+					toast.error(`Record Add Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			showErrorDialog(`Record Add Failed...${error}`);
+			toast.error(`Record Add Failed...${error}`);
 		}
 	};
 
@@ -220,13 +218,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					showSuccessDialogWithTimer("Record Successfully Updated...");
+					toast.success("Record Successfully Updated...");
 				} else {
-					showErrorDialog(`Record Update Failed...${response.status}`);
+					toast.error(`Record Update Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 		}
 	};
 
@@ -247,13 +245,13 @@ const CustomerSupplierMSATabX = () => {
 		try {
 			fetch(fetchString, requestOptions).then((response) => {
 				if (response.ok) {
-					showSuccessDialogWithTimer("Record Successfully Deleted...");
+					toast.success("Record Successfully Deleted...");
 				} else {
-					showErrorDialog(`Record Delete Failed...${response.status}`);
+					toast.error(`Record Delete Failed...${response.status}`);
 				}
 			});
 		} catch (error) {
-			showErrorDialog(`Error: ${error}`);
+			toast.error(`Error: ${error}`);
 		}
 	};
 

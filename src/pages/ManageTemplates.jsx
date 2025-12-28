@@ -23,17 +23,16 @@ import {
 	deleteRequestTemplate,
 } from "../api/worksideAPI";
 import TemplateFilterDialog from "../components/TemplateFilterDialog";
-import {
-	showConfirmationDialog,
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
+import useConfirmation from "../hooks/useConfirmation";
 import ConfirmationDialog from "../components/ConfirmationDialog";
 import useUserStore from "../stores/UserStore";
 
 let gridPageSize = 10;
 
 const ManageTemplates = () => {
+	const toast = useToast();
+	const { confirm, ConfirmationDialog: ConfirmDialog } = useConfirmation();
 	const [templateData, setTemplateData] = useState(null);
 	const [filterDialogOpen, setFilterDialogOpen] = useState(false);
 	const [selectedVisibilities, setSelectedVisibilities] = useState(() => {
@@ -122,11 +121,11 @@ const ManageTemplates = () => {
 			}
 		},
 		onSuccess: (data) => {
-			showSuccessDialogWithTimer("Template successfully deleted");
+			toast.success("Template successfully deleted");
 			queryClient.invalidateQueries("templates");
 		},
 		onError: (error) => {
-			showErrorDialog(`Error deleting template...${error}`);
+			toast.error(`Error deleting template...${error}`);
 		},
 	});
 
@@ -139,18 +138,18 @@ const ManageTemplates = () => {
 			}
 		},
 		onSuccess: (data) => {
-			showSuccessDialogWithTimer("Template updated successfully");
+			toast.success("Template updated successfully");
 			queryClient.invalidateQueries("templates");
 		},
 		onError: (error) => {
-			showErrorDialog(`Error updating template: ${error}`);
+			toast.error(`Error updating template: ${error}`);
 		},
 	});
 
 	const handleDelete = async () => {
-		const deleteFlag = await showConfirmationDialog(
-			"Are you sure you want to delete this template?",
-		);
+		const deleteFlag = await confirm({
+			message: "Are you sure you want to delete this template?",
+		});
 		if (deleteFlag === true) {
 			deleteTemplateMutation.mutate(selectedRecord);
 		}
@@ -411,6 +410,7 @@ const ManageTemplates = () => {
 				onApply={handleFilterApply}
 				selectedVisibilities={selectedVisibilities}
 			/>
+			<ConfirmDialog />
 		</div>
 	);
 };

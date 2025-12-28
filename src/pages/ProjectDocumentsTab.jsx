@@ -27,7 +27,7 @@ import Modal from "@mui/material/Modal";
 import axios from "axios";
 import "../index.css";
 
-import { showSuccessDialog } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 
 // TODO Need to Add FIlter Options for Documents
 // TODO FIlter by Date, By Status
@@ -112,6 +112,7 @@ import { showSuccessDialog } from "../utils/useSweetAlert";
  * - JSX structure for the ProjectDocumentsTab component.
  */
 const ProjectDocumentsTab = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(false);
 	const [refreshFlag, setRefreshFlag] = useState(true);
 	const [needRefreshFlag, setNeedRefreshFlag] = useState(false);
@@ -219,7 +220,7 @@ const ProjectDocumentsTab = () => {
 				})
 				.then((response) => {
 					if (response.status === 200) {
-						showSuccessDialog("Document Deleted...");
+						toast.success("Document Deleted...");
 
 						if (treeObj.current) {
 							treeObj.current.removeNodes([response.data._id]); // Pass the node ID to delete

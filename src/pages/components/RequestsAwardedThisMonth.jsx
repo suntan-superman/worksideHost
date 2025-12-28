@@ -12,7 +12,7 @@ import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { ArrowRight as ArrowRightIcon } from "@phosphor-icons/react/dist/ssr/ArrowRight";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 
-import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
+import { useToast } from "../../contexts/ToastContext";
 
 /**
  * Component to display the number of requests awarded this month along with a trend indicator.
@@ -25,6 +25,7 @@ import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
  * @returns {JSX.Element} The rendered component.
  */
 export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
+	const toast = useToast();
 	// Determine the Trend icon and color based on 'trend' prop
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
 	const trendColor =
@@ -91,7 +92,7 @@ export function RequestsAwardedThisMonth({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							showSuccessDialogWithTimer("Requests Awarded This Month");
+							toast.success("Requests Awarded This Month");
 						}}
 					>
 						Details

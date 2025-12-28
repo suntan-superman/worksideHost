@@ -10,9 +10,7 @@ import {
 	Button,
 } from "@mui/material";
 import axios from "axios";
-import {
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 // import { AuthContext } from "../context/AuthContext";
 // import { baseUrl, postRequest } from "../utils/service";
 
@@ -66,6 +64,7 @@ import {
  * - Redirects the user to the login page after a successful verification or error.
  */
 const VerifyEmail = () => {
+	const toast = useToast();
 	const [isLoading, setIsLoading] = useState(true);
 	const [isUserVerified, setIsUserVerified] = useState(false);
 	const [error, setError] = useState({ error: false, message: "" });
@@ -94,7 +93,7 @@ const VerifyEmail = () => {
 				if (checkResponse.data.status === true) {
 					setIsUserVerified(true);
 					setIsLoading(false);
-					await showSuccessDialogWithTimer(
+					toast.success(
 						"Email already verified, redirecting...",
 					);
 					setTimeout(() => navigate("/login"), 3000);
@@ -108,9 +107,8 @@ const VerifyEmail = () => {
 				if (verifyResponse?.data?.success) {
 					setIsUserVerified(true);
 					setIsLoading(false);
-					await showSuccessDialogWithTimer(
+					toast.success(
 						"Email successfully verified! Your account is now pending administrator validation. You will receive an email once your account is fully validated.",
-						5000,
 					);
 					setTimeout(() => navigate("/login"), 5000);
 				} else {

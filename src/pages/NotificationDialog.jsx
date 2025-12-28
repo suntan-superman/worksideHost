@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Dialog, TextField, DialogTitle, Button, Box } from "@mui/material";
-import { showErrorDialog } from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 import NotificationService from "../services/notification-service";	
 
 /**
@@ -20,6 +20,7 @@ import NotificationService from "../services/notification-service";
  * @returns {JSX.Element} The rendered NotificationDialog component.
  */
 const NotificationDialog = ({ open, onClose }) => {
+	const toast = useToast();
 	const [formData, setFormData] = useState({
 		recipients: "",
 		title: "",
@@ -84,7 +85,7 @@ const NotificationDialog = ({ open, onClose }) => {
 				additionalData: "",
 			});
 		} catch (error) {
-			showErrorDialog("Error sending notification:", error);
+			toast.error("Error sending notification:", error);
 			// Show error toast
 		}
 	};

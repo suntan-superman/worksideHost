@@ -12,7 +12,7 @@ import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/Arrow
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { CurrencyDollar as CurrencyDollarIcon } from "@phosphor-icons/react/dist/ssr/CurrencyDollar";
 
-import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
+import { useToast } from "../../contexts/ToastContext";
 
 /**
  * Component to display the number of requests completed this week along with a trend indicator.
@@ -25,6 +25,7 @@ import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
  * @returns {JSX.Element} The rendered component.
  */
 export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
+	const toast = useToast();
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
 	const trendColor =
 		trend === "up"
@@ -91,7 +92,7 @@ export function RequestsCompletedThisWeek({ diff, trend, sx, value }) {
 						size="small"
 						variant="text"
 						onClick={() => {
-							showSuccessDialogWithTimer("Requests Completed This Week");
+							toast.info("Requests Completed This Week");
 						}}
 					>
 						Details

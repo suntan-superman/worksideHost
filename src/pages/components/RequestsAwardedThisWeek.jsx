@@ -12,7 +12,7 @@ import { ArrowDown as ArrowDownIcon } from "@phosphor-icons/react/dist/ssr/Arrow
 import { ArrowUp as ArrowUpIcon } from "@phosphor-icons/react/dist/ssr/ArrowUp";
 import { CurrencyDollar as CurrencyDollarIcon } from "@phosphor-icons/react/dist/ssr/CurrencyDollar";
 
-import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
+import { useToast } from "../../contexts/ToastContext";
 
 /**
  * A React component that displays information about requests awarded this week,
@@ -27,6 +27,7 @@ import { showSuccessDialogWithTimer } from "../../utils/useSweetAlert";
  * @returns {JSX.Element} The rendered component.
  */
 export function RequestsAwardedThisWeek({ diff, trend, sx, value }) {
+	const toast = useToast();
 	const TrendIcon = trend === "up" ? ArrowUpIcon : ArrowDownIcon;
 	const trendColor =
 		trend === "up"

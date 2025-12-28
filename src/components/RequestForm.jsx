@@ -7,10 +7,7 @@ import {
 	NumericTextBoxComponent,
 } from "@syncfusion/ej2-react-dropdowns";
 import { Button, CircularProgress } from "@mui/material";
-import {
-	showErrorDialog,
-	showSuccessDialogWithTimer,
-} from "../utils/useSweetAlert";
+import { useToast } from "../contexts/ToastContext";
 import {
 	GetProducts,
 	GetAllSupplierGroupData,
@@ -40,6 +37,7 @@ const RequestForm = ({
 	onCancel,
 	isEditMode = false,
 }) => {
+	const toast = useToast();
 	const queryClient = useQueryClient();
 	const [formData, setFormData] = useState(() => {
 		const storedPrefs = getStoredPreferences();
@@ -129,13 +127,13 @@ const RequestForm = ({
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries(["requests"]);
-			showSuccessDialogWithTimer(
+			toast.success(
 				`Request ${isEditMode ? "Updated" : "Created"} Successfully`,
 			);
 			onSuccess?.();
 		},
 		onError: (error) => {
-			showErrorDialog(error.message || "Failed to save request");
+			toast.error(error.message || "Failed to save request");
 		},
 	});
 
