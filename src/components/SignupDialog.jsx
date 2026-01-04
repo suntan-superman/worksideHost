@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import Select from "react-select";
 
 import { useToast } from "../contexts/ToastContext";
+import { APP_INFO } from "../constants/appInfo";
 
 // Initial form state
 const INITIAL_FORM_STATE = {
@@ -217,7 +218,7 @@ const SignupDialog = () => {
 							// className="w-full h-full object-cover"
 						/>
 						<h2 className="text-xs font-bold text-black mb-2 text-center">
-							Copyright Workside Software 2025
+							{APP_INFO.COPYRIGHT_WITH_COMPANY}
 						</h2>
 					</div>
 					{/* Sign Up Section */}

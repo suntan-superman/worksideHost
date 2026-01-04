@@ -6,6 +6,7 @@ import { googleMapsConfig } from './config/googleMapsConfig';
 import RouteModals from './components/RouteModals';
 import axios from 'axios';
 import MarkerTypeModal, { MARKER_TYPES } from './components/MarkerTypeModal';
+import { APP_INFO } from '../../constants/appInfo';
 
 const containerStyle = {
 	width: '100%',
@@ -3730,7 +3731,7 @@ function RouteDesigner() {
 			)}
 
 			<div className="absolute top-4 right-4 text-sm text-gray-600">
-				Copyright Workside Software 2025
+				{APP_INFO.COPYRIGHT_WITH_COMPANY}
 			</div>
 
 			{/* Load/Save Route Buttons */}

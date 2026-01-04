@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { GoogleMap, useJsApiLoader, DirectionsRenderer, Marker } from '@react-google-maps/api';
 import { useRoute } from './RouteContext';
 import { googleMapsConfig } from './config/googleMapsConfig';
+import { APP_INFO } from '../../constants/appInfo';
 
 const containerStyle = {
 	width: '100%',
@@ -181,7 +182,7 @@ function MonitorView() {
 			</div>
 
 			<div className="absolute top-4 right-4 text-sm text-gray-600">
-				Copyright Workside Software 2025
+				{APP_INFO.COPYRIGHT_WITH_COMPANY}
 			</div>
 		</div>
 	);

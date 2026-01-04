@@ -17,6 +17,7 @@ import {
 import ContactEditTemplate from "../components/ContactEditTemplate";
 
 import { useToast } from "../contexts/ToastContext";
+import { APP_INFO } from "../constants/appInfo";
 
 import "../index.css";
 import "../App.css";
@@ -155,7 +156,7 @@ const ContactsTab = () => {
 							cells: [
 								{
 									colSpan: 4,
-									value: "Copyright 2025",
+									value: APP_INFO.COPYRIGHT_SIMPLE,
 									style: {
 										fontColor: "#0C0A09",
 										fontSize: 15,

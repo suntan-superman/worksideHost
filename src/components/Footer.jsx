@@ -1,5 +1,6 @@
 /* eslint-disable */
 import React from "react";
+import { APP_INFO } from "../constants/appInfo";
 
 /**
  * Footer component that displays a copyright notice.
@@ -10,7 +11,7 @@ import React from "react";
 const Footer = () => (
 	<div className="mt-24">
 		<p className="dark:text-gray-200 text-gray-700 text-center m-20">
-			© 2025 All rights reserved by WorksideSoftware.com
+			© {APP_INFO.COPYRIGHT_YEAR} All rights reserved by {APP_INFO.COMPANY_WEBSITE}
 		</p>
 	</div>
 );
